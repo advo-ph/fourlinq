@@ -78,43 +78,150 @@ const DesignTool = () => {
     const glassTint = glassVisual.tint;
 
     const renderFrame = () => {
+      const f = 6; // frame inset
+      const fw = w - f * 2; // frame inner width
+      const fh = clampedH - f * 2; // frame inner height
+
       switch (config.type) {
-        case "sliding":
+        case "sliding": {
+          const mid = w / 2;
           return (
             <>
-              <rect x="6" y="6" width={w - 12} height={clampedH - 12} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              <line x1={w / 2} y1="6" x2={w / 2} y2={clampedH - 6} stroke={frameColor} strokeWidth="2" />
-              <rect x="10" y="10" width={w / 2 - 12} height={clampedH - 20} fill={glassTint} />
-              <rect x={w / 2 + 2} y="10" width={w / 2 - 12} height={clampedH - 20} fill={glassTint} />
-              <path d={`M${w / 2 + 8},${clampedH / 2 - 6} l8,6 l-8,6`} fill={frameColor} opacity={0.5} />
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
+              <rect x={f + 4} y={f + 4} width={mid - f - 6} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              <rect x={mid + 2} y={f + 4} width={mid - f - 6} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              <rect x={mid - 2} y={clampedH / 2 - 10} width="4" height="20" rx="1" fill={frameColor} opacity={0.4} />
             </>
           );
+        }
+        case "sliding-door": {
+          const mid = w / 2;
+          return (
+            <>
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="5" />
+              <rect x={f + 5} y={f + 5} width={mid - f - 8} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
+              <rect x={mid + 3} y={f + 5} width={mid - f - 8} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
+              <rect x={mid - 2} y={clampedH / 2 - 12} width="4" height="24" rx="1.5" fill={frameColor} opacity={0.5} />
+              <line x={f} y1={clampedH - f - 3} x2={w - f} y2={clampedH - f - 3} stroke={frameColor} strokeWidth="2" opacity={0.3} />
+            </>
+          );
+        }
         case "fixed":
           return (
             <>
-              <rect x="6" y="6" width={w - 12} height={clampedH - 12} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              <rect x="10" y="10" width={w - 20} height={clampedH - 20} fill={glassTint} />
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
+              <rect x={f + 4} y={f + 4} width={fw - 8} height={fh - 8} fill={glassTint} />
             </>
           );
-        case "bifold":
+        case "bifold": {
+          const panels = 4;
+          const panelW = fw / panels;
           return (
             <>
-              <rect x="6" y="6" width={w - 12} height={clampedH - 12} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              {[0, 1, 2, 3].map((i) => {
-                const panelW = (w - 12) / 4;
-                return <rect key={i} x={6 + i * panelW} y="10" width={panelW} height={clampedH - 20} fill={glassTint} stroke={frameColor} strokeWidth="1" />;
-              })}
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="5" />
+              {Array.from({ length: panels }).map((_, i) => (
+                <g key={i}>
+                  <rect x={f + i * panelW + 2} y={f + 5} width={panelW - 4} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
+                  {i < panels - 1 && <circle cx={f + (i + 1) * panelW} cy={f + 8} r="2" fill={frameColor} opacity={0.3} />}
+                </g>
+              ))}
+              <rect x={f + panelW * 2 - 2} y={clampedH / 2 - 8} width="4" height="16" rx="1" fill={frameColor} opacity={0.4} />
             </>
           );
-        default:
+        }
+        case "lift-slide": {
+          const mid = w / 2;
           return (
             <>
-              <rect x="6" y="6" width={w - 12} height={clampedH - 12} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              <line x1={w / 2} y1="6" x2={w / 2} y2={clampedH - 6} stroke={frameColor} strokeWidth="2" />
-              <rect x="10" y="10" width={w / 2 - 12} height={clampedH - 20} fill={glassTint} />
-              <rect x={w / 2 + 2} y="10" width={w / 2 - 12} height={clampedH - 20} fill={glassTint} />
-              <circle cx={w / 2 - 6} cy={clampedH / 2} r="3" fill={frameColor} opacity={0.5} />
-              <circle cx={w / 2 + 6} cy={clampedH / 2} r="3" fill={frameColor} opacity={0.5} />
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="5" />
+              <rect x={f + 5} y={f + 5} width={mid - f - 8} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
+              <rect x={mid + 3} y={f + 5} width={mid - f - 8} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
+              <rect x={mid + 8} y={clampedH / 2 - 12} width="5" height="24" rx="2" fill={frameColor} opacity={0.5} />
+              <line x1={f} y1={clampedH - f - 4} x2={w - f} y2={clampedH - f - 4} stroke={frameColor} strokeWidth="3" opacity={0.25} />
+            </>
+          );
+        }
+        case "french-door": {
+          const mid = w / 2;
+          return (
+            <>
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="5" />
+              <line x1={mid} y1={f} x2={mid} y2={clampedH - f} stroke={frameColor} strokeWidth="3" />
+              {/* Left door - glass panels */}
+              <rect x={f + 5} y={f + 5} width={mid - f - 8} height={fh * 0.45} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              <rect x={f + 5} y={f + 5 + fh * 0.48} width={mid - f - 8} height={fh * 0.45} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              {/* Right door - glass panels */}
+              <rect x={mid + 3} y={f + 5} width={mid - f - 8} height={fh * 0.45} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              <rect x={mid + 3} y={f + 5 + fh * 0.48} width={mid - f - 8} height={fh * 0.45} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              {/* Handles */}
+              <rect x={mid - 8} y={clampedH / 2 - 10} width="3" height="20" rx="1" fill={frameColor} opacity={0.5} />
+              <rect x={mid + 5} y={clampedH / 2 - 10} width="3" height="20" rx="1" fill={frameColor} opacity={0.5} />
+            </>
+          );
+        }
+        case "entrance": {
+          const doorX = f + 5;
+          const doorW = fw - 10;
+          const doorH = fh - 10;
+          const glassTop = f + 5;
+          const glassH = doorH * 0.28;
+          const panelTop = glassTop + glassH + 6;
+          const panelH = doorH - glassH - 6;
+          return (
+            <>
+              {/* Thick entrance frame */}
+              <rect x={f} y={f} width={fw} height={fh} rx="3" fill="none" stroke={frameColor} strokeWidth="6" />
+              {/* Transom glass */}
+              <rect x={doorX} y={glassTop} width={doorW} height={glassH} rx="1" fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              {/* Door panel with raised inner panel detail */}
+              <rect x={doorX} y={panelTop} width={doorW} height={panelH} rx="1" fill={frameColor} opacity={0.08} stroke={frameColor} strokeWidth="1" />
+              <rect x={doorX + 12} y={panelTop + 10} width={doorW - 24} height={panelH * 0.4} rx="2" fill="none" stroke={frameColor} strokeWidth="1.5" opacity={0.2} />
+              <rect x={doorX + 12} y={panelTop + panelH * 0.5} width={doorW - 24} height={panelH * 0.4} rx="2" fill="none" stroke={frameColor} strokeWidth="1.5" opacity={0.2} />
+              {/* Handle */}
+              <rect x={doorX + doorW - 16} y={panelTop + panelH / 2 - 14} width="4" height="28" rx="2" fill={frameColor} opacity={0.5} />
+              {/* Lock */}
+              <circle cx={doorX + doorW - 14} cy={panelTop + panelH / 2 + 20} r="2.5" fill={frameColor} opacity={0.3} />
+            </>
+          );
+        }
+        case "awning":
+          return (
+            <>
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
+              <rect x={f + 4} y={f + 4} width={fw - 8} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              {/* Hinge line at top */}
+              <line x1={f + 4} y1={f + 4} x2={w - f - 4} y2={f + 4} stroke={frameColor} strokeWidth="2" opacity={0.5} />
+              {/* Open angle lines */}
+              <line x1={f + 4} y1={f + 4} x2={w / 2} y2={clampedH * 0.35} stroke={frameColor} strokeWidth="1" opacity={0.25} />
+              <line x1={w - f - 4} y1={f + 4} x2={w / 2} y2={clampedH * 0.35} stroke={frameColor} strokeWidth="1" opacity={0.25} />
+              {/* Bottom latch */}
+              <rect x={w / 2 - 6} y={clampedH - f - 10} width="12" height="3" rx="1" fill={frameColor} opacity={0.4} />
+            </>
+          );
+        case "tilt-turn":
+          return (
+            <>
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
+              <rect x={f + 4} y={f + 4} width={fw - 8} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              {/* Tilt indicator — dashed triangle from bottom */}
+              <line x1={w / 2} y1={f + 8} x2={f + 8} y2={clampedH - f - 8} stroke={frameColor} strokeWidth="1" strokeDasharray="4 3" opacity={0.2} />
+              <line x1={w / 2} y1={f + 8} x2={w - f - 8} y2={clampedH - f - 8} stroke={frameColor} strokeWidth="1" strokeDasharray="4 3" opacity={0.2} />
+              {/* Turn indicator — dashed vertical */}
+              <line x1={w / 2} y1={f + 8} x2={w / 2} y2={clampedH - f - 8} stroke={frameColor} strokeWidth="1" strokeDasharray="4 3" opacity={0.15} />
+              {/* Handle */}
+              <rect x={w - f - 12} y={clampedH / 2 - 10} width="4" height="20" rx="1.5" fill={frameColor} opacity={0.5} />
+            </>
+          );
+        default: // casement
+          return (
+            <>
+              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
+              <line x1={w / 2} y1={f} x2={w / 2} y2={clampedH - f} stroke={frameColor} strokeWidth="2" />
+              <rect x={f + 4} y={f + 4} width={w / 2 - f - 6} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              <rect x={w / 2 + 2} y={f + 4} width={w / 2 - f - 6} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
+              {/* Handles */}
+              <rect x={w / 2 - 7} y={clampedH / 2 - 8} width="3" height="16" rx="1" fill={frameColor} opacity={0.4} />
+              <rect x={w / 2 + 4} y={clampedH / 2 - 8} width="3" height="16" rx="1" fill={frameColor} opacity={0.4} />
             </>
           );
       }
@@ -174,15 +281,30 @@ const DesignTool = () => {
               {step === 0 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Select Product Type</h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    {productTypes.filter((t) => ["casement", "sliding", "fixed", "bifold"].includes(t.id)).map((type) => {
+                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Windows</h3>
+                  <div className="grid grid-cols-3 gap-3 mb-6">
+                    {productTypes.filter((t) => t.category === "windows").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
-                        <button key={type.id} onClick={() => setConfig({ ...config, type: type.id })} className={`p-6 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                        <button key={type.id} onClick={() => setConfig({ ...config, type: type.id })} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
                           <div className="flex justify-center mb-2">
-                            {Icon && <Icon size={44} className={config.type === type.id ? "text-primary" : "text-muted-foreground"} strokeWidth={1} />}
+                            {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-muted-foreground"} strokeWidth={1} />}
                           </div>
-                          <span className="text-sm font-medium text-primary">{type.name}</span>
+                          <span className="text-xs font-medium text-primary">{type.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Doors</h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    {productTypes.filter((t) => t.category === "doors").map((type) => {
+                      const Icon = iconMap[type.iconKey];
+                      return (
+                        <button key={type.id} onClick={() => setConfig({ ...config, type: type.id })} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                          <div className="flex justify-center mb-2">
+                            {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-muted-foreground"} strokeWidth={1} />}
+                          </div>
+                          <span className="text-xs font-medium text-primary">{type.name}</span>
                         </button>
                       );
                     })}
@@ -205,13 +327,13 @@ const DesignTool = () => {
               {step === 2 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Select Glass Type</h2>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-3">
                     {glassOptions.map((glass) => {
                       const visual = glassVisuals[glass.id] || { tint: "rgba(200,220,240,0.1)" };
                       return (
-                        <button key={glass.id} onClick={() => setConfig({ ...config, glass: glass.id })} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.glass === glass.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
-                          <div className="w-12 h-16 mx-auto rounded mb-2 border border-border" style={{ backgroundColor: visual.tint }} />
-                          <span className="text-sm font-medium text-primary">{glass.name}</span>
+                        <button key={glass.id} onClick={() => setConfig({ ...config, glass: glass.id })} className={`p-3 rounded-lg border-2 text-center transition-colors ${config.glass === glass.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                          <div className="w-10 h-14 mx-auto rounded mb-2 border border-border" style={{ backgroundColor: visual.tint }} />
+                          <span className="text-xs font-medium text-primary">{glass.name}</span>
                         </button>
                       );
                     })}
@@ -249,7 +371,26 @@ const DesignTool = () => {
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Dimensions</span><span className="text-primary font-medium">{config.width} × {config.height} mm</span></div>
               </div>
               <div className="flex gap-3 mt-6 w-full">
-                <Button variant="outline" className="flex-1 font-medium" onClick={() => toast.success("Configuration saved! Reference: CFG-" + Date.now().toString(36).toUpperCase())}>Save Configuration</Button>
+                <Button variant="outline" className="flex-1 font-medium" onClick={async () => {
+                  try {
+                    const res = await fetch("/api/save-configuration", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ config }),
+                    });
+                    const data = await res.json();
+                    const saved = JSON.parse(localStorage.getItem("fourlinq_configs") || "[]");
+                    saved.push({ ...config, refId: data.refId, date: new Date().toISOString() });
+                    localStorage.setItem("fourlinq_configs", JSON.stringify(saved));
+                    toast.success(`Configuration saved! Reference: ${data.refId}`);
+                  } catch {
+                    const refId = "CFG-" + Date.now().toString(36).toUpperCase();
+                    const saved = JSON.parse(localStorage.getItem("fourlinq_configs") || "[]");
+                    saved.push({ ...config, refId, date: new Date().toISOString() });
+                    localStorage.setItem("fourlinq_configs", JSON.stringify(saved));
+                    toast.success(`Configuration saved locally! Reference: ${refId}`);
+                  }
+                }}>Save Configuration</Button>
                 <Button asChild className="flex-1 font-medium"><Link to="/brand#contact">Book Consultation</Link></Button>
               </div>
             </div>

@@ -7,11 +7,13 @@ import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ChatBubble from "@/components/chat/ChatBubble";
+import CookieBanner from "@/components/shared/CookieBanner";
 
 const Products = lazy(() => import("./pages/Products"));
 const DesignTool = lazy(() => import("./pages/DesignTool"));
 const WhyUpvc = lazy(() => import("./pages/WhyUpvc"));
 const Brand = lazy(() => import("./pages/Brand"));
+const Legal = lazy(() => import("./pages/Legal"));
 
 const queryClient = new QueryClient();
 
@@ -34,10 +36,12 @@ const App = () => (
             <Route path="/design-tool" element={<DesignTool />} />
             <Route path="/why-upvc" element={<WhyUpvc />} />
             <Route path="/brand" element={<Brand />} />
+            <Route path="/legal" element={<Legal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
         <ChatBubble />
+        <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

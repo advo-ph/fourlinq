@@ -4,6 +4,7 @@ import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import AnimatedSection from "@/components/shared/AnimatedSection";
 import CTABanner from "@/components/shared/CTABanner";
+import ContactForm from "@/components/shared/ContactForm";
 import { brandStory, certifications } from "@/data/brand";
 import { ShieldCheck, BadgeCheck, Award, FileCheck, Leaf, Wind, MapPin, Phone, Mail, Clock } from "lucide-react";
 import { motion } from "framer-motion";
@@ -76,8 +77,8 @@ const Brand = () => {
       <AnimatedSection className="py-16 bg-secondary/30">
         <div className="page-container">
           <div className="grid md:grid-cols-2 gap-8">
-            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80" alt="FourlinQ showroom interior" className="w-full aspect-[4/3] object-cover rounded-xl" loading="lazy" />
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80" alt="FourlinQ team at work" className="w-full aspect-[4/3] object-cover rounded-xl" loading="lazy" />
+            <img src="/images/wp-export/Company-Profile.jpg" alt="FourlinQ showroom interior" className="w-full aspect-[4/3] object-cover rounded-xl" loading="lazy" />
+            <img src="/images/wp-export/Company_Profile1.jpg" alt="FourlinQ team at work" className="w-full aspect-[4/3] object-cover rounded-xl" loading="lazy" />
           </div>
         </div>
       </AnimatedSection>
@@ -104,13 +105,7 @@ const Brand = () => {
                 </div>
               ))}
             </div>
-            <div className="bg-muted rounded-xl flex items-center justify-center aspect-[4/3]">
-              <div className="text-center">
-                <MapPin className="mx-auto text-muted-foreground mb-2" size={32} />
-                <p className="text-sm text-muted-foreground">Filinvest City, Alabang</p>
-                <p className="text-xs text-muted-foreground/60 mt-1">Muntinlupa 1781</p>
-              </div>
-            </div>
+            <ContactForm />
           </div>
         </div>
       </AnimatedSection>

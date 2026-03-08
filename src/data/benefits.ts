@@ -18,7 +18,7 @@ export const benefits: Benefit[] = [
     stat: "45%",
     statLabel: "reduction in solar heat gain vs aluminium",
     icon: "thermometer",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+    image: "/images/wp-export/Air-Water-Tight.jpg",
   },
   {
     id: "maintenance",
@@ -28,7 +28,7 @@ export const benefits: Benefit[] = [
     stat: "₱0",
     statLabel: "annual maintenance cost for uPVC frames",
     icon: "wrench",
-    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
+    image: "/images/wp-export/Low-Maintenance.jpg",
   },
   {
     id: "sound",
@@ -38,7 +38,7 @@ export const benefits: Benefit[] = [
     stat: "40 dB",
     statLabel: "sound reduction with double glazing",
     icon: "volume-x",
-    image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
+    image: "/images/wp-export/Sound-Insulation.jpg",
   },
   {
     id: "weather",
@@ -48,7 +48,7 @@ export const benefits: Benefit[] = [
     stat: "Signal 3",
     statLabel: "typhoon resistance rating achieved",
     icon: "cloud-rain",
-    image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&q=80",
+    image: "/images/wp-export/Weather-Resistance.jpg",
   },
 ];
 

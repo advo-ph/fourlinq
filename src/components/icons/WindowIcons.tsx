@@ -222,11 +222,10 @@ export const SlidingDoorIcon = ({
     className={className}
   >
     <rect x={FRAME.x} y={FRAME.y} width={FRAME.w} height={FRAME.h} rx="1.5" />
-    {/* Track sill */}
-    <rect x="8" y="69" width="64" height="5" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
     <line x1="8" y1="11" x2="72" y2="11" strokeWidth={strokeWidth * INNER_SCALE} />
-    <rect x="12" y="14" width="26" height="53" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
-    <rect x="36" y="14" width="32" height="53" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
+    <line x1="8" y1="69" x2="72" y2="69" strokeWidth={strokeWidth * INNER_SCALE} />
+    <rect x="12" y="14" width="26" height="52" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
+    <rect x="36" y="14" width="32" height="52" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
     {/* Slide arrows */}
     <line x1="50" y1="40" x2="64" y2="40" strokeWidth={strokeWidth * 0.65} opacity={0.55} />
     <path d="M61 37 l3 3 l-3 3" strokeWidth={strokeWidth * 0.65} fill="none" opacity={0.55} />
@@ -305,10 +304,10 @@ export const LiftAndSlideIcon = ({
     className={className}
   >
     <rect x={FRAME.x} y={FRAME.y} width={FRAME.w} height={FRAME.h} rx="1.5" />
-    {/* Track sill – rect covers the bottom, no redundant line needed */}
-    <rect x="8" y="69" width="64" height="5" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
-    <rect x="12" y="10" width="26" height="57" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
-    <rect x="40" y="10" width="28" height="57" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
+    <line x1="8" y1="11" x2="72" y2="11" strokeWidth={strokeWidth * INNER_SCALE} />
+    <line x1="8" y1="69" x2="72" y2="69" strokeWidth={strokeWidth * INNER_SCALE} />
+    <rect x="12" y="14" width="26" height="52" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
+    <rect x="40" y="14" width="28" height="52" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
     {/* Handle */}
     <rect x="43" y="36" width="2" height="6" rx="0.5" fill="currentColor" stroke="none" />
     {/* Lift-then-slide L-arrow */}
@@ -334,8 +333,6 @@ export const FrenchDoorIcon = ({
     className={className}
   >
     <rect x={FRAME.x} y={FRAME.y} width={FRAME.w} height={FRAME.h} rx="1.5" />
-    {/* Threshold */}
-    <line x1="8" y1="72" x2="72" y2="72" strokeWidth={strokeWidth * INNER_SCALE} />
     {/* Center mullion */}
     <line x1="40" y1="6" x2="40" y2="74" strokeWidth={strokeWidth * INNER_SCALE} />
     {/* Left door panel */}
@@ -406,8 +403,6 @@ export const EntranceIcon = ({
       strokeWidth={strokeWidth * 0.4}
       opacity={0.25}
     />
-    {/* Threshold */}
-    <line x1="8" y1="72" x2="72" y2="72" strokeWidth={strokeWidth * INNER_SCALE} />
     {/* Handle */}
     <rect x="57" y="42" width="2" height="6" rx="0.5" fill="currentColor" stroke="none" />
     {/* Swing arc */}

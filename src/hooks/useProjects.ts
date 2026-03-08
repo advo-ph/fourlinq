@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { projects as staticProjects } from "@/data/projects";
 
 export interface Project {
   id: string;
@@ -8,9 +9,13 @@ export interface Project {
 }
 
 async function fetchProjects(): Promise<Project[]> {
-  const res = await fetch("/api/projects");
-  if (!res.ok) throw new Error("Failed to fetch projects");
-  return res.json();
+  try {
+    const res = await fetch("/api/projects");
+    if (!res.ok) throw new Error("Failed to fetch projects");
+    return res.json();
+  } catch {
+    return staticProjects;
+  }
 }
 
 export function useProjects() {

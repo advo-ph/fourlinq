@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Send, Loader2 } from "lucide-react";
 import ChatMessage from "./ChatMessage";
+import { streamChat, resetChat } from "@/lib/gemini-chat";
 
 interface Message {
   role: "user" | "assistant";
@@ -23,7 +24,6 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [sessionToken, setSessionToken] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -41,6 +41,12 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
     }
   }, [isOpen]);
 
+  const handleClose = () => {
+    resetChat();
+    setMessages([]);
+    onClose();
+  };
+
   const sendMessage = async (text: string) => {
     if (!text.trim() || isStreaming) return;
 
@@ -53,53 +59,17 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text.trim(),
-          sessionToken,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Chat request failed");
-
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-
-      if (!reader) throw new Error("No reader");
-
       let accumulatedText = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n");
-
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (data.sessionToken) {
-                setSessionToken(data.sessionToken);
-              }
-              if (data.chunk) {
-                accumulatedText += data.chunk;
-                setMessages((prev) => {
-                  const updated = [...prev];
-                  updated[updated.length - 1] = {
-                    role: "assistant",
-                    content: accumulatedText,
-                  };
-                  return updated;
-                });
-              }
-            } catch {
-              // skip malformed JSON lines
-            }
-          }
-        }
+      for await (const chunk of streamChat(text.trim())) {
+        accumulatedText += chunk;
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            role: "assistant",
+            content: accumulatedText,
+          };
+          return updated;
+        });
       }
     } catch (err) {
       console.error("Chat error:", err);
@@ -137,7 +107,7 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
           </div>
         </div>
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="text-primary-foreground/70 hover:text-primary-foreground transition-colors p-1"
         >
           <X size={18} />

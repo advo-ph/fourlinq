@@ -76,15 +76,17 @@ const Navbar = () => {
   const { data: dbTypes } = useProductTypes();
   const windowTypes = useMemo(() => {
     if (!dbTypes) return staticWindowTypes;
-    return dbTypes
+    const filtered = dbTypes
       .filter((t) => t.category === "windows")
       .map((t) => ({ name: t.name, icon: iconMap[t.iconKey] || FixedIcon, to: "/products?filter=windows" }));
+    return filtered.length > 0 ? filtered : staticWindowTypes;
   }, [dbTypes]);
   const doorTypes = useMemo(() => {
     if (!dbTypes) return staticDoorTypes;
-    return dbTypes
+    const filtered = dbTypes
       .filter((t) => t.category === "doors")
       .map((t) => ({ name: t.name, icon: iconMap[t.iconKey] || FixedIcon, to: "/products?filter=doors" }));
+    return filtered.length > 0 ? filtered : staticDoorTypes;
   }, [dbTypes]);
 
   useEffect(() => {
@@ -115,8 +117,8 @@ const Navbar = () => {
   const activeMegaTypes = megaOpen === "windows" ? windowTypes : doorTypes;
   const activeMegaCategories = megaOpen === "windows" ? windowCategories : doorCategories;
   const featuredImage = megaOpen === "windows"
-    ? "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80"
-    : "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=400&q=80";
+    ? "/images/wp-export/Casement-Windows.jpg"
+    : "/images/wp-export/Sliding-Door.jpg";
   const featuredTitle = megaOpen === "windows"
     ? "Manila Residence — Full Window Upgrade"
     : "Tagaytay Villa — Bifold Door Installation";
@@ -128,7 +130,7 @@ const Navbar = () => {
       {/* Utility Bar */}
       <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${showUtility ? "h-8 bg-primary" : "h-8 bg-primary/90"}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between h-full px-6">
-          <div className="flex items-center gap-6">
+          <div className="hidden sm:flex items-center gap-6">
             {utilityLinks.map((link) => (
               <Link key={link.label} to={link.to} className="text-[11px] font-medium text-primary-foreground/80 hover:text-primary-foreground transition-colors tracking-wide uppercase">
                 {link.label}
@@ -185,50 +187,38 @@ const Navbar = () => {
       {/* Mega Menu (desktop) */}
       {megaOpen && (
         <div className="fixed left-0 right-0 z-40 hidden md:block" style={{ top: "calc(2rem + 5rem)" }} onMouseEnter={() => openMega(megaOpen)} onMouseLeave={closeMega}>
-          <div className="bg-surface border-b border-border shadow-xl">
-            <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-12 gap-8">
-              <div className="col-span-3 space-y-6">
-                <div>
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">By Type</h4>
-                  <ul className="space-y-2">
-                    {activeMegaCategories.byType.map((cat) => (
-                      <li key={cat}><Link to="/products" className="text-sm text-foreground hover:text-accent transition-colors">{cat}</Link></li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">By Material</h4>
-                  <ul className="space-y-2">
-                    {activeMegaCategories.byMaterial.map((cat) => (
-                      <li key={cat}><Link to="/products" className="text-sm text-foreground hover:text-accent transition-colors">{cat}</Link></li>
-                    ))}
-                  </ul>
+          <div className="bg-surface border-b border-border shadow-lg">
+            <div className="max-w-7xl mx-auto flex">
+              {/* Left sidebar */}
+              <div className="w-64 shrink-0 bg-[#F7F6F3] py-8 px-6 space-y-1">
+                <Link to="/products" className="flex items-center justify-between py-3 px-3 rounded-md text-sm font-medium text-foreground hover:bg-border/50 transition-colors">
+                  By Type <ChevronRight size={16} className="text-muted-foreground" />
+                </Link>
+                <Link to="/products" className="flex items-center justify-between py-3 px-3 rounded-md text-sm font-medium text-foreground hover:bg-border/50 transition-colors">
+                  By Material <ChevronRight size={16} className="text-muted-foreground" />
+                </Link>
+                <div className="pt-4">
+                  <Link
+                    to={megaOpen === "windows" ? "/products?filter=windows" : "/products?filter=doors"}
+                    className="block py-3 px-3 text-sm font-semibold text-foreground hover:text-accent transition-colors"
+                  >
+                    All {megaOpen === "windows" ? "Windows" : "Doors"}
+                  </Link>
                 </div>
               </div>
-              <div className="col-span-6">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
-                  {megaOpen === "windows" ? "Window Types" : "Door Types"}
-                </h4>
-                <div className="grid grid-cols-3 gap-4">
+
+              {/* Right — icon grid */}
+              <div className="flex-1 bg-[#F7F6F3]/40 py-8 px-10">
+                <div className="grid grid-cols-2 gap-x-12 gap-y-6">
                   {activeMegaTypes.map((type) => {
                     const Icon = type.icon;
                     return (
-                      <Link key={type.name} to={type.to} className="group flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-muted/50 transition-colors">
-                        <Icon size={52} className="text-primary group-hover:text-accent transition-colors" strokeWidth={0.9} />
-                        <span className="text-xs font-medium text-foreground group-hover:text-accent transition-colors">{type.name}</span>
+                      <Link key={type.name} to={type.to} className="group flex items-center gap-4 py-2 hover:opacity-70 transition-opacity">
+                        <Icon size={48} className="text-primary shrink-0" strokeWidth={0.9} />
+                        <span className="text-[15px] font-medium text-foreground">{type.name}</span>
                       </Link>
                     );
                   })}
-                </div>
-              </div>
-              <div className="col-span-3">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Featured</h4>
-                <div className="rounded-lg overflow-hidden relative group">
-                  <img src={featuredImage} alt="Featured project" className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent flex flex-col justify-end p-4">
-                    <h5 className="text-sm font-semibold text-primary-foreground">{featuredTitle}</h5>
-                    <Link to="/brand" className="text-xs text-primary-foreground/80 hover:text-primary-foreground mt-1 underline underline-offset-2">Read More →</Link>
-                  </div>
                 </div>
               </div>
             </div>

@@ -7,19 +7,19 @@ const categories = [
   {
     name: "Window Systems",
     description: "Casement, sliding, and fixed panels engineered for tropical performance.",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80",
+    image: "/images/wp-export/Casement-Windows.jpg",
     to: "/products?filter=windows",
   },
   {
     name: "Door Systems",
     description: "French, sliding, bifold, and entrance doors with multi-point security.",
-    image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&q=80",
+    image: "/images/wp-export/Sliding-Door.jpg",
     to: "/products?filter=doors",
   },
   {
     name: "Specialist Systems",
     description: "Curtain walls, entrance prestige, and architectural solutions.",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80",
+    image: "/images/wp-export/Product-Page.jpg",
     to: "/products?filter=systems",
   },
 ];
@@ -52,7 +52,7 @@ const ProductsPreview = () => {
                   <img
                     src={cat.image}
                     alt={cat.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-contain bg-white p-4 group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
                 </div>

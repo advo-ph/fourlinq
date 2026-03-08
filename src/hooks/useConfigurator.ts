@@ -1,4 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import {
+  productTypes as staticProductTypes,
+  finishOptions as staticFinishes,
+  glassOptions as staticGlassOptions,
+} from "@/data/configurator";
 
 export interface ProductTypeItem {
   id: string;
@@ -24,29 +29,61 @@ export interface GlassOption {
   acousticDb?: number;
 }
 
+const staticTypesFallback: ProductTypeItem[] = staticProductTypes.map((t) => ({
+  id: t.id,
+  name: t.name,
+  iconKey: t.icon,
+  openingMechanism: t.id,
+  category: t.category,
+  categoryName: t.category === "windows" ? "Windows" : "Doors",
+}));
+
+const staticFinishesFallback: FinishOption[] = staticFinishes.map((f) => ({
+  id: f.id,
+  name: f.name,
+  color: f.color,
+}));
+
+const staticGlassFallback: GlassOption[] = staticGlassOptions.map((g) => ({
+  id: g.id,
+  name: g.name,
+}));
+
 async function fetchProductTypes(): Promise<ProductTypeItem[]> {
-  const res = await fetch("/api/product-types");
-  if (!res.ok) throw new Error("Failed to fetch product types");
-  return res.json();
+  try {
+    const res = await fetch("/api/product-types");
+    if (!res.ok) throw new Error("Failed to fetch product types");
+    return res.json();
+  } catch {
+    return staticTypesFallback;
+  }
 }
 
 async function fetchFinishes(): Promise<FinishOption[]> {
-  const res = await fetch("/api/finishes");
-  if (!res.ok) throw new Error("Failed to fetch finishes");
-  return res.json();
+  try {
+    const res = await fetch("/api/finishes");
+    if (!res.ok) throw new Error("Failed to fetch finishes");
+    return res.json();
+  } catch {
+    return staticFinishesFallback;
+  }
 }
 
 async function fetchGlassTypes(): Promise<GlassOption[]> {
-  const res = await fetch("/api/glass-types");
-  if (!res.ok) throw new Error("Failed to fetch glass types");
-  return res.json();
+  try {
+    const res = await fetch("/api/glass-types");
+    if (!res.ok) throw new Error("Failed to fetch glass types");
+    return res.json();
+  } catch {
+    return staticGlassFallback;
+  }
 }
 
 export function useProductTypes() {
   return useQuery({
     queryKey: ["productTypes"],
     queryFn: fetchProductTypes,
-    staleTime: 10 * 60 * 1000, // 10 minutes — rarely changes
+    staleTime: 10 * 60 * 1000,
   });
 }
 

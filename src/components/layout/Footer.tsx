@@ -17,9 +17,9 @@ const footerLinks = {
     { label: "Book Consultation", to: "/brand#contact" },
   ],
   Legal: [
-    { label: "Privacy Policy", to: "#" },
-    { label: "Terms of Service", to: "#" },
-    { label: "Cookie Policy", to: "#" },
+    { label: "Privacy Policy", to: "/legal?page=privacy" },
+    { label: "Terms of Service", to: "/legal?page=terms" },
+    { label: "Cookie Policy", to: "/legal?page=cookies" },
   ],
 };
 
@@ -71,13 +71,19 @@ const Footer = () => {
             © {new Date().getFullYear()} FourlinQ Windows & Doors. All rights reserved.
           </p>
           <div className="flex gap-4">
-            {["Instagram", "Facebook", "LinkedIn"].map((social) => (
+            {[
+              { label: "Instagram", href: "https://instagram.com/fourlinq" },
+              { label: "Facebook", href: "https://facebook.com/fourlinq" },
+              { label: "LinkedIn", href: "https://linkedin.com/company/fourlinq" },
+            ].map((social) => (
               <a
-                key={social}
-                href="#"
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-xs text-primary-foreground/40 hover:text-primary-foreground transition-colors"
               >
-                {social}
+                {social.label}
               </a>
             ))}
           </div>

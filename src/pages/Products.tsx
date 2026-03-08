@@ -3,11 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import AnimatedSection from "@/components/shared/AnimatedSection";
+import QuoteModal from "@/components/shared/QuoteModal";
 import { useProducts, Product } from "@/hooks/useProducts";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
   LiftAndSlideIcon, FrenchDoorIcon, SlidingDoorIcon, EntranceIcon,
@@ -44,51 +44,56 @@ const ProductIconBadge = ({ productId }: { productId: string }) => {
   );
 };
 
-const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => void }) => (
-  <>
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 z-50" onClick={onClose} />
-    <motion.div
-      initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-      transition={{ type: "spring", damping: 30, stiffness: 300 }}
-      className="fixed top-0 right-0 h-full w-full max-w-lg bg-surface z-50 shadow-2xl overflow-y-auto"
-    >
-      <div className="p-6">
-        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-primary p-2"><X size={20} /></button>
-        <img src={product.image} alt={product.name} className="w-full aspect-[4/3] object-cover rounded-lg mb-6" />
-        <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">{product.category}</span>
-        <h2 className="text-2xl font-semibold text-primary mt-1 mb-3">{product.name}</h2>
-        <p className="text-muted-foreground leading-relaxed mb-6">{product.description}</p>
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Specifications</h3>
-        <ul className="space-y-2 mb-6">
-          {product.specs.map((spec) => (
-            <li key={spec} className="text-sm text-muted-foreground flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
-              {spec}
-            </li>
-          ))}
-        </ul>
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Available Finishes</h3>
-        <div className="flex gap-3 mb-6 flex-wrap">
-          {product.finishes.map((finish) => (
-            <div key={finish.name} className="flex flex-col items-center gap-1">
-              <div className="w-10 h-10 rounded-full border-2 border-border" style={{ backgroundColor: finish.color }} title={finish.name} />
-              <span className="text-[10px] text-muted-foreground">{finish.name}</span>
-            </div>
-          ))}
+const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => void }) => {
+  const [quoteOpen, setQuoteOpen] = useState(false);
+
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 z-50" onClick={onClose} />
+      <motion.div
+        initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        className="fixed top-0 right-0 h-full w-full max-w-lg bg-surface z-50 shadow-2xl overflow-y-auto"
+      >
+        <div className="p-6">
+          <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-primary p-2"><X size={20} /></button>
+          <img src={product.image} alt={product.name} className="w-full aspect-[4/3] object-contain bg-white rounded-lg mb-6 p-4" />
+          <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">{product.category}</span>
+          <h2 className="text-2xl font-semibold text-primary mt-1 mb-3">{product.name}</h2>
+          <p className="text-muted-foreground leading-relaxed mb-6">{product.description}</p>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Specifications</h3>
+          <ul className="space-y-2 mb-6">
+            {product.specs.map((spec) => (
+              <li key={spec} className="text-sm text-muted-foreground flex items-start gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                {spec}
+              </li>
+            ))}
+          </ul>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Available Finishes</h3>
+          <div className="flex gap-3 mb-6 flex-wrap">
+            {product.finishes.map((finish) => (
+              <div key={finish.name} className="flex flex-col items-center gap-1">
+                <div className="w-10 h-10 rounded-full border-2 border-border" style={{ backgroundColor: finish.color }} title={finish.name} />
+                <span className="text-[10px] text-muted-foreground">{finish.name}</span>
+              </div>
+            ))}
+          </div>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Glass Options</h3>
+          <div className="flex gap-2 flex-wrap mb-8">
+            {product.glassOptions.map((glass) => (
+              <span key={glass} className="px-3 py-1 text-xs bg-secondary rounded-full text-secondary-foreground">{glass}</span>
+            ))}
+          </div>
+          <Button className="w-full font-medium" size="lg" onClick={() => setQuoteOpen(true)}>
+            Request a Quote
+          </Button>
         </div>
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Glass Options</h3>
-        <div className="flex gap-2 flex-wrap mb-8">
-          {product.glassOptions.map((glass) => (
-            <span key={glass} className="px-3 py-1 text-xs bg-secondary rounded-full text-secondary-foreground">{glass}</span>
-          ))}
-        </div>
-        <Button className="w-full font-medium" size="lg" onClick={() => { toast.success("Quote request received! We'll contact you within 24 hours."); onClose(); }}>
-          Request a Quote
-        </Button>
-      </div>
-    </motion.div>
-  </>
-);
+      </motion.div>
+      <QuoteModal isOpen={quoteOpen} onClose={() => setQuoteOpen(false)} productName={product.name} productId={product.id} />
+    </>
+  );
+};
 
 const Products = () => {
   const [searchParams] = useSearchParams();
@@ -154,7 +159,7 @@ const Products = () => {
                     className="group bg-card rounded-lg border border-border overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                   >
                     <div className="aspect-[4/3] overflow-hidden relative">
-                      <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                      <img src={product.image} alt={product.name} className="w-full h-full object-contain bg-white p-4 group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                       <ProductIconBadge productId={product.id} />
                     </div>
                     <div className="p-5">
