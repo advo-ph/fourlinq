@@ -1,92 +1,101 @@
-
-
 # FourlinQ — Premium uPVC Windows & Doors Website
 
-A complete 5-page, production-ready website for FourlinQ, a premium uPVC windows and doors company in the Philippines. Frontend-only, with Framer Motion animations, fully responsive, and zero placeholders.
+A complete production-ready website for FourlinQ, a premium uPVC windows and doors company in the Philippines. React + TypeScript frontend with Vercel serverless backend and Neon Postgres database.
 
 ---
 
-## Design System Setup
+## Design System
 
-- Custom warm cream background (#F5F2EA), navy brand color (#1B2E4B), accent red (#CC0000)
-- DM Sans font (Google Fonts) — weights 300/400/500/600 only
-- Light mode only, warm professional aesthetic
+- Black/white/red color scheme: white backgrounds, near-black (#0A0A0A) text, red accent (#DC2626)
+- DM Sans (body/UI) + Playfair Display (logo serif)
+- "Tropical Futurism" aesthetic — Tesla-inspired minimalist premium
+- Sharp border radius (0.25rem), clean edges
 - All design tokens defined in CSS variables and Tailwind config
 
 ---
 
 ## Shared Components
 
-- **Navbar** — Logo (text-based, red Q), center nav links, "Book Consultation" CTA. Transparent → white-on-scroll. Mobile hamburger with slide-in drawer
-- **Footer** — Navy background, logo, 4 link columns, social icons, copyright
-- **CTA Banner** — Reusable full-width navy section with headline + two buttons
-- **Section wrapper** — Framer Motion fade-up on scroll with staggered children
+- **Logo** — Playfair Display serif wordmark: "FourlinQ" with red Q, divider line, "Windows & Doors". Light/dark variants
+- **Navbar** — Dark utility bar (#171717) + transparent-to-white glassmorphism nav. Mega menus for Windows/Doors with icon grids. Red "Get a Quote" CTA. Mobile drawer at lg breakpoint
+- **Footer** — Dark charcoal (#0d0d0d) background, Logo (light), 4 link columns, social links
+- **CTA Banner** — Full-width dark section with red primary + white outline buttons
+- **AnimatedSection** — Framer Motion fade-up on scroll with staggered children
+- **QuoteModal** — Modal form for quote requests, persisted to Neon Postgres
+- **ContactForm** — Contact form component on Brand page
+- **CookieBanner** — GDPR cookie consent with localStorage persistence
 
 ---
 
-## Page 1 — Homepage
+## Pages
 
-1. **Hero** — Full-bleed Unsplash interior photo, overlaid headline + two CTAs, scroll indicator
+### Page 1 — Homepage (`/`)
+
+1. **Hero** — Full-bleed hero-bg.jpg, dark gradient overlay, "Precision. Performance. Perfection." headline, two CTAs
 2. **Trust Bar** — Stats band: German-Engineered / 500+ Installations / 15 Years
-3. **Products Preview** — "Our Systems" 3-card grid with hover lift, links to Products page
-4. **Design Tool Teaser** — Two-column: copy + CTA left, stylized configurator mockup component right
-5. **Why uPVC Cards** — 4 benefit cards with outline icons, Philippine climate-specific copy
-6. **Inspiration Gallery** — 6-photo grid with hover overlay (project name + location)
-7. **CTA Banner** — "Ready to Transform Your Space?" with two buttons
+3. **Products Preview** — "Our Systems" 3-card grid (Windows, Doors, Specialist)
+4. **Design Tool Teaser** — Two-column: copy + CTA left, configurator mockup right
+5. **Why uPVC Cards** — 4 benefit cards with icons
+6. **Inspiration Gallery** — 6-photo project grid with hover overlay
+7. **CTA Banner** — "Ready to Transform Your Space?"
 
----
-
-## Page 2 — Products / All Systems
+### Page 2 — Products (`/products`)
 
 - Page header with breadcrumb
-- Filter tabs (All / Windows / Doors / Systems) — pill style, fully wired
-- 6+ product cards from a data file, with images, names, descriptions, category tags
-- **Product Drawer** — Slides in from right on card click. Shows large image, specs, 5+ finish swatches, glass options, "Request a Quote" button. Closes on X or overlay click
+- Filter tabs (All / Windows / Doors / Systems) — pill style
+- Product cards from API/data with images, names, categories
+- **Product Drawer** — Slides in from right. Large image, specs, finish swatches, glass options, "Request a Quote" button
+
+### Page 3 — Design Tool (`/design-tool`)
+
+- Step 1: Product type icon grid
+- Step 2: Finish color swatches
+- Step 3: Glass type cards
+- Step 4: Width/height sliders with live mm display
+- Live Preview Panel: SVG updating in real-time
+- Save Configuration + Book Consultation CTAs
+
+### Page 4 — Why uPVC (`/why-upvc`)
+
+- Hero banner
+- 4 benefit sections with stats and photos
+- Comparison Table: uPVC vs Aluminium vs Timber
+- Philippine Climate callout section
+- Bottom CTA
+
+### Page 5 — Brand (`/brand`)
+
+- Company story and mission
+- "German Engineering, Philippine Expertise" section
+- Certifications grid
+- Contact form with showroom info
+
+### Page 6 — Legal (`/legal`)
+
+- Privacy Policy, Terms of Service, Cookie Policy (tab-based)
 
 ---
 
-## Page 3 — Design Tool / Configurator
+## Backend
 
-- **Step 1**: Product type icon grid (Casement, Sliding, Fixed, Bifold)
-- **Step 2**: Finish color swatches (6 colors with navy ring on select)
-- **Step 3**: Glass type cards (Clear, Frosted, Tinted)
-- **Step 4**: Width/height sliders with live mm display
-- **Live Preview Panel**: SVG illustration updating in real-time (frame color, glass tint, dimensions)
-- Step progress bar, back/continue navigation, configuration summary
-- "Save Configuration" + "Book Consultation" CTAs
-
----
-
-## Page 4 — Why uPVC
-
-- Hero banner with headline
-- 4 detailed benefit sections with paragraphs, stats, and lifestyle photos
-- **Comparison Table**: uPVC vs Aluminium vs Timber (cost, maintenance, thermal, weather, lifespan, aesthetics)
-- Philippine Climate callout section (tropical heat, coastal humidity, typhoons)
-- Bottom CTA linking to Products and Design Tool
-
----
-
-## Page 5 — Brand
-
-- Company story and mission section
-- "German Engineering, Philippine Expertise" two-column layout
-- Certifications grid (icon + label)
-- Showroom/team photo section
-- Contact info with showroom address and embedded map placeholder
+- **Vercel Functions:** chat/stream, contact, quote-request, save-configuration, setup-db
+- **Database:** Neon Postgres — inquiries table for contact/quote submissions
+- **AI Chat:** Gemini API streaming via server-side endpoint (API key not exposed to client)
+- **Local Dev:** Express.js server with lightweight routes (no DB dependency)
 
 ---
 
 ## Data Architecture
 
-- All product data, configurator options, benefit copy, and page content in dedicated TypeScript data files — not hardcoded inline
-- Each visual section is its own named component file (HeroSection, TrustBar, ProductGrid, ProductDrawer, etc.)
+- Product data, configurator options, benefit copy in TypeScript data files
+- React Query hooks for API data fetching
+- Each visual section is its own named component file
 
 ---
 
 ## Animations & Responsiveness
 
-- Framer Motion scroll-triggered fade-up on every section with staggered children
-- Fully responsive: mobile (375px), tablet (768px), desktop (1280px+)
+- Framer Motion scroll-triggered fade-up, staggered children
+- Fully responsive: mobile (375px), tablet (768px), desktop (1024px+)
+- Nav breakpoint at `lg` (1024px) to prevent link wrapping
 - All nav links, CTAs, and filters fully wired with React Router
-

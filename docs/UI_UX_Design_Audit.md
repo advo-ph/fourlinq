@@ -67,16 +67,16 @@
 - **UX:** Highly interactive video and high-end car configurator feel.
 - **Key Takeaway for FourlinQ:** This is the North Star. Adopt the monochromatic/liquid-glass palette, massive typographic scale, and focus heavily on macro-shots of the hardware to prove the luxury feel.
 
-### 1.7 Current Baseline: FourlinQ (fourlinq.com)
+### 1.7 Current Implementation: FourlinQ (Redesigned March 2026)
 
-**Vibe:** Mid-range Corporate, Generic WordPress Template.
+**Vibe:** Tropical Futurism — Tesla-inspired minimalist premium.
 
-- **Hero Section:** Static, standard-width image slider of houses. The typography over the images is basic, lacking the confidence or "editorial" feel of premium brands. The overlay text feels cramped.
-- **Typography:** Uses standard sans-serifs (Montserrat), but the hierarchy is flat. Everything feels the same weight, making it read more like a technical manual than a luxury brochure.
-- **Color Palette:** High-contrast Black, White, Red (from the logo), and a dated corporate navy blue. It lacks the subtle, sophisticated neutrals (warm greys, chamapgne, slates) found in modern architectural sites.
-- **Imagery:** The images feel like standard stock photography rather than curated, high-end project showcases. **Critical Issue:** During the audit, several product grid images were broken/failed to load, severely undermining the "premium" positioning.
-- **Navigation & UX:** Very basic top-nav grid. The product showcase is simply a grid of boxes with text labels (e.g., "Casement Window") rather than visual icons or an interactive configurator.
-- **Key Takeaway for the Redesign:** The current site serves as a basic digital brochure but fails to inspire. The transition from this "Generic WordPress" look to an **"Architecture/Interior Design Adjacent"** aesthetic is the most critical step. We must break out of the rigid, boxed layouts and stop using standard corporate blue.
+- **Hero Section:** Full-bleed architectural photography with dark gradient overlay. Bold serif-scale "Precision. Performance. Perfection." headline with red + white-bordered CTAs. Framer Motion fade-up animation.
+- **Typography:** DM Sans for body/UI (clean, geometric) + Playfair Display for the logo (editorial serif accent). Strong hierarchy with uppercase tracked labels, bold headlines, and restrained body copy.
+- **Color Palette:** Black/white/red. Near-black charcoal (#0A0A0A), clean white surfaces, red accent (#DC2626). No navy, no cream — strictly monochromatic with red signature.
+- **Imagery:** White-background product photos for catalog clarity, architectural lifestyle photos for hero/projects. Client-provided minimalistic PNG window/door icons.
+- **Navigation & UX:** Dark utility bar + glassmorphism nav with mega menus featuring SVG icon grids. Interactive Design Tool configurator. AI chat assistant powered by Gemini.
+- **Achieved:** Successfully transitioned from "Generic WordPress" to a premium architectural brand aesthetic aligned with competitors like Schüco and Marvin.
 
 ---
 
@@ -86,21 +86,22 @@
 
 The new FourlinQ website should act as the digital equivalent of a high-end luxury car showroom mixed with an architecture magazine. It must bridge the gap between "European Technical Engineering" (Schüco/Rehau) and "Aspirational Lifestyle" (Marvin). The aesthetic is **"Liquid Glass & Monolithic Architecture."** It should not feel like a general contractor's site; it should feel like you are purchasing high-end real estate features.
 
-### 2.2 Typography System
+### 2.2 Typography System (Implemented)
 
-**Primary Approach:** Geometric Modernity with an Editorial Touch.
+**Chosen Approach:** DM Sans + Playfair Display pairing.
 
-- **Headers (Option A - Ultra Modern):** _Inter_ or _Outfit_ (Highly geometric, clean, very Schüco-esque).
-- **Headers (Option B - Luxury Editorial Accent):** _Playfair Display_ or _Lora_ (Used selectively for massive hero titles to add instant "high-end interior design" feel like Marvin, while keeping everything else sans-serif).
-- **Body & UI:** _Inter_ or _BlinkMacSystemFont_. Highly legible, neutral, letting the imagery do the heavy lifting.
+- **Logo & Brand:** _Playfair Display_ — serif wordmark for editorial luxury feel (like Marvin).
+- **Body & UI:** _DM Sans_ — geometric, clean, highly legible sans-serif for all content.
+- Weights: 300 (light display), 400 (body), 500 (UI labels), 600 (headings/CTAs).
 
-### 2.3 Color Palette
+### 2.3 Color Palette (Implemented)
 
-Avoid "Home Depot Orange" or "Contractor Blue."
+Avoided "Home Depot Orange" and "Contractor Blue."
 
-- **Primary Backgrounds:** Monolithic White (`#FAFAFA`) to soft Slate (`#F0F1F3`).
-- **Text & High Contrast Elements:** Deep Obsidian Black (`#121212`).
-- **Accents:** Champagne/Bronze (`#BCA99F`) or Anodized Silver (`#E0E0E0`) to mimic premium hardware finishes.
+- **Primary Backgrounds:** Clean White (`#FFFFFF`).
+- **Text & High Contrast:** Near-Black (`#0A0A0A`).
+- **Accent:** Brand Red (`#DC2626`) — CTAs, logo Q, active states.
+- **Dark Sections:** Charcoal (`#0d0d0d`) for footer, CTA banners, utility bar.
 
 ### 2.4 Iconography & Imagery Style
 

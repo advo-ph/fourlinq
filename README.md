@@ -1,73 +1,98 @@
-# Welcome to your Lovable project
+# FourlinQ — Premium uPVC Windows & Doors
 
-## Project info
+A production-ready website for FourlinQ, a premium uPVC windows and doors company in the Philippines. Built with React, TypeScript, Tailwind CSS, and Framer Motion. Deployed on Vercel with Neon Postgres backend.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Tech Stack
 
-## How can I edit this code?
+- **Frontend:** React 18 + TypeScript + Vite
+- **Styling:** Tailwind CSS + shadcn/ui components
+- **Animations:** Framer Motion
+- **Backend:** Express.js (local dev) / Vercel Serverless Functions (production)
+- **Database:** Neon Postgres (PostgreSQL 15+)
+- **AI Chat:** Google Gemini API (server-side streaming)
+- **Deployment:** Vercel
 
-There are several ways of editing your application.
+## Design System
 
-**Use Lovable**
+- **Color palette:** Black/white/red — dark charcoal backgrounds, white surfaces, red accent (#DC2626)
+- **Typography:** DM Sans (body/UI) + Playfair Display (logo/brand serif)
+- **Logo:** Serif wordmark "FourlinQ" with red Q, divider line, "Windows & Doors" subtitle
+- **Aesthetic:** "Tropical Futurism" — Tesla-inspired minimalist premium
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Getting Started
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Install dependencies
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start dev server (frontend + backend)
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The dev server runs on `http://localhost:5173` with the Express backend on port 3001.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Environment Variables
 
-**Use GitHub Codespaces**
+Create a `.env` file in the project root:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+GEMINI_API_KEY=your_gemini_api_key
+DATABASE_URL=your_neon_postgres_connection_string
+```
 
-## What technologies are used for this project?
+## Project Structure
 
-This project is built with:
+```
+├── api/                    # Vercel serverless functions
+│   ├── chat/stream.ts      # Gemini streaming chat endpoint
+│   ├── contact.ts          # Contact form submissions
+│   ├── quote-request.ts    # Quote request submissions
+│   ├── save-configuration.ts # Design tool config saves
+│   └── setup-db.ts         # Database migration endpoint
+├── docs/                   # Design system & architecture docs
+├── public/images/          # Product images, hero bg, icons
+│   ├── hero-bg.jpg         # Hero background image
+│   ├── icons/              # Minimalistic window/door PNG icons
+│   └── wp-export/          # Product & project photos
+├── server/                 # Local Express dev server
+├── src/
+│   ├── components/
+│   │   ├── chat/           # AI chat panel components
+│   │   ├── home/           # Homepage sections
+│   │   ├── icons/          # SVG window/door icon components
+│   │   ├── layout/         # Navbar, Footer, Layout wrapper
+│   │   ├── shared/         # Logo, CTABanner, QuoteModal, etc.
+│   │   └── ui/             # shadcn/ui primitives
+│   ├── data/               # Product, project, configurator data
+│   ├── hooks/              # React Query hooks for API data
+│   ├── lib/                # Utilities
+│   └── pages/              # Route pages (Home, Products, Brand, etc.)
+├── vercel.json             # Vercel deployment config
+└── tailwind.config.ts      # Tailwind configuration
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Pages
 
-## How can I deploy this project?
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage — hero, trust bar, products preview, benefits, gallery |
+| `/products` | Product catalog with filter tabs and detail drawer |
+| `/design-tool` | Interactive window/door configurator |
+| `/why-upvc` | Material comparison and benefits |
+| `/brand` | Company story, certifications, contact form |
+| `/legal` | Privacy policy, terms, cookie policy |
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Deployment
 
-## Can I connect a custom domain to my Lovable project?
+The project is configured for Vercel deployment:
 
-Yes, you can!
+```sh
+# Deploy to Vercel
+vercel --prod
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Serverless functions in `api/` are automatically deployed as Vercel Functions. The `vercel.json` handles SPA routing rewrites.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## License
+
+Proprietary — FourlinQ Windows & Doors.
