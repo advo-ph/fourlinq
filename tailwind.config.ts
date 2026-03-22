@@ -50,11 +50,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        navy: {
-          DEFAULT: "hsl(var(--navy))",
-          hover: "hsl(var(--navy-hover))",
+        charcoal: {
+          DEFAULT: "hsl(var(--charcoal))",
+          light: "hsl(var(--charcoal-light))",
         },
-        cream: "hsl(var(--cream))",
         surface: "hsl(var(--surface))",
       },
       borderRadius: {

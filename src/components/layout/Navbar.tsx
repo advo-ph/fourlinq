@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown, ChevronRight, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
   LiftAndSlideIcon, FrenchDoorIcon, TiltAndTurnIcon, SlidingDoorIcon, EntranceIcon,
@@ -22,9 +21,9 @@ const iconMap: Record<string, React.FC<{ className?: string; size?: number; stro
 };
 
 const utilityLinks = [
-  { label: "For Professionals", to: "/brand#professionals" },
-  { label: "Visit Showroom", to: "/brand#contact" },
+  { label: "Find a Dealer", to: "/brand#contact" },
   { label: "Support", to: "/brand#contact" },
+  { label: "Technical Specs", to: "/products" },
 ];
 
 // Static fallbacks for when API is loading
@@ -110,9 +109,9 @@ const Navbar = () => {
   const openMega = (key: MegaKey) => { clearTimeout(megaTimeout.current); setMegaOpen(key); };
   const closeMega = () => { megaTimeout.current = setTimeout(() => setMegaOpen(null), 200); };
 
-  const navBg = scrolled || !isHome ? "bg-surface/95 backdrop-blur-md shadow-sm border-b border-border" : "bg-transparent";
-  const textColor = scrolled || !isHome ? "text-foreground" : "text-primary";
-  const showUtility = scrolled || !isHome;
+  const navBg = scrolled || !isHome ? "bg-white/98 backdrop-blur-xl shadow-sm border-b border-border" : "bg-transparent";
+  const textColor = scrolled || !isHome ? "text-foreground" : "text-white";
+  const showUtility = true;
 
   const activeMegaTypes = megaOpen === "windows" ? windowTypes : doorTypes;
   const activeMegaCategories = megaOpen === "windows" ? windowCategories : doorCategories;
@@ -128,18 +127,14 @@ const Navbar = () => {
   return (
     <>
       {/* Utility Bar */}
-      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${showUtility ? "h-8 bg-primary" : "h-8 bg-primary/90"}`}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between h-full px-6">
+      <div className="fixed top-0 left-0 right-0 z-50 h-8 bg-[#171717]">
+        <div className="max-w-7xl mx-auto flex items-center justify-end h-full px-6">
           <div className="hidden sm:flex items-center gap-6">
             {utilityLinks.map((link) => (
-              <Link key={link.label} to={link.to} className="text-[11px] font-medium text-primary-foreground/80 hover:text-primary-foreground transition-colors tracking-wide uppercase">
+              <Link key={link.label} to={link.to} className="text-[11px] font-medium text-white/70 hover:text-white transition-colors tracking-[0.08em] uppercase">
                 {link.label}
               </Link>
             ))}
-          </div>
-          <div className="hidden sm:flex items-center gap-4 text-[11px] text-primary-foreground/60">
-            <span>📞 +63 2 8123 4567</span>
-            <span>✉ info@fourlinq.ph</span>
           </div>
         </div>
       </div>
@@ -149,9 +144,9 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 md:h-20 px-6">
           <Link to="/" className="flex flex-col leading-tight">
             <span className={`text-xl font-semibold tracking-tight ${textColor}`}>
-              FOURLIN<span className="text-accent">Q</span>
+              Fourlin<span className="text-accent">Q</span>
             </span>
-            <span className={`text-[10px] uppercase tracking-[0.2em] ${scrolled || !isHome ? "text-muted-foreground" : "text-primary/60"}`}>
+            <span className={`text-[10px] uppercase tracking-[0.2em] ${scrolled || !isHome ? "text-muted-foreground" : "text-white/60"}`}>
               Windows & Doors
             </span>
           </Link>
@@ -161,13 +156,13 @@ const Navbar = () => {
             {navLinks.map((link) =>
               link.megaKey ? (
                 <div key={link.label} className="relative" onMouseEnter={() => openMega(link.megaKey)} onMouseLeave={closeMega}>
-                  <Link to={link.to} className={`text-sm font-medium transition-colors hover:text-accent flex items-center gap-1 ${megaOpen === link.megaKey ? "text-accent" : textColor}`}>
+                  <Link to={link.to} className={`text-sm font-medium uppercase tracking-wide transition-colors hover:text-accent flex items-center gap-1 ${megaOpen === link.megaKey ? "text-accent" : textColor}`}>
                     {link.label}
                     <ChevronDown size={14} className={`transition-transform duration-200 ${megaOpen === link.megaKey ? "rotate-180" : ""}`} />
                   </Link>
                 </div>
               ) : (
-                <Link key={link.label} to={link.to} className={`text-sm font-medium transition-colors hover:text-accent ${location.pathname === link.to ? "text-accent" : textColor}`}>
+                <Link key={link.label} to={link.to} className={`text-sm font-medium uppercase tracking-wide transition-colors hover:text-accent ${location.pathname === link.to ? "text-accent" : textColor}`}>
                   {link.label}
                 </Link>
               )
@@ -175,10 +170,12 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:block">
-            <Button asChild size="sm" className="font-medium"><Link to="/brand#contact">Book Consultation</Link></Button>
+            <Link to="/brand#contact" className="inline-flex items-center px-5 py-2 bg-accent text-white text-xs font-medium uppercase tracking-[0.08em] hover:bg-red-700 transition-colors">
+              Get a Quote
+            </Link>
           </div>
 
-          <button onClick={() => setMobileOpen(!mobileOpen)} className={`md:hidden p-2 ${textColor}`} aria-label="Toggle menu">
+          <button onClick={() => setMobileOpen(!mobileOpen)} className={`md:hidden p-2 ${scrolled || !isHome ? "text-foreground" : "text-white"}`} aria-label="Toggle menu">
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -187,10 +184,10 @@ const Navbar = () => {
       {/* Mega Menu (desktop) */}
       {megaOpen && (
         <div className="fixed left-0 right-0 z-40 hidden md:block" style={{ top: "calc(2rem + 5rem)" }} onMouseEnter={() => openMega(megaOpen)} onMouseLeave={closeMega}>
-          <div className="bg-surface border-b border-border shadow-lg">
+          <div className="bg-white border-b border-border shadow-lg">
             <div className="max-w-7xl mx-auto flex">
               {/* Left sidebar */}
-              <div className="w-64 shrink-0 bg-[#F7F6F3] py-8 px-6 space-y-1">
+              <div className="w-64 shrink-0 bg-neutral-50 py-8 px-6 space-y-1">
                 <Link to="/products" className="flex items-center justify-between py-3 px-3 rounded-md text-sm font-medium text-foreground hover:bg-border/50 transition-colors">
                   By Type <ChevronRight size={16} className="text-muted-foreground" />
                 </Link>
@@ -208,7 +205,7 @@ const Navbar = () => {
               </div>
 
               {/* Right — icon grid */}
-              <div className="flex-1 bg-[#F7F6F3]/40 py-8 px-10">
+              <div className="flex-1 bg-white py-8 px-10">
                 <div className="grid grid-cols-2 gap-x-12 gap-y-6">
                   {activeMegaTypes.map((type) => {
                     const Icon = type.icon;
@@ -262,9 +259,9 @@ const Navbar = () => {
                     </Link>
                   ))}
                 </div>
-                <Button asChild className="mt-6 font-medium">
-                  <Link to="/brand#contact">Book Consultation</Link>
-                </Button>
+                <Link to="/brand#contact" className="mt-6 inline-flex items-center justify-center px-6 py-3 bg-accent text-white text-sm font-medium uppercase tracking-[0.08em] hover:bg-red-700 transition-colors">
+                  Get a Quote
+                </Link>
               </div>
             )}
 
