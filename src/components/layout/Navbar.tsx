@@ -110,8 +110,9 @@ const Navbar = () => {
   const openMega = (key: MegaKey) => { clearTimeout(megaTimeout.current); setMegaOpen(key); };
   const closeMega = () => { megaTimeout.current = setTimeout(() => setMegaOpen(null), 200); };
 
-  const navBg = scrolled || !isHome ? "bg-white/98 backdrop-blur-xl shadow-sm" : "bg-transparent";
-  const textColor = scrolled || !isHome ? "text-foreground" : "text-white";
+  const navBg = scrolled || !isHome || mobileOpen ? "bg-white/98 backdrop-blur-xl shadow-sm" : "bg-transparent";
+  const textColor = scrolled || !isHome || mobileOpen ? "text-foreground" : "text-white";
+  const logoVariant = scrolled || !isHome || mobileOpen ? "dark" : "light";
   const showUtility = true;
 
   const activeMegaTypes = megaOpen === "windows" ? windowTypes : doorTypes;
@@ -127,6 +128,11 @@ const Navbar = () => {
 
   return (
     <>
+      {/* Top gradient scrim for nav readability over images */}
+      {isHome && !scrolled && (
+        <div className="fixed top-0 left-0 right-0 z-40 h-32 pointer-events-none bg-gradient-to-b from-black/60 via-black/30 to-transparent" />
+      )}
+
       {/* Utility Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 h-8 bg-[#171717]">
         <div className="max-w-7xl mx-auto flex items-center justify-end h-full px-6">
@@ -142,9 +148,9 @@ const Navbar = () => {
 
       {/* Main Nav */}
       <nav className={`fixed top-8 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 md:h-20 px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
           <Link to="/" className="shrink-0">
-            <Logo variant={scrolled || !isHome ? "dark" : "light"} />
+            <Logo variant={logoVariant} />
           </Link>
 
           {/* Desktop Nav */}
@@ -171,7 +177,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <button onClick={() => setMobileOpen(!mobileOpen)} className={`lg:hidden p-2 ${scrolled || !isHome ? "text-foreground" : "text-white"}`} aria-label="Toggle menu">
+          <button onClick={() => setMobileOpen(!mobileOpen)} className={`lg:hidden p-2 ${textColor}`} aria-label="Toggle menu">
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -222,7 +228,9 @@ const Navbar = () => {
       {/* Mobile Full-Screen Drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="absolute inset-0 bg-surface flex flex-col pt-24 overflow-y-auto">
+          <div className="absolute inset-0 bg-surface flex flex-col pt-28">
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto">
             {/* Main level */}
             {!mobileSubPanel && (
               <div className="flex flex-col px-6">
@@ -255,9 +263,6 @@ const Navbar = () => {
                     </Link>
                   ))}
                 </div>
-                <Link to="/brand#contact" className="mt-6 inline-flex items-center justify-center px-6 py-3 bg-accent text-white text-sm font-medium uppercase tracking-[0.08em] hover:bg-red-700 transition-colors">
-                  Get a Quote
-                </Link>
               </div>
             )}
 
@@ -297,6 +302,13 @@ const Navbar = () => {
                 </Link>
               </div>
             )}
+            </div>
+            {/* Fixed bottom CTA */}
+            <div className="shrink-0 px-6 py-4 border-t border-border">
+              <Link to="/brand#contact" className="flex items-center justify-center w-full px-6 py-3 bg-accent text-white text-sm font-medium uppercase tracking-[0.08em] hover:bg-red-700 transition-colors">
+                Get a Quote
+              </Link>
+            </div>
           </div>
         </div>
       )}

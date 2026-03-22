@@ -4,26 +4,42 @@ interface LogoProps {
 }
 
 const Logo = ({ variant = "dark", className = "" }: LogoProps) => {
-  const textColor = variant === "light" ? "text-white" : "text-foreground";
-  const lineColor = variant === "light" ? "bg-white/60" : "bg-foreground/30";
-  const subColor = variant === "light" ? "text-white/80" : "text-muted-foreground";
+  const textColor = variant === "light" ? "#ffffff" : "currentColor";
+  const lineColor = variant === "light" ? "#ffffff" : "currentColor";
+  const subColor = variant === "light" ? "#ffffff" : "currentColor";
+  const qColor = "#DC2626";
 
   return (
-    <div className={`flex flex-col items-start ${className}`}>
-      <span
-        className={`text-2xl font-medium leading-none ${textColor}`}
-        style={{ fontFamily: "'Playfair Display', serif" }}
+    <svg
+      viewBox="0 0 240 58"
+      className={`h-14 w-auto ${className}`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="FourlinQ Windows & Doors"
+    >
+      {/* Baseline divider — rendered first so Q tail appears on top */}
+      <line x1="23" y1="36" x2="217" y2="36" stroke={lineColor} strokeWidth="1" />
+      {/* Main wordmark */}
+      <text
+        x="120"
+        y="32"
+        textAnchor="middle"
+        style={{ fontFamily: "'Times New Roman', 'Times', serif", fontSize: "42px", fontWeight: 400 }}
       >
-        Fourlin<span className="text-accent font-semibold">Q</span>
-      </span>
-      <div className={`w-full h-px ${lineColor} my-1`} />
-      <span
-        className={`text-[10px] tracking-[0.15em] ${subColor}`}
-        style={{ fontFamily: "'Playfair Display', serif" }}
+        <tspan fill={textColor}>Fourlin</tspan>
+        <tspan fill={qColor} style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500 }}>Q</tspan>
+      </text>
+      {/* Subtitle */}
+      <text
+        x="120"
+        y="56"
+        fill={subColor}
+        textAnchor="middle"
+        style={{ fontFamily: "'Times New Roman', 'Times', serif", fontSize: "23px", fontWeight: 400, letterSpacing: "0.03em" }}
       >
         Windows &amp; Doors
-      </span>
-    </div>
+      </text>
+    </svg>
   );
 };
 
