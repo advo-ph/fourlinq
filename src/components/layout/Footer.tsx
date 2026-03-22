@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Logo from "@/components/shared/Logo";
 
 const footerLinks = {
   Brand: [
@@ -31,12 +32,7 @@ const Footer = () => {
           {/* Logo */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block mb-4">
-              <span className="text-xl font-semibold tracking-tight text-white">
-                Fourlin<span className="text-accent">Q</span>
-              </span>
-              <span className="block text-[10px] uppercase tracking-[0.2em] text-white/50">
-                Windows & Doors
-              </span>
+              <Logo variant="light" />
             </Link>
             <p className="text-sm text-white/60 leading-relaxed">
               German-engineered uPVC systems for the Philippine climate.

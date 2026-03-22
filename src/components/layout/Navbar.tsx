@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown, ChevronRight, ArrowLeft } from "lucide-react";
+import Logo from "@/components/shared/Logo";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
   LiftAndSlideIcon, FrenchDoorIcon, TiltAndTurnIcon, SlidingDoorIcon, EntranceIcon,
@@ -109,7 +110,7 @@ const Navbar = () => {
   const openMega = (key: MegaKey) => { clearTimeout(megaTimeout.current); setMegaOpen(key); };
   const closeMega = () => { megaTimeout.current = setTimeout(() => setMegaOpen(null), 200); };
 
-  const navBg = scrolled || !isHome ? "bg-white/98 backdrop-blur-xl shadow-sm border-b border-border" : "bg-transparent";
+  const navBg = scrolled || !isHome ? "bg-white/98 backdrop-blur-xl shadow-sm" : "bg-transparent";
   const textColor = scrolled || !isHome ? "text-foreground" : "text-white";
   const showUtility = true;
 
@@ -142,17 +143,12 @@ const Navbar = () => {
       {/* Main Nav */}
       <nav className={`fixed top-8 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 md:h-20 px-6">
-          <Link to="/" className="flex flex-col leading-tight">
-            <span className={`text-xl font-semibold tracking-tight ${textColor}`}>
-              Fourlin<span className="text-accent">Q</span>
-            </span>
-            <span className={`text-[10px] uppercase tracking-[0.2em] ${scrolled || !isHome ? "text-muted-foreground" : "text-white/60"}`}>
-              Windows & Doors
-            </span>
+          <Link to="/" className="shrink-0">
+            <Logo variant={scrolled || !isHome ? "dark" : "light"} />
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-6 whitespace-nowrap">
             {navLinks.map((link) =>
               link.megaKey ? (
                 <div key={link.label} className="relative" onMouseEnter={() => openMega(link.megaKey)} onMouseLeave={closeMega}>
@@ -169,13 +165,13 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden lg:block shrink-0">
             <Link to="/brand#contact" className="inline-flex items-center px-5 py-2 bg-accent text-white text-xs font-medium uppercase tracking-[0.08em] hover:bg-red-700 transition-colors">
               Get a Quote
             </Link>
           </div>
 
-          <button onClick={() => setMobileOpen(!mobileOpen)} className={`md:hidden p-2 ${scrolled || !isHome ? "text-foreground" : "text-white"}`} aria-label="Toggle menu">
+          <button onClick={() => setMobileOpen(!mobileOpen)} className={`lg:hidden p-2 ${scrolled || !isHome ? "text-foreground" : "text-white"}`} aria-label="Toggle menu">
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -183,7 +179,7 @@ const Navbar = () => {
 
       {/* Mega Menu (desktop) */}
       {megaOpen && (
-        <div className="fixed left-0 right-0 z-40 hidden md:block" style={{ top: "calc(2rem + 5rem)" }} onMouseEnter={() => openMega(megaOpen)} onMouseLeave={closeMega}>
+        <div className="fixed left-0 right-0 z-40 hidden lg:block" style={{ top: "calc(2rem + 5rem)" }} onMouseEnter={() => openMega(megaOpen)} onMouseLeave={closeMega}>
           <div className="bg-white border-b border-border shadow-lg">
             <div className="max-w-7xl mx-auto flex">
               {/* Left sidebar */}
@@ -225,7 +221,7 @@ const Navbar = () => {
 
       {/* Mobile Full-Screen Drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
+        <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-surface flex flex-col pt-24 overflow-y-auto">
             {/* Main level */}
             {!mobileSubPanel && (

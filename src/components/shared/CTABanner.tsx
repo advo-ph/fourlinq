@@ -29,12 +29,12 @@ const CTABanner = ({
           {subtext}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild size="lg" className="bg-surface text-primary hover:bg-surface/90 font-medium">
-            <Link to={primaryTo}>{primaryLabel}</Link>
-          </Button>
-          <Button asChild variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 font-medium">
-            <Link to={secondaryTo}>{secondaryLabel}</Link>
-          </Button>
+          <Link to={primaryTo} className="inline-flex items-center justify-center px-8 py-3 bg-accent text-white text-sm font-medium uppercase tracking-[0.08em] hover:bg-red-700 transition-colors">
+            {primaryLabel}
+          </Link>
+          <Link to={secondaryTo} className="inline-flex items-center justify-center px-8 py-3 border border-white/30 text-white text-sm font-medium uppercase tracking-[0.08em] hover:bg-white/10 transition-colors">
+            {secondaryLabel}
+          </Link>
         </div>
       </div>
     </AnimatedSection>

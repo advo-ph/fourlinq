@@ -148,13 +148,13 @@ const Products = () => {
               ))}
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <AnimatePresence mode="popLayout">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 relative overflow-hidden">
+              <AnimatePresence mode="wait">
                 {filtered.map((product) => (
                   <motion.div
-                    key={product.id} layout
-                    initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
+                    key={product.id}
+                    initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
                     onClick={() => setSelectedProduct(product)}
                     className="group bg-card rounded-lg border border-border overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                   >
