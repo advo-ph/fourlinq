@@ -48,7 +48,7 @@ if (isProd) {
   const distPath = path.resolve(import.meta.dirname, "../dist");
   app.use(express.static(distPath));
   // SPA fallback — serve index.html for all non-API routes
-  app.get("*", (_req, res) => {
+  app.use((_req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
