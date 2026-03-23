@@ -30,16 +30,11 @@ app.use(cookieParser());
 
 // ─── Public routes ───────────────────────────────
 app.use("/api/chat", chatLiteRouter);
-
-// Public form submissions (contact, quote, save-config)
-app.post("/api/contact", inquiriesRouter);
-app.post("/api/quote-request", inquiriesRouter);
-app.post("/api/save-configuration", inquiriesRouter);
-
-// Public analytics endpoint (fire-and-forget from frontend)
 app.use("/api/analytics", analyticsRouter);
+// Public form submissions (router has /contact, /quote-request, /save-configuration)
+app.use("/api", inquiriesRouter);
 
-// ─── Admin auth (no password required) ───────────
+// ─── Admin auth (open) ──────────────────────────
 app.post("/api/admin/login", loginHandler);
 app.post("/api/admin/logout", logoutHandler);
 app.get("/api/admin/check", checkAuthHandler);
@@ -47,6 +42,7 @@ app.get("/api/admin/check", checkAuthHandler);
 // ─── Protected admin routes ──────────────────────
 app.use("/api/admin/chat", requireAdmin, adminChatRouter);
 app.use("/api/admin/analytics", requireAdmin, analyticsRouter);
+// Admin inquiries (router has /inquiries GET and /inquiries/:id PATCH)
 app.use("/api/admin", requireAdmin, inquiriesRouter);
 
 // Health check

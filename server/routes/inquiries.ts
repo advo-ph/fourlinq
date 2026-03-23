@@ -86,7 +86,7 @@ router.post("/save-configuration", async (req, res) => {
  * GET /api/admin/inquiries
  * Query: ?type=contact|quote|configuration&status=new|contacted|quoted|won|lost&limit=50&offset=0
  */
-router.get("/admin/inquiries", async (req, res) => {
+router.get("/inquiries", async (req, res) => {
   const { type, status, limit = "50", offset = "0" } = req.query;
 
   try {
@@ -128,7 +128,7 @@ router.get("/admin/inquiries", async (req, res) => {
  * PATCH /api/admin/inquiries/:id
  * Body: { status?, notes? }
  */
-router.patch("/admin/inquiries/:id", async (req, res) => {
+router.patch("/inquiries/:id", async (req, res) => {
   const { id } = req.params;
   const { status, notes } = req.body;
 
