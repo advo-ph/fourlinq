@@ -6,6 +6,8 @@ import { Slider } from "@/components/ui/slider";
 import { useProductTypes, useFinishes, useGlassTypes } from "@/hooks/useConfigurator";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import WindowPreview from "@/components/configurator/WindowPreview";
+import FinishSwatch from "@/components/shared/FinishSwatch";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
   LiftAndSlideIcon, FrenchDoorIcon, TiltAndTurnIcon, SlidingDoorIcon, EntranceIcon,
@@ -69,171 +71,6 @@ const DesignTool = () => {
 
   const canContinue = step < 3;
   const canBack = step > 0;
-
-  const renderPreview = () => {
-    const w = 180;
-    const h = (config.height / config.width) * w;
-    const clampedH = Math.min(Math.max(h, 120), 260);
-    const frameColor = selectedFinish.color;
-    const glassTint = glassVisual.tint;
-
-    const renderFrame = () => {
-      const f = 6; // frame inset
-      const fw = w - f * 2; // frame inner width
-      const fh = clampedH - f * 2; // frame inner height
-
-      switch (config.type) {
-        case "sliding": {
-          const mid = w / 2;
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              <rect x={f + 4} y={f + 4} width={mid - f - 6} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              <rect x={mid + 2} y={f + 4} width={mid - f - 6} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              <rect x={mid - 2} y={clampedH / 2 - 10} width="4" height="20" rx="1" fill={frameColor} opacity={0.4} />
-            </>
-          );
-        }
-        case "sliding-door": {
-          const mid = w / 2;
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="5" />
-              <rect x={f + 5} y={f + 5} width={mid - f - 8} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
-              <rect x={mid + 3} y={f + 5} width={mid - f - 8} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
-              <rect x={mid - 2} y={clampedH / 2 - 12} width="4" height="24" rx="1.5" fill={frameColor} opacity={0.5} />
-              <line x={f} y1={clampedH - f - 3} x2={w - f} y2={clampedH - f - 3} stroke={frameColor} strokeWidth="2" opacity={0.3} />
-            </>
-          );
-        }
-        case "fixed":
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              <rect x={f + 4} y={f + 4} width={fw - 8} height={fh - 8} fill={glassTint} />
-            </>
-          );
-        case "bifold": {
-          const panels = 4;
-          const panelW = fw / panels;
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="5" />
-              {Array.from({ length: panels }).map((_, i) => (
-                <g key={i}>
-                  <rect x={f + i * panelW + 2} y={f + 5} width={panelW - 4} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
-                  {i < panels - 1 && <circle cx={f + (i + 1) * panelW} cy={f + 8} r="2" fill={frameColor} opacity={0.3} />}
-                </g>
-              ))}
-              <rect x={f + panelW * 2 - 2} y={clampedH / 2 - 8} width="4" height="16" rx="1" fill={frameColor} opacity={0.4} />
-            </>
-          );
-        }
-        case "lift-slide": {
-          const mid = w / 2;
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="5" />
-              <rect x={f + 5} y={f + 5} width={mid - f - 8} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
-              <rect x={mid + 3} y={f + 5} width={mid - f - 8} height={fh - 10} fill={glassTint} stroke={frameColor} strokeWidth="1.5" />
-              <rect x={mid + 8} y={clampedH / 2 - 12} width="5" height="24" rx="2" fill={frameColor} opacity={0.5} />
-              <line x1={f} y1={clampedH - f - 4} x2={w - f} y2={clampedH - f - 4} stroke={frameColor} strokeWidth="3" opacity={0.25} />
-            </>
-          );
-        }
-        case "french-door": {
-          const mid = w / 2;
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="5" />
-              <line x1={mid} y1={f} x2={mid} y2={clampedH - f} stroke={frameColor} strokeWidth="3" />
-              {/* Left door - glass panels */}
-              <rect x={f + 5} y={f + 5} width={mid - f - 8} height={fh * 0.45} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              <rect x={f + 5} y={f + 5 + fh * 0.48} width={mid - f - 8} height={fh * 0.45} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              {/* Right door - glass panels */}
-              <rect x={mid + 3} y={f + 5} width={mid - f - 8} height={fh * 0.45} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              <rect x={mid + 3} y={f + 5 + fh * 0.48} width={mid - f - 8} height={fh * 0.45} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              {/* Handles */}
-              <rect x={mid - 8} y={clampedH / 2 - 10} width="3" height="20" rx="1" fill={frameColor} opacity={0.5} />
-              <rect x={mid + 5} y={clampedH / 2 - 10} width="3" height="20" rx="1" fill={frameColor} opacity={0.5} />
-            </>
-          );
-        }
-        case "entrance": {
-          const doorX = f + 5;
-          const doorW = fw - 10;
-          const doorH = fh - 10;
-          const glassTop = f + 5;
-          const glassH = doorH * 0.28;
-          const panelTop = glassTop + glassH + 6;
-          const panelH = doorH - glassH - 6;
-          return (
-            <>
-              {/* Thick entrance frame */}
-              <rect x={f} y={f} width={fw} height={fh} rx="3" fill="none" stroke={frameColor} strokeWidth="6" />
-              {/* Transom glass */}
-              <rect x={doorX} y={glassTop} width={doorW} height={glassH} rx="1" fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              {/* Door panel with raised inner panel detail */}
-              <rect x={doorX} y={panelTop} width={doorW} height={panelH} rx="1" fill={frameColor} opacity={0.08} stroke={frameColor} strokeWidth="1" />
-              <rect x={doorX + 12} y={panelTop + 10} width={doorW - 24} height={panelH * 0.4} rx="2" fill="none" stroke={frameColor} strokeWidth="1.5" opacity={0.2} />
-              <rect x={doorX + 12} y={panelTop + panelH * 0.5} width={doorW - 24} height={panelH * 0.4} rx="2" fill="none" stroke={frameColor} strokeWidth="1.5" opacity={0.2} />
-              {/* Handle */}
-              <rect x={doorX + doorW - 16} y={panelTop + panelH / 2 - 14} width="4" height="28" rx="2" fill={frameColor} opacity={0.5} />
-              {/* Lock */}
-              <circle cx={doorX + doorW - 14} cy={panelTop + panelH / 2 + 20} r="2.5" fill={frameColor} opacity={0.3} />
-            </>
-          );
-        }
-        case "awning":
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              <rect x={f + 4} y={f + 4} width={fw - 8} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              {/* Hinge line at top */}
-              <line x1={f + 4} y1={f + 4} x2={w - f - 4} y2={f + 4} stroke={frameColor} strokeWidth="2" opacity={0.5} />
-              {/* Open angle lines */}
-              <line x1={f + 4} y1={f + 4} x2={w / 2} y2={clampedH * 0.35} stroke={frameColor} strokeWidth="1" opacity={0.25} />
-              <line x1={w - f - 4} y1={f + 4} x2={w / 2} y2={clampedH * 0.35} stroke={frameColor} strokeWidth="1" opacity={0.25} />
-              {/* Bottom latch */}
-              <rect x={w / 2 - 6} y={clampedH - f - 10} width="12" height="3" rx="1" fill={frameColor} opacity={0.4} />
-            </>
-          );
-        case "tilt-turn":
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              <rect x={f + 4} y={f + 4} width={fw - 8} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              {/* Tilt indicator — dashed triangle from bottom */}
-              <line x1={w / 2} y1={f + 8} x2={f + 8} y2={clampedH - f - 8} stroke={frameColor} strokeWidth="1" strokeDasharray="4 3" opacity={0.2} />
-              <line x1={w / 2} y1={f + 8} x2={w - f - 8} y2={clampedH - f - 8} stroke={frameColor} strokeWidth="1" strokeDasharray="4 3" opacity={0.2} />
-              {/* Turn indicator — dashed vertical */}
-              <line x1={w / 2} y1={f + 8} x2={w / 2} y2={clampedH - f - 8} stroke={frameColor} strokeWidth="1" strokeDasharray="4 3" opacity={0.15} />
-              {/* Handle */}
-              <rect x={w - f - 12} y={clampedH / 2 - 10} width="4" height="20" rx="1.5" fill={frameColor} opacity={0.5} />
-            </>
-          );
-        default: // casement
-          return (
-            <>
-              <rect x={f} y={f} width={fw} height={fh} rx="2" fill="none" stroke={frameColor} strokeWidth="4" />
-              <line x1={w / 2} y1={f} x2={w / 2} y2={clampedH - f} stroke={frameColor} strokeWidth="2" />
-              <rect x={f + 4} y={f + 4} width={w / 2 - f - 6} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              <rect x={w / 2 + 2} y={f + 4} width={w / 2 - f - 6} height={fh - 8} fill={glassTint} stroke={frameColor} strokeWidth="1" />
-              {/* Handles */}
-              <rect x={w / 2 - 7} y={clampedH / 2 - 8} width="3" height="16" rx="1" fill={frameColor} opacity={0.4} />
-              <rect x={w / 2 + 4} y={clampedH / 2 - 8} width="3" height="16" rx="1" fill={frameColor} opacity={0.4} />
-            </>
-          );
-      }
-    };
-
-    return (
-      <div className="flex flex-col items-center">
-        <svg viewBox={`0 0 ${w} ${clampedH}`} className="w-full max-w-[280px]">{renderFrame()}</svg>
-        <p className="text-sm text-muted-foreground mt-4">{config.width} mm × {config.height} mm</p>
-      </div>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -314,11 +151,21 @@ const DesignTool = () => {
               {step === 1 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Choose Finish</h2>
-                  <div className="grid grid-cols-3 gap-4">
-                    {finishOptions.map((finish) => (
-                      <button key={finish.id} onClick={() => setConfig({ ...config, finish: finish.id })} className="flex flex-col items-center gap-2">
-                        <div className={`w-14 h-14 rounded-full border-[3px] transition-colors ${config.finish === finish.id ? "border-primary ring-2 ring-primary/30" : "border-border"}`} style={{ backgroundColor: finish.color }} />
-                        <span className="text-xs text-muted-foreground">{finish.name}</span>
+                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Solid</h3>
+                  <div className="grid grid-cols-4 gap-3 mb-6">
+                    {finishOptions.filter((f) => f.finishType === "solid").map((finish) => (
+                      <button key={finish.id} onClick={() => setConfig({ ...config, finish: finish.id })} className="flex flex-col items-center gap-2 group" title={finish.description}>
+                        <FinishSwatch finishId={finish.id} color={finish.color} finishType="solid" selected={config.finish === finish.id} />
+                        <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-primary font-medium" : "text-muted-foreground"}`}>{finish.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Wood Grain</h3>
+                  <div className="grid grid-cols-4 gap-3">
+                    {finishOptions.filter((f) => f.finishType === "wood-grain").map((finish) => (
+                      <button key={finish.id} onClick={() => setConfig({ ...config, finish: finish.id })} className="flex flex-col items-center gap-2 group" title={finish.description}>
+                        <FinishSwatch finishId={finish.id} color={finish.color} finishType="wood-grain" selected={config.finish === finish.id} />
+                        <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-primary font-medium" : "text-muted-foreground"}`}>{finish.name}</span>
                       </button>
                     ))}
                   </div>
@@ -363,7 +210,15 @@ const DesignTool = () => {
 
             <div className="bg-card rounded-xl border border-border p-8 flex flex-col items-center justify-center">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/50 mb-6">Live Preview</h3>
-              {renderPreview()}
+              <WindowPreview
+                type={config.type}
+                frameColor={selectedFinish.color}
+                finishId={config.finish}
+                glassTint={glassVisual.tint}
+                glassOpacity={glassVisual.opacity}
+                width={config.width}
+                height={config.height}
+              />
               <div className="mt-8 w-full border-t border-border pt-6 space-y-2">
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Type</span><span className="text-primary font-medium">{selectedType.name}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Finish</span><span className="text-primary font-medium">{selectedFinish.name}</span></div>

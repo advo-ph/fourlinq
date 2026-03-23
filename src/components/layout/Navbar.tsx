@@ -22,7 +22,7 @@ const iconMap: Record<string, React.FC<{ className?: string; size?: number; stro
 };
 
 const utilityLinks = [
-  { label: "Find a Dealer", to: "/brand#contact" },
+  { label: "Visit a Showroom", to: "/brand#contact" },
   { label: "Support", to: "/brand#contact" },
   { label: "Technical Specs", to: "/products" },
 ];
@@ -66,6 +66,7 @@ const navLinks = [
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [overDark, setOverDark] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSubPanel, setMobileSubPanel] = useState<MegaKey>(null);
   const [megaOpen, setMegaOpen] = useState<MegaKey>(null);
@@ -90,7 +91,23 @@ const Navbar = () => {
   }, [dbTypes]);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+
+      // Check if nav overlaps a dark section
+      const navBottom = 32 + 80; // utility bar + nav height
+      const el = document.elementFromPoint(window.innerWidth / 2, navBottom + 4);
+      if (el) {
+        const bg = getComputedStyle(el).backgroundColor;
+        const match = bg.match(/\d+/g);
+        if (match) {
+          const [r, g, b] = match.map(Number);
+          // Consider dark if luminance is below threshold
+          const lum = (0.299 * r + 0.587 * g + 0.114 * b);
+          setOverDark(lum < 60);
+        }
+      }
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -110,9 +127,16 @@ const Navbar = () => {
   const openMega = (key: MegaKey) => { clearTimeout(megaTimeout.current); setMegaOpen(key); };
   const closeMega = () => { megaTimeout.current = setTimeout(() => setMegaOpen(null), 200); };
 
-  const navBg = scrolled || !isHome || mobileOpen ? "bg-white/98 backdrop-blur-xl shadow-sm" : "bg-transparent";
-  const textColor = scrolled || !isHome || mobileOpen ? "text-foreground" : "text-white";
-  const logoVariant = scrolled || !isHome || mobileOpen ? "dark" : "light";
+  const useLight = (!scrolled && isHome && !mobileOpen) || (scrolled && overDark && !mobileOpen);
+  const navBg = mobileOpen
+    ? "bg-white/98 backdrop-blur-xl shadow-sm"
+    : useLight
+      ? (scrolled ? "bg-black/40 backdrop-blur-xl" : "bg-transparent")
+      : "bg-white/98 backdrop-blur-xl shadow-sm";
+  const textColor = useLight
+    ? "text-white [text-shadow:_0_1px_3px_rgba(0,0,0,0.4)]"
+    : "text-foreground";
+  const logoVariant = useLight ? "light" : "dark";
   const showUtility = true;
 
   const activeMegaTypes = megaOpen === "windows" ? windowTypes : doorTypes;
@@ -130,13 +154,13 @@ const Navbar = () => {
     <>
       {/* Top gradient scrim for nav readability over images */}
       {isHome && !scrolled && (
-        <div className="fixed top-0 left-0 right-0 z-40 h-32 pointer-events-none bg-gradient-to-b from-black/60 via-black/30 to-transparent" />
+        <div className="fixed top-0 left-0 right-0 z-40 h-28 pointer-events-none bg-gradient-to-b from-black/40 via-black/15 to-transparent" />
       )}
 
       {/* Utility Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 h-8 bg-[#171717]">
-        <div className="max-w-7xl mx-auto flex items-center justify-end h-full px-6">
-          <div className="hidden sm:flex items-center gap-6">
+        <div className="page-container flex items-center justify-end h-full">
+          <div className="flex items-center gap-4 sm:gap-6">
             {utilityLinks.map((link) => (
               <Link key={link.label} to={link.to} className="text-[11px] font-medium text-white/70 hover:text-white transition-colors tracking-[0.08em] uppercase">
                 {link.label}
@@ -148,7 +172,7 @@ const Navbar = () => {
 
       {/* Main Nav */}
       <nav className={`fixed top-8 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
+        <div className="page-container flex items-center justify-between h-20">
           <Link to="/" className="shrink-0">
             <Logo variant={logoVariant} />
           </Link>
@@ -177,7 +201,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <button onClick={() => setMobileOpen(!mobileOpen)} className={`lg:hidden p-2 ${textColor}`} aria-label="Toggle menu">
+          <button onClick={() => setMobileOpen(!mobileOpen)} className={`lg:hidden -mr-1 p-1 ${textColor}`} aria-label="Toggle menu">
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -187,7 +211,7 @@ const Navbar = () => {
       {megaOpen && (
         <div className="fixed left-0 right-0 z-40 hidden lg:block" style={{ top: "calc(2rem + 5rem)" }} onMouseEnter={() => openMega(megaOpen)} onMouseLeave={closeMega}>
           <div className="bg-white border-b border-border shadow-lg">
-            <div className="max-w-7xl mx-auto flex">
+            <div className="max-w-7xl mx-auto flex px-6">
               {/* Left sidebar */}
               <div className="w-64 shrink-0 bg-neutral-50 py-8 px-6 space-y-1">
                 <Link to="/products" className="flex items-center justify-between py-3 px-3 rounded-md text-sm font-medium text-foreground hover:bg-border/50 transition-colors">
@@ -256,13 +280,12 @@ const Navbar = () => {
                     </Link>
                   )
                 )}
-                <div className="pt-6 space-y-3">
-                  {utilityLinks.map((link) => (
-                    <Link key={link.label} to={link.to} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
+                <Link
+                  to="/brand#contact"
+                  className="flex items-center justify-center mt-6 px-6 py-3 bg-accent text-white text-sm font-medium uppercase tracking-[0.08em] hover:bg-red-700 transition-colors"
+                >
+                  Get a Quote
+                </Link>
               </div>
             )}
 
@@ -302,12 +325,6 @@ const Navbar = () => {
                 </Link>
               </div>
             )}
-            </div>
-            {/* Fixed bottom CTA */}
-            <div className="shrink-0 px-6 py-4 border-t border-border">
-              <Link to="/brand#contact" className="flex items-center justify-center w-full px-6 py-3 bg-accent text-white text-sm font-medium uppercase tracking-[0.08em] hover:bg-red-700 transition-colors">
-                Get a Quote
-              </Link>
             </div>
           </div>
         </div>

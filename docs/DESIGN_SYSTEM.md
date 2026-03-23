@@ -8,10 +8,12 @@ This document is the single source of truth for all UI decisions on the FourlinQ
 ## Brand Identity
 
 **Company:** FourlinQ Windows & Doors
-**Positioning:** Premium uPVC fenestration for the Philippine market. German-engineered, locally installed.
+**Positioning:** Premium uPVC windows and doors for the Philippine market. Custom-made to suit customers' specifications.
 **Tone:** Warm, precise, confident. Not cold or corporate. Not overly casual.
 **Aesthetic:** "Tropical Futurism" — Tesla-inspired, minimalist premium with dark accents.
-**Key narrative pillars:** German engineering · Philippine climate expertise · Typhoon-grade performance · Thermal efficiency · 50-year lifespan
+**Brand promise:** "A Lifetime of Satisfaction and Peace of Mind."
+**Key narrative pillars:** Custom-made to specification · 10-Year Warranty · Corrosion resistance · Weather resistance · Sound insulation · Fire retardant · Thermal efficiency
+**Data source:** All brand claims, contact info, branches, product types, finishes, and advantages are sourced from `src/data/fourlinq-data.ts` — verified from official printed brochures and physical profile samples. Do NOT add claims not present in that file without client verification.
 
 ---
 
@@ -26,6 +28,9 @@ This document is the single source of truth for all UI decisions on the FourlinQ
   - `dark` — dark text on white backgrounds (scrolled nav, inner pages)
 - **Component:** `src/components/shared/Logo.tsx`
 - The red `Q` is the brand signature — accent red is also used for CTA buttons and active states
+- **Favicon:** The red Playfair Display `Q` glyph, exported as SVG path (`public/favicon.svg`) + PNG sizes (180, 192, 512)
+- **Apple Touch Icon:** `public/apple-touch-icon.png` (180×180)
+- **OG Image:** `public/images/hero-bg.jpg` — used as the social/messenger preview image
 
 ---
 
@@ -237,7 +242,8 @@ These are white on transparent — change fill color as needed for context.
 ## Hero Section
 
 - Full-screen height (`h-screen min-h-[600px]`)
-- Background: `hero-bg.jpg` with dark gradient overlay (`from-black/80 via-black/50 to-black/20`)
+- Background: `hero-bg.jpg` with light gradient overlay (`from-black/30 via-black/10 to-transparent`) — keep the image bright and visible
+- Nav scrim: `from-black/40 via-black/15 to-transparent` (h-28) — just enough for nav readability
 - Headline: "Precision. Performance. Perfection." — bold, white, large serif-like scale
 - Subtext: white/80, max-w-md
 - Two CTAs: red primary + white-bordered secondary
@@ -260,10 +266,12 @@ These are white on transparent — change fill color as needed for context.
 - Background: `#0d0d0d` (very dark charcoal)
 - Text: white
 - Logo component (light variant)
+- Brand tagline + verified contact info (email, sales phone) below logo
 - 4 link columns: Brand, Products, Support, Legal
 - Column headers: uppercase tracked white/40
 - Links: white/70, hover to white
 - Bottom bar: copyright + social links, separated by white/10 border-top
+- Contact data sourced from `CONTACT` in `fourlinq-data.ts`
 
 ---
 

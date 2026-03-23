@@ -15,8 +15,8 @@ const ChatMessage = memo(({ role, content, isStreaming }: ChatMessageProps) => {
       <div
         className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
           isUser
-            ? "bg-primary text-primary-foreground rounded-br-md"
-            : "bg-muted text-primary rounded-bl-md"
+            ? "bg-red-600 text-white rounded-br-md"
+            : "bg-white/10 text-white/90 border border-white/10 rounded-bl-md"
         }`}
       >
         {content ? (

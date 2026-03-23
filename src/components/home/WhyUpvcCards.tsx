@@ -1,41 +1,41 @@
-import { Thermometer, Wrench, VolumeX, CloudRain } from "lucide-react";
 import AnimatedSection from "@/components/shared/AnimatedSection";
 import { motion } from "framer-motion";
 
-const iconMap: Record<string, React.ReactNode> = {
-  thermometer: <Thermometer size={28} />,
-  wrench: <Wrench size={28} />,
-  "volume-x": <VolumeX size={28} />,
-  "cloud-rain": <CloudRain size={28} />,
-};
-
 const cards = [
   {
-    icon: "thermometer",
     title: "Thermal Insulation",
-    body: "Multi-chamber profiles trap air to create a natural thermal barrier, keeping Philippine interiors cool without overworking your air conditioning.",
+    stat: "45%",
+    statLabel: "less heat gain",
+    body: "Multi-chamber profiles create a natural thermal barrier, keeping interiors cool without overworking your AC.",
+    image: "/images/generated/benefit-thermal.png",
   },
   {
-    icon: "wrench",
     title: "Zero Maintenance",
-    body: "Unlike timber that rots or aluminium that corrodes in coastal air, uPVC never needs painting, sanding, or sealing — just a simple wipe-down.",
+    stat: "₱0",
+    statLabel: "upkeep cost",
+    body: "uPVC never rots, corrodes, or needs repainting — just a simple wipe-down keeps it pristine for decades.",
+    image: "/images/generated/benefit-maintenance.png",
   },
   {
-    icon: "volume-x",
     title: "Sound Attenuation",
-    body: "Living near EDSA or a busy barangay road? Our sealed uPVC systems cut external noise by up to 40 dB, turning your home into a quiet sanctuary.",
+    stat: "40 dB",
+    statLabel: "noise reduction",
+    body: "Sealed multi-chamber systems cut external noise, turning your home into a quiet sanctuary.",
+    image: "/images/generated/benefit-sound.png",
   },
   {
-    icon: "cloud-rain",
     title: "Weather Resistance",
-    body: "Engineered and tested for typhoon-strength winds and torrential rain, our systems keep your home sealed and secure when it matters most.",
+    stat: "Signal 3",
+    statLabel: "typhoon rated",
+    body: "Steel-reinforced profiles with multi-point locks, tested for typhoon-strength winds and torrential rain.",
+    image: "/images/generated/benefit-weather.png",
   },
 ];
 
 const WhyUpvcCards = () => {
   return (
-    <AnimatedSection className="py-20 px-6">
-      <div className="max-w-7xl mx-auto">
+    <AnimatedSection className="py-20">
+      <div className="page-container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold text-primary mb-3">Why uPVC?</h2>
           <p className="text-muted-foreground max-w-lg mx-auto">
@@ -43,19 +43,36 @@ const WhyUpvcCards = () => {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 gap-5">
           {cards.map((card, i) => (
             <motion.div
               key={card.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="bg-card rounded-lg border border-border p-6 hover:shadow-md transition-shadow"
+              transition={{ duration: 0.5, delay: i * 0.08 }}
+              className="group relative rounded-xl overflow-hidden aspect-[16/9] sm:aspect-[2/1]"
             >
-              <div className="text-primary mb-4">{iconMap[card.icon]}</div>
-              <h3 className="font-medium text-primary mb-2">{card.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{card.body}</p>
+              {/* Background image */}
+              <img
+                src={card.image}
+                alt={card.title}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                loading="lazy"
+              />
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
+
+              {/* Content */}
+              <div className="relative h-full flex flex-col justify-end p-6 sm:p-8">
+                {/* Stat pill */}
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-2xl sm:text-3xl font-bold text-white">{card.stat}</span>
+                  <span className="text-xs text-white/60 uppercase tracking-wider">{card.statLabel}</span>
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-1">{card.title}</h3>
+                <p className="text-sm text-white/70 leading-relaxed max-w-sm">{card.body}</p>
+              </div>
             </motion.div>
           ))}
         </div>

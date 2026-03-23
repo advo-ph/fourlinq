@@ -1,7 +1,8 @@
 # FourlinQ — Backend Data Architecture
 
-**Version 2.0 — February 2026**  
-Platform: Pure PostgreSQL 15+ (portable — Supabase, Neon, RDS, Railway, bare metal)  
+**Version 2.1 — March 2026**
+Platform: Pure PostgreSQL 15+ (portable — Supabase, Neon, RDS, Railway, bare metal)
+Seed data source: `src/data/fourlinq-data.ts` — verified from official FourlinQ brochures and physical profile samples  
 Auth: Self-owned `auth_user` table — no platform lock-in  
 PK convention: `{table}_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`  
 Public-facing tokens/codes: `TEXT` generated at app layer (nanoid, cuid2, or similar)  
@@ -234,8 +235,8 @@ CREATE TABLE organization (
 CREATE TABLE branch (
   branch_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   organization_id BIGINT NOT NULL REFERENCES organization(organization_id),
-  name            TEXT NOT NULL,           -- 'Ortigas Showroom'
-  code            TEXT,                    -- 'ORG', 'CEB'
+  name            TEXT NOT NULL,           -- 'Main Office'|'Ortigas — CW Home Depot'|'Alabang — CW Home Depot'|'Cebu Branch'
+  code            TEXT,                    -- 'main'|'ortigas'|'alabang'|'cebu'
   address_line_1  TEXT,
   address_line_2  TEXT,
   city            TEXT,
@@ -435,11 +436,11 @@ CREATE TABLE product (
 CREATE TABLE finish (
   finish_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   organization_id BIGINT REFERENCES organization(organization_id),
-  name            TEXT NOT NULL,            -- 'Matte Black'|'Dark Grey'|'Bronze'|'Sand'|'White'|'Anthracite'
-  slug            TEXT NOT NULL,            -- 'matte-black'|'dark-grey'|'bronze'|'sand'|'white'|'anthracite'
-  code            TEXT,                     -- 'RAL9005'|'RAL7016'|'RAL9016' etc.
-  finish_type     TEXT,                     -- 'solid'|'woodgrain'|'metallic'|'custom'
-  hex_color       TEXT,                     -- matches frontend: '#1A1A1A','#4A4A4A','#8B6914','#C2B280','#F5F5F0','#383E42'
+  name            TEXT NOT NULL,            -- 'White'|'Jet Black'|'Charcoal Gray'|'Matte Quartz'|'Oak Light'|'Walnut'|etc.
+  slug            TEXT NOT NULL,            -- 'white'|'jet-black'|'charcoal-gray'|'oak-light'|'walnut'|etc.
+  code            TEXT,                     -- RAL code if applicable
+  finish_type     TEXT,                     -- 'solid'|'wood-grain'
+  hex_color       TEXT,                     -- matches FRAME_FINISHES in fourlinq-data.ts
   texture_url     TEXT,
   is_standard     BOOLEAN DEFAULT true,
   surcharge_pct   NUMERIC(5,4) DEFAULT 0,
@@ -449,14 +450,20 @@ CREATE TABLE finish (
   UNIQUE (organization_id, slug)
 );
 
--- Seed values (match frontend productFinishes and configurator finishOptions):
--- INSERT INTO finish (name, slug, hex_color, sort_order) VALUES
---   ('Matte Black', 'matte-black', '#1A1A1A', 1),
---   ('Dark Grey',   'dark-grey',   '#4A4A4A', 2),
---   ('Bronze',      'bronze',      '#8B6914', 3),
---   ('Sand',        'sand',        '#C2B280', 4),
---   ('White',       'white',       '#F5F5F0', 5),
---   ('Anthracite',  'anthracite',  '#383E42', 6);
+-- Seed values — 11 verified finishes from physical uPVC profile sample bars
+-- Must match FRAME_FINISHES in src/data/fourlinq-data.ts
+-- INSERT INTO finish (name, slug, hex_color, finish_type, sort_order) VALUES
+--   ('Oak Light',      'oak-light',      '#D6C4A1', 'wood-grain', 1),
+--   ('Oak Malt',       'oak-malt',       '#B89A6A', 'wood-grain', 2),
+--   ('Woodgray',       'woodgray',       '#8C8680', 'wood-grain', 3),
+--   ('2 Wood Black',   '2-wood-black',   '#2E2A27', 'wood-grain', 4),
+--   ('Dark Oak',       'dark-oak',       '#5C3A1E', 'wood-grain', 5),
+--   ('Walnut',         'walnut',         '#6B4226', 'wood-grain', 6),
+--   ('Golden Oak',     'golden-oak',     '#C8820A', 'wood-grain', 7),
+--   ('White',          'white',          '#F5F5F5', 'solid', 8),
+--   ('Jet Black',      'jet-black',      '#1A1A1A', 'solid', 9),
+--   ('Charcoal Gray',  'charcoal-gray',  '#4A4A4A', 'solid', 10),
+--   ('Matte Quartz',   'matte-quartz',   '#9E9E9E', 'solid', 11);
 ```
 
 ### `glass_type`

@@ -7,27 +7,27 @@ const categories = [
   {
     name: "Window Systems",
     description: "Casement, sliding, and fixed panels engineered for tropical performance.",
-    image: "/images/wp-export/Casement-Windows.jpg",
+    image: "/images/wp-export/FourlinQ_Project-3.jpg",
     to: "/products?filter=windows",
   },
   {
     name: "Door Systems",
     description: "French, sliding, bifold, and entrance doors with multi-point security.",
-    image: "/images/wp-export/Sliding-Door.jpg",
+    image: "/images/wp-export/FourlinQ-Project-7.jpg",
     to: "/products?filter=doors",
   },
   {
     name: "Specialist Systems",
     description: "Curtain walls, entrance prestige, and architectural solutions.",
-    image: "/images/wp-export/Product-Page.jpg",
+    image: "/images/wp-export/FourlinQ_Project-4.jpg",
     to: "/products?filter=systems",
   },
 ];
 
 const ProductsPreview = () => {
   return (
-    <AnimatedSection className="py-20 px-6">
-      <div className="max-w-7xl mx-auto">
+    <AnimatedSection className="py-20">
+      <div className="page-container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold text-primary mb-3">Our Systems</h2>
           <p className="text-muted-foreground max-w-lg mx-auto">
@@ -52,7 +52,7 @@ const ProductsPreview = () => {
                   <img
                     src={cat.image}
                     alt={cat.name}
-                    className="w-full h-full object-contain bg-white p-4 group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
                 </div>

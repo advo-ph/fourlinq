@@ -71,12 +71,15 @@
 
 **Vibe:** Tropical Futurism — Tesla-inspired minimalist premium.
 
-- **Hero Section:** Full-bleed architectural photography with dark gradient overlay. Bold serif-scale "Precision. Performance. Perfection." headline with red + white-bordered CTAs. Framer Motion fade-up animation.
+- **Hero Section:** Full-bleed architectural photography with light gradient overlay (`from-black/30 via-black/10`) — hero image stays bright and visible. Bold serif-scale "Precision. Performance. Perfection." headline with red + white-bordered CTAs. Framer Motion fade-up animation.
 - **Typography:** DM Sans for body/UI (clean, geometric) + Playfair Display for the logo (editorial serif accent). Strong hierarchy with uppercase tracked labels, bold headlines, and restrained body copy.
 - **Color Palette:** Black/white/red. Near-black charcoal (#0A0A0A), clean white surfaces, red accent (#DC2626). No navy, no cream — strictly monochromatic with red signature.
 - **Imagery:** White-background product photos for catalog clarity, architectural lifestyle photos for hero/projects. Client-provided minimalistic PNG window/door icons.
 - **Navigation & UX:** Dark utility bar + glassmorphism nav with mega menus featuring SVG icon grids. Interactive Design Tool configurator. AI chat assistant powered by Gemini.
-- **Achieved:** Successfully transitioned from "Generic WordPress" to a premium architectural brand aesthetic aligned with competitors like Schüco and Marvin.
+- **Data Integrity:** All brand claims, product types, contact info, branches, finishes, and advantages sourced from `src/data/fourlinq-data.ts` — verified from official FourlinQ printed brochures and physical profile samples. No unverified stats or claims.
+- **Favicon & OG:** Red Playfair Display "Q" glyph as favicon (SVG + PNG). Hero image (`hero-bg.jpg`) as og:image for Messenger/social previews.
+- **Brand Page:** Verified contact info (3 phone numbers + email) and all 5 branch locations (Manila Main Office, Ortigas CW Home Depot, Alabang CW Home Depot, Cebu Branch, Davao Showroom). 10-Year Warranty scope displayed as badge cards.
+- **Achieved:** Successfully transitioned from "Generic WordPress" to a premium architectural brand aesthetic aligned with competitors like Schüco and Marvin. All data now verified against official brochures.
 
 ---
 

@@ -5,6 +5,8 @@ import PageHeader from "@/components/shared/PageHeader";
 import AnimatedSection from "@/components/shared/AnimatedSection";
 import QuoteModal from "@/components/shared/QuoteModal";
 import { useProducts, Product } from "@/hooks/useProducts";
+import FinishSwatch from "@/components/shared/FinishSwatch";
+import { FRAME_FINISHES } from "@/data/fourlinq-data";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,14 +26,14 @@ const filters: { label: string; value: Filter }[] = [
 ];
 
 const productIconMap: Record<string, React.FC<{ className?: string; size?: number; strokeWidth?: number }>> = {
-  "casement-70": CasementIcon,
-  "sliding-85": SlidingIcon,
-  "fixed-panel": FixedIcon,
-  "french-door": FrenchDoorIcon,
+  casement: CasementIcon,
+  sliding: SlidingIcon,
+  "special-shapes": FixedIcon,
+  awning: AwningIcon,
   "sliding-door": SlidingDoorIcon,
-  "bifold-system": BifoldIcon,
-  "entrance-system": EntranceIcon,
-  "curtain-wall": FixedIcon,
+  "slide-and-fold": BifoldIcon,
+  "french-door": FrenchDoorIcon,
+  "entrance-door": EntranceIcon,
 };
 
 const ProductIconBadge = ({ productId }: { productId: string }) => {
@@ -71,13 +73,39 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
             ))}
           </ul>
           <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Available Finishes</h3>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Wood Grain</p>
+          <div className="flex gap-3 mb-4 flex-wrap">
+            {product.finishes
+              .filter((finish) => {
+                const v = FRAME_FINISHES.find((f) => f.label === finish.name);
+                return v?.category === "wood-grain";
+              })
+              .map((finish) => {
+                const verified = FRAME_FINISHES.find((f) => f.label === finish.name);
+                return (
+                  <div key={finish.name} className="flex flex-col items-center gap-1">
+                    <FinishSwatch finishId={verified?.id} color={finish.color} finishType="wood-grain" size="sm" />
+                    <span className="text-[10px] text-muted-foreground">{finish.name}</span>
+                  </div>
+                );
+              })}
+          </div>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Solid</p>
           <div className="flex gap-3 mb-6 flex-wrap">
-            {product.finishes.map((finish) => (
-              <div key={finish.name} className="flex flex-col items-center gap-1">
-                <div className="w-10 h-10 rounded-full border-2 border-border" style={{ backgroundColor: finish.color }} title={finish.name} />
-                <span className="text-[10px] text-muted-foreground">{finish.name}</span>
-              </div>
-            ))}
+            {product.finishes
+              .filter((finish) => {
+                const v = FRAME_FINISHES.find((f) => f.label === finish.name);
+                return !v || v.category === "solid";
+              })
+              .map((finish) => {
+                const verified = FRAME_FINISHES.find((f) => f.label === finish.name);
+                return (
+                  <div key={finish.name} className="flex flex-col items-center gap-1">
+                    <FinishSwatch finishId={verified?.id} color={finish.color} finishType="solid" size="sm" />
+                    <span className="text-[10px] text-muted-foreground">{finish.name}</span>
+                  </div>
+                );
+              })}
           </div>
           <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Glass Options</h3>
           <div className="flex gap-2 flex-wrap mb-8">

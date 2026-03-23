@@ -11,75 +11,73 @@ if (!GEMINI_API_KEY) {
   console.warn("GEMINI_API_KEY not set — chat will be disabled");
 }
 
+// ─────────────────────────────────────────────
+// KNOWLEDGE BASE — 100% verified from official FourlinQ brochures
+// Source: src/data/fourlinq-data.ts
+// ⚠️ Do NOT add claims not present in the brochure
+// ─────────────────────────────────────────────
+
 const KNOWLEDGE_BASE = `
-[1] Casement 70 Series Overview
-The Casement 70 Series is FourlinQ's flagship casement window. It features a 70mm multi-chamber profile for superior thermal insulation with a Uw value of 1.3 W/m²K. It includes double-sealed weatherstrips and supports up to 28mm glazing capacity. Available in 6 frame finishes (Matte Black, Dark Grey, Bronze, Sand, White, Anthracite) and 4 glass options (Clear Float, Low-E Coated, Frosted Privacy, Tinted Bronze). Ideal for bedrooms, living rooms, and offices in the Philippines.
+[BRAND]
+Company: FourlinQ Windows & Doors
+Promise: "A Lifetime of Satisfaction and Peace of Mind."
+Core offer: Custom-made Windows & Doors to suit customers' specifications.
+Warranty: 10-Year Warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation.
 
-[2] Sliding 85 Series Overview
-The Sliding 85 Series is a premium sliding window engineered for wide openings and panoramic views. It has an 85mm reinforced profile with a tandem roller system for smooth, effortless operation. Supports up to 36mm glazing and includes an anti-lift security block.
+[CONTACT — VERIFIED]
+Sales: 0925-848-8888
+Assistance: 0925-896-5978
+Landline: (02)8563-5363
+Email: sales@fourlinq.com
 
-[3] Fixed Panorama Panel Overview
-The Fixed Panorama Panel is a floor-to-ceiling fixed glass panel designed for maximum natural light and unobstructed views. It uses a 70mm structural profile and supports up to 44mm triple glazing. Maximum panel size is 2.4m x 3.0m. Can use structural silicone for a frameless exterior look.
+[BRANCHES — 4 LOCATIONS]
+1. Main Office — #2635 Lamayan St., Sta. Ana, Manila (NCR)
+2. Ortigas — CW Home Depot, Unit 41 Doña Julia Vargas Ave., cor. Meralco Avenue, Brgy. Ugong, Pasig City (NCR)
+3. Alabang — CW Home Depot, Alabang Zapote Road cor. Filinvest Ave., Westgate Alabang, Muntinlupa (NCR)
+4. Cebu Branch — Door 9 Centro Fortuna Building, A.S. Fortuna Street, Banilad, Mandaue City, Cebu
 
-[4] French Door Classic Overview
-The French Door Classic is an elegant double-leaf door system featuring a 70mm reinforced door profile with multi-point espagnolette locking. Low threshold option (20mm) for seamless indoor-outdoor transitions. Supports up to 36mm glazing.
+[PRODUCT TYPES — 5 CONFIRMED]
+1. Casement (Window) — "Smooth operation. Reliable performance." Hinged on one side, opens outward for maximum ventilation and a clean facade. Benefit: Maximum ventilation and easy cleaning.
+2. Sliding (Window & Door) — "Elegant. Versatile. Thoroughly reliable." Slides horizontally along a track — ideal where outward clearance is limited. Benefit: Space-saving, ideal for balconies and wide openings.
+3. Special Shapes (Window) — "Make a statement with glass." Can be combined with other window types to create a dramatic feature wall of glass. Supports fully custom geometry.
+4. Awning (Window) — "Light and security, beautifully combined." Hinged at the top and opens outward. Provides light and architectural interest where security matters.
+5. Slide & Fold (Window & Door) — "Open up your space completely." Panels slide and fold to one side, creating a fully open wall. Ideal for living areas, patios, and entertainment spaces.
 
-[5] Lift & Slide Terrace Overview
-Premium lift-and-slide door system that handles panels up to 200kg with fingertip ease. 85mm heavy-duty profile with triple weatherseal system. Supports up to 44mm glazing. Designed for luxury Philippine residences, resorts, and condominiums.
+[MATERIALS]
+1. uPVC — Fire retardant, thermally efficient (multi-chamber design), never rusts or corrodes, no painting or maintenance required, galvanized steel reinforced for security, EPDM gaskets (fully weatherproof), 6mm–12mm glass options, sound insulating. 10-Year Warranty. Compatible with all 11 finishes.
+2. Aluminum (New) — Slim sightlines for a modern minimal look, high strength-to-weight ratio, suitable for large-span openings, corrosion-resistant. Compatible with 4 solid finishes only (White, Jet Black, Charcoal Gray, Matte Quartz).
 
-[6] Bifold Horizon Overview
-Multi-panel folding door system that opens entire walls to the outdoors. Available in 2 to 7 panel configurations with a 76mm folding profile. Top-hung and bottom-rolling options. Typhoon-rated hardware.
+[7 FOURLINQ ADVANTAGES — VERIFIED CLAIMS ONLY]
+1. Attractive Appearance — 11 finishes from classic white to rich wood grains, designed to complement any architectural style.
+2. Fire Retardant — uPVC is inherently fire retardant, slowing the spread of flames.
+3. Thermal Efficiency — Multi-chamber profile traps air to reduce heat transfer, keeping interiors cooler.
+4. Corrosion Resistant — Unlike steel, uPVC never rusts — ideal for Philippine humidity, salt air, and heavy rainfall.
+5. Long Lasting Performance — 10-year warranty. uPVC does not warp, rot, or require repainting.
+6. Weather Resistance — EPDM gaskets and drainage holes ensure a tight seal against rain, wind, and storms.
+7. Sound Insulation — Multi-chamber profiles and thick glass (6mm–12mm) significantly reduce outside noise.
 
-[7] Entrance Prestige Overview
-Complete entrance door system with 82mm profile and reinforced steel core. 5-point security lock with RC2 burglar resistance rating.
+[uPVC PROFILE ENGINEERING — 7 FEATURES]
+1. Thick Glass — 6mm–12mm for insulation, soundproofing, and impact resistance.
+2. Smooth Homogenous Profile — Easy cleaning, no grooves where dirt accumulates.
+3. Galvanized Steel Reinforcement — Structural rigidity that resists forced entry and heavy wind loads.
+4. Multi-Chamber Profile — Trapped air chambers act as thermal barriers — cooler rooms, lower electricity bills.
+5. Internal Glazing Beads — Glass secured from inside — cannot be removed from outside.
+6. EPDM Gaskets — Weatherproof seal against rain, wind, dust, and insects.
+7. Drainage Holes — Prevents water pooling inside the frame.
 
-[8] Curtain Wall System Overview
-Architectural solution for commercial and high-rise residential. 50x100mm mullion profile with structural glazing option. Wind load rated up to 3.0 kPa.
+[FRAME FINISHES — 11 OPTIONS]
+Wood-grain (7): Oak Light, Oak Malt, Woodgray, 2 Wood Black, Dark Oak, Walnut, Golden Oak
+Solid (4): White, Jet Black, Charcoal Gray, Matte Quartz
 
-[9] uPVC vs Aluminium — Thermal Performance
-uPVC profiles provide dramatically better thermal insulation than aluminium. A typical uPVC window achieves a Uw value of 1.3-1.6 W/m²K, while aluminium typically rates 3.5-5.0 W/m²K. uPVC can reduce air conditioning costs by 30-40% in the Philippine tropical climate.
-
-[10] uPVC vs Timber — Maintenance
-uPVC requires virtually zero maintenance compared to timber. Timber needs repainting every 3-5 years, is susceptible to termites, and can warp with humidity. uPVC retains its appearance for 25+ years. The lifetime cost is significantly lower.
-
-[11] uPVC Acoustic Performance
-FourlinQ uPVC windows achieve up to 45dB noise reduction. The multi-chamber profile combined with proper glazing creates multiple air barriers. Standard single-pane aluminium windows only achieve 10-15dB reduction.
-
-[12] uPVC Weather Resistance — Philippine Climate
-Engineered for Philippine tropical climate. Withstand typhoon-force winds (tested to 200+ km/h), UV exposure without fading, and extreme humidity. UV stabilizers prevent yellowing for 25+ years. Marine-grade stainless steel hardware for coastal areas.
-
-[13] How long do FourlinQ windows last?
-Designed to last 25-30 years. 10-year manufacturer warranty covering profile discoloration and structural integrity. Hardware components carry a 5-year warranty.
-
-[14] What finishes are available?
-6 standard finishes: Matte Black, Dark Grey, Bronze, Sand, White, Anthracite. Custom RAL colors available on request for orders above 10 units with 4-week lead time premium.
-
-[15] What is the lead time for orders?
-Standard orders: 4-6 weeks. Custom sizes: 6-8 weeks. Curtain wall: 8-12 weeks. Express delivery available at 15% premium.
-
-[16] Do you offer installation services?
-Yes, professional installation through certified installer network covering Metro Manila, Cebu, Davao, and major Philippine cities. All installers are factory-trained.
-
-[17] How much do FourlinQ windows cost?
-Casement windows: PHP 8,000-15,000 per panel. Sliding windows: PHP 12,000-25,000 per unit. Door systems: PHP 35,000-120,000. Use our Design Tool for exact requirements, or contact us for free consultation.
-
-[18] Objection: uPVC looks cheap
-Modern FourlinQ profiles use premium German-engineered formulations with matte, brushed texture resembling powder-coated aluminium. Dark Grey and Anthracite finishes are visually indistinguishable from premium aluminium.
-
-[19] Objection: uPVC cannot handle Philippine typhoons
-Profiles reinforced with galvanized steel inserts. Hardware tested for Signal No. 5 typhoons (200+ km/h). Multi-point locking and double/triple weatherseals. Proven in real-world super typhoons in Visayas and Bicol.
-
-[20] About FourlinQ
-Premium uPVC manufacturer serving the Philippines. German-engineered profiles and European hardware. Contact: +63 2 8123 4567, info@fourlinq.ph. Showroom in Filinvest City, Alabang, Muntinlupa.
-
-[21] FourlinQ Warranty Policy
-10-year warranty on profiles (structural + color). 5-year warranty on hardware. 2-year warranty on glass units. Void if installed by non-certified installers.
-
-[22] Installation Process
-5 steps: (1) Free consultation and site survey (2) Custom quotation within 48 hours (3) Production 4-6 weeks (4) Professional installation 1-2 days residential (5) Quality inspection.
+[DIMENSION RANGES (mm)]
+Casement: 400–1800mm wide × 400–2100mm tall
+Sliding: 600–3600mm wide × 600–2400mm tall
+Special Shapes: 300–3000mm wide × 300–3000mm tall
+Awning: 400–1500mm wide × 300–900mm tall
+Slide & Fold: 1800–6000mm wide × 2000–2800mm tall
 `;
 
-const SYSTEM_PROMPT = `You are LinQ, the AI assistant for FourlinQ Windows & Doors — a premium uPVC fenestration company in the Philippines.
+const SYSTEM_PROMPT = `You are LinQ, the AI assistant for FourlinQ Windows & Doors — a premium uPVC windows and doors company in the Philippines.
 
 PERSONALITY:
 - Professional yet warm and approachable — like a knowledgeable showroom consultant
@@ -92,13 +90,15 @@ KNOWLEDGE:
 ${KNOWLEDGE_BASE}
 
 RULES:
-1. Never make up product specifications, prices, or features not in your knowledge
-2. For pricing questions, provide the ranges from your knowledge and always recommend a free consultation for exact quotes
-3. If asked about competitors, focus on FourlinQ strengths rather than criticizing competitors
-4. Proactively suggest the Design Tool (/design-tool) when users discuss configurations
-5. Suggest booking a consultation when the conversation reaches a buying stage
-6. Contact info: +63 2 8123 4567, info@fourlinq.ph
-7. Format responses in clean, readable text with bullet points where appropriate`;
+1. ONLY state facts present in your KNOWLEDGE section above. Never invent specifications, prices, performance numbers, or features.
+2. If you don't know something (e.g. pricing, lead times, specific technical specs not listed), say "I'd recommend contacting our sales team for that detail" and provide the contact info.
+3. For pricing questions: FourlinQ provides custom quotes based on specifications. Direct them to call 0925-848-8888 or email sales@fourlinq.com.
+4. If asked about competitors, focus on FourlinQ strengths rather than criticizing competitors.
+5. Proactively suggest the Design Tool (/design-tool) when users discuss configurations or finishes.
+6. Suggest booking a consultation when the conversation reaches a buying stage.
+7. Contact: Sales 0925-848-8888, Assistance 0925-896-5978, Landline (02)8563-5363, Email sales@fourlinq.com
+8. Format responses in clean, readable text with bullet points where appropriate.
+9. When asked about warranty, it is a 10-Year Warranty covering: corrosion resistance, long lasting performance, weather resistance, and sound insulation.`;
 
 /**
  * POST /api/chat/stream

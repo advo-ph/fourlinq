@@ -4,8 +4,8 @@ import AnimatedSection from "@/components/shared/AnimatedSection";
 
 const DesignToolTeaser = () => {
   return (
-    <AnimatedSection className="py-20 px-6 bg-secondary/30">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+    <AnimatedSection className="py-20 bg-secondary/30">
+      <div className="page-container grid md:grid-cols-2 gap-12 items-center">
         {/* Copy */}
         <div>
           <h2 className="text-3xl md:text-4xl font-semibold text-primary mb-4">

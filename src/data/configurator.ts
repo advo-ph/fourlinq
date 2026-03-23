@@ -1,3 +1,8 @@
+// Configurator data — derived from verified fourlinq-data.ts
+// Glass options are kept locally (not in brochure data)
+import { FRAME_FINISHES, DIMENSION_CONSTRAINTS } from "./fourlinq-data";
+import type { WindowType } from "./fourlinq-data";
+
 export interface ProductType {
   id: string;
   name: string;
@@ -9,6 +14,8 @@ export interface FinishOption {
   id: string;
   name: string;
   color: string;
+  finishType: "solid" | "wood-grain";
+  description: string;
 }
 
 export interface GlassOption {
@@ -18,6 +25,8 @@ export interface GlassOption {
   tint: string;
 }
 
+// Verified from brochure: Casement, Sliding, Awning, Special Shapes (windows)
+// Doors: Sliding Door, Bifold/Slide & Fold, French Door, Entrance, Lift & Slide
 export const productTypes: ProductType[] = [
   // Windows
   { id: "casement", name: "Casement", icon: "casement", category: "windows" },
@@ -27,20 +36,21 @@ export const productTypes: ProductType[] = [
   { id: "tilt-turn", name: "Tilt & Turn", icon: "tilt-turn", category: "windows" },
   // Doors
   { id: "sliding-door", name: "Sliding Door", icon: "sliding-door", category: "doors" },
-  { id: "bifold", name: "Bifold", icon: "bifold", category: "doors" },
+  { id: "bifold", name: "Slide & Fold", icon: "bifold", category: "doors" },
   { id: "lift-slide", name: "Lift & Slide", icon: "lift-slide", category: "doors" },
   { id: "french-door", name: "French Door", icon: "french-door", category: "doors" },
   { id: "entrance", name: "Entrance", icon: "entrance", category: "doors" },
 ];
 
-export const finishOptions: FinishOption[] = [
-  { id: "matte-black", name: "Matte Black", color: "#1A1A1A" },
-  { id: "dark-grey", name: "Dark Grey", color: "#4A4A4A" },
-  { id: "bronze", name: "Bronze", color: "#8B6914" },
-  { id: "sand", name: "Sand", color: "#C2B280" },
-  { id: "white", name: "White", color: "#F5F5F0" },
-  { id: "anthracite", name: "Anthracite", color: "#383E42" },
-];
+// 11 verified finishes from physical uPVC profile sample bars
+// Mapped from FRAME_FINISHES canonical source
+export const finishOptions: FinishOption[] = FRAME_FINISHES.map((f) => ({
+  id: f.id,
+  name: f.label,
+  color: f.swatchHex,
+  finishType: f.category,
+  description: f.description,
+}));
 
 export const glassOptions: GlassOption[] = [
   { id: "clear-float", name: "Clear Float", opacity: 0.1, tint: "rgba(200,220,240,0.1)" },
@@ -59,7 +69,11 @@ export const defaultConfig = {
   height: 1400,
 };
 
+// Per-type dimension constraints from verified data (in mm)
 export const sizeConstraints = {
   width: { min: 400, max: 3000, step: 50 },
   height: { min: 400, max: 3000, step: 50 },
 };
+
+export { DIMENSION_CONSTRAINTS };
+export type { WindowType };

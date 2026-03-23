@@ -5,8 +5,8 @@ import PageHeader from "@/components/shared/PageHeader";
 import AnimatedSection from "@/components/shared/AnimatedSection";
 import CTABanner from "@/components/shared/CTABanner";
 import ContactForm from "@/components/shared/ContactForm";
-import { certifications } from "@/data/brand";
-import { ShieldCheck, BadgeCheck, Award, FileCheck, Leaf, Wind, MapPin, Phone, Mail, Clock } from "lucide-react";
+import { certifications, CONTACT, BRANCHES, BRAND } from "@/data/brand";
+import { ShieldCheck, BadgeCheck, Award, FileCheck, Leaf, Wind, MapPin, Phone, Mail, Clock, Shield, CloudRain, VolumeX, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 
 const certIconMap: Record<string, React.ReactNode> = {
@@ -16,6 +16,10 @@ const certIconMap: Record<string, React.ReactNode> = {
   "file-check": <FileCheck size={20} />,
   leaf: <Leaf size={20} />,
   wind: <Wind size={20} />,
+  shield: <Shield size={20} />,
+  clock: <Clock size={20} />,
+  "cloud-rain": <CloudRain size={20} />,
+  "volume-x": <VolumeX size={20} />,
 };
 
 const Brand = () => {
@@ -24,7 +28,10 @@ const Brand = () => {
   useEffect(() => {
     if (hash) {
       const el = document.querySelector(hash);
-      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 100);
+      if (el) setTimeout(() => {
+        const y = el.getBoundingClientRect().top + window.scrollY - 112;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }, 100);
     }
   }, [hash]);
 
@@ -33,7 +40,7 @@ const Brand = () => {
       <PageHeader
         title="Our Brand"
         breadcrumbLabel="Brand"
-        subtitle="German engineering precision meets Philippine climate expertise. Since 2009."
+        subtitle={BRAND.promise}
       />
 
       {/* Story + Image */}
@@ -41,12 +48,12 @@ const Brand = () => {
         <div className="page-container">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">15 Years. 500+ Installations.</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">{BRAND.heroQuote}</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                FourlinQ was founded to bridge the gap between world-class uPVC technology and the specific demands of the Philippine climate.
+                {BRAND.promiseSupport}
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                From luxury residences in Alabang to beachfront resorts in Cebu, our systems protect, insulate, and beautify spaces across the archipelago.
+                Available in 11 finishes — from classic white to rich wood grains — with a {BRAND.warranty} covering corrosion resistance, weather resistance, and long-lasting performance.
               </p>
             </div>
             <img
@@ -59,20 +66,19 @@ const Brand = () => {
         </div>
       </AnimatedSection>
 
-      {/* Two Pillars - dark section */}
+      {/* Warranty - dark section */}
       <AnimatedSection className="py-16 bg-[#0a0a0a]">
-        <div className="page-container grid md:grid-cols-2 gap-10">
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-3">German Engineering</h3>
-            <p className="text-white/60 text-sm leading-relaxed">
-              Profiles extruded using German-engineered tooling with UV-stabilized compounds and precise dimensional tolerances. Every profile meets European EN 12608 standards.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-3">Philippine Expertise</h3>
-            <p className="text-white/60 text-sm leading-relaxed">
-              Our Filipino engineers bring decades of experience specifying and installing systems optimized for each project — from typhoon exposure to salt air corrosion.
-            </p>
+        <div className="page-container max-w-4xl text-center">
+          <h3 className="text-lg font-semibold text-white mb-3">{BRAND.warranty}</h3>
+          <p className="text-white/60 text-sm leading-relaxed mb-8">
+            {BRAND.promise}
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {BRAND.warrantyScope.map((scope) => (
+              <div key={scope} className="border border-white/10 rounded-lg p-4 text-center">
+                <p className="text-sm text-white font-medium">{scope}</p>
+              </div>
+            ))}
           </div>
         </div>
       </AnimatedSection>
@@ -111,26 +117,86 @@ const Brand = () => {
 
       {/* Contact */}
       <AnimatedSection id="contact" className="py-16 bg-neutral-50">
-        <div className="page-container max-w-4xl">
-          <h2 className="text-2xl font-semibold text-foreground mb-8 text-center">Visit Our Showroom</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-5">
-              {[
-                { icon: <MapPin size={18} />, label: "Address", value: "Unit 4B, The Commercenter, East Asia Drive, Filinvest City, Alabang, Muntinlupa 1781" },
-                { icon: <Phone size={18} />, label: "Phone", value: "+63 2 8845 1234" },
-                { icon: <Mail size={18} />, label: "Email", value: "hello@fourlinq.ph" },
-                { icon: <Clock size={18} />, label: "Hours", value: "Monday – Saturday, 9:00 AM – 6:00 PM" },
-              ].map((item) => (
-                <div key={item.label} className="flex gap-3">
-                  <div className="text-accent shrink-0 mt-0.5">{item.icon}</div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">{item.label}</p>
-                    <p className="text-sm text-foreground">{item.value}</p>
-                  </div>
+        <div className="page-container max-w-5xl">
+          <h2 className="text-3xl font-semibold text-foreground mb-2 text-center">Contact Us</h2>
+          <p className="text-muted-foreground text-center mb-10 text-sm">
+            Whether you need a quote, consultation, or just have a question — we're here to help.
+          </p>
+
+          {/* Contact Info */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="space-y-6">
+              <div className="flex gap-3">
+                <div className="text-accent shrink-0 mt-0.5"><Phone size={20} /></div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Sales</p>
+                  <a href={`tel:${CONTACT.mobileSales.replace(/-/g, "")}`} className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.mobileSales}</a>
                 </div>
-              ))}
+              </div>
+              <div className="flex gap-3">
+                <div className="text-accent shrink-0 mt-0.5"><Phone size={20} /></div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Assistance</p>
+                  <a href={`tel:${CONTACT.mobileAssist.replace(/-/g, "")}`} className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.mobileAssist}</a>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <div className="text-accent shrink-0 mt-0.5"><Phone size={20} /></div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Landline</p>
+                  <a href={`tel:${CONTACT.landline.replace(/[()]/g, "")}`} className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.landline}</a>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <div className="text-accent shrink-0 mt-0.5"><Mail size={20} /></div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Email</p>
+                  <a href={`mailto:${CONTACT.email}`} className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.email}</a>
+                </div>
+              </div>
             </div>
             <ContactForm />
+          </div>
+
+          {/* Branches */}
+          <h3 className="text-lg font-semibold text-foreground mb-6 text-center">Our Locations</h3>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {BRANCHES.map((branch) => (
+              <motion.div
+                key={branch.id}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-card border border-border rounded-lg overflow-hidden"
+              >
+                <iframe
+                  title={`Map — ${branch.label}`}
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${branch.lng - 0.005},${branch.lat - 0.003},${branch.lng + 0.005},${branch.lat + 0.003}&layer=mapnik&marker=${branch.lat},${branch.lng}`}
+                  className="w-full h-40 border-0"
+                  loading="lazy"
+                />
+                <div className="p-5">
+                  <div className="flex items-start gap-3">
+                    <div className="text-accent shrink-0 mt-0.5"><MapPin size={16} /></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-foreground mb-1">{branch.label}</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{branch.address}</p>
+                      <div className="flex items-center justify-between mt-3">
+                        <p className="text-[10px] uppercase tracking-wider text-accent">{branch.region}</p>
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
+                        >
+                          Get Directions <ExternalLink size={12} />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </AnimatedSection>

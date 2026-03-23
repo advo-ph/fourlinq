@@ -3,14 +3,17 @@ import PageHeader from "@/components/shared/PageHeader";
 import AnimatedSection from "@/components/shared/AnimatedSection";
 import CTABanner from "@/components/shared/CTABanner";
 import { benefits, comparisonData } from "@/data/benefits";
-import { Thermometer, Wrench, VolumeX, CloudRain, Sun, Droplets, Wind } from "lucide-react";
+import { Eye, Flame, Sun, Shield, Clock, CloudRain, VolumeX, Droplets, Wind } from "lucide-react";
 import { motion } from "framer-motion";
 
 const iconMap: Record<string, React.ReactNode> = {
-  thermometer: <Thermometer size={28} />,
-  wrench: <Wrench size={28} />,
-  "volume-x": <VolumeX size={28} />,
+  sparkles: <Eye size={28} />,
+  flame: <Flame size={28} />,
+  sun: <Sun size={28} />,
+  shield: <Shield size={28} />,
+  clock: <Clock size={28} />,
   "cloud-rain": <CloudRain size={28} />,
+  "volume-x": <VolumeX size={28} />,
 };
 
 const WhyUpvc = () => {
@@ -40,37 +43,11 @@ const WhyUpvc = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {benefit.shortDescription}
                   </p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-semibold text-accent">{benefit.stat}</span>
-                    <span className="text-xs text-muted-foreground">{benefit.statLabel}</span>
-                  </div>
                 </div>
               </motion.div>
-            ))}
-          </div>
-        </div>
-      </AnimatedSection>
-
-      {/* Visual Gallery */}
-      <AnimatedSection className="py-16 bg-neutral-50">
-        <div className="page-container">
-          <div className="grid md:grid-cols-2 gap-6">
-            {benefits.map((benefit) => (
-              <div key={benefit.id} className="relative rounded-lg overflow-hidden group">
-                <img
-                  src={benefit.image}
-                  alt={benefit.title}
-                  className="w-full aspect-[3/2] object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-white font-semibold">{benefit.title}</h3>
-                </div>
-              </div>
             ))}
           </div>
         </div>
@@ -117,20 +94,20 @@ const WhyUpvc = () => {
         </div>
       </AnimatedSection>
 
-      {/* Philippine Climate - dark section */}
-      <AnimatedSection className="py-20 bg-[#0a0a0a]">
+      {/* Philippine Climate */}
+      <AnimatedSection className="py-20 bg-neutral-50">
         <div className="page-container max-w-5xl text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white mb-3">
+          <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">
             Built for the Philippine Climate
           </h2>
-          <p className="text-white/60 mb-12 max-w-xl mx-auto text-sm">
+          <p className="text-muted-foreground mb-12 max-w-xl mx-auto text-sm">
             Unique challenges demand more from your windows and doors.
           </p>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: <Sun size={24} />, title: "Tropical Heat", body: "Multi-chamber profiles reduce solar heat gain by up to 45%. Lower energy bills, cooler interiors." },
-              { icon: <Droplets size={24} />, title: "Coastal Humidity", body: "Chemically inert — won't corrode, rot, or degrade in salt-laden coastal air." },
-              { icon: <Wind size={24} />, title: "Typhoon Conditions", body: "Steel-reinforced profiles with multi-point locks. Tested to Signal No. 3 wind loads." },
+              { icon: <Sun size={24} />, title: "Tropical Heat", body: "Multi-chamber profile design traps air to reduce heat transfer, keeping interiors cooler and lowering energy consumption." },
+              { icon: <Droplets size={24} />, title: "Coastal Humidity", body: "Unlike steel, uPVC never rusts — ideal for the Philippine climate with its humidity, salt air, and heavy rainfall." },
+              { icon: <Wind size={24} />, title: "Storm Conditions", body: "EPDM gaskets and drainage holes ensure a tight seal against rain, wind, and storm conditions — built for tropical weather." },
             ].map((item, i) => (
               <motion.div
                 key={item.title}
@@ -138,11 +115,11 @@ const WhyUpvc = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="border border-white/10 rounded-lg p-6 text-left"
+                className="bg-card border border-border rounded-lg p-6 text-left"
               >
                 <div className="text-accent mb-3">{item.icon}</div>
-                <h3 className="font-medium text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-white/60 leading-relaxed">{item.body}</p>
+                <h3 className="font-medium text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.body}</p>
               </motion.div>
             ))}
           </div>

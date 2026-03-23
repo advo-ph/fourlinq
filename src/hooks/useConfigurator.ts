@@ -19,6 +19,7 @@ export interface FinishOption {
   name: string;
   color: string;
   finishType?: string;
+  description?: string;
 }
 
 export interface GlassOption {
@@ -42,6 +43,8 @@ const staticFinishesFallback: FinishOption[] = staticFinishes.map((f) => ({
   id: f.id,
   name: f.name,
   color: f.color,
+  finishType: f.finishType,
+  description: f.description,
 }));
 
 const staticGlassFallback: GlassOption[] = staticGlassOptions.map((g) => ({

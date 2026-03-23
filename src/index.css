@@ -61,6 +61,6 @@
   }
 
   .page-container {
-    @apply max-w-[1280px] mx-auto px-6 md:px-20;
+    @apply max-w-7xl mx-auto px-6;
   }
 }

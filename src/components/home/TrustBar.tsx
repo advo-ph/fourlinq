@@ -9,7 +9,7 @@ const stats = [
 const TrustBar = () => {
   return (
     <AnimatedSection className="bg-surface py-10 border-y border-border">
-      <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-0 md:divide-x divide-border">
+      <div className="page-container max-w-5xl flex flex-col md:flex-row items-center justify-center gap-8 md:gap-0 md:divide-x divide-border">
         {stats.map((stat) => (
           <div key={stat.label} className="text-center px-8 md:px-12">
             <p className="text-lg md:text-xl font-semibold text-primary tracking-tight">

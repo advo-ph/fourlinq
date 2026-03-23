@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import Logo from "@/components/shared/Logo";
+import { BRAND, CONTACT } from "@/data/fourlinq-data";
 
 const footerLinks = {
   Brand: [
     { label: "Our Story", to: "/brand" },
     { label: "Certifications", to: "/brand#certifications" },
-    { label: "Showroom", to: "/brand#contact" },
+    { label: "Visit a Showroom", to: "/brand#contact" },
   ],
   Products: [
     { label: "All Systems", to: "/products" },
@@ -27,15 +28,19 @@ const footerLinks = {
 const Footer = () => {
   return (
     <footer className="bg-[#0d0d0d] text-white">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="page-container py-16">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {/* Logo */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block mb-4">
               <Logo variant="light" />
             </Link>
-            <p className="text-sm text-white/60 leading-relaxed">
-              German-engineered uPVC systems for the Philippine climate.
+            <p className="text-sm text-white/60 leading-relaxed mb-2">
+              {BRAND.tagline}
+            </p>
+            <p className="text-xs text-white/40 leading-relaxed">
+              {CONTACT.email}<br />
+              {CONTACT.mobileSales}
             </p>
           </div>
 

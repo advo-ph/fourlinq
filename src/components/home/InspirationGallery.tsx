@@ -6,8 +6,8 @@ const InspirationGallery = () => {
   const { data: projects = [], isLoading } = useProjects();
 
   return (
-    <AnimatedSection className="py-20 px-6 bg-secondary/30">
-      <div className="max-w-7xl mx-auto">
+    <AnimatedSection className="py-20 bg-secondary/30">
+      <div className="page-container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold text-primary mb-3">Inspiration Gallery</h2>
           <p className="text-muted-foreground max-w-lg mx-auto">

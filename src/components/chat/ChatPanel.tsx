@@ -94,21 +94,19 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-24 right-6 z-[60] w-[380px] max-w-[calc(100vw-48px)] h-[520px] max-h-[calc(100vh-120px)] bg-surface rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
+    <div className="fixed bottom-24 right-6 z-[60] w-[380px] max-w-[calc(100vw-48px)] h-[520px] max-h-[calc(100vh-120px)] rounded-2xl shadow-[0_24px_80px_rgba(0,0,0,0.6),0_0_60px_rgba(220,38,38,0.15),0_0_0_1px_rgba(255,255,255,0.12)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300 bg-black/80 backdrop-blur-2xl border border-white/15">
       {/* Header */}
-      <div className="bg-primary px-5 py-4 flex items-center justify-between shrink-0">
+      <div className="px-5 py-4 flex items-center justify-between shrink-0 border-b border-white/10 bg-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-primary font-bold text-sm">
-            Q
-          </div>
+          <span className="text-red-500 font-bold text-2xl" style={{ fontFamily: "'Playfair Display', serif" }}>Q</span>
           <div>
-            <p className="text-primary-foreground font-semibold text-sm">LinQ</p>
-            <p className="text-primary-foreground/60 text-[11px]">FourlinQ Assistant</p>
+            <p className="text-white font-semibold text-sm">LinQ</p>
+            <p className="text-white/40 text-[11px]">FourlinQ Assistant</p>
           </div>
         </div>
         <button
           onClick={handleClose}
-          className="text-primary-foreground/70 hover:text-primary-foreground transition-colors p-1"
+          className="text-white/50 hover:text-white transition-colors p-1"
         >
           <X size={18} />
         </button>
@@ -117,20 +115,17 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 && (
-          <div className="text-center py-6">
-            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-              <span className="text-primary font-bold text-xl">Q</span>
-            </div>
-            <p className="text-sm font-medium text-primary mb-1">Hi! I'm LinQ 👋</p>
-            <p className="text-xs text-muted-foreground mb-4">
+          <div className="py-6 px-1">
+            <p className="text-white font-medium text-sm mb-1">Hi, I'm LinQ</p>
+            <p className="text-white/50 text-xs leading-relaxed mb-5">
               Your FourlinQ product specialist. Ask me anything about our windows, doors, or uPVC systems.
             </p>
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex flex-wrap gap-2">
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
                   onClick={() => sendMessage(s)}
-                  className="px-3 py-1.5 text-xs bg-primary/5 border border-primary/15 rounded-full text-primary hover:bg-primary/10 transition-colors"
+                  className="px-3 py-1.5 text-xs bg-white/8 border border-white/10 rounded-full text-white/70 hover:bg-white/15 hover:text-white transition-colors"
                 >
                   {s}
                 </button>
@@ -147,8 +142,8 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="px-4 py-3 border-t border-border shrink-0">
-        <div className="flex items-center gap-2">
+      <form onSubmit={handleSubmit} className="px-4 py-4 shrink-0 border-t border-white/10 bg-white/5">
+        <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-full pl-5 pr-2 py-2 shadow-[0_0_20px_rgba(255,255,255,0.05),inset_0_1px_0_rgba(255,255,255,0.1)]">
           <input
             ref={inputRef}
             type="text"
@@ -156,14 +151,14 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about our products..."
             disabled={isStreaming}
-            className="flex-1 bg-muted rounded-full px-4 py-2.5 text-sm text-primary outline-none placeholder:text-muted-foreground disabled:opacity-50"
+            className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/30 disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={!input.trim() || isStreaming}
-            className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            className="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
           >
-            {isStreaming ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            {isStreaming ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
           </button>
         </div>
       </form>

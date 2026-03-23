@@ -20,8 +20,8 @@ const CTABanner = ({
   secondaryTo = "/products",
 }: CTABannerProps) => {
   return (
-    <AnimatedSection className="bg-primary py-20 px-6">
-      <div className="max-w-4xl mx-auto text-center">
+    <AnimatedSection className="bg-primary py-20">
+      <div className="page-container max-w-4xl text-center">
         <h2 className="text-3xl md:text-4xl font-semibold text-primary-foreground mb-4">
           {headline}
         </h2>
