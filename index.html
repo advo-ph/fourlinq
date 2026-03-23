@@ -17,7 +17,31 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preload critical font files to avoid FOUC -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/dmsans/v15/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAop-hSA3-f.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKd3vUDQ.woff2" as="font" type="font/woff2" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      /* Fallback font metrics to prevent layout shift */
+      @font-face {
+        font-family: 'DM Sans Fallback';
+        src: local('Arial');
+        size-adjust: 96%;
+        ascent-override: 94%;
+        descent-override: 26%;
+        line-gap-override: 0%;
+      }
+      @font-face {
+        font-family: 'Playfair Display Fallback';
+        src: local('Georgia');
+        size-adjust: 112%;
+        ascent-override: 88%;
+        descent-override: 22%;
+        line-gap-override: 0%;
+      }
+      /* Hide content until fonts load to prevent FOUC */
+      html { visibility: visible; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
