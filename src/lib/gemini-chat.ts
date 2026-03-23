@@ -4,9 +4,11 @@ export interface ChatMessage {
 }
 
 let chatHistory: ChatMessage[] = [];
+let sessionId: string | null = null;
 
 export function resetChat() {
   chatHistory = [];
+  sessionId = null;
 }
 
 export async function* streamChat(
@@ -23,6 +25,7 @@ export async function* streamChat(
     body: JSON.stringify({
       message: userMessage,
       history: chatHistory.slice(0, -1),
+      sessionId,
     }),
   });
 
@@ -49,6 +52,9 @@ export async function* streamChat(
       if (!line.startsWith("data: ")) continue;
       try {
         const data = JSON.parse(line.slice(6));
+        if (data.sessionId) {
+          sessionId = data.sessionId;
+        }
         if (data.chunk) {
           fullResponse += data.chunk;
           yield data.chunk;

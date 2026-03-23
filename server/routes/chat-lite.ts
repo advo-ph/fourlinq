@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import crypto from "crypto";
 import dotenv from "dotenv";
+import pool from "../db.js";
 
 dotenv.config();
 
@@ -110,11 +112,14 @@ router.post("/stream", async (req, res) => {
     return res.status(503).json({ error: "Chat service not configured" });
   }
 
-  const { message, history } = req.body;
+  const { message, history, sessionId } = req.body;
 
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "message is required" });
   }
+
+  // Generate or reuse session ID for grouping conversations
+  const sid = sessionId || crypto.randomUUID();
 
   try {
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
@@ -127,15 +132,34 @@ router.post("/stream", async (req, res) => {
     const chat = model.startChat({ history: chatHistory });
     const result = await chat.sendMessageStream(message);
 
+    // Log the user message (fire-and-forget)
+    pool.query(
+      "INSERT INTO chat_messages (session_id, role, message) VALUES ($1, $2, $3)",
+      [sid, "user", message]
+    ).catch((e) => console.error("Chat log (user) error:", e));
+
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
+    // Send session ID so client can reuse it
+    res.write(`data: ${JSON.stringify({ sessionId: sid })}\n\n`);
+
+    let fullResponse = "";
     for await (const chunk of result.stream) {
       const text = chunk.text();
       if (text) {
+        fullResponse += text;
         res.write(`data: ${JSON.stringify({ chunk: text })}\n\n`);
       }
+    }
+
+    // Log the bot response (fire-and-forget)
+    if (fullResponse) {
+      pool.query(
+        "INSERT INTO chat_messages (session_id, role, message) VALUES ($1, $2, $3)",
+        [sid, "model", fullResponse]
+      ).catch((e) => console.error("Chat log (model) error:", e));
     }
 
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);

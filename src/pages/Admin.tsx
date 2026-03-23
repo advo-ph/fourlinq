@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Phone, Mail, Calendar, Tag, RefreshCw, MessageSquare, Send, X, Loader2, ChevronRight, Lock, LogOut } from "lucide-react";
+import { Phone, Mail, Calendar, Tag, RefreshCw, MessageSquare, Send, X, Loader2, ChevronRight, Lock, LogOut, MessagesSquare, ArrowLeft, HelpCircle } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 import { Link } from "react-router-dom";
 
@@ -173,6 +173,189 @@ const AdminChat = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   );
 };
 
+// ─── Chat Logs ──────────────────────────────────
+
+interface ChatSession {
+  session_id: string;
+  started_at: string;
+  last_message_at: string;
+  user_messages: number;
+  total_messages: number;
+  first_question: string;
+}
+
+interface ChatLogMessage {
+  id: number;
+  role: "user" | "model";
+  message: string;
+  created_at: string;
+}
+
+interface TopQuestion {
+  question: string;
+  times_asked: number;
+}
+
+const ChatLogs = () => {
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [topQuestions, setTopQuestions] = useState<TopQuestion[]>([]);
+  const [totalSessions, setTotalSessions] = useState(0);
+  const [selectedSession, setSelectedSession] = useState<string | null>(null);
+  const [conversation, setConversation] = useState<ChatLogMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingConvo, setLoadingConvo] = useState(false);
+
+  const fetchSessions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/chat-logs?limit=100", { credentials: "include" });
+      const data = await res.json();
+      setSessions(data.sessions || []);
+      setTotalSessions(data.total || 0);
+      setTopQuestions(data.topQuestions || []);
+    } catch (err) {
+      console.error("Failed to fetch chat logs:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchSessions(); }, [fetchSessions]);
+
+  const openConversation = async (sessionId: string) => {
+    setSelectedSession(sessionId);
+    setLoadingConvo(true);
+    try {
+      const res = await fetch(`/api/admin/chat-logs/${sessionId}`, { credentials: "include" });
+      const data = await res.json();
+      setConversation(data.messages || []);
+    } catch (err) {
+      console.error("Failed to fetch conversation:", err);
+    } finally {
+      setLoadingConvo(false);
+    }
+  };
+
+  // Conversation detail view
+  if (selectedSession) {
+    return (
+      <div>
+        <button
+          onClick={() => { setSelectedSession(null); setConversation([]); }}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary mb-6 transition-colors"
+        >
+          <ArrowLeft size={14} /> Back to all conversations
+        </button>
+
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
+          <div className="px-5 py-3 border-b border-border bg-muted/30">
+            <p className="text-xs font-mono text-muted-foreground">{selectedSession.slice(0, 8)}...</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {conversation.length > 0 && new Date(conversation[0].created_at).toLocaleString("en-PH")}
+            </p>
+          </div>
+
+          <div className="p-5 space-y-4 max-h-[600px] overflow-y-auto">
+            {loadingConvo ? (
+              <div className="text-center py-12"><Loader2 size={20} className="animate-spin mx-auto text-muted-foreground" /></div>
+            ) : (
+              conversation.map((msg) => (
+                <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[80%] rounded-lg px-4 py-2.5 ${
+                    msg.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-foreground"
+                  }`}>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.message}</p>
+                    <p className={`text-[10px] mt-1.5 ${msg.role === "user" ? "text-primary-foreground/50" : "text-muted-foreground"}`}>
+                      {new Date(msg.created_at).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Sessions list view
+  return (
+    <div>
+      {/* Top Questions */}
+      {topQuestions.length > 0 && (
+        <div className="bg-card rounded-lg border border-border p-5 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <HelpCircle size={14} className="text-accent" />
+            <h3 className="text-sm font-semibold text-foreground">Most Asked Questions</h3>
+          </div>
+          <div className="space-y-2">
+            {topQuestions.slice(0, 5).map((q, i) => (
+              <div key={i} className="flex items-center justify-between text-sm">
+                <span className="text-foreground truncate flex-1 mr-4">"{q.question}"</span>
+                <span className="text-muted-foreground text-xs shrink-0">{q.times_asked}×</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Total Conversations</p>
+          <p className="text-2xl font-semibold text-foreground">{totalSessions}</p>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Total Messages</p>
+          <p className="text-2xl font-semibold text-foreground">
+            {sessions.reduce((sum, s) => sum + s.total_messages, 0)}
+          </p>
+        </div>
+      </div>
+
+      {/* Session List */}
+      <div className="space-y-2">
+        {loading ? (
+          <div className="text-center py-20 text-muted-foreground text-sm">Loading...</div>
+        ) : sessions.length === 0 ? (
+          <div className="text-center py-20">
+            <MessagesSquare size={32} className="mx-auto text-muted-foreground/30 mb-3" />
+            <p className="text-muted-foreground text-sm">No chat conversations yet</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">Customer conversations with LinQ will appear here.</p>
+          </div>
+        ) : (
+          sessions.map((s) => (
+            <button
+              key={s.session_id}
+              onClick={() => openConversation(s.session_id)}
+              className="w-full text-left bg-card rounded-lg border border-border p-4 hover:shadow-sm hover:border-primary/30 transition-all"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground truncate">{s.first_question || "(no question)"}</p>
+                  <div className="flex items-center gap-3 mt-1.5">
+                    <span className="text-[10px] text-muted-foreground">
+                      {s.user_messages} question{s.user_messages !== 1 ? "s" : ""} · {s.total_messages} messages
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <p className="text-[10px] text-muted-foreground">
+                    {new Date(s.started_at).toLocaleDateString("en-PH", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                  <ChevronRight size={14} className="text-muted-foreground/40" />
+                </div>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Admin Page ─────────────────────────────
 
 const Admin = ({ onLogout }: { onLogout: () => void }) => {
@@ -182,6 +365,7 @@ const Admin = ({ onLogout }: { onLogout: () => void }) => {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Inquiry | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
+  const [tab, setTab] = useState<"leads" | "chats">("leads");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -264,6 +448,31 @@ const Admin = ({ onLogout }: { onLogout: () => void }) => {
           ))}
         </div>
 
+        {/* Tab Switcher */}
+        <div className="flex gap-2 mb-6 border-b border-border pb-4">
+          <button
+            onClick={() => setTab("leads")}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              tab === "leads" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
+            }`}
+          >
+            <Tag size={14} /> Leads & Inquiries
+          </button>
+          <button
+            onClick={() => setTab("chats")}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              tab === "chats" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
+            }`}
+          >
+            <MessagesSquare size={14} /> Chat Logs
+          </button>
+        </div>
+
+        {/* Chat Logs Tab */}
+        {tab === "chats" && <ChatLogs />}
+
+        {/* Leads Tab */}
+        {tab === "leads" && <>
         {/* Filters */}
         <div className="flex gap-2 mb-6">
           {[
@@ -433,6 +642,7 @@ const Admin = ({ onLogout }: { onLogout: () => void }) => {
         </div>
       </div>
 
+        </>}
       {/* Chat FAB */}
       <button
         onClick={() => setChatOpen(!chatOpen)}

@@ -160,4 +160,76 @@ router.patch("/inquiries/:id", async (req, res) => {
   }
 });
 
+/**
+ * GET /api/admin/chat-logs
+ * Query: ?limit=50&offset=0
+ * Returns conversations grouped by session, with message count and latest message
+ */
+router.get("/chat-logs", async (req, res) => {
+  const { limit = "50", offset = "0" } = req.query;
+
+  try {
+    // Get sessions with summary info
+    const sessions = await pool.query(
+      `SELECT
+        session_id,
+        min(created_at) as started_at,
+        max(created_at) as last_message_at,
+        count(*) FILTER (WHERE role = 'user')::int as user_messages,
+        count(*)::int as total_messages,
+        (SELECT message FROM chat_messages m2 WHERE m2.session_id = cm.session_id AND m2.role = 'user' ORDER BY m2.created_at ASC LIMIT 1) as first_question
+      FROM chat_messages cm
+      GROUP BY session_id
+      ORDER BY max(created_at) DESC
+      LIMIT $1 OFFSET $2`,
+      [parseInt(limit as string, 10), parseInt(offset as string, 10)]
+    );
+
+    // Total session count
+    const countResult = await pool.query(
+      "SELECT count(DISTINCT session_id)::int as total FROM chat_messages"
+    );
+
+    // Top questions (most common first user messages)
+    const topQuestions = await pool.query(
+      `SELECT first_msg as question, count(*)::int as times_asked FROM (
+        SELECT DISTINCT ON (session_id) session_id, message as first_msg
+        FROM chat_messages WHERE role = 'user'
+        ORDER BY session_id, created_at ASC
+      ) sub
+      GROUP BY first_msg
+      ORDER BY count(*) DESC
+      LIMIT 10`
+    );
+
+    res.json({
+      sessions: sessions.rows,
+      total: countResult.rows[0]?.total || 0,
+      topQuestions: topQuestions.rows,
+    });
+  } catch (err) {
+    console.error("Chat logs error:", err);
+    res.status(500).json({ error: "Failed to fetch chat logs" });
+  }
+});
+
+/**
+ * GET /api/admin/chat-logs/:sessionId
+ * Returns all messages for a specific conversation
+ */
+router.get("/chat-logs/:sessionId", async (req, res) => {
+  const { sessionId } = req.params;
+
+  try {
+    const result = await pool.query(
+      "SELECT id, role, message, created_at FROM chat_messages WHERE session_id = $1 ORDER BY created_at ASC",
+      [sessionId]
+    );
+    res.json({ messages: result.rows });
+  } catch (err) {
+    console.error("Chat log detail error:", err);
+    res.status(500).json({ error: "Failed to fetch conversation" });
+  }
+});
+
 export default router;

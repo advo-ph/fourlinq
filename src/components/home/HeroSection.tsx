@@ -14,7 +14,7 @@ const HeroSection = () => {
           fetchPriority="high"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/10" />
       </div>
 
       {/* Content */}
@@ -25,14 +25,14 @@ const HeroSection = () => {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-2xl text-left"
         >
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
             Precision.
             <br />
             Performance.
             <br />
             Perfection.
           </h1>
-          <p className="text-base md:text-lg text-white/80 mb-10 leading-relaxed max-w-md">
+          <p className="text-base md:text-lg text-white/80 mb-10 leading-relaxed max-w-md drop-shadow-[0_1px_6px_rgba(0,0,0,0.4)]">
             Premium uPVC windows and doors engineered for Philippine homes.
             Designed for comfort, built to last.
           </p>
