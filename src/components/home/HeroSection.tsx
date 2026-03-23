@@ -11,7 +11,7 @@ const HeroSection = () => {
           alt="Modern home with large uPVC windows"
           className="w-full h-full object-cover object-center"
           loading="eager"
-          fetchPriority="high"
+          fetchpriority="high"
           decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/10" />
