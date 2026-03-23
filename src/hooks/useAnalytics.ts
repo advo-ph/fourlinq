@@ -22,17 +22,13 @@ function sendEvent(event: string, extra: Record<string, unknown> = {}) {
     ...extra,
   };
 
-  // Use sendBeacon for reliability (survives page unload)
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon("/api/analytics", new Blob([JSON.stringify(payload)], { type: "application/json" }));
-  } else {
-    fetch("/api/analytics", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    }).catch(() => {});
-  }
+  // Use fetch with keepalive (survives page unload, proper content-type)
+  fetch("/api/analytics", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  }).catch(() => {});
 }
 
 /**
@@ -55,16 +51,16 @@ export function useAnalytics() {
   useEffect(() => {
     const page = location.pathname;
     if (page === lastPageRef.current) return;
-    lastPageRef.current = page;
 
     // Send scroll depth for the previous page before tracking new one
-    if (scrollMaxRef.current > 0) {
+    if (scrollMaxRef.current > 0 && lastPageRef.current) {
       sendEvent("scroll_depth", {
         page: lastPageRef.current,
         data: { depth: scrollMaxRef.current },
       });
     }
 
+    lastPageRef.current = page;
     scrollMaxRef.current = 0;
     sendEvent("page_view");
   }, [location.pathname]);
