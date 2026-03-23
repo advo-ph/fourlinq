@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import Logo from "@/components/shared/Logo";
-import { BRAND, CONTACT } from "@/data/fourlinq-data";
+import { CONTACT } from "@/data/fourlinq-data";
 
 const footerLinks = {
   Brand: [
@@ -32,10 +31,11 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {/* Logo */}
           <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="inline-block mb-4">
-              <Logo variant="light" className="h-8" compact />
+            <Link to="/" className="inline-block mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+              <span className="text-2xl text-white">Fourlin</span>
+              <span className="text-2xl text-accent font-medium">Q</span>
             </Link>
-            <p className="text-xs text-white/40 leading-relaxed mt-2">
+            <p className="text-xs text-white/40 leading-relaxed">
               {CONTACT.email}<br />
               {CONTACT.mobileSales}
             </p>
