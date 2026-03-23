@@ -4,6 +4,7 @@ import helmet from "helmet";
 import path from "path";
 import dotenv from "dotenv";
 import chatLiteRouter from "./routes/chat-lite.js";
+import adminChatRouter from "./routes/admin-chat.js";
 import inquiriesRouter from "./routes/inquiries.js";
 
 dotenv.config({ path: ".env.development.local" });
@@ -31,6 +32,7 @@ app.use(express.json());
 
 // API routes
 app.use("/api/chat", chatLiteRouter);
+app.use("/api/admin/chat", adminChatRouter);
 app.use("/api", inquiriesRouter);
 
 // Health check
