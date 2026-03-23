@@ -33,7 +33,7 @@ const Footer = () => {
           {/* Logo */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block mb-4">
-              <Logo variant="light" />
+              <Logo variant="light" className="h-10" />
             </Link>
             <p className="text-sm text-white/60 leading-relaxed mb-2">
               {BRAND.tagline}

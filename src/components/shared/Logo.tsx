@@ -12,7 +12,7 @@ const Logo = ({ variant = "dark", className = "" }: LogoProps) => {
   return (
     <svg
       viewBox="0 0 200 58"
-      className={`h-14 w-auto ${className}`}
+      className={`w-auto ${className || "h-14"}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="FourlinQ Windows & Doors"
