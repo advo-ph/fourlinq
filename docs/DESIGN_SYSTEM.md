@@ -330,12 +330,28 @@ Implementation: `elementFromPoint` samples the element behind the nav on scroll,
 
 ## Admin Dashboard (`/admin`)
 
-- **Nav:** Dark bar (`#0a0a0a`) with Logo (light variant) + "Admin" label. Matches main site header style.
+### Authentication
+
+- **Password-gated:** Dark login screen with FourlinQ logo + "Admin Access" label
+- **httpOnly cookie:** JWT stored in `__flq_admin` cookie — invisible to JavaScript, DevTools can't read the value
+- **Security:** `secure: true` (HTTPS only), `sameSite: strict` (no CSRF), 8-hour session expiry
+- **JWT secret regenerates on server restart** — all sessions invalidated automatically
+- **All `/api/admin/*` endpoints return 401 without valid cookie**
+- **Default password:** `FourlinQ@dmin2026` (configurable via `ADMIN_PASSWORD` env var)
+- **Login endpoint:** `POST /api/admin/login` — sets httpOnly cookie
+- **Check endpoint:** `GET /api/admin/check` — returns `{ authenticated: true/false }`
+- **Logout endpoint:** `POST /api/admin/logout` — clears cookie server-side
+- **Logout button** in admin nav bar
+
+### Layout & Design
+
+- **Nav:** Dark bar (`#0a0a0a`) with Logo (light variant) + "Admin" label + Refresh / View Site / Logout links
 - **Stat Cards:** 4 cards (New Leads, Quotes, Contacts, Configs) with `text-3xl` numbers. New leads uses accent color.
 - **Filter Pills:** Same rounded-full pills as Products page (`bg-primary text-primary-foreground` active, `bg-card border` inactive)
 - **Lead List:** Cards with status badge, ref ID, type label, name, email, date. Selected state: `border-primary`
 - **Detail Panel:** Sticky sidebar with contact links, config viewer, message display, status update buttons
-- **LinQ Admin Bot:** Floating chat panel (red FAB bottom-right). Dark header, streaming responses. Quick-ask suggestion buttons.
+- **LinQ Admin Bot:** Floating chat panel (`rounded-lg`, red FAB bottom-right). Dark header, streaming responses. Quick-ask suggestion buttons. Queries live DB stats.
+- **Border radius:** `rounded-lg` on cards and panels (not `rounded-xl` — matches site design system)
 - **Status colors:**
   - new: `bg-accent/10 text-accent`
   - contacted: `bg-yellow-500/10 text-yellow-700`

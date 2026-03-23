@@ -26,7 +26,12 @@ POST /api/quote-request        — Quote modal → inquiries table (with config 
 POST /api/save-configuration   — Design tool → inquiries table (with config JSON)
 POST /api/chat/stream          — LinQ chatbot (Gemini SSE stream, verified knowledge base)
 
-# Admin
+# Admin Auth (no password required to call, but login sets httpOnly cookie)
+POST /api/admin/login          — Validate password, set JWT httpOnly cookie (__flq_admin)
+POST /api/admin/logout         — Clear auth cookie
+GET  /api/admin/check          — Returns { authenticated: true/false }
+
+# Admin (protected — requires valid __flq_admin httpOnly cookie)
 GET  /api/admin/inquiries      — List inquiries (?type, ?status, ?limit, ?offset)
 PATCH /api/admin/inquiries/:id — Update status/notes
 POST /api/admin/chat/stream    — LinQ Admin chatbot (Gemini SSE + live DB stats injection)
@@ -34,6 +39,14 @@ POST /api/admin/chat/stream    — LinQ Admin chatbot (Gemini SSE + live DB stat
 # Utility
 GET  /api/health               — Health check
 ```
+
+## Authentication
+
+- **Method:** JWT in httpOnly secure sameSite:strict cookie (`__flq_admin`)
+- **Session:** 8-hour expiry; JWT secret regenerates on server restart
+- **Middleware:** `requireAdmin` in `server/auth.ts` — checks cookie on every `/api/admin/*` request
+- **Password:** `ADMIN_PASSWORD` env var (default: `FourlinQ@dmin2026`)
+- **401 response** for all unauthenticated admin API calls
 
 ## Active Tables
 

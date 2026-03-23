@@ -82,6 +82,7 @@
 - **Adaptive Navbar:** Detects dark background sections on scroll via luminance sampling. Switches to white text + dark backdrop when over dark sections, white bg + dark text over light sections. Text-shadow on hero for readability.
 - **CRM / Lead Management:** All form submissions (contact, quotes, design tool configs) stored in PostgreSQL. Admin dashboard at `/admin` with lead list, detail panel, status pipeline (new → contacted → quoted → won/lost).
 - **LinQ Admin Bot:** AI chatbot on admin page with live database context injection. Can answer "How many leads today?", "Show stale leads", client lookups, product popularity, company info. Uses Gemini 2.5 Flash with real-time stats in system prompt.
+- **Admin Auth:** Password-gated login screen. httpOnly cookie auth — JWT invisible to JavaScript/DevTools. sameSite strict (no CSRF), secure (HTTPS only), 8h expiry. All `/api/admin/*` endpoints return 401 without valid session. Sessions invalidate on server restart.
 - **Deployment:** Self-hosted on Contabo VPS (Singapore). Node.js + Express + PM2, Nginx reverse proxy, Let's Encrypt SSL. PostgreSQL 16 on same VPS. Live at https://fourlinq.ph.
 - **Performance:** Font preloading + fallback metrics prevent FOUC. Hero image preloaded with `fetchPriority="high"`. Dark initial background prevents white flash.
 - **Achieved:** Successfully transitioned from "Generic WordPress" to a premium architectural brand aesthetic aligned with competitors like Schüco and Marvin. All data verified against official brochures. Full-stack self-hosted deployment operational.
