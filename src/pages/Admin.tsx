@@ -108,7 +108,7 @@ const AdminChat = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 w-[420px] h-[600px] bg-surface rounded-xl border border-border shadow-2xl z-50 flex flex-col overflow-hidden">
+    <div className="fixed bottom-6 right-6 w-[420px] h-[600px] bg-surface rounded-lg border border-border shadow-2xl z-50 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-[#0a0a0a]">
         <div className="flex items-center gap-2">
@@ -487,7 +487,7 @@ const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
             <Lock size={12} /> Admin Access
           </div>
         </div>
-        <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-border p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-card rounded-lg border border-border p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Password</label>
             <input
