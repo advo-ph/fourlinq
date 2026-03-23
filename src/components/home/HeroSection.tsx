@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="relative h-screen min-h-[600px] flex items-center overflow-hidden">
+    <section className="relative h-screen min-h-[600px] flex items-center overflow-hidden bg-[#1a1a1a]">
       {/* Background */}
       <div className="absolute inset-0">
         <img
@@ -11,6 +11,8 @@ const HeroSection = () => {
           alt="Modern home with large uPVC windows"
           className="w-full h-full object-cover object-center"
           loading="eager"
+          fetchPriority="high"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/10 to-transparent" />
       </div>

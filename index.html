@@ -17,6 +17,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preload hero image to prevent white flash -->
+    <link rel="preload" href="/images/hero-bg.jpg" as="image" />
     <!-- Preload critical font files to avoid FOUC -->
     <link rel="preload" href="https://fonts.gstatic.com/s/dmsans/v15/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAop-hSA3-f.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKd3vUDQ.woff2" as="font" type="font/woff2" crossorigin />
@@ -39,8 +41,8 @@
         descent-override: 22%;
         line-gap-override: 0%;
       }
-      /* Hide content until fonts load to prevent FOUC */
-      html { visibility: visible; }
+      /* Dark initial background matches hero — prevents white flash */
+      html { background: #1a1a1a; }
     </style>
   </head>
   <body>
