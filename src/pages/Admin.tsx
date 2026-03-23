@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Phone, Mail, Calendar, Tag, RefreshCw, MessageSquare, Send, X, Loader2, ChevronRight } from "lucide-react";
+import { Phone, Mail, Calendar, Tag, RefreshCw, MessageSquare, Send, X, Loader2, ChevronRight, Lock, LogOut } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 import { Link } from "react-router-dom";
 
@@ -65,6 +65,7 @@ const AdminChat = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
       const res = await fetch("/api/admin/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ message: userMsg, history: messages }),
       });
 
@@ -174,7 +175,7 @@ const AdminChat = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
 
 // ─── Main Admin Page ─────────────────────────────
 
-const Admin = () => {
+const Admin = ({ onLogout }: { onLogout: () => void }) => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [counts, setCounts] = useState<CountRow[]>([]);
   const [filter, setFilter] = useState<string>("all");
@@ -188,7 +189,7 @@ const Admin = () => {
       const params = new URLSearchParams();
       if (filter !== "all") params.set("type", filter);
       params.set("limit", "100");
-      const res = await fetch(`/api/admin/inquiries?${params}`);
+      const res = await fetch(`/api/admin/inquiries?${params}`, { credentials: "include" });
       const data = await res.json();
       setInquiries(data.inquiries || []);
       setCounts(data.counts || []);
@@ -205,6 +206,7 @@ const Admin = () => {
     await fetch(`/api/admin/inquiries/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ status }),
     });
     fetchData();
@@ -233,6 +235,15 @@ const Admin = () => {
             <Link to="/" className="text-[11px] text-white/50 hover:text-white uppercase tracking-wider transition-colors">
               View Site
             </Link>
+            <button
+              onClick={async () => {
+                await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
+                onLogout();
+              }}
+              className="flex items-center gap-1.5 text-[11px] text-white/50 hover:text-accent uppercase tracking-wider transition-colors"
+            >
+              <LogOut size={13} /> Logout
+            </button>
           </div>
         </div>
       </nav>
@@ -436,4 +447,99 @@ const Admin = () => {
   );
 };
 
-export default Admin;
+// ─── Login Gate ──────────────────────────────────
+
+const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        onLogin();
+      } else {
+        setError("Invalid password");
+        setPassword("");
+      }
+    } catch {
+      setError("Connection failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <Logo variant="light" className="h-12 mx-auto mb-6" />
+          <div className="flex items-center justify-center gap-2 text-white/40 text-xs uppercase tracking-wider">
+            <Lock size={12} /> Admin Access
+          </div>
+        </div>
+        <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-border p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Password</label>
+            <input
+              type="password"
+              autoFocus
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              placeholder="Enter admin password"
+            />
+          </div>
+          {error && <p className="text-xs text-accent">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : "Sign In"}
+          </button>
+        </form>
+        <p className="text-center text-[10px] text-white/20 mt-6">FourlinQ Internal System</p>
+      </div>
+    </div>
+  );
+};
+
+// ─── Auth Wrapper ────────────────────────────────
+
+const AdminWithAuth = () => {
+  const [authed, setAuthed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/check", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => setAuthed(d.authenticated))
+      .catch(() => setAuthed(false));
+  }, []);
+
+  if (authed === null) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <Loader2 size={24} className="text-white/30 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!authed) {
+    return <LoginScreen onLogin={() => setAuthed(true)} />;
+  }
+
+  return <Admin onLogout={() => setAuthed(false)} />;
+};
+
+export default AdminWithAuth;
