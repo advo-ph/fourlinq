@@ -3,6 +3,24 @@ import pool from "../db.js";
 
 const router = Router();
 
+// ─── Helpers ────────────────────────────────────
+
+const VALID_STATUSES = ["new", "contacted", "quoted", "won", "lost"];
+const VALID_TYPES = ["contact", "quote", "configuration"];
+const MAX_LIMIT = 200;
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function clampInt(val: string | undefined, fallback: number, max: number): number {
+  const n = parseInt(val as string, 10);
+  if (isNaN(n) || n < 0) return fallback;
+  return Math.min(n, max);
+}
+
+// ─── Public endpoints ───────────────────────────
+
 /**
  * POST /api/contact
  * Body: { name, email, phone?, subject?, message }
@@ -12,6 +30,9 @@ router.post("/contact", async (req, res) => {
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: "name, email, and message are required" });
+  }
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: "Invalid email address" });
   }
 
   try {
@@ -38,6 +59,9 @@ router.post("/quote-request", async (req, res) => {
 
   if (!name || !email) {
     return res.status(400).json({ error: "name and email are required" });
+  }
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: "Invalid email address" });
   }
 
   try {
@@ -66,6 +90,9 @@ router.post("/save-configuration", async (req, res) => {
   if (!config) {
     return res.status(400).json({ error: "config is required" });
   }
+  if (email && !isValidEmail(email)) {
+    return res.status(400).json({ error: "Invalid email address" });
+  }
 
   try {
     const refId = "CFG-" + Date.now().toString(36).toUpperCase();
@@ -82,12 +109,25 @@ router.post("/save-configuration", async (req, res) => {
   }
 });
 
+// ─── Admin endpoints ────────────────────────────
+
 /**
  * GET /api/admin/inquiries
  * Query: ?type=contact|quote|configuration&status=new|contacted|quoted|won|lost&limit=50&offset=0
  */
 router.get("/inquiries", async (req, res) => {
-  const { type, status, limit = "50", offset = "0" } = req.query;
+  const { type, status, limit, offset } = req.query;
+
+  // Validate filter values
+  if (type && !VALID_TYPES.includes(type as string)) {
+    return res.status(400).json({ error: `Invalid type. Must be one of: ${VALID_TYPES.join(", ")}` });
+  }
+  if (status && !VALID_STATUSES.includes(status as string)) {
+    return res.status(400).json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}` });
+  }
+
+  const safeLimit = clampInt(limit as string, 50, MAX_LIMIT);
+  const safeOffset = clampInt(offset as string, 0, 100000);
 
   try {
     let query = "SELECT * FROM inquiries WHERE 1=1";
@@ -104,7 +144,7 @@ router.get("/inquiries", async (req, res) => {
     }
 
     query += ` ORDER BY created_at DESC LIMIT $${idx++} OFFSET $${idx++}`;
-    params.push(parseInt(limit as string, 10), parseInt(offset as string, 10));
+    params.push(safeLimit, safeOffset);
 
     const result = await pool.query(query, params);
 
@@ -132,6 +172,22 @@ router.patch("/inquiries/:id", async (req, res) => {
   const { id } = req.params;
   const { status, notes } = req.body;
 
+  // Validate ID
+  const numericId = parseInt(id, 10);
+  if (isNaN(numericId) || numericId <= 0) {
+    return res.status(400).json({ error: "Invalid inquiry ID" });
+  }
+
+  // Validate status
+  if (status && !VALID_STATUSES.includes(status)) {
+    return res.status(400).json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}` });
+  }
+
+  // Must provide at least one field to update
+  if (!status && notes === undefined) {
+    return res.status(400).json({ error: "Provide status or notes to update" });
+  }
+
   try {
     const updates: string[] = [];
     const params: (string | number)[] = [];
@@ -147,11 +203,15 @@ router.patch("/inquiries/:id", async (req, res) => {
     }
     updates.push(`updated_at = now()`);
 
-    params.push(parseInt(id, 10));
-    await pool.query(
+    params.push(numericId);
+    const result = await pool.query(
       `UPDATE inquiries SET ${updates.join(", ")} WHERE id = $${idx}`,
       params
     );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Inquiry not found" });
+    }
 
     res.json({ success: true });
   } catch (err) {
@@ -166,10 +226,11 @@ router.patch("/inquiries/:id", async (req, res) => {
  * Returns conversations grouped by session, with message count and latest message
  */
 router.get("/chat-logs", async (req, res) => {
-  const { limit = "50", offset = "0" } = req.query;
+  const { limit, offset } = req.query;
+  const safeLimit = clampInt(limit as string, 50, MAX_LIMIT);
+  const safeOffset = clampInt(offset as string, 0, 100000);
 
   try {
-    // Get sessions with summary info
     const sessions = await pool.query(
       `SELECT
         session_id,
@@ -182,15 +243,13 @@ router.get("/chat-logs", async (req, res) => {
       GROUP BY session_id
       ORDER BY max(created_at) DESC
       LIMIT $1 OFFSET $2`,
-      [parseInt(limit as string, 10), parseInt(offset as string, 10)]
+      [safeLimit, safeOffset]
     );
 
-    // Total session count
     const countResult = await pool.query(
       "SELECT count(DISTINCT session_id)::int as total FROM chat_messages"
     );
 
-    // Top questions (most common first user messages)
     const topQuestions = await pool.query(
       `SELECT first_msg as question, count(*)::int as times_asked FROM (
         SELECT DISTINCT ON (session_id) session_id, message as first_msg
@@ -219,6 +278,10 @@ router.get("/chat-logs", async (req, res) => {
  */
 router.get("/chat-logs/:sessionId", async (req, res) => {
   const { sessionId } = req.params;
+
+  if (!sessionId || sessionId.length > 100) {
+    return res.status(400).json({ error: "Invalid session ID" });
+  }
 
   try {
     const result = await pool.query(
