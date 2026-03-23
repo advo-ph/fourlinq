@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import chatLiteRouter from "./routes/chat-lite.js";
 import adminChatRouter from "./routes/admin-chat.js";
 import inquiriesRouter from "./routes/inquiries.js";
+import analyticsRouter from "./routes/analytics.js";
 import { loginHandler, logoutHandler, checkAuthHandler, requireAdmin } from "./auth.js";
 
 dotenv.config({ path: ".env.development.local" });
@@ -35,6 +36,9 @@ app.post("/api/contact", inquiriesRouter);
 app.post("/api/quote-request", inquiriesRouter);
 app.post("/api/save-configuration", inquiriesRouter);
 
+// Public analytics endpoint (fire-and-forget from frontend)
+app.post("/api/analytics", analyticsRouter);
+
 // ─── Admin auth (no password required) ───────────
 app.post("/api/admin/login", loginHandler);
 app.post("/api/admin/logout", logoutHandler);
@@ -42,6 +46,7 @@ app.get("/api/admin/check", checkAuthHandler);
 
 // ─── Protected admin routes ──────────────────────
 app.use("/api/admin/chat", requireAdmin, adminChatRouter);
+app.use("/api/admin/analytics", requireAdmin, analyticsRouter);
 app.use("/api/admin", requireAdmin, inquiriesRouter);
 
 // Health check

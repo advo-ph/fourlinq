@@ -69,9 +69,65 @@ async function getAdminContext(): Promise<string> {
       LIMIT 10
     `);
 
+    // ─── ANALYTICS ─────────────────────────────
+    const pageViews = await pool.query(`
+      SELECT
+        count(*) FILTER (WHERE created_at >= CURRENT_DATE)::int as today,
+        count(*) FILTER (WHERE created_at >= CURRENT_DATE - INTERVAL '7 days')::int as week,
+        count(DISTINCT session_id) FILTER (WHERE created_at >= CURRENT_DATE)::int as visitors_today,
+        count(DISTINCT session_id) FILTER (WHERE created_at >= CURRENT_DATE - INTERVAL '7 days')::int as visitors_week
+      FROM analytics WHERE event = 'page_view'
+    `);
+
+    const topPages = await pool.query(`
+      SELECT page, count(*)::int as views FROM analytics
+      WHERE event = 'page_view' AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+      GROUP BY page ORDER BY views DESC LIMIT 8
+    `);
+
+    const topClicks = await pool.query(`
+      SELECT target, count(*)::int as clicks FROM analytics
+      WHERE event = 'click' AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+      GROUP BY target ORDER BY clicks DESC LIMIT 10
+    `);
+
+    const scrollDepth = await pool.query(`
+      SELECT page, round(avg((data->>'depth')::numeric))::int as avg_depth FROM analytics
+      WHERE event = 'scroll_depth' AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+      GROUP BY page ORDER BY avg_depth DESC
+    `);
+
+    const topFinishes = await pool.query(`
+      SELECT data->>'value' as finish, count(*)::int as tries FROM analytics
+      WHERE event = 'config_change' AND data->>'field' = 'finish'
+        AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+      GROUP BY data->>'value' ORDER BY tries DESC LIMIT 11
+    `);
+
+    const topTypes = await pool.query(`
+      SELECT data->>'value' as product_type, count(*)::int as tries FROM analytics
+      WHERE event = 'config_change' AND data->>'field' = 'type'
+        AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+      GROUP BY data->>'value' ORDER BY tries DESC LIMIT 5
+    `);
+
+    const topProductViews = await pool.query(`
+      SELECT target as product, count(*)::int as views FROM analytics
+      WHERE event = 'product_view' AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+      GROUP BY target ORDER BY views DESC LIMIT 10
+    `);
+
+    const chatOpens = await pool.query(`
+      SELECT count(*)::int as total FROM analytics
+      WHERE event = 'chat_open' AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+    `);
+
+    const pv = pageViews.rows[0] || {};
+
     return `
 [LIVE DATABASE STATS — as of ${new Date().toISOString()}]
 
+── LEADS ──
 Leads today: ${today.rows[0].count}
 Leads this week: ${week.rows[0].count}
 Leads this month: ${month.rows[0].count}
@@ -83,13 +139,37 @@ ${summary.rows.map((r: { type: string; status: string; count: number }) => `  ${
 Status breakdown:
 ${statuses.rows.map((r: { status: string; count: number }) => `  ${r.status}: ${r.count}`).join("\n")}
 
-Most requested products:
+Most requested products (from quotes):
 ${products.rows.length > 0 ? products.rows.map((r: { product_name: string; count: number }) => `  ${r.product_name}: ${r.count} requests`).join("\n") : "  No product-specific requests yet"}
 
 Stale leads (new > 24h, need follow-up):
 ${stale.rows.length > 0 ? stale.rows.map((r: { ref_id: string; name: string; email: string; type: string; created_at: string }) => `  ${r.ref_id} — ${r.name} (${r.email}) — ${r.type} — ${new Date(r.created_at).toLocaleDateString()}`).join("\n") : "  None — all leads followed up"}
 
-Recent 20 inquiries:
+── WEBSITE ANALYTICS ──
+Page views today: ${pv.today || 0} (${pv.visitors_today || 0} unique visitors)
+Page views this week: ${pv.week || 0} (${pv.visitors_week || 0} unique visitors)
+Chat opens this week: ${chatOpens.rows[0]?.total || 0}
+
+Top pages (last 7 days):
+${topPages.rows.length > 0 ? topPages.rows.map((r: { page: string; views: number }) => `  ${r.page}: ${r.views} views`).join("\n") : "  No data yet"}
+
+Top clicked elements (last 7 days):
+${topClicks.rows.length > 0 ? topClicks.rows.map((r: { target: string; clicks: number }) => `  "${r.target}": ${r.clicks} clicks`).join("\n") : "  No data yet"}
+
+Average scroll depth per page (last 7 days):
+${scrollDepth.rows.length > 0 ? scrollDepth.rows.map((r: { page: string; avg_depth: number }) => `  ${r.page}: ${r.avg_depth}%`).join("\n") : "  No data yet"}
+
+── DESIGN TOOL INSIGHTS ──
+Most tried finishes (last 30 days):
+${topFinishes.rows.length > 0 ? topFinishes.rows.map((r: { finish: string; tries: number }) => `  ${r.finish}: ${r.tries} tries`).join("\n") : "  No data yet"}
+
+Most tried product types (last 30 days):
+${topTypes.rows.length > 0 ? topTypes.rows.map((r: { product_type: string; tries: number }) => `  ${r.product_type}: ${r.tries} tries`).join("\n") : "  No data yet"}
+
+Most viewed products (drawer opens, last 30 days):
+${topProductViews.rows.length > 0 ? topProductViews.rows.map((r: { product: string; views: number }) => `  ${r.product}: ${r.views} views`).join("\n") : "  No data yet"}
+
+── RECENT INQUIRIES ──
 ${recent.rows.map((r: { ref_id: string; type: string; name: string | null; email: string | null; product_name: string | null; status: string; created_at: string; message: string | null }) =>
   `  ${r.ref_id} | ${r.type} | ${r.name || "anon"} | ${r.email || "-"} | ${r.product_name || "-"} | ${r.status} | ${new Date(r.created_at).toLocaleDateString()}`
 ).join("\n")}

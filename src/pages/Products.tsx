@@ -7,6 +7,7 @@ import QuoteModal from "@/components/shared/QuoteModal";
 import { useProducts, Product } from "@/hooks/useProducts";
 import FinishSwatch from "@/components/shared/FinishSwatch";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
+import { trackProductView } from "@/hooks/useAnalytics";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -183,7 +184,7 @@ const Products = () => {
                     key={product.id}
                     initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    onClick={() => setSelectedProduct(product)}
+                    onClick={() => { setSelectedProduct(product); trackProductView(product.name); }}
                     className="group bg-card rounded-lg border border-border overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                   >
                     <div className="aspect-[4/3] overflow-hidden relative">

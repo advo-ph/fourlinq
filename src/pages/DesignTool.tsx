@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { Loader2, CheckCircle, X } from "lucide-react";
 import WindowPreview from "@/components/configurator/WindowPreview";
 import FinishSwatch from "@/components/shared/FinishSwatch";
+import { trackConfigChange } from "@/hooks/useAnalytics";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
   LiftAndSlideIcon, FrenchDoorIcon, TiltAndTurnIcon, SlidingDoorIcon, EntranceIcon,
@@ -152,6 +153,11 @@ const DesignTool = () => {
     height: 1400,
   });
 
+  const updateConfig = (field: string, value: string | number) => {
+    setConfig((prev) => ({ ...prev, [field]: value }));
+    if (typeof value === "string") trackConfigChange(field, value);
+  };
+
   const { data: productTypes = [], isLoading: typesLoading } = useProductTypes();
   const { data: finishOptions = [], isLoading: finishesLoading } = useFinishes();
   const { data: glassOptions = [], isLoading: glassLoading } = useGlassTypes();
@@ -218,7 +224,7 @@ const DesignTool = () => {
                     {productTypes.filter((t) => t.category === "windows").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
-                        <button key={type.id} onClick={() => setConfig({ ...config, type: type.id })} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
                           <div className="flex justify-center mb-2">
                             {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-muted-foreground"} strokeWidth={1} />}
                           </div>
@@ -232,7 +238,7 @@ const DesignTool = () => {
                     {productTypes.filter((t) => t.category === "doors").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
-                        <button key={type.id} onClick={() => setConfig({ ...config, type: type.id })} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
                           <div className="flex justify-center mb-2">
                             {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-muted-foreground"} strokeWidth={1} />}
                           </div>
@@ -249,7 +255,7 @@ const DesignTool = () => {
                   <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Solid</h3>
                   <div className="grid grid-cols-4 gap-3 mb-6">
                     {finishOptions.filter((f) => f.finishType === "solid").map((finish) => (
-                      <button key={finish.id} onClick={() => setConfig({ ...config, finish: finish.id })} className="flex flex-col items-center gap-2 group" title={finish.description}>
+                      <button key={finish.id} onClick={() => updateConfig("finish", finish.id)} className="flex flex-col items-center gap-2 group" title={finish.description}>
                         <FinishSwatch finishId={finish.id} color={finish.color} finishType="solid" selected={config.finish === finish.id} />
                         <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-primary font-medium" : "text-muted-foreground"}`}>{finish.name}</span>
                       </button>
@@ -258,7 +264,7 @@ const DesignTool = () => {
                   <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Wood Grain</h3>
                   <div className="grid grid-cols-4 gap-3">
                     {finishOptions.filter((f) => f.finishType === "wood-grain").map((finish) => (
-                      <button key={finish.id} onClick={() => setConfig({ ...config, finish: finish.id })} className="flex flex-col items-center gap-2 group" title={finish.description}>
+                      <button key={finish.id} onClick={() => updateConfig("finish", finish.id)} className="flex flex-col items-center gap-2 group" title={finish.description}>
                         <FinishSwatch finishId={finish.id} color={finish.color} finishType="wood-grain" selected={config.finish === finish.id} />
                         <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-primary font-medium" : "text-muted-foreground"}`}>{finish.name}</span>
                       </button>
@@ -273,7 +279,7 @@ const DesignTool = () => {
                     {glassOptions.map((glass) => {
                       const visual = glassVisuals[glass.id] || { tint: "rgba(200,220,240,0.1)" };
                       return (
-                        <button key={glass.id} onClick={() => setConfig({ ...config, glass: glass.id })} className={`p-3 rounded-lg border-2 text-center transition-colors ${config.glass === glass.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                        <button key={glass.id} onClick={() => updateConfig("glass", glass.id)} className={`p-3 rounded-lg border-2 text-center transition-colors ${config.glass === glass.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
                           <div className="w-10 h-14 mx-auto rounded mb-2 border border-border" style={{ backgroundColor: visual.tint }} />
                           <span className="text-xs font-medium text-primary">{glass.name}</span>
                         </button>
@@ -288,11 +294,11 @@ const DesignTool = () => {
                   <div className="space-y-8">
                     <div>
                       <div className="flex justify-between mb-2"><span className="text-sm text-muted-foreground">Width</span><span className="text-sm font-medium text-primary">{config.width} mm</span></div>
-                      <Slider value={[config.width]} onValueChange={([v]) => setConfig({ ...config, width: v })} min={sizeConstraints.width.min} max={sizeConstraints.width.max} step={sizeConstraints.width.step} />
+                      <Slider value={[config.width]} onValueChange={([v]) => updateConfig("width", v)} min={sizeConstraints.width.min} max={sizeConstraints.width.max} step={sizeConstraints.width.step} />
                     </div>
                     <div>
                       <div className="flex justify-between mb-2"><span className="text-sm text-muted-foreground">Height</span><span className="text-sm font-medium text-primary">{config.height} mm</span></div>
-                      <Slider value={[config.height]} onValueChange={([v]) => setConfig({ ...config, height: v })} min={sizeConstraints.height.min} max={sizeConstraints.height.max} step={sizeConstraints.height.step} />
+                      <Slider value={[config.height]} onValueChange={([v]) => updateConfig("height", v)} min={sizeConstraints.height.min} max={sizeConstraints.height.max} step={sizeConstraints.height.step} />
                     </div>
                   </div>
                 </div>

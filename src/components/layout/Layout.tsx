@@ -1,8 +1,10 @@
 import { ReactNode } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 const Layout = ({ children }: { children: ReactNode }) => {
+  useAnalytics();
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

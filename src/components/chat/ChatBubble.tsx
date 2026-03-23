@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 import ChatPanel from "./ChatPanel";
+import { trackChatOpen } from "@/hooks/useAnalytics";
 
 const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +12,7 @@ const ChatBubble = () => {
 
       {/* Floating bubble — always visible, toggles between open/close icon */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { if (!isOpen) trackChatOpen(); setIsOpen(!isOpen); }}
         className="fixed bottom-6 right-6 z-[61] w-14 h-14 rounded-full bg-red-600/40 backdrop-blur-xl border border-white/20 text-white shadow-[0_8px_32px_rgba(220,38,38,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-red-600/50 hover:shadow-[0_12px_40px_rgba(220,38,38,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center group"
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
