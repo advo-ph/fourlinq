@@ -33,12 +33,9 @@ const Footer = () => {
           {/* Logo */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block mb-4">
-              <Logo variant="light" className="h-10" />
+              <Logo variant="light" className="h-8" compact />
             </Link>
-            <p className="text-sm text-white/60 leading-relaxed mb-2">
-              {BRAND.tagline}
-            </p>
-            <p className="text-xs text-white/40 leading-relaxed">
+            <p className="text-xs text-white/40 leading-relaxed mt-2">
               {CONTACT.email}<br />
               {CONTACT.mobileSales}
             </p>

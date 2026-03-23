@@ -1,9 +1,10 @@
 interface LogoProps {
   variant?: "light" | "dark";
   className?: string;
+  compact?: boolean;
 }
 
-const Logo = ({ variant = "dark", className = "" }: LogoProps) => {
+const Logo = ({ variant = "dark", className = "", compact = false }: LogoProps) => {
   const textColor = variant === "light" ? "#ffffff" : "currentColor";
   const lineColor = variant === "light" ? "#ffffff" : "currentColor";
   const subColor = variant === "light" ? "#ffffff" : "currentColor";
@@ -11,7 +12,7 @@ const Logo = ({ variant = "dark", className = "" }: LogoProps) => {
 
   return (
     <svg
-      viewBox="0 0 200 58"
+      viewBox={compact ? "0 0 200 38" : "0 0 200 58"}
       className={`w-auto ${className || "h-14"}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -30,15 +31,17 @@ const Logo = ({ variant = "dark", className = "" }: LogoProps) => {
         <tspan fill={qColor} style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500 }}>Q</tspan>
       </text>
       {/* Subtitle */}
-      <text
-        x="100"
-        y="56"
-        fill={subColor}
-        textAnchor="middle"
-        style={{ fontFamily: "'Times New Roman', 'Times', serif", fontSize: "23px", fontWeight: 400, letterSpacing: "0.03em" }}
-      >
-        Windows &amp; Doors
-      </text>
+      {!compact && (
+        <text
+          x="100"
+          y="56"
+          fill={subColor}
+          textAnchor="middle"
+          style={{ fontFamily: "'Times New Roman', 'Times', serif", fontSize: "23px", fontWeight: 400, letterSpacing: "0.03em" }}
+        >
+          Windows &amp; Doors
+        </text>
+      )}
     </svg>
   );
 };
