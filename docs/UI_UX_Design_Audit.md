@@ -71,7 +71,7 @@
 
 **Vibe:** Tropical Futurism — Tesla-inspired minimalist premium.
 
-- **Hero Section:** Full-bleed architectural photography with light gradient overlay (`from-black/30 via-black/10`) — hero image stays bright and visible. Bold serif-scale "Precision. Performance. Perfection." headline with red + white-bordered CTAs. Framer Motion fade-up animation.
+- **Hero Section:** Full-bleed architectural photography with gradient overlay (`from-black/60 via-black/30 to-black/10`) + drop-shadow on text for readability. Bold serif-scale "Precision. Performance. Perfection." headline with red + white-bordered CTAs. Framer Motion fade-up animation.
 - **Typography:** DM Sans for body/UI (clean, geometric) + Playfair Display for the logo (editorial serif accent). Strong hierarchy with uppercase tracked labels, bold headlines, and restrained body copy.
 - **Color Palette:** Black/white/red. Near-black charcoal (#0A0A0A), clean white surfaces, red accent (#DC2626). No navy, no cream — strictly monochromatic with red signature.
 - **Imagery:** White-background product photos for catalog clarity, architectural lifestyle photos for hero/projects. Client-provided minimalistic PNG window/door icons.
@@ -81,10 +81,12 @@
 - **Brand Page:** Verified contact info (3 phone numbers + email) and 4 branch locations (Manila Main Office, Ortigas CW Home Depot, Alabang CW Home Depot, Cebu Branch). Davao removed — no longer operating in Mindanao. 10-Year Warranty scope displayed as badge cards. OSM map embeds on each branch card with "Get Directions" link.
 - **Adaptive Navbar:** Detects dark background sections on scroll via luminance sampling. Switches to white text + dark backdrop when over dark sections, white bg + dark text over light sections. Text-shadow on hero for readability.
 - **CRM / Lead Management:** All form submissions (contact, quotes, design tool configs) stored in PostgreSQL. Admin dashboard at `/admin` with lead list, detail panel, status pipeline (new → contacted → quoted → won/lost).
+- **Chat Message Tracking:** Every customer chatbot message + bot response logged to `chat_messages` table with session grouping. Admin "Chat Logs" tab shows all conversations, message counts, timestamps, and "Most Asked Questions" ranked by frequency.
 - **LinQ Admin Bot:** AI chatbot on admin page with live database context injection. Can answer "How many leads today?", "Show stale leads", client lookups, product popularity, company info. Uses Gemini 2.5 Flash with real-time stats in system prompt.
+- **Analytics:** Fire-and-forget event tracking (page views, clicks, scroll depth, config changes, product views, chat opens). Admin summary endpoint with daily visitors, top pages, top clicks, top finishes tried, referrers.
 - **Admin Auth:** Password-gated login screen. httpOnly cookie auth — JWT invisible to JavaScript/DevTools. sameSite strict (no CSRF), secure (HTTPS only), 8h expiry. All `/api/admin/*` endpoints return 401 without valid session. Sessions invalidate on server restart.
 - **Deployment:** Self-hosted on Contabo VPS (Singapore). Node.js + Express + PM2, Nginx reverse proxy, Let's Encrypt SSL. PostgreSQL 16 on same VPS. Live at https://fourlinq.ph.
-- **Performance:** Font preloading + fallback metrics prevent FOUC. Hero image preloaded with `fetchPriority="high"`. Dark initial background prevents white flash.
+- **Performance:** Font fallback metrics prevent FOUC (preconnect + fallback @font-face with size-adjust). Hero image preloaded with `fetchpriority="high"`. Dark initial background prevents white flash. Product/configurator data loaded from static TS files — no phantom API fetches.
 - **Achieved:** Successfully transitioned from "Generic WordPress" to a premium architectural brand aesthetic aligned with competitors like Schüco and Marvin. All data verified against official brochures. Full-stack self-hosted deployment operational.
 
 ---

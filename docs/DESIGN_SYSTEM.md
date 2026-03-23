@@ -22,10 +22,14 @@ This document is the single source of truth for all UI decisions on the FourlinQ
 - **Font:** Playfair Display (serif)
 - **Wordmark:** `Fourlin` in white or dark (context-dependent) + `Q` in red `#DC2626`
 - **Divider:** Thin horizontal line below the wordmark
-- **Subline:** `Windows & Doors` in small text, tracked, below the divider
+- **Subline:** `Windows & Doors` in small text, tracked, below the divider (hidden in `compact` mode)
 - **Variants:**
   - `light` — white text on dark/image backgrounds (hero, footer)
   - `dark` — dark text on white backgrounds (scrolled nav, inner pages)
+- **Props:**
+  - `variant`: `"light"` | `"dark"` (default: `"dark"`)
+  - `className`: override default `h-14` height (e.g., `"h-8"`, `"h-10"`)
+  - `compact`: `boolean` — hides "Windows & Doors" subtitle, crops viewBox (used in footer)
 - **Component:** `src/components/shared/Logo.tsx`
 - The red `Q` is the brand signature — accent red is also used for CTA buttons and active states
 - **Favicon:** The red Playfair Display `Q` glyph, exported as SVG path (`public/favicon.svg`) + PNG sizes (180, 192, 512)
@@ -242,9 +246,9 @@ These are white on transparent — change fill color as needed for context.
 ## Hero Section
 
 - Full-screen height (`h-screen min-h-[600px]`)
-- Background: `hero-bg.jpg` with light gradient overlay (`from-black/30 via-black/10 to-transparent`) — keep the image bright and visible
+- Background: `hero-bg.jpg` with gradient overlay (`from-black/60 via-black/30 to-black/10`) — darkened for text readability
 - Nav scrim: `from-black/40 via-black/15 to-transparent` (h-28) — just enough for nav readability
-- Headline: "Precision. Performance. Perfection." — bold, white, large serif-like scale
+- Headline: "Precision. Performance. Perfection." — bold, white, large serif-like scale, `drop-shadow` for contrast
 - Subtext: white/80, max-w-md
 - Two CTAs: red primary + white-bordered secondary
 - Framer Motion fade-up animation
@@ -265,8 +269,8 @@ These are white on transparent — change fill color as needed for context.
 
 - Background: `#0d0d0d` (very dark charcoal)
 - Text: white
-- Logo component (light variant)
-- Brand tagline + verified contact info (email, sales phone) below logo
+- Logo component (light variant, `compact` — no "Windows & Doors" subtitle, `h-8`)
+- Verified contact info (email, sales phone) below logo
 - 4 link columns: Brand, Products, Support, Legal
 - Column headers: uppercase tracked white/40
 - Links: white/70, hover to white
@@ -351,6 +355,7 @@ Implementation: `elementFromPoint` samples the element behind the nav on scroll,
 - **Lead List:** Cards with status badge, ref ID, type label, name, email, date. Selected state: `border-primary`
 - **Detail Panel:** Sticky sidebar with contact links, config viewer, message display, status update buttons
 - **LinQ Admin Bot:** Floating chat panel (`rounded-lg`, red FAB bottom-right). Dark header, streaming responses. Quick-ask suggestion buttons. Queries live DB stats.
+- **Chat Logs Tab:** Switchable tab ("Leads & Inquiries" | "Chat Logs"). Shows all customer chatbot conversations grouped by session. Click to view full conversation thread. "Most Asked Questions" panel ranks top customer questions by frequency. Stats cards for total conversations and messages.
 - **Border radius:** `rounded-lg` on cards and panels (not `rounded-xl` — matches site design system)
 - **Status colors:**
   - new: `bg-accent/10 text-accent`
@@ -383,13 +388,19 @@ Collects contact info (name, email, phone) before saving a design configuration:
 
 ## Font Loading & Performance
 
-- Google Fonts (DM Sans + Playfair Display) preloaded via `<link rel="preload">` for critical woff2 files
+- Google Fonts loaded via `<link rel="preconnect">` + stylesheet (no hardcoded woff2 preloads — URLs change and cause warnings)
 - Fallback `@font-face` declarations with `size-adjust`, `ascent-override`, `descent-override` prevent layout shift:
   - `DM Sans Fallback` → Arial (96% size-adjust)
   - `Playfair Display Fallback` → Georgia (112% size-adjust)
 - Hero image preloaded: `<link rel="preload" href="/images/hero-bg.jpg" as="image">`
-- Hero section has `bg-[#1a1a1a]` placeholder and `fetchPriority="high"` on img
+- Hero section has `bg-[#1a1a1a]` placeholder and `fetchpriority="high"` on img (lowercase for DOM)
 - `html { background: #1a1a1a }` prevents white flash before React mounts
+
+## Data Loading
+
+- Product types, finishes, glass options, projects — all loaded from static TypeScript data files (`src/data/`)
+- No phantom API fetches — hooks (`useProducts`, `useConfigurator`, `useProjects`) return static data directly
+- Only form submissions, chat, and analytics hit the API server
 
 ---
 

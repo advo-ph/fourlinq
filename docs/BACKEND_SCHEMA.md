@@ -24,7 +24,8 @@ Domain: fourlinq.ph
 POST /api/contact              — Contact form → inquiries table
 POST /api/quote-request        — Quote modal → inquiries table (with config JSON)
 POST /api/save-configuration   — Design tool → inquiries table (with config JSON)
-POST /api/chat/stream          — LinQ chatbot (Gemini SSE stream, verified knowledge base)
+POST /api/chat/stream          — LinQ chatbot (Gemini SSE stream, verified knowledge base, logs to chat_messages)
+POST /api/analytics            — Fire-and-forget event tracking → analytics table
 
 # Admin Auth (no password required to call, but login sets httpOnly cookie)
 POST /api/admin/login          — Validate password, set JWT httpOnly cookie (__flq_admin)
@@ -34,7 +35,10 @@ GET  /api/admin/check          — Returns { authenticated: true/false }
 # Admin (protected — requires valid __flq_admin httpOnly cookie)
 GET  /api/admin/inquiries      — List inquiries (?type, ?status, ?limit, ?offset)
 PATCH /api/admin/inquiries/:id — Update status/notes
+GET  /api/admin/chat-logs      — List chat sessions (?limit, ?offset) + top questions
+GET  /api/admin/chat-logs/:sid — Full conversation for a session
 POST /api/admin/chat/stream    — LinQ Admin chatbot (Gemini SSE + live DB stats injection)
+GET  /api/admin/analytics/summary — Analytics dashboard data (page views, clicks, scroll depth, etc.)
 
 # Utility
 GET  /api/health               — Health check
@@ -71,6 +75,46 @@ CREATE TABLE inquiries (
   updated_at  TIMESTAMPTZ DEFAULT now()
 );
 ```
+
+### `chat_messages` (operational — logs all customer chatbot conversations)
+
+```sql
+CREATE TABLE chat_messages (
+  id          SERIAL PRIMARY KEY,
+  session_id  TEXT NOT NULL,                -- groups messages into conversations
+  role        TEXT NOT NULL CHECK (role IN ('user', 'model')),
+  message     TEXT NOT NULL,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX idx_chat_messages_session ON chat_messages(session_id);
+CREATE INDEX idx_chat_messages_created ON chat_messages(created_at DESC);
+```
+
+- Every customer message to LinQ chatbot + every bot response is logged
+- `session_id` is a UUID generated server-side, returned to the client, and reused for the conversation
+- Admin can view all conversations via `/api/admin/chat-logs`
+
+### `analytics` (operational — tracks page views, clicks, scroll depth)
+
+```sql
+CREATE TABLE analytics (
+  id          SERIAL PRIMARY KEY,
+  session_id  TEXT NOT NULL,
+  event       TEXT NOT NULL,                -- 'page_view'|'click'|'scroll_depth'|'config_change'|'product_view'|'chat_open'|'chat_message'
+  page        TEXT,
+  target      TEXT,
+  data        JSONB DEFAULT '{}',
+  referrer    TEXT,
+  user_agent  TEXT,
+  screen_w    INT,
+  screen_h    INT,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+```
+
+- Fire-and-forget from client (`useAnalytics` hook)
+- Tracks: page views, click targets, scroll depth, design tool config changes, product views, chat opens
+- Admin summary at `/api/admin/analytics/summary`
 
 ## Future Schema (from original design — not yet deployed)  
 PK convention: `{table}_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`  
