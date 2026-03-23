@@ -316,4 +316,65 @@ Do not use spring physics, rotation, scale bounces, or color-shift animations.
 
 ---
 
+## Adaptive Navbar
+
+The navbar detects dark background sections and adapts automatically:
+
+- **On hero (not scrolled):** Transparent background, white text with subtle text-shadow
+- **Over light sections (scrolled):** White background, dark text, shadow-sm
+- **Over dark sections (scrolled):** Semi-transparent dark backdrop (`bg-black/40 backdrop-blur`), white text
+
+Implementation: `elementFromPoint` samples the element behind the nav on scroll, computes luminance, and sets `overDark` state when luminance < 60.
+
+---
+
+## Admin Dashboard (`/admin`)
+
+- **Nav:** Dark bar (`#0a0a0a`) with Logo (light variant) + "Admin" label. Matches main site header style.
+- **Stat Cards:** 4 cards (New Leads, Quotes, Contacts, Configs) with `text-3xl` numbers. New leads uses accent color.
+- **Filter Pills:** Same rounded-full pills as Products page (`bg-primary text-primary-foreground` active, `bg-card border` inactive)
+- **Lead List:** Cards with status badge, ref ID, type label, name, email, date. Selected state: `border-primary`
+- **Detail Panel:** Sticky sidebar with contact links, config viewer, message display, status update buttons
+- **LinQ Admin Bot:** Floating chat panel (red FAB bottom-right). Dark header, streaming responses. Quick-ask suggestion buttons.
+- **Status colors:**
+  - new: `bg-accent/10 text-accent`
+  - contacted: `bg-yellow-500/10 text-yellow-700`
+  - quoted: `bg-purple-500/10 text-purple-700`
+  - won: `bg-green-500/10 text-green-700`
+  - lost: `bg-foreground/5 text-muted-foreground`
+
+---
+
+## Shared Components
+
+### `FinishSwatch` (`src/components/shared/FinishSwatch.tsx`)
+
+Renders finish color swatches with proper visual differentiation:
+- **Solid finishes:** `rounded-full` circle with flat color
+- **Wood grain finishes:** `rounded-lg` square with organic curved SVG grain lines overlaid at 18% opacity
+- Auto-detects finish type from `FRAME_FINISHES` if `finishId` provided
+- Props: `finishId`, `color`, `finishType`, `size` (sm/md/lg), `selected`
+- Used in: Design Tool (step 2) and Products page drawer
+
+### `SaveModal` (in `src/pages/DesignTool.tsx`)
+
+Collects contact info (name, email, phone) before saving a design configuration:
+- Shows config summary (type, finish, glass, size)
+- Saves to PostgreSQL via `/api/save-configuration`
+- Returns reference ID on success
+
+---
+
+## Font Loading & Performance
+
+- Google Fonts (DM Sans + Playfair Display) preloaded via `<link rel="preload">` for critical woff2 files
+- Fallback `@font-face` declarations with `size-adjust`, `ascent-override`, `descent-override` prevent layout shift:
+  - `DM Sans Fallback` → Arial (96% size-adjust)
+  - `Playfair Display Fallback` → Georgia (112% size-adjust)
+- Hero image preloaded: `<link rel="preload" href="/images/hero-bg.jpg" as="image">`
+- Hero section has `bg-[#1a1a1a]` placeholder and `fetchPriority="high"` on img
+- `html { background: #1a1a1a }` prevents white flash before React mounts
+
+---
+
 _This document should be updated whenever a new component or pattern is approved and added to the site._

@@ -78,8 +78,13 @@
 - **Navigation & UX:** Dark utility bar + glassmorphism nav with mega menus featuring SVG icon grids. Interactive Design Tool configurator. AI chat assistant powered by Gemini.
 - **Data Integrity:** All brand claims, product types, contact info, branches, finishes, and advantages sourced from `src/data/fourlinq-data.ts` — verified from official FourlinQ printed brochures and physical profile samples. No unverified stats or claims.
 - **Favicon & OG:** Red Playfair Display "Q" glyph as favicon (SVG + PNG). Hero image (`hero-bg.jpg`) as og:image for Messenger/social previews.
-- **Brand Page:** Verified contact info (3 phone numbers + email) and all 5 branch locations (Manila Main Office, Ortigas CW Home Depot, Alabang CW Home Depot, Cebu Branch, Davao Showroom). 10-Year Warranty scope displayed as badge cards.
-- **Achieved:** Successfully transitioned from "Generic WordPress" to a premium architectural brand aesthetic aligned with competitors like Schüco and Marvin. All data now verified against official brochures.
+- **Brand Page:** Verified contact info (3 phone numbers + email) and 4 branch locations (Manila Main Office, Ortigas CW Home Depot, Alabang CW Home Depot, Cebu Branch). Davao removed — no longer operating in Mindanao. 10-Year Warranty scope displayed as badge cards. OSM map embeds on each branch card with "Get Directions" link.
+- **Adaptive Navbar:** Detects dark background sections on scroll via luminance sampling. Switches to white text + dark backdrop when over dark sections, white bg + dark text over light sections. Text-shadow on hero for readability.
+- **CRM / Lead Management:** All form submissions (contact, quotes, design tool configs) stored in PostgreSQL. Admin dashboard at `/admin` with lead list, detail panel, status pipeline (new → contacted → quoted → won/lost).
+- **LinQ Admin Bot:** AI chatbot on admin page with live database context injection. Can answer "How many leads today?", "Show stale leads", client lookups, product popularity, company info. Uses Gemini 2.5 Flash with real-time stats in system prompt.
+- **Deployment:** Self-hosted on Contabo VPS (Singapore). Node.js + Express + PM2, Nginx reverse proxy, Let's Encrypt SSL. PostgreSQL 16 on same VPS. Live at https://fourlinq.ph.
+- **Performance:** Font preloading + fallback metrics prevent FOUC. Hero image preloaded with `fetchPriority="high"`. Dark initial background prevents white flash.
+- **Achieved:** Successfully transitioned from "Generic WordPress" to a premium architectural brand aesthetic aligned with competitors like Schüco and Marvin. All data verified against official brochures. Full-stack self-hosted deployment operational.
 
 ---
 

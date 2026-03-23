@@ -1,9 +1,65 @@
 # FourlinQ — Backend Data Architecture
 
-**Version 2.1 — March 2026**
-Platform: Pure PostgreSQL 15+ (portable — Supabase, Neon, RDS, Railway, bare metal)
-Seed data source: `src/data/fourlinq-data.ts` — verified from official FourlinQ brochures and physical profile samples  
-Auth: Self-owned `auth_user` table — no platform lock-in  
+**Version 2.2 — March 2026**
+Platform: PostgreSQL 16 on Contabo VPS (62.146.237.12, Singapore)
+Seed data source: `src/data/fourlinq-data.ts` — verified from official FourlinQ brochures and physical profile samples
+Database: `fourlinq` / User: `fourlinq` / Host: `localhost:5432` (on VPS)
+Auth: Self-owned `auth_user` table — no platform lock-in (not yet implemented)
+
+## Current Deployment
+
+```
+VPS: Contabo Cloud VPS 20 SSD — Singapore (62.146.237.12)
+OS: Ubuntu 24.04 LTS
+DB: PostgreSQL 16
+App: Node.js 22 + Express + PM2
+Web: Nginx reverse proxy + Let's Encrypt SSL
+Domain: fourlinq.ph
+```
+
+## Active API Endpoints
+
+```
+# Public (customer-facing)
+POST /api/contact              — Contact form → inquiries table
+POST /api/quote-request        — Quote modal → inquiries table (with config JSON)
+POST /api/save-configuration   — Design tool → inquiries table (with config JSON)
+POST /api/chat/stream          — LinQ chatbot (Gemini SSE stream, verified knowledge base)
+
+# Admin
+GET  /api/admin/inquiries      — List inquiries (?type, ?status, ?limit, ?offset)
+PATCH /api/admin/inquiries/:id — Update status/notes
+POST /api/admin/chat/stream    — LinQ Admin chatbot (Gemini SSE + live DB stats injection)
+
+# Utility
+GET  /api/health               — Health check
+```
+
+## Active Tables
+
+### `inquiries` (operational — stores all leads)
+
+```sql
+CREATE TABLE inquiries (
+  id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  type        TEXT NOT NULL DEFAULT 'contact',  -- 'contact'|'quote'|'configuration'
+  ref_id      TEXT,                              -- 'CT-xxx'|'QR-xxx'|'CFG-xxx'
+  name        TEXT,
+  email       TEXT,
+  phone       TEXT,
+  subject     TEXT,
+  message     TEXT,
+  product_id  TEXT,
+  product_name TEXT,
+  config      JSONB,                             -- design tool config or quote details
+  notes       TEXT,
+  status      TEXT DEFAULT 'new',                -- 'new'|'contacted'|'quoted'|'won'|'lost'
+  created_at  TIMESTAMPTZ DEFAULT now(),
+  updated_at  TIMESTAMPTZ DEFAULT now()
+);
+```
+
+## Future Schema (from original design — not yet deployed)  
 PK convention: `{table}_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`  
 Public-facing tokens/codes: `TEXT` generated at app layer (nanoid, cuid2, or similar)  
 Timestamps: `created_at`, `updated_at` on every table  
