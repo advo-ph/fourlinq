@@ -37,7 +37,7 @@ app.post("/api/quote-request", inquiriesRouter);
 app.post("/api/save-configuration", inquiriesRouter);
 
 // Public analytics endpoint (fire-and-forget from frontend)
-app.post("/api/analytics", analyticsRouter);
+app.use("/api/analytics", analyticsRouter);
 
 // ─── Admin auth (no password required) ───────────
 app.post("/api/admin/login", loginHandler);
