@@ -14,6 +14,7 @@ const DesignTool = lazy(() => import("./pages/DesignTool"));
 const WhyUpvc = lazy(() => import("./pages/WhyUpvc"));
 const Brand = lazy(() => import("./pages/Brand"));
 const Legal = lazy(() => import("./pages/Legal"));
+const Admin = lazy(() => import("./pages/Admin"));
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/why-upvc" element={<WhyUpvc />} />
             <Route path="/brand" element={<Brand />} />
             <Route path="/legal" element={<Legal />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

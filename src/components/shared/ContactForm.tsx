@@ -21,7 +21,7 @@ const ContactForm = () => {
       setResult({ success: res.ok, message: data.message || data.error });
       if (res.ok) setForm({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch {
-      setResult({ success: false, message: "Network error. Please try again or call +63 2 8123 4567." });
+      setResult({ success: false, message: "Network error. Please try again or call 0925-848-8888." });
     } finally {
       setSubmitting(false);
     }

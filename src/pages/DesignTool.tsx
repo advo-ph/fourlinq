@@ -4,8 +4,8 @@ import PageHeader from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useProductTypes, useFinishes, useGlassTypes } from "@/hooks/useConfigurator";
-import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { Loader2, CheckCircle, X } from "lucide-react";
 import WindowPreview from "@/components/configurator/WindowPreview";
 import FinishSwatch from "@/components/shared/FinishSwatch";
 import {
@@ -47,8 +47,103 @@ const sizeConstraints = {
 
 const stepLabels = ["Type", "Finish", "Glass", "Size"];
 
+const SaveModal = ({ isOpen, onClose, config, selectedType, selectedFinish, selectedGlass }: {
+  isOpen: boolean;
+  onClose: () => void;
+  config: { type: string; finish: string; glass: string; width: number; height: number };
+  selectedType: { name: string };
+  selectedFinish: { name: string };
+  selectedGlass: { name: string };
+}) => {
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<{ refId?: string; success: boolean } | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/save-configuration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, config }),
+      });
+      const data = await res.json();
+      const saved = JSON.parse(localStorage.getItem("fourlinq_configs") || "[]");
+      saved.push({ ...config, ...form, refId: data.refId, date: new Date().toISOString() });
+      localStorage.setItem("fourlinq_configs", JSON.stringify(saved));
+      setResult({ refId: data.refId, success: true });
+    } catch {
+      const refId = "CFG-" + Date.now().toString(36).toUpperCase();
+      const saved = JSON.parse(localStorage.getItem("fourlinq_configs") || "[]");
+      saved.push({ ...config, refId, date: new Date().toISOString() });
+      localStorage.setItem("fourlinq_configs", JSON.stringify(saved));
+      setResult({ refId, success: true });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleClose = () => { setForm({ name: "", email: "", phone: "" }); setResult(null); onClose(); };
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-foreground/30 z-50" onClick={handleClose} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-surface rounded-xl shadow-2xl border border-border w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-primary">Save Your Configuration</h2>
+            <button onClick={handleClose} className="text-muted-foreground hover:text-primary p-1"><X size={18} /></button>
+          </div>
+
+          {result ? (
+            <div className="px-6 py-8 text-center">
+              <CheckCircle className="mx-auto mb-4 text-green-600" size={48} />
+              <p className="text-primary font-medium mb-2">Configuration Saved!</p>
+              <p className="text-xs text-muted-foreground">Reference: <span className="font-mono font-medium text-primary">{result.refId}</span></p>
+              <p className="text-sm text-muted-foreground mt-3">Our team will reach out with a detailed quotation.</p>
+              <Button onClick={handleClose} className="mt-6">Close</Button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+              <div className="bg-muted rounded-lg p-3 text-xs space-y-1">
+                <div className="flex justify-between"><span className="text-muted-foreground">Type</span><span className="font-medium text-primary">{selectedType.name}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Finish</span><span className="font-medium text-primary">{selectedFinish.name}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Glass</span><span className="font-medium text-primary">{selectedGlass.name}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Size</span><span className="font-medium text-primary">{config.width} × {config.height} mm</span></div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-1">Name *</label>
+                <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="Your name" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-1">Email *</label>
+                <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="you@email.com" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-1">Phone</label>
+                <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="+63 9XX XXX XXXX" />
+              </div>
+              <Button type="submit" className="w-full font-medium" size="lg" disabled={submitting}>
+                {submitting ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : "Save & Get a Quote"}
+              </Button>
+              <p className="text-[10px] text-muted-foreground text-center">We'll use your details to prepare a custom quotation.</p>
+            </form>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
 const DesignTool = () => {
   const [step, setStep] = useState(0);
+  const [saveOpen, setSaveOpen] = useState(false);
   const [config, setConfig] = useState({
     type: "casement",
     finish: "white",
@@ -226,28 +321,17 @@ const DesignTool = () => {
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Dimensions</span><span className="text-primary font-medium">{config.width} × {config.height} mm</span></div>
               </div>
               <div className="flex gap-3 mt-6 w-full">
-                <Button variant="outline" className="flex-1 font-medium" onClick={async () => {
-                  try {
-                    const res = await fetch("/api/save-configuration", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ config }),
-                    });
-                    const data = await res.json();
-                    const saved = JSON.parse(localStorage.getItem("fourlinq_configs") || "[]");
-                    saved.push({ ...config, refId: data.refId, date: new Date().toISOString() });
-                    localStorage.setItem("fourlinq_configs", JSON.stringify(saved));
-                    toast.success(`Configuration saved! Reference: ${data.refId}`);
-                  } catch {
-                    const refId = "CFG-" + Date.now().toString(36).toUpperCase();
-                    const saved = JSON.parse(localStorage.getItem("fourlinq_configs") || "[]");
-                    saved.push({ ...config, refId, date: new Date().toISOString() });
-                    localStorage.setItem("fourlinq_configs", JSON.stringify(saved));
-                    toast.success(`Configuration saved locally! Reference: ${refId}`);
-                  }
-                }}>Save Configuration</Button>
+                <Button variant="outline" className="flex-1 font-medium" onClick={() => setSaveOpen(true)}>Save & Get Quote</Button>
                 <Button asChild className="flex-1 font-medium"><Link to="/brand#contact">Book Consultation</Link></Button>
               </div>
+              <SaveModal
+                isOpen={saveOpen}
+                onClose={() => setSaveOpen(false)}
+                config={config}
+                selectedType={selectedType}
+                selectedFinish={selectedFinish}
+                selectedGlass={selectedGlass}
+              />
             </div>
           </div>
         </div>

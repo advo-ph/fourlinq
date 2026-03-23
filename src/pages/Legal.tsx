@@ -25,7 +25,7 @@ const legalContent: Record<string, { title: string; lastUpdated: string; section
       },
       {
         heading: "Contact",
-        body: "For privacy-related inquiries, please contact us at info@fourlinq.ph or call +63 2 8123 4567.",
+        body: "For privacy-related inquiries, please contact us at sales@fourlinq.com or call 0925-848-8888.",
       },
     ],
   },

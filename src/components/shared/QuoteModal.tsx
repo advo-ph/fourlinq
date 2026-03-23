@@ -11,7 +11,7 @@ interface QuoteModalProps {
 }
 
 const QuoteModal = ({ isOpen, onClose, productName, productId }: QuoteModalProps) => {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", quantity: "", dimensions: "", finish: "", timeline: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string; refId?: string } | null>(null);
 
@@ -23,19 +23,19 @@ const QuoteModal = ({ isOpen, onClose, productName, productId }: QuoteModalProps
       const res = await fetch("/api/quote-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, productId, productName }),
+        body: JSON.stringify({ ...form, productId, productName, quantity: form.quantity || null, dimensions: form.dimensions || null, finish: form.finish || null, timeline: form.timeline || null }),
       });
       const data = await res.json();
       setResult({ success: res.ok, message: data.message || data.error, refId: data.refId });
     } catch {
-      setResult({ success: false, message: "Network error. Please try again or call +63 2 8123 4567." });
+      setResult({ success: false, message: "Network error. Please try again or call 0925-848-8888." });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleClose = () => {
-    setForm({ name: "", email: "", phone: "", notes: "" });
+    setForm({ name: "", email: "", phone: "", quantity: "", dimensions: "", finish: "", timeline: "", notes: "" });
     setResult(null);
     onClose();
   };
@@ -114,14 +114,38 @@ const QuoteModal = ({ isOpen, onClose, productName, productId }: QuoteModalProps
                       placeholder="+63 9XX XXX XXXX"
                     />
                   </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-primary mb-1">Quantity</label>
+                      <input type="text" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+                        className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="e.g. 5 panels" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-primary mb-1">Dimensions</label>
+                      <input type="text" value={form.dimensions} onChange={(e) => setForm({ ...form, dimensions: e.target.value })}
+                        className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="e.g. 1200×1400mm" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-primary mb-1">Preferred Finish</label>
+                      <input type="text" value={form.finish} onChange={(e) => setForm({ ...form, finish: e.target.value })}
+                        className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="e.g. Walnut" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-primary mb-1">Timeline</label>
+                      <input type="text" value={form.timeline} onChange={(e) => setForm({ ...form, timeline: e.target.value })}
+                        className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="e.g. 2 months" />
+                    </div>
+                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-primary mb-1">Notes</label>
+                    <label className="block text-sm font-medium text-primary mb-1">Additional Notes</label>
                     <textarea
                       value={form.notes}
                       onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                      rows={3}
+                      rows={2}
                       className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary resize-none"
-                      placeholder="Quantity, size requirements, project details..."
+                      placeholder="Project details, special requirements..."
                     />
                   </div>
                   <Button type="submit" className="w-full font-medium" size="lg" disabled={submitting}>

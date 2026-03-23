@@ -77,7 +77,7 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
         const updated = [...prev];
         updated[updated.length - 1] = {
           role: "assistant",
-          content: "Sorry, I'm having trouble connecting right now. Please try again or contact us at +63 2 8123 4567.",
+          content: "Sorry, I'm having trouble connecting right now. Please try again or contact us at 0925-848-8888.",
         };
         return updated;
       });
