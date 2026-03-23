@@ -18,7 +18,7 @@ const InspirationGallery = () => {
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="aspect-[4/3] rounded-lg bg-muted animate-pulse" />
+              <div key={i} className="aspect-[4/3] rounded-lg bg-muted" />
             ))}
           </div>
         ) : (

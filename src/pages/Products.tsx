@@ -166,12 +166,12 @@ const Products = () => {
           {isLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-card rounded-lg border border-border overflow-hidden animate-pulse">
+                <div key={i} className="bg-card rounded-lg border border-border overflow-hidden">
                   <div className="aspect-[4/3] bg-muted" />
                   <div className="p-5 space-y-2">
-                    <div className="h-3 bg-muted rounded w-16" />
-                    <div className="h-4 bg-muted rounded w-32" />
-                    <div className="h-3 bg-muted rounded w-48" />
+                    <div className="h-3 bg-border rounded w-16" />
+                    <div className="h-4 bg-border rounded w-32" />
+                    <div className="h-3 bg-border rounded w-48" />
                   </div>
                 </div>
               ))}
