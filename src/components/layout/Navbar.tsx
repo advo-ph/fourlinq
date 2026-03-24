@@ -65,7 +65,6 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSubPanel, setMobileSubPanel] = useState<MegaKey>(null);
   const [megaOpen, setMegaOpen] = useState<MegaKey>(null);
@@ -89,14 +88,6 @@ const Navbar = () => {
   }, [dbTypes]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
     setMobileOpen(false);
     setMobileSubPanel(null);
     setMegaOpen(null);
@@ -113,9 +104,7 @@ const Navbar = () => {
 
   const navBg = mobileOpen
     ? "bg-white/98 backdrop-blur-xl shadow-sm"
-    : scrolled
-      ? "bg-black/60 backdrop-blur-xl"
-      : "bg-transparent";
+    : "bg-black/60 backdrop-blur-xl";
   const textColor = mobileOpen ? "text-foreground" : "text-white";
   const logoVariant = mobileOpen ? "dark" : "light";
   const showUtility = true;
