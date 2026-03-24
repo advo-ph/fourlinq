@@ -11,6 +11,7 @@ const HeroSection = () => {
           alt="Modern home with large uPVC windows"
           className="w-full h-full object-cover object-center"
           loading="eager"
+          // @ts-expect-error -- valid HTML attr, React types lag behind
           fetchpriority="high"
           decoding="async"
         />
@@ -25,7 +26,7 @@ const HeroSection = () => {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-2xl text-left"
         >
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6 drop-shadow-[0_4px_16px_rgba(0,0,0,0.7)]" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.6), 0 0 40px rgba(0,0,0,0.3)" }}>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6">
             Precision.
             <br />
             Performance.

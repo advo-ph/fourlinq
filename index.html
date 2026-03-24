@@ -19,7 +19,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Preload hero image to prevent white flash -->
     <link rel="preload" href="/images/hero-bg.jpg" as="image" />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Load fonts non-blocking: paint immediately with fallback, swap when ready -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
     <style>
       /* Fallback font metrics to prevent layout shift */
       @font-face {
@@ -40,6 +43,8 @@
       }
       /* Dark initial background matches hero — prevents white flash */
       html { background: #1a1a1a; }
+      /* Hide root until React hydrates — prevents FOUC */
+      #root:empty { visibility: hidden; }
     </style>
   </head>
   <body>
