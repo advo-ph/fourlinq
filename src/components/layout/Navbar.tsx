@@ -66,13 +66,11 @@ const navLinks = [
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [overDark, setOverDark] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSubPanel, setMobileSubPanel] = useState<MegaKey>(null);
   const [megaOpen, setMegaOpen] = useState<MegaKey>(null);
   const megaTimeout = useRef<ReturnType<typeof setTimeout>>();
   const location = useLocation();
-  const isHome = location.pathname === "/";
 
   const { data: dbTypes } = useProductTypes();
   const windowTypes = useMemo(() => {
@@ -93,20 +91,6 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
-
-      // Check if nav overlaps a dark section
-      const navBottom = 32 + 80; // utility bar + nav height
-      const el = document.elementFromPoint(window.innerWidth / 2, navBottom + 4);
-      if (el) {
-        const bg = getComputedStyle(el).backgroundColor;
-        const match = bg.match(/\d+/g);
-        if (match) {
-          const [r, g, b] = match.map(Number);
-          // Consider dark if luminance is below threshold
-          const lum = (0.299 * r + 0.587 * g + 0.114 * b);
-          setOverDark(lum < 60);
-        }
-      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -127,16 +111,13 @@ const Navbar = () => {
   const openMega = (key: MegaKey) => { clearTimeout(megaTimeout.current); setMegaOpen(key); };
   const closeMega = () => { megaTimeout.current = setTimeout(() => setMegaOpen(null), 200); };
 
-  const useLight = (!scrolled && isHome && !mobileOpen) || (scrolled && overDark && !mobileOpen);
   const navBg = mobileOpen
     ? "bg-white/98 backdrop-blur-xl shadow-sm"
-    : useLight
-      ? (scrolled ? "bg-black/40 backdrop-blur-xl" : "bg-transparent")
-      : "bg-white/98 backdrop-blur-xl shadow-sm";
-  const textColor = useLight
-    ? "text-white [text-shadow:_0_1px_3px_rgba(0,0,0,0.4)]"
-    : "text-foreground";
-  const logoVariant = useLight ? "light" : "dark";
+    : scrolled
+      ? "bg-black/60 backdrop-blur-xl"
+      : "bg-transparent";
+  const textColor = mobileOpen ? "text-foreground" : "text-white";
+  const logoVariant = mobileOpen ? "dark" : "light";
   const showUtility = true;
 
   const activeMegaTypes = megaOpen === "windows" ? windowTypes : doorTypes;
@@ -152,11 +133,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Top gradient scrim for nav readability over images */}
-      {isHome && !scrolled && (
-        <div className="fixed top-0 left-0 right-0 z-40 h-28 pointer-events-none bg-gradient-to-b from-black/40 via-black/15 to-transparent" />
-      )}
-
       {/* Utility Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 h-8 bg-[#171717]">
         <div className="page-container flex items-center justify-end h-full">
