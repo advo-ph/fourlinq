@@ -269,8 +269,8 @@ These are white on transparent — change fill color as needed for context.
 
 - Background: `#0d0d0d` (very dark charcoal)
 - Text: white
-- Logo component (light variant, `compact` — no "Windows & Doors" subtitle, `h-8`)
-- Verified contact info (email, sales phone) below logo
+- Text wordmark: "Fourlin" in white + "Q" in accent red, Playfair Display font (`text-2xl`). No SVG Logo component — simpler, avoids overshooting SVG line.
+- Verified contact info (email, sales phone) below wordmark
 - 4 link columns: Brand, Products, Support, Legal
 - Column headers: uppercase tracked white/40
 - Links: white/70, hover to white

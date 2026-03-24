@@ -1,6 +1,6 @@
 # FourlinQ — Backend Data Architecture
 
-**Version 2.2 — March 2026**
+**Version 2.3 — March 2026**
 Platform: PostgreSQL 16 on Contabo VPS (62.146.237.12, Singapore)
 Seed data source: `src/data/fourlinq-data.ts` — verified from official FourlinQ brochures and physical profile samples
 Database: `fourlinq` / User: `fourlinq` / Host: `localhost:5432` (on VPS)
@@ -21,9 +21,9 @@ Domain: fourlinq.ph
 
 ```
 # Public (customer-facing)
-POST /api/contact              — Contact form → inquiries table
-POST /api/quote-request        — Quote modal → inquiries table (with config JSON)
-POST /api/save-configuration   — Design tool → inquiries table (with config JSON)
+POST /api/contact              — Contact form → inquiries table (email validated)
+POST /api/quote-request        — Quote modal → inquiries table (email validated, config JSON)
+POST /api/save-configuration   — Design tool → inquiries table (email validated if provided)
 POST /api/chat/stream          — LinQ chatbot (Gemini SSE stream, verified knowledge base, logs to chat_messages)
 POST /api/analytics            — Fire-and-forget event tracking → analytics table
 
@@ -33,8 +33,8 @@ POST /api/admin/logout         — Clear auth cookie
 GET  /api/admin/check          — Returns { authenticated: true/false }
 
 # Admin (protected — requires valid __flq_admin httpOnly cookie)
-GET  /api/admin/inquiries      — List inquiries (?type, ?status, ?limit, ?offset)
-PATCH /api/admin/inquiries/:id — Update status/notes
+GET  /api/admin/inquiries      — List inquiries (?type, ?status, ?limit, ?offset) — validated, limit capped at 200
+PATCH /api/admin/inquiries/:id — Update status/notes — status validated against allowed values, 404 on missing
 GET  /api/admin/chat-logs      — List chat sessions (?limit, ?offset) + top questions
 GET  /api/admin/chat-logs/:sid — Full conversation for a session
 POST /api/admin/chat/stream    — LinQ Admin chatbot (Gemini SSE + live DB stats injection)
@@ -51,6 +51,20 @@ GET  /api/health               — Health check
 - **Middleware:** `requireAdmin` in `server/auth.ts` — checks cookie on every `/api/admin/*` request
 - **Password:** `ADMIN_PASSWORD` env var (default: `FourlinQ@dmin2026`)
 - **401 response** for all unauthenticated admin API calls
+
+## Input Validation & Hardening
+
+- **Email:** Basic format validation (`x@x.x`) on contact, quote, and config endpoints
+- **Status values:** PATCH only accepts `new|contacted|quoted|won|lost` — rejects anything else with 400
+- **Inquiry ID:** Validated as positive integer — rejects NaN/negative with 400
+- **Pagination:** `limit` capped at 200, `offset` clamped to non-negative via `clampInt` helper
+- **Type/status filters:** GET inquiries validates against allowed enum values
+- **PATCH response:** Returns 404 if inquiry ID doesn't exist (checks `rowCount`)
+- **Empty PATCH:** Requires at least `status` or `notes` — rejects empty body with 400
+- **Session ID:** Chat log lookups validate sessionId length (max 100 chars)
+- **DB pool:** Max 10 connections, 5s connect timeout, 30s idle timeout, error handler prevents silent crashes
+- **Graceful shutdown:** SIGINT + SIGTERM handlers close pool cleanly
+- **Env vars:** Documented in `.env.example`
 
 ## Active Tables
 
