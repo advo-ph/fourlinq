@@ -640,8 +640,8 @@ const Admin = ({ onLogout }: { onLogout: () => void }) => {
             )}
           </div>
         </div>
-
-        </>}
+        </>
+        }
       </div>
 
       {/* Chat FAB */}

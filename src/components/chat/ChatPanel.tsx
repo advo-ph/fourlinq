@@ -8,6 +8,11 @@ interface Message {
   content: string;
 }
 
+interface FollowUp {
+  label: string;
+  message: string;
+}
+
 interface ChatPanelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +24,83 @@ const SUGGESTIONS = [
   "How much do your windows cost?",
   "Tell me about your finishes",
 ];
+
+// ── Contextual follow-ups based on response content ──
+
+function getFollowUps(text: string, allMessages: Message[]): FollowUp[] {
+  const t = text.toLowerCase();
+  const followUps: FollowUp[] = [];
+  const messageCount = allMessages.filter((m) => m.role === "user").length;
+
+  // Product-related
+  if (t.includes("casement") || t.includes("sliding") || t.includes("awning") || t.includes("slide & fold") || t.includes("special shape")) {
+    followUps.push({ label: "Try the Design Tool", message: "How do I use the Design Tool?" });
+    if (!t.includes("finish")) followUps.push({ label: "What finishes are available?", message: "What finishes are available?" });
+    followUps.push({ label: "Request a quote", message: "How can I request a quote?" });
+  }
+
+  // Finishes
+  if (t.includes("finish") || t.includes("laminate") || t.includes("wood grain") || t.includes("oak") || t.includes("walnut")) {
+    if (!followUps.some((f) => f.label.includes("Design Tool")))
+      followUps.push({ label: "Try the Design Tool", message: "How do I use the Design Tool?" });
+    followUps.push({ label: "Which finishes for aluminum?", message: "Which finishes are available for aluminum frames?" });
+  }
+
+  // Pricing / quotes
+  if (t.includes("price") || t.includes("cost") || t.includes("quote") || t.includes("budget")) {
+    followUps.push({ label: "Visit a showroom", message: "Where are your showrooms?" });
+    followUps.push({ label: "What's the warranty?", message: "What warranty do you offer?" });
+  }
+
+  // Warranty
+  if (t.includes("warranty") || t.includes("10-year") || t.includes("10 year")) {
+    followUps.push({ label: "What does the warranty cover?", message: "What exactly does the 10-year warranty cover?" });
+    followUps.push({ label: "Contact sales", message: "How can I contact your sales team?" });
+  }
+
+  // Location / branches
+  if (t.includes("branch") || t.includes("showroom") || t.includes("office") || t.includes("cebu") || t.includes("alabang") || t.includes("ortigas")) {
+    followUps.push({ label: "Get directions", message: "Give me the full address of your nearest branch" });
+    followUps.push({ label: "Call sales", message: "What's your sales phone number?" });
+  }
+
+  // uPVC benefits
+  if (t.includes("fire retardant") || t.includes("corrosion") || t.includes("thermal") || t.includes("sound insulation") || t.includes("weather")) {
+    followUps.push({ label: "uPVC vs aluminum?", message: "What's the difference between your uPVC and aluminum options?" });
+    followUps.push({ label: "See all 7 advantages", message: "What are all 7 FourlinQ advantages?" });
+  }
+
+  // Design Tool
+  if (t.includes("design tool") || t.includes("configurator") || t.includes("customize")) {
+    followUps.push({ label: "What products can I configure?", message: "What window and door types can I configure?" });
+    followUps.push({ label: "What glass options?", message: "What glass types are available?" });
+  }
+
+  // Contact info given
+  if (t.includes("0925-848-8888") || t.includes("sales@fourlinq")) {
+    followUps.push({ label: "Where are you located?", message: "Where are your branches located?" });
+    followUps.push({ label: "What are your products?", message: "What window and door types do you offer?" });
+  }
+
+  // Generic fallback for early conversation
+  if (followUps.length === 0 && messageCount <= 2) {
+    followUps.push({ label: "What products do you offer?", message: "What window and door types do you offer?" });
+    followUps.push({ label: "Why choose uPVC?", message: "Why should I choose uPVC windows?" });
+    followUps.push({ label: "Where are your branches?", message: "Where are your branches located?" });
+  }
+
+  // Dedupe and limit to 3
+  const seen = new Set<string>();
+  return followUps
+    .filter((f) => {
+      if (seen.has(f.label)) return false;
+      seen.add(f.label);
+      return true;
+    })
+    .slice(0, 3);
+}
+
+// ── Component ──
 
 const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -134,9 +216,21 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
           </div>
         )}
 
-        {messages.map((msg, i) => (
-          <ChatMessage key={i} role={msg.role} content={msg.content} isStreaming={isStreaming && i === messages.length - 1 && msg.role === "assistant"} />
-        ))}
+        {messages.map((msg, i) => {
+          const isLastAssistant = msg.role === "assistant" && i === messages.length - 1;
+          const followUps = isLastAssistant && !isStreaming ? getFollowUps(msg.content, messages) : undefined;
+
+          return (
+            <ChatMessage
+              key={i}
+              role={msg.role}
+              content={msg.content}
+              isStreaming={isStreaming && i === messages.length - 1 && msg.role === "assistant"}
+              followUps={followUps}
+              onFollowUp={sendMessage}
+            />
+          );
+        })}
 
         <div ref={messagesEndRef} />
       </div>
