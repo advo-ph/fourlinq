@@ -5,6 +5,7 @@ import Logo from "@/components/shared/Logo";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
   LiftAndSlideIcon, FrenchDoorIcon, TiltAndTurnIcon, SlidingDoorIcon, EntranceIcon,
+  SpecialShapesIcon,
 } from "@/components/icons/WindowIcons";
 import { useProductTypes } from "@/hooks/useConfigurator";
 
@@ -13,6 +14,7 @@ const iconMap: Record<string, React.FC<{ className?: string; size?: number; stro
   awning: AwningIcon,
   sliding: SlidingIcon,
   fixed: FixedIcon,
+  "special-shapes": SpecialShapesIcon,
   "tilt-turn": TiltAndTurnIcon,
   bifold: BifoldIcon,
   "lift-slide": LiftAndSlideIcon,
@@ -22,7 +24,7 @@ const iconMap: Record<string, React.FC<{ className?: string; size?: number; stro
 };
 
 const utilityLinks = [
-  { label: "Visit a Showroom", to: "/brand#contact" },
+  { label: "Visit a Showroom", to: "/brand#showrooms" },
   { label: "Support", to: "/brand#contact" },
   { label: "Technical Specs", to: "/products" },
 ];
@@ -41,7 +43,7 @@ const staticDoorTypes = [
   { name: "Bifold", icon: BifoldIcon, to: "/products?filter=doors" },
   { name: "Lift & Slide", icon: LiftAndSlideIcon, to: "/products?filter=doors" },
   { name: "French Door", icon: FrenchDoorIcon, to: "/products?filter=doors" },
-  { name: "Entrance", icon: EntranceIcon, to: "/products?filter=doors" },
+  { name: "Casement Door", icon: EntranceIcon, to: "/products?filter=doors" },
 ];
 
 const windowCategories = {
@@ -50,7 +52,7 @@ const windowCategories = {
 };
 
 const doorCategories = {
-  byType: ["Sliding Doors", "French Doors", "Bifold Doors", "Lift & Slide", "Entrance Systems"],
+  byType: ["Sliding Doors", "French Doors", "Bifold Doors", "Lift & Slide", "Casement Doors"],
   byMaterial: ["uPVC Systems", "uPVC + Aluminium Clad", "Reinforced Profiles"],
 };
 

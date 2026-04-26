@@ -12,7 +12,7 @@ const categories = [
   },
   {
     name: "Door Systems",
-    description: "French, sliding, bifold, and entrance doors with multi-point security.",
+    description: "French, sliding, bifold, and casement doors with multi-point security.",
     image: "/images/wp-export/FourlinQ-Project-7.jpg",
     to: "/products?filter=doors",
   },

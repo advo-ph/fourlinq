@@ -13,7 +13,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
-  LiftAndSlideIcon, FrenchDoorIcon, SlidingDoorIcon, EntranceIcon,
+  LiftAndSlideIcon, FrenchDoorIcon, SlidingDoorIcon, EntranceIcon, SpecialShapesIcon,
 } from "@/components/icons/WindowIcons";
 
 type ProductCategory = "windows" | "doors" | "systems";
@@ -29,7 +29,7 @@ const filters: { label: string; value: Filter }[] = [
 const productIconMap: Record<string, React.FC<{ className?: string; size?: number; strokeWidth?: number }>> = {
   casement: CasementIcon,
   sliding: SlidingIcon,
-  "special-shapes": FixedIcon,
+  "special-shapes": SpecialShapesIcon,
   awning: AwningIcon,
   "sliding-door": SlidingDoorIcon,
   "slide-and-fold": BifoldIcon,

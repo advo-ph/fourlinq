@@ -6,7 +6,7 @@ const footerLinks = {
   Brand: [
     { label: "Our Story", to: "/brand" },
     { label: "Certifications", to: "/brand#certifications" },
-    { label: "Visit a Showroom", to: "/brand#contact" },
+    { label: "Visit a Showroom", to: "/brand#showrooms" },
   ],
   Products: [
     { label: "All Systems", to: "/products" },
@@ -36,8 +36,21 @@ const Footer = () => {
               <Logo variant="light" className="h-10" />
             </Link>
             <p className="text-xs text-white/40 leading-relaxed">
-              {CONTACT.email}<br />
-              {CONTACT.mobileSales}
+              <a
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                {CONTACT.email}
+              </a>
+              <br />
+              <a
+                href={`tel:${CONTACT.mobileSales.replace(/-/g, "")}`}
+                className="hover:text-white transition-colors"
+              >
+                {CONTACT.mobileSales}
+              </a>
             </p>
           </div>
 
@@ -70,9 +83,8 @@ const Footer = () => {
           </p>
           <div className="flex gap-4">
             {[
-              { label: "Instagram", href: "https://instagram.com/fourlinq" },
-              { label: "Facebook", href: "https://facebook.com/fourlinq" },
-              { label: "LinkedIn", href: "https://linkedin.com/company/fourlinq" },
+              { label: "Instagram", href: "https://www.instagram.com/fourlinq/" },
+              { label: "Facebook", href: "https://www.facebook.com/FourlinQofficial/" },
             ].map((social) => (
               <a
                 key={social.label}

@@ -339,6 +339,14 @@ export const FrenchDoorIcon = ({
     <rect x="12" y="10" width="24" height="60" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
     {/* Right door panel */}
     <rect x="44" y="10" width="24" height="60" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
+    {/* Left muntin bars — 2x3 grid (1 vertical + 2 horizontal) */}
+    <line x1="24" y1="10" x2="24" y2="70" strokeWidth={strokeWidth * 0.4} opacity={0.7} />
+    <line x1="12" y1="30" x2="36" y2="30" strokeWidth={strokeWidth * 0.4} opacity={0.7} />
+    <line x1="12" y1="50" x2="36" y2="50" strokeWidth={strokeWidth * 0.4} opacity={0.7} />
+    {/* Right muntin bars — 2x3 grid (1 vertical + 2 horizontal) */}
+    <line x1="56" y1="10" x2="56" y2="70" strokeWidth={strokeWidth * 0.4} opacity={0.7} />
+    <line x1="44" y1="30" x2="68" y2="30" strokeWidth={strokeWidth * 0.4} opacity={0.7} />
+    <line x1="44" y1="50" x2="68" y2="50" strokeWidth={strokeWidth * 0.4} opacity={0.7} />
     {/* Left handle */}
     <rect x="31" y="37" width="2" height="6" rx="0.5" fill="currentColor" stroke="none" />
     {/* Right handle */}
@@ -412,5 +420,36 @@ export const EntranceIcon = ({
       strokeWidth={strokeWidth * 0.5}
       opacity={0.35}
     />
+  </svg>
+);
+
+export const SpecialShapesIcon = ({
+  className,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+}: IconProps) => (
+  <svg
+    viewBox="0 0 80 80"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={strokeWidth}
+    className={className}
+  >
+    <rect x={FRAME.x} y={FRAME.y} width={FRAME.w} height={FRAME.h} rx="1.5" />
+    {/* Arch-top window: rectangular bottom + semicircular top */}
+    <path
+      d="M 18 67 L 18 38 A 22 22 0 0 1 62 38 L 62 67 Z"
+      strokeWidth={strokeWidth * INNER_SCALE}
+    />
+    {/* Springline divider where arch meets the rectangular sash */}
+    <line x1="18" y1="38" x2="62" y2="38" strokeWidth={strokeWidth * 0.4} opacity={0.6} />
+    {/* Radial muntins fanning from the arch springline center */}
+    <line x1="40" y1="38" x2="40" y2="16" strokeWidth={strokeWidth * 0.3} opacity={0.55} />
+    <line x1="40" y1="38" x2="24" y2="22" strokeWidth={strokeWidth * 0.3} opacity={0.55} />
+    <line x1="40" y1="38" x2="56" y2="22" strokeWidth={strokeWidth * 0.3} opacity={0.55} />
+    {/* Vertical mullion in the rectangular section */}
+    <line x1="40" y1="38" x2="40" y2="67" strokeWidth={strokeWidth * 0.4} opacity={0.55} />
   </svg>
 );

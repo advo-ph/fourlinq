@@ -32,10 +32,10 @@ const WhyUpvc = () => {
             {benefits.map((benefit, i) => (
               <motion.div
                 key={benefit.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.06, duration: 0.4, ease: "easeOut" }}
                 className="flex gap-5"
               >
                 <div className="shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
@@ -79,7 +79,7 @@ const WhyUpvc = () => {
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.03 }}
+                    transition={{ delay: i * 0.03, duration: 0.3, ease: "easeOut" }}
                     className="border-b border-border"
                   >
                     <td className="p-4 text-sm font-medium text-foreground">{row.feature}</td>
@@ -111,10 +111,10 @@ const WhyUpvc = () => {
             ].map((item, i) => (
               <motion.div
                 key={item.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.06, duration: 0.4, ease: "easeOut" }}
                 className="bg-card border border-border rounded-lg p-6 text-left"
               >
                 <div className="text-accent mb-3">{item.icon}</div>

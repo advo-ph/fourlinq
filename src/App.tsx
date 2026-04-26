@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ChatBubble from "@/components/chat/ChatBubble";
 import CookieBanner from "@/components/shared/CookieBanner";
+import ScrollToTop from "@/components/shared/ScrollToTop";
 
 const Products = lazy(() => import("./pages/Products"));
 const DesignTool = lazy(() => import("./pages/DesignTool"));
@@ -30,6 +31,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Index />} />

@@ -9,7 +9,7 @@ const HeroSection = () => {
         <img
           src="/images/hero-bg.jpg"
           alt="Modern home with large uPVC windows"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-[center_70%]"
           loading="eager"
           // @ts-expect-error -- valid HTML attr, React types lag behind
           fetchpriority="high"

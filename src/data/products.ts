@@ -129,11 +129,11 @@ export const products: Product[] = [
   },
   {
     id: "entrance-door",
-    name: "Entrance Door",
+    name: "Casement Door",
     category: "doors",
     description:
-      "Reinforced uPVC entrance door combining aesthetic versatility with the security demands of main entry points. Multi-chamber profile with galvanized steel reinforcement.",
-    shortDescription: "Secure and elegant main entry doors.",
+      "Reinforced uPVC casement door combining aesthetic versatility with the security demands of main entry points. Multi-chamber profile with galvanized steel reinforcement.",
+    shortDescription: "Secure and elegant single-leaf hinged doors.",
     image: "/images/wp-export/Door-5.jpg",
     specs: [
       "Multi-chamber reinforced profile",

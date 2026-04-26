@@ -39,7 +39,7 @@ export const productTypes: ProductType[] = [
   { id: "bifold", name: "Slide & Fold", icon: "bifold", category: "doors" },
   { id: "lift-slide", name: "Lift & Slide", icon: "lift-slide", category: "doors" },
   { id: "french-door", name: "French Door", icon: "french-door", category: "doors" },
-  { id: "entrance", name: "Entrance", icon: "entrance", category: "doors" },
+  { id: "entrance", name: "Casement Door", icon: "entrance", category: "doors" },
 ];
 
 // 11 verified finishes from physical uPVC profile sample bars

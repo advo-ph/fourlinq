@@ -12,6 +12,7 @@ import { trackConfigChange } from "@/hooks/useAnalytics";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
   LiftAndSlideIcon, FrenchDoorIcon, TiltAndTurnIcon, SlidingDoorIcon, EntranceIcon,
+  SpecialShapesIcon,
 } from "@/components/icons/WindowIcons";
 
 const iconMap: Record<string, React.FC<{ className?: string; size?: number; strokeWidth?: number }>> = {
@@ -19,6 +20,7 @@ const iconMap: Record<string, React.FC<{ className?: string; size?: number; stro
   awning: AwningIcon,
   sliding: SlidingIcon,
   fixed: FixedIcon,
+  "special-shapes": SpecialShapesIcon,
   "tilt-turn": TiltAndTurnIcon,
   bifold: BifoldIcon,
   "lift-slide": LiftAndSlideIcon,

@@ -231,7 +231,9 @@ Custom SVG icon components in `src/components/icons/WindowIcons.tsx`:
 - Fill: none
 - Motion indicators: dashed lines, small arrowheads
 
-Types: Casement, Awning, Sliding, Fixed, Tilt & Turn, Sliding Door, Bifold, Lift & Slide, French Door, Entrance
+Types: Casement, Awning, Sliding, Fixed, Special Shapes (Palladian arch-top), Tilt & Turn, Sliding Door, Bifold, Lift & Slide, French Door (with muntin bars), Entrance/Casement Door
+
+> Note: the `EntranceIcon` component is reused for the user-facing "Casement Door" product label — the internal name was kept to avoid touching every consumer at rename time. See [CHANGELOG.md](./CHANGELOG.md) `[2026-04-26]`.
 
 ### PNG Icons (from client)
 
@@ -246,7 +248,7 @@ These are white on transparent — change fill color as needed for context.
 ## Hero Section
 
 - Full-screen height (`h-screen min-h-[600px]`)
-- Background: `hero-bg.jpg` with gradient overlay (`from-black/60 via-black/30 to-black/10`) — darkened for text readability
+- Background: `hero-bg.jpg` with gradient overlay (`from-black/70 via-black/40 to-black/15`) — darkened for text readability. Image is anchored with `object-position: center 70%` so the building sits lower on tall viewports.
 - Nav scrim: `from-black/40 via-black/15 to-transparent` (h-28) — just enough for nav readability
 - Headline: "Precision. Performance. Perfection." — bold, white, large serif-like scale, `drop-shadow` for contrast
 - Subtext: white/80, max-w-md

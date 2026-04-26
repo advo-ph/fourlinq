@@ -39,7 +39,7 @@ const InspirationGallery = () => {
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/60 transition-colors duration-300 flex items-end p-4">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
+                  <div className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-[opacity,transform] duration-300">
                     <p className="text-primary-foreground font-medium text-sm">{project.name}</p>
                     <p className="text-primary-foreground/70 text-xs">{project.location}</p>
                   </div>

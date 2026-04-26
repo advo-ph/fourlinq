@@ -3,7 +3,7 @@ import AnimatedSection from "@/components/shared/AnimatedSection";
 const stats = [
   { value: "German-Engineered", label: "Profile Systems" },
   { value: "500+", label: "Philippine Installations" },
-  { value: "15 Years", label: "Of Precision" },
+  { value: "22 Years", label: "Of Precision" },
 ];
 
 const TrustBar = () => {

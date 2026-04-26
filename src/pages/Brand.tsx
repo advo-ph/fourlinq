@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import AnimatedSection from "@/components/shared/AnimatedSection";
@@ -23,18 +21,6 @@ const certIconMap: Record<string, React.ReactNode> = {
 };
 
 const Brand = () => {
-  const { hash } = useLocation();
-
-  useEffect(() => {
-    if (hash) {
-      const el = document.querySelector(hash);
-      if (el) setTimeout(() => {
-        const y = el.getBoundingClientRect().top + window.scrollY - 112;
-        window.scrollTo({ top: y, behavior: "smooth" });
-      }, 100);
-    }
-  }, [hash]);
-
   return (
     <Layout>
       <PageHeader
@@ -57,8 +43,8 @@ const Brand = () => {
               </p>
             </div>
             <img
-              src="/images/wp-export/Company-Profile.jpg"
-              alt="FourlinQ showroom"
+              src="/images/brand-story.jpg"
+              alt="A FourlinQ-equipped home in the Philippines"
               className="w-full aspect-[4/3] object-cover rounded-lg"
               loading="lazy"
             />
@@ -84,7 +70,7 @@ const Brand = () => {
       </AnimatedSection>
 
       {/* Certifications */}
-      <AnimatedSection id="certifications" className="py-16">
+      <AnimatedSection id="certifications" className="py-16 scroll-mt-28">
         <div className="page-container max-w-4xl">
           <h2 className="text-2xl font-semibold text-foreground mb-8 text-center">Certifications</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -94,7 +80,7 @@ const Brand = () => {
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
+                transition={{ delay: i * 0.06, duration: 0.4, ease: "easeOut" }}
                 className="bg-card border border-border rounded-lg p-4 flex items-center gap-3"
               >
                 <div className="text-accent shrink-0">{certIconMap[cert.icon]}</div>
@@ -105,18 +91,8 @@ const Brand = () => {
         </div>
       </AnimatedSection>
 
-      {/* Team Photo */}
-      <div className="page-container pb-16">
-        <img
-          src="/images/wp-export/Company_Profile1.jpg"
-          alt="FourlinQ team"
-          className="w-full aspect-[21/9] object-cover rounded-lg"
-          loading="lazy"
-        />
-      </div>
-
       {/* Contact */}
-      <AnimatedSection id="contact" className="py-16 bg-neutral-50">
+      <AnimatedSection id="contact" className="py-16 bg-neutral-50 scroll-mt-28">
         <div className="page-container max-w-5xl">
           <h2 className="text-3xl font-semibold text-foreground mb-2 text-center">Contact Us</h2>
           <p className="text-muted-foreground text-center mb-10 text-sm">
@@ -151,7 +127,7 @@ const Brand = () => {
                 <div className="text-accent shrink-0 mt-0.5"><Mail size={20} /></div>
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Email</p>
-                  <a href={`mailto:${CONTACT.email}`} className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.email}</a>
+                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.email}</a>
                 </div>
               </div>
             </div>
@@ -159,7 +135,7 @@ const Brand = () => {
           </div>
 
           {/* Branches */}
-          <h3 className="text-lg font-semibold text-foreground mb-6 text-center">Our Locations</h3>
+          <h3 id="showrooms" className="text-lg font-semibold text-foreground mb-6 text-center scroll-mt-28">Our Locations</h3>
           <div className="grid sm:grid-cols-2 gap-4">
             {BRANCHES.map((branch) => (
               <motion.div
@@ -167,6 +143,7 @@ const Brand = () => {
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
                 className="bg-card border border-border rounded-lg overflow-hidden"
               >
                 <iframe

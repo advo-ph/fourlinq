@@ -29,7 +29,9 @@ npm install
 npm run dev
 ```
 
-The dev server runs on `http://localhost:5173` with the Express backend on port 3001.
+The dev server runs on `http://localhost:8080` (per [vite.config.ts](./vite.config.ts)) with the Express backend on port 3001.
+
+For frontend + backend together, use `npm run dev:all` (runs Vite and the Express server concurrently).
 
 ### Environment Variables
 
