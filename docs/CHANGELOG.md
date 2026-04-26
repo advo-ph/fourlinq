@@ -27,7 +27,12 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
-_No unreleased changes yet._
+### Fixed
+- Products page: removed orphaned **Systems** filter pill that always produced an empty grid. The catalog has no `category: "systems"` products — the historical Entrance Prestige + Curtain Wall System entries were intentionally dropped during the 2026-03-23 verified-data pass because their specs and images were not brochure-backed. The pill stayed behind from that cleanup. Page title remains "All Systems" so the unfiltered view still reads naturally. ([products.ts:6](../src/data/products.ts#L6) keeps `"systems"` in the type union for forward-compat if/when the client confirms a real specialist-systems lineup.)
+
+### Infrastructure
+- DNS cutover from old Contabo nginx to Vercel via Namecheap (apex `A` → `76.76.21.21`, `www` `CNAME` → `cname.vercel-dns.com`). Site is now served from Vercel with auto-provisioned SSL.
+- Added 301 redirects in [vercel.json](../vercel.json) for legacy WordPress URLs (`/index.php/contact-us/` etc.) so Google's indexed links resolve to the right new pages instead of dumping users on the homepage.
 
 ---
 
