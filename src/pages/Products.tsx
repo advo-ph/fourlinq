@@ -23,7 +23,6 @@ const filters: { label: string; value: Filter }[] = [
   { label: "All", value: "all" },
   { label: "Windows", value: "windows" },
   { label: "Doors", value: "doors" },
-  { label: "Systems", value: "systems" },
 ];
 
 const productIconMap: Record<string, React.FC<{ className?: string; size?: number; strokeWidth?: number }>> = {
