@@ -84,58 +84,162 @@ Diagnosed from the screenshots she sent of our build vs. Marvin:
 
 ## 4. Marvin design language — analyzed
 
-Pulled from the screenshots Tita sent, my own observation of marvin.com, and general knowledge of the brand's aesthetic system. Values noted as "approx" where measured by eye, not extracted from their CSS.
+**Methodology:** Pulled directly from Marvin's production CSS and HTML on 2026-04-26. Fetched 158 CSS bundles from `_next/static/css/`, parsed `--font-size-*`, `--color-*`, `--space-*` design tokens, plus aspect-ratio and max-width values. Probed home, `/products/collections/vivid`, `/inspiration/photo-gallery`, `/products/collections/compare-collections`, and home rendered with a mobile user-agent. Pages NOT probed: individual blog post layout, find-a-dealer detail, individual window product page, mega-menu open-state JS, news article template, mobile hamburger drawer.
 
-### 4.1 Typography
+Values below are **extracted from real CSS** unless explicitly marked `(visual estimate)`.
 
-| Element | Treatment |
-|---|---|
-| **Headline serif** | A clean transitional serif used for marketing headlines and collection names. Looks like a custom or licensed serif (not Playfair, more refined). Possible candidates: Söhne Schmal, Untitled Serif, GT Sectra, or their own commission. |
-| **Body sans** | Clean humanist sans, mid-weight (400-500). Looks like Söhne, Untitled Sans, or similar grotesque-humanist hybrid. NOT Helvetica, NOT Inter. |
-| **Display sizes** | Hero headline ~80-100px desktop, line-height ~1.05, slight negative letter-spacing (~-0.02em). Drops to ~48-56px tablet, ~36-40px mobile. |
-| **Section headlines** | ~40-56px desktop, ~32-40px tablet, ~24-28px mobile. |
-| **Body** | ~18-20px desktop, ~16-18px mobile. Line-height ~1.55-1.6. Generous. |
-| **Captions / eyebrows** | ~12-14px, often uppercase with letter-spacing ~0.1-0.15em. |
-| **Hierarchy contrast** | Aggressive — hero is 4-5x body size. Builds editorial pacing. |
+### 4.1 Typography (extracted from CSS)
 
-### 4.2 Color
+Marvin actually ships **two parallel typeface stacks** in their CSS, suggesting a migration in progress between two design systems:
 
-| Token | Approx value | Used for |
+| Stack | Sans (body) | Serif (headlines) |
 |---|---|---|
-| Page background | Warm off-white `#FAF8F4` (cream tint) | Main canvas |
-| Surface (cards) | Same as bg or pure white `#FFFFFF` | Content blocks |
-| Primary text | Near-black, slightly warm `#1A1A1A` | Headlines + body |
-| Secondary text | `#5A5A5A` neutral mid-grey | Captions, body de-emphasized |
-| Border / divider | `#E5E2DC` ultra-light warm grey | Thin section rules |
-| Marvin yellow | `#FFD23F`-ish, used **only** for: primary CTA pill, logo icon dot, occasional underline accent | Hard-earned highlight color |
-| Accent stripe | Varies (red, brown, charcoal) on Vivid/Modern/Essential collections — a 2-3px colored line under collection titles | Subtle category coding |
+| Legacy (`apercu` stack) | **Apercu** — Colophon Foundry, ~$200/weight commercial | **Grifo** — Rosetta Type, commercial serif |
+| New (`nationale` stack) | **Nationale** — Klim Type Foundry, ~$300/weight commercial | **TabacG1** — Suitcase Type, commercial serif |
 
-**Key principle:** Restraint. Most of the page is neutral. Color earns its place by being rare.
+All four are commercial licenses, total ~$1,500-2,500 to replicate exactly. **We won't.** See §6.2 for free-tier alternates.
 
-### 4.3 Spacing & layout
+**Real type scale (from `--font-size-*` CSS vars):**
 
-| Token | Approx value |
+```
+font-size-tiny:    12px
+font-size-small:   14px
+font-size-regular: 16px            ← body default (NOT 18-20)
+font-size-medium:  18px
+font-size-large:   20px
+font-size-h6:      18px
+font-size-h5:      18-20px
+font-size-h4:      20-24px (responsive)
+font-size-h3:      24-32px (responsive)
+font-size-h2:      28-48px (responsive)
+font-size-h1:      32-56px (responsive)
+font-size-hjumbo:  48-88px (responsive)   ← hero headlines max at 88px, not 100
+```
+
+**Eyebrows:**
+```
+eyebrow-s: 11-14px
+eyebrow-m: 15-16px
+eyebrow-l: 20px
+```
+
+**Key correction from initial estimate:** body text is **16px**, not 17-20px. Marvin's editorial feel comes from typographic *hierarchy contrast* (88px → 16px = 5.5x), not from oversizing the body. Hero is ~5x body, h1 is ~3.5x body. Restraint at the bottom of the scale; aggression at the top.
+
+### 4.2 Color (extracted from CSS, ranked by frequency of use)
+
+| Hex | Frequency | Role |
+|---|---|---|
+| `#242424` | 170 uses | Primary text + dark surface (NOT pure black — 14% lighter) |
+| `#ffffff` | 93 uses | White surfaces |
+| `#444444` | 66 uses | Secondary text |
+| `#909090` | 34 uses | Muted text / icons |
+| `#f8f8f8` | 27 uses | Light surface variant (page bg in some sections) |
+| `#d4d4d4` | 27 uses | Light borders / dividers |
+| `#d92d20` | 24 uses | **Marvin RED** — alerts, error states, some accents |
+| `#ffc600` | 23 uses | **Marvin YELLOW** — primary CTA, logo dot, key highlights |
+| `#686868` | 21 uses | Dark grey, secondary text variant |
+| `#dfdfdf` | 16 uses | Lighter border |
+| `#282b2f` | 16 uses | Slate dark variant |
+| `#0096db` | 6 uses | **Blue** — info/links |
+| `#fff8df` | 10 uses | Yellow-tinted background (CTA hover/active) |
+| `#fef0c7` | 4 uses | Light yellow card bg |
+| `#fef3f2` | 5 uses | Light pink (red tint bg) |
+| `#ecfdf3` | 5 uses | Light green (success tint) |
+
+**rgba overlays:**
+- `rgba(36,36,36,.19)` — 19% dark overlay (shadows, scrim)
+- `rgba(36,36,36,.04)` — 4% dark overlay (whisper-light dividers)
+
+**Key corrections from initial estimate:**
+- Dark text is `#242424`, NOT `#1A1A1A` (I was too dark)
+- Marvin yellow is `#FFC600` (pure saturated yellow), NOT `#FFD23F`
+- Page background is `#f8f8f8` or `#ffffff` — they do NOT use a warm cream like I guessed
+- Their palette includes a real **blue** `#0096db` for info/links — I missed this entirely
+
+**CSS variable system:**
+```
+--color-primary-500     (the brand color — yellow #FFC600)
+--color-primary-050     (lightest tint — #FFF8DF)
+--color-info-500        (blue — #0096DB)
+--color-info-050        (lightest blue tint)
+--color-hardcoded-neutral-050 / 100 / 500 / 700  (neutral scale)
+```
+
+Material/Bootstrap-style numeric scale (050, 100, 500, 700).
+
+**Principle confirmed:** Color is restrained. The brand yellow `#FFC600` appears in only 23 spots across the entire CSS — once per important element, never as decoration.
+
+### 4.3 Spacing & layout (extracted from CSS)
+
+**Content max-widths used (sorted by frequency):**
+- `87.5rem` (1400px) — primary max-width, 30 uses ✓ confirmed
+- `1400px` — same target, declared in px elsewhere (14 uses)
+- `992px` — tablet container max (18 uses)
+- `768px` — small tablet (11 uses)
+- `62.5rem` (1000px) — narrower reading container (7 uses)
+- `1200px` — md desktop (5 uses)
+- `52.5rem` (840px) — text column max (3 uses)
+- `27.5rem` (440px) — small content blocks
+
+**Section padding (real values found):**
+- `padding-top/bottom: 120px` (5 uses each) — large section padding ✓
+- `padding-top/bottom: 48px` (5 uses) — medium section padding
+- `padding: 24px` / `16px` — small block padding
+- `padding: 1rem` (16px) — micro-spacing
+
+**Gutter:** `--bs-gutter-x: 20px` (Bootstrap-style grid gutter — 20px between columns, not 24-32 like I guessed)
+
+**Spacing scale (inferred from `--v-space-*` references):**
+```
+v-space-050: ~2px
+v-space-100:  4px
+v-space-200:  8px
+v-space-300: 16px      ← most common section internal padding
+v-space-400: ~24px (estimated)
+v-space-500: ~32px
+v-space-600: ~48px
+v-space-700: ~64px
+v-space-800: ~96px (estimated max)
+```
+
+**Aspect ratios used in layout (extracted):**
+```
+1/1                square — used in mega-menu (600×600 product thumbnails)
+16/9               standard widescreen
+1400/710           cinema hero (~1.97:1)   ← hero default
+1400/540           ultra-wide letterbox (~2.59:1)   ← image bands
+1400/786           ~16:9 variant
+1400/954           ~3:2 variant
+1180/1040          near-square landscape
+1365/1040          landscape
+1000/1400          portrait — for tall architectural shots
+```
+
+**Key principle stays right:** whitespace is the layout, but I overestimated. Gutter is **20px**, not 24-32. Section padding is **120px desktop / 48px medium**. Their grid is Bootstrap 5-derived.
+
+### 4.4 Buttons & CTAs (extracted from CSS vars)
+
+```
+--button-border-radius: 50px      ← pill button (primary)
+--button-border-radius: 0         ← square button (secondary)
+--button-border-width:  0         ← filled buttons
+--button-border-width:  2px       ← outlined buttons
+```
+
+**Two parallel button systems:**
+- **Primary CTA:** pill (border-radius 50px), filled yellow, no border, no shadow
+- **Secondary:** square (border-radius 0), with 2px border, ghost/outlined
+
+| Type | Treatment (real) |
 |---|---|
-| Content max-width | ~1400px |
-| Section vertical padding (desktop) | 120-160px top/bottom |
-| Section vertical padding (mobile) | 60-80px |
-| Section horizontal gutter (desktop) | 48-64px |
-| Section horizontal gutter (mobile) | 20-24px |
-| Grid gap (Collections 5-up) | 24-32px |
-| Paragraph max-width | 60-70 characters (~640px) |
-| Image asymmetry | Many sections use 5/7 or 4/8 split between text and image |
+| **Primary** | Yellow pill `#FFC600` bg, `#242424` text, `border-radius: 50px`, no border, no shadow. Hover state via 4% dark overlay `rgba(36,36,36,.04)` or color shift. |
+| **Secondary** | Square outlined button — `border: 2px solid #242424`, transparent bg, `border-radius: 0`, dark text. Hover: bg fill 4% dark overlay. |
+| **Filter chip** | Has separate token system (`--button-filter-chip-*`) — used on Inspiration/Photo Gallery for taxonomy filters. Pill shape, lighter bg. |
+| **Text link** | Plain text + arrow. Underline on hover only. No button chrome. |
 
-**Key principle:** Whitespace is the layout. Sections breathe; text columns are narrow; images get full or near-full width.
+**Transition:** `transition: all .25s` (250ms) — faster than I estimated.
 
-### 4.4 Buttons & CTAs
-
-| Type | Treatment |
-|---|---|
-| **Primary** | Yellow pill (`background: marvin-yellow`, `color: dark`, `border-radius: 9999px`, `padding: 12-16px 24-32px`, `font-weight: 500`, no shadow). Hover: slight darken. |
-| **Secondary** | Plain text + arrow `Learn More →`. No background, no border. Underline appears on hover. |
-| **Tertiary nav** | Plain text dropdowns. Animated underline indicator (1-2px bar that slides between items). |
-
-**Key principle:** One CTA per section, max. Secondary actions are inline text + arrow, not buttons. We've been making everything a button.
+**Key correction:** Marvin uses **both pill and square buttons**, not pill-only. The square outlined secondary is everywhere — I missed it.
 
 ### 4.5 Navigation
 
@@ -172,32 +276,75 @@ Pulled from the screenshots Tita sent, my own observation of marvin.com, and gen
 - **Hover effect:** Subtle photo scale (1.02-1.04x) over 400-600ms. No card lift. No shadow grow. No color shift.
 - **No icon badges, no "NEW" tags, no overlay chips.** The photo and the headline do the work.
 
-### 4.9 Accent lines & dividers
+### 4.9 Accent lines & dividers (extracted from CSS)
 
-- **1px or hairline rules** in `#E5E2DC` or similar warm grey, used:
-  - Between sections occasionally (most sections don't need them — whitespace separates).
-  - Under collection names (sometimes a 2-3px colored accent specific to that collection).
-- **Never used as card borders.** Dividers separate sections, they don't enclose content.
+```
+--accent-height: 1px              ← thin hairline divider
+--accent-height: 5px              ← thick colored accent stripe
+--accent-width: 100px             ← long accent
+--accent-width: 48px              ← short accent
+```
 
-### 4.10 Motion
+Two distinct accent treatments:
+- **1px hairline**, neutral color (`#d4d4d4` or `rgba(36,36,36,.19)`), 100px or 48px wide — used as soft section separators.
+- **5px colored stripe**, brand color or category color, 48-100px wide — used as bold underlines beneath collection names (the colored bars I noticed in the Vivid/Modern/Elevate screenshot).
 
-- **Fade-up on scroll:** opacity 0 → 1, translateY 16-24px → 0, duration 600-800ms, ease-out (NOT spring).
-- **Hover scale on photos:** 1.02-1.04x, 400-600ms ease-out.
-- **Cross-fade carousel:** 1200-1500ms.
-- **Page transitions:** Soft fade, not slide.
-- **Nothing bounces.** Nothing springs. Nothing wobbles. Premium sites use motion to *settle*, not to attract attention.
+Border-radius values used:
+- `0` — square (zero-radius — most cards and images)
+- `0.25rem` (4px) — barely-rounded
+- `0.5rem` (8px) — moderately rounded
 
-### 4.11 Responsive behavior
+**Key correction:** the 5px colored accent stripes are real and standardized in their token system — these are the most distinctive visual flourish on the site. The colored line under each Collection title is at fixed widths of 48px or 100px, not arbitrary.
 
-| Breakpoint | Behavior |
-|---|---|
-| `>1280px` (desktop large) | 5-column collection grid, full editorial layouts, asymmetric splits |
-| `1024-1280px` (desktop) | 4-column grid, same layout structures |
-| `768-1024px` (tablet) | 2-3 column grids, section padding scales down ~40%, mega-menu collapses to drawer |
-| `<768px` (mobile) | Single-column stack, photos full-width with 20-24px horizontal padding, buttons full-width inside their text block, mega-menu becomes a slide-in drawer with accordion sections, hero crops tighter |
-| **Touch behavior** | Carousels become swipeable; hover effects suppressed or replaced with tap-active states |
+### 4.10 Motion (extracted from CSS)
 
-**Key principle:** Mobile isn't a smaller desktop — it's a different reading rhythm. Photos go full-bleed (no horizontal padding on images), text gets generous padding (24-32px), buttons stretch to fill, vertical pacing tightens.
+Real transition declarations found:
+- `transition: all .25s` (250ms)
+- `transition: border .25s ease, background-color .25s`
+
+Marvin's actual motion is **faster than I estimated**. Their site uses snappy 250ms transitions for hover/state changes — not the languorous 600-800ms I assumed for everything.
+
+What's likely longer (visual estimate, not in CSS):
+- **Cross-fade carousel:** 1000-1500ms (animations of this scale live in JS, not CSS, so not captured in our extraction)
+- **Fade-up on scroll:** likely 400-600ms ease-out
+- **Page transitions:** soft fade
+
+**Corrected motion language for our build:**
+- Hover/state changes: **250ms ease**
+- Hero carousel cross-fade: 1200ms
+- Fade-up on scroll: 500ms ease-out
+- No spring, no bounce — easeOut cubic only
+
+**Nothing bounces. Nothing springs. Nothing wobbles.** Premium sites use motion to *settle*, not to attract attention.
+
+### 4.11 Responsive behavior (extracted breakpoints)
+
+Real `@media (min-width: X)` breakpoints found in Marvin's CSS:
+- `375px` — small phone threshold
+- `376px` — phone bump
+- `576px` — sm (Bootstrap 5)
+- `768px` — md
+- `991/992px` — lg
+- `1064px` — custom intermediate
+- `1200px` — xl
+- `1320px` — xxl variant
+- `1400px` — xxl (Bootstrap 5)
+- `1464px` — XXL+
+
+This is **Bootstrap 5's breakpoint system** (576/768/992/1200/1400) with a couple of custom thresholds. Our redesign should adopt the same — there's no reason to invent our own.
+
+**Behavior per breakpoint (visual inferences from probing):**
+
+| Breakpoint | Container max-width | Section padding | Grid columns | Behavior |
+|---|---|---|---|---|
+| `<576px` (mobile) | full-width with 20px gutter | ~48px | 1 col | Hamburger nav, single-column stack, photos full-bleed, buttons full-width |
+| `576-768px` (large phone / small tablet) | 540px or full | 48-72px | 1-2 col | Two-up grid emerges |
+| `768-992px` (tablet) | 720px-992px max | 72-96px | 2-3 col | Sidebar layouts possible |
+| `992-1200px` (small desktop) | 992-1200px max | 96px | 3-4 col | Mega-menu opens |
+| `1200-1400px` (desktop) | 1200-1400px max | 120px | 4-5 col | Full editorial layouts |
+| `>1400px` (large desktop) | 1400px max (87.5rem) | 120px | 5 col | Max content width — content centers, gutters grow |
+
+**Key principle stays right:** Mobile isn't a smaller desktop — different reading rhythm. Photos full-bleed on mobile, text gets generous padding, buttons stretch.
 
 ---
 
@@ -241,92 +388,186 @@ Pulled from the screenshots Tita sent, my own observation of marvin.com, and gen
 
 Tokens to land before any component work begins. These supersede the current design-system.
 
-### 6.1 Color
+### 6.1 Color (revised against real Marvin values)
+
+Marvin's actual neutrals are flat true greys, not warm cream. Their text-dark is `#242424` (14% lighter than I initially proposed). Aligning:
 
 ```css
 /* Surfaces */
---bg-canvas:     #FAF8F4;  /* warm off-white — primary page bg */
---bg-surface:    #FFFFFF;  /* cards / panels when separation needed */
---bg-dark:       #1A1A1A;  /* footer, dark sections */
+--bg-canvas:     #FFFFFF;          /* primary page bg — pure white, matches Marvin */
+--bg-soft:       #F8F8F8;          /* alternate section bg, matches Marvin #f8f8f8 */
+--bg-dark:       #242424;          /* dark sections, footer — exact Marvin dark */
 
 /* Text */
---text-primary:   #1A1A1A;
---text-secondary: #5A5A5A;
---text-muted:     #8C8780;
---text-inverse:   #FAF8F4;
+--text-primary:   #242424;         /* exact Marvin dark */
+--text-secondary: #444444;         /* exact Marvin secondary */
+--text-muted:     #686868;         /* exact Marvin muted */
+--text-faint:     #909090;         /* very faint, captions */
+--text-inverse:   #FFFFFF;
 
-/* Borders */
---border-hairline: #E5E2DC;  /* dividers, never card borders */
+/* Borders / dividers (matches Marvin's hierarchy of separator weights) */
+--border-strong:  #d4d4d4;
+--border-soft:    #dfdfdf;
+--border-faint:   rgba(36,36,36,0.04);   /* whisper-light */
 
-/* Accent — FourlinQ red, used sparingly */
---accent:         #C8102E;  /* CTAs, single accent stripes, link hovers */
+/* Accent — FourlinQ red, applied with Marvin's restraint principle */
+--accent:         #C8102E;         /* FourlinQ red — used like Marvin uses yellow */
 --accent-hover:   #A00D26;
---accent-quiet:   rgba(200,16,46,0.08);  /* faint accent washes */
+--accent-quiet:   rgba(200,16,46,0.08);  /* tinted bg, like Marvin's #fff8df pattern */
+--accent-stripe-h: 5px;            /* matches Marvin's --accent-height: 5px */
+--accent-stripe-w: 48px;           /* matches Marvin's --accent-width: 48px */
 ```
 
-**Color rule:** Red is the *only* color outside the neutral scale. It must earn each appearance — primary CTAs, the "Q" in the logo, one optional accent stripe per page section. NOT on nav links, NOT on hover states everywhere, NOT on chat bubble, NOT on icon badges.
+**Color rule:** Red is the *only* color outside the neutral scale. Marvin's brand color (yellow) appears 23 times in their entire CSS — once per important element. Our red must show the same discipline. NOT on nav links, NOT on hover states everywhere, NOT on chat bubble, NOT on icon badges.
 
-### 6.2 Typography
+### 6.2 Typography (free analogs to Marvin's commercial stack)
 
-Candidate stack — pick one before component work starts:
+Marvin uses two parallel commercial stacks (Apercu+Grifo OR Nationale+TabacG1). We can't license those. Closest free analogs:
 
-**Option A — "Editorial Refined" (recommended)**
-- Headlines: **Fraunces** (variable serif, free, very flexible) or **GT Sectra** (paid)
-- Body: **Söhne** (paid) or **Inter** (free, neutral grotesque)
+**Option A — "Editorial Refined" (RECOMMENDED)**
+- Headlines: **Fraunces** (variable serif, Google Fonts free — analog to TabacG1/Grifo)
+- Body: **Inter** (Google Fonts free — neutral grotesque, close to Apercu/Nationale)
+- Free, both excellent on screen, well-supported, fast to load via Google Fonts CDN.
 
-**Option B — "German Engineering"**
-- Headlines: **Roboto Serif** or **Lora**
-- Body: **Inter** or **IBM Plex Sans**
+**Option B — "Closer to Nationale-style"**
+- Headlines: **Roboto Serif** (Google Fonts free — variable, refined transitional)
+- Body: **DM Sans** (current — already in use, neutral)
+- Lower-risk migration since DM Sans is already loaded.
 
 **Option C — "Stay close to current"**
-- Headlines: Keep **Playfair Display** but use it bigger and quieter
-- Body: Replace **DM Sans** with **Inter** (more neutral, less startup-y)
+- Headlines: Keep **Playfair Display** (current, but use it bigger and quieter than the current build does)
+- Body: Replace **DM Sans** with **Inter**
 
-Recommendation: **Option A with Fraunces + Inter**. Both free, both excellent on screen, Fraunces has the editorial weight we need without feeling generic.
+**Recommendation: Option A.** Fraunces gives the editorial sophistication Marvin gets from TabacG1, with a much wider variable axis (you can use it as a delicate display serif AND as a heavier body emphasis). Inter is the closest free neutral sans to Apercu/Nationale.
 
-### 6.3 Scale
+**Performance budget:** Total font payload < 80kb after subsetting. Preload only the weights actually used in the hero — defer everything else.
+
+### 6.3 Scale (calibrated to Marvin's real scale)
 
 ```
-Hero display:     96px / 1.05 / -0.02em   (desktop)
-                  56px / 1.1  / -0.01em   (mobile)
-H1:               64px / 1.1
-H2:               48px / 1.15
+Hjumbo (hero):    88px / 1.05 / -0.02em   (desktop)   ← matches Marvin's hjumbo max
+                  48px / 1.1  / -0.01em   (mobile)
+H1:               56px / 1.1                          ← matches Marvin's h1 max
+                  32px / 1.15             (mobile)
+H2:               48px / 1.15                         ← matches Marvin's h2 max
+                  28px / 1.2              (mobile)
 H3:               32px / 1.2
+                  24px / 1.25             (mobile)
 H4:               24px / 1.3
-Body lead:        20px / 1.55
-Body:             17px / 1.6
-Caption:          14px / 1.5
-Eyebrow (caps):   12px / 1.4 / 0.12em
+H5:               20px / 1.4
+H6:               18px / 1.4
+Body large:       20px / 1.55
+Body regular:     16px / 1.6              ← Marvin body default
+Body small:       14px / 1.5
+Tiny / caption:   12px / 1.4
+Eyebrow large:    20px / 1.4 / 0.10em (caps)
+Eyebrow medium:   16px / 1.4 / 0.12em (caps)
+Eyebrow small:    14px / 1.4 / 0.15em (caps)
 ```
 
-### 6.4 Spacing
+**Key change vs initial estimate:** body is **16px**, not 17px. Hero is **88px**, not 96px. The editorial pacing comes from the *contrast ratio* (88:16 = 5.5×), not from absolute size.
+
+### 6.4 Spacing (Bootstrap 5 system + Marvin's section padding)
 
 ```
-Section padding (desktop):  120px top/bottom
-Section padding (tablet):    80px
-Section padding (mobile):    56px
+Section padding (desktop):  120px top/bottom         ← matches Marvin
+Section padding (tablet):    96px
+Section padding (mobile):    48px                    ← matches Marvin
 
-Content max-width:          1400px
-Reading max-width:          640px (paragraph columns)
+Container max-width:        1400px (87.5rem)         ← matches Marvin exactly
+Container narrow:           1000px (62.5rem)         ← matches Marvin
+Reading max-width:          840px (52.5rem)          ← matches Marvin
 
-Grid gaps:                  32px desktop, 16px mobile
+Grid gutter:                20px (--bs-gutter-x)     ← matches Marvin exactly
 
-Section horizontal padding: 48px desktop, 20px mobile
+Spacing scale (rem):
+  0     -> 0
+  100   -> 0.25rem (4px)
+  200   -> 0.5rem  (8px)
+  300   -> 1rem    (16px)
+  400   -> 1.5rem  (24px)
+  500   -> 2rem    (32px)
+  600   -> 3rem    (48px)
+  700   -> 4rem    (64px)
+  800   -> 6rem    (96px)
+  900   -> 7.5rem  (120px)
 ```
 
-### 6.5 Motion
+**Breakpoints (Bootstrap 5, matching Marvin):**
+```
+sm:  576px
+md:  768px
+lg:  992px
+xl:  1200px
+xxl: 1400px
+```
+
+### 6.5 Motion (calibrated to Marvin's 250ms hover)
 
 ```css
 --ease:           cubic-bezier(0.16, 1, 0.3, 1);    /* ease-out cubic */
 --ease-soft:      cubic-bezier(0.4, 0, 0.2, 1);     /* gentle ease-in-out */
 
---dur-fast:       200ms;   /* hover state changes */
+--dur-hover:      250ms;   /* hover/state changes — matches Marvin */
 --dur-base:       400ms;   /* most transitions */
---dur-slow:       800ms;   /* fade-ups, page transitions */
---dur-carousel:   1400ms;  /* hero cross-fades */
+--dur-slow:       600ms;   /* fade-ups on scroll */
+--dur-carousel:   1200ms;  /* hero cross-fades */
 ```
 
 **Motion rule:** No spring. No bounce. No overshoot. Always ease-out. Only animate `opacity` and `transform` (never `width`, `height`, `top`).
+
+---
+
+## 6.6 Marvin's actual IA (from sitemap, for reference)
+
+For context, the real Marvin information architecture (extracted from `marvin.com/sitemap.xml`, 2026-04-26):
+
+```
+/
+/products                            (entry)
+  /collections                       (5-up grid of named collections)
+    /ultimate
+    /modern
+    /vivid
+    /elevate
+    /essential
+    /compare-collections             (decision tool)
+  /design-options                    (modular options across products)
+    /casings, /divided-lites, /exterior-finish, ...
+/solutions                           (use-case oriented — 4 entries)
+/inspiration
+  /photo-gallery
+  /email-sign-up
+  /request-brochure
+    /{collection}-catalog            (PDF brochure per collection)
+/our-story
+  /history-of-marvin
+  /tours-and-training
+/news                                (57 press entries)
+/blog                                (153 editorial posts)
+/find-a-dealer                       (1317 dealer pages — search-driven)
+/international-dealers
+/careers                             (areas, locations, benefits)
+/support                             (131 entries — installation, warranty, etc.)
+/c/{campaign}                        (campaign landing pages — e.g. "Meet Vivid")
+/marvin-at-7-tide                    (showroom microsite)
+/legal/...
+```
+
+What translates directly to FourlinQ:
+- **`/products/collections`** → our `/systems` with three buckets
+- **`/products/collections/compare-collections`** → potential future "compare systems" tool
+- **`/inspiration/photo-gallery`** → our `/inspiration` photo gallery
+- **`/inspiration/request-brochure`** → could be a useful pattern for sending FourlinQ brochures
+- **`/find-a-dealer`** → our `/showrooms` (FourlinQ has 4 locations, much smaller scope)
+- **`/our-story`** → our `/brand`
+- **`/news`** + **`/blog`** → our `/whats-new` (combined into one feed for our smaller scope)
+
+What we ignore from Marvin's IA:
+- `/careers` — too small a company; not needed
+- `/solutions` — overlap with `/products` in their structure; not needed for us
+- `/legal` sub-tree at the depth they have — keep our minimal `/legal/privacy` + `/legal/terms`
+- `/c/{campaign}` — when we eventually run campaigns, this pattern works, but not Day 1
 
 ---
 
