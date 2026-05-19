@@ -346,6 +346,102 @@ This is **Bootstrap 5's breakpoint system** (576/768/992/1200/1400) with a coupl
 
 **Key principle stays right:** Mobile isn't a smaller desktop — different reading rhythm. Photos full-bleed on mobile, text gets generous padding, buttons stretch.
 
+### 4.12 Component inventory (extracted from CSS module class names)
+
+Probed 14 production pages, parsed CSS-module class names, ranked by usage. These are the architectural patterns that compose Marvin's site:
+
+| Component | Uses | Purpose |
+|---|---|---|
+| **SwatchList** | 114 | Finish/color swatch grid — directly applies to FourlinQ's 11 finishes |
+| **Modal** | 97 | Modal/dialog system — quote requests, brochure downloads |
+| **Header** | 76 | Top navigation with mega-menu, blur backdrop, logo |
+| **Spacer** | 68 | Explicit vertical spacer component (Squarespace-style — they put `<Spacer />` between content blocks) |
+| **ColorMode** | 50 | Light/dark section toggle — same page alternates between cream/white and dark `#242424` |
+| **ThreeUpImageGroup** | 48 | 3-up image grid layout primitive |
+| **SubHeadCopy** | 45 | Subhead + paragraph combo (editorial typographic block) |
+| **SubHeadListGroup** | 43 | Subhead + bullet list combo |
+| **Category** | 42 | Category navigation pattern |
+| **Media** | 41 | Generic image/video media wrapper |
+| **ProductCard** | 38 | Product card with photo + name + caption |
+| **AccordionsMobile** | 31 | Mobile-only accordion (FAQ, spec lists collapse on small screens) |
+| **FilterVista** | 30 | Filter UI (used on photo gallery) |
+| **FeatureLink** | 27 | Text + arrow link (their "Learn More →" pattern) |
+| **AccordionsDesktop** | 27 | Desktop accordion (different markup than mobile) |
+| **FilterRow** | 26 | Filter pill row |
+| **TwoUpImageGroup** | 25 | 2-up image grid layout |
+| **TextBlock** | 13 | Standalone text content block |
+| **SbTestimonialCard** | 11 | Testimonial card |
+| **SbTestimonialCarousel** | 10 | Testimonial carousel wrapper |
+| **LayoutGridBleedGridItem** | 9 | Full-bleed grid item |
+| **SbFeaturedImage** | 7 | Featured image with caption |
+| **StoryExpander*** | 6+ | Editorial story expander — used on news/blog posts |
+| **ResourceCard / ResourcesSection** | 6 | Downloads, specs, brochures section |
+| **PageHeaderDisplayTextHero** | 5 | Page hero header with display text |
+| **CollectionLogo** | 4 | Collection-specific logo treatment |
+| **Carousel** | 2 | Generic carousel (separate from testimonial carousel) |
+| **StickyTitleBar** | 1 | Sticky page title that pins on scroll |
+| **YoutubeVideo** | 2 | YouTube embed wrapper |
+| **SbForm** | 1 | Form component (CMS-driven) |
+| **SbPhotoGalleryVista** | 1 | Photo gallery (Vista variant) |
+| **SbQuoteCard** | 1 | Pull-quote card |
+
+**The `Sb` prefix is Storyblok** — Marvin's CMS. Components prefixed `Sb` are content-block components delivered from Storyblok and rendered into the page. Marvin's content is *editorial-CMS-driven* — editors compose pages from these blocks.
+
+For FourlinQ this is a model worth borrowing in principle, even though we don't have Storyblok — we have admin + Postgres. The same idea: design composable content blocks (TextBlock, TwoUpImageGroup, AccordionDesktop, etc.) that can be assembled into a page rather than hardcoding layouts.
+
+### 4.13 Elevation / shadow system (extracted)
+
+Marvin has a **7-level elevation scale**, all ultra-subtle (4-19% opacity):
+
+```css
+--depth-1:  0 0 1px 0 rgba(39,39,39,.04), 0 .5px 1.5px 0 rgba(36,36,36,.19);
+--depth-2:  0 .25px 1px 0 rgba(36,36,36,.04), 0 .85px 3px 0 rgba(36,36,36,.19);
+--depth-4:  0 .5px 1.75px 0 rgba(36,36,36,.04), 0 1.85px 6.25px 0 rgba(36,36,36,.19);
+--depth-6:  0 .25px 3px 0 rgba(36,36,36,.04), 0 2.75px 9px 0 rgba(36,36,36,.19);
+--depth-8:  0 .5px 5px 0 rgba(36,36,36,.04), 0 3.75px 11px 0 rgba(36,36,36,.19);
+--depth-12: 0 .5px 5px 0 rgba(39,39,39,.04), 0 3.75px 11px 0 rgba(39,39,39,.19);
+--depth-6-top-shadow: .25px -2.75px 3px 0 rgba(36,36,36,.04), 0 0 9px 0 rgba(36,36,36,.19);
+```
+
+**Key insights:**
+- Every shadow uses **two layers** — a 4% near-shadow (sharpness) + a 19% farther shadow (depth). Single-layer shadows look cheap; two-layer shadows feel physical.
+- All offsets are sub-pixel (0.25px, 0.5px, 0.85px, 1.85px, 2.75px, 3.75px) — fractional values, not integers.
+- A `top-shadow` variant exists for elements that need to cast shadow upward (sticky bottom bars).
+- Max blur on any depth is 11px — never the 20-40px blur common in startup-y card UIs.
+
+Translation: ditch the `shadow-md` / `shadow-lg` Tailwind defaults. Implement the same two-layer subtle-shadow system in our tokens.
+
+### 4.14 Animation curves used
+
+Real `cubic-bezier()` values from Marvin's CSS:
+
+```
+cubic-bezier(.215, .61, .355, 1)      ← easeOutCubic (most common)
+cubic-bezier(.55, .055, .675, .19)    ← easeInQuart (rare, for exits)
+cubic-bezier(.54, 1.5, .38, 1.11)     ← gentle spring overshoot — used VERY sparingly
+ease-out                              ← default
+```
+
+The `1.5` y-value in the third curve is a mild overshoot — Marvin DOES allow a touch of spring on specific transitions, but the overshoot is tiny (1.5, vs 1.7+ for visible bounce). Most of their motion is straight cubic-out.
+
+### 4.15 Performance & loading patterns
+
+- **Font preloading:** 10+ woff2 files preloaded via `<link rel="preload">` — aggressive for a marketing site (would hurt LCP). We'll do less.
+- **No `dns-prefetch` for external CDNs** — they self-host or proxy through Next.js Image.
+- **Image optimization:** Next.js Image at `q=75` (not 90+) — they accept slightly softer images for smaller payload.
+- **CSS layering:** They use `@layer reset` + `@layer default` for cascade ordering. Modern, clean. We should adopt.
+
+### 4.16 SEO / structured data (JSON-LD types found)
+
+On home: `Organization`, `ContactPoint`, `PostalAddress`, `WebSite`, `SearchAction`, `EntryPoint`
+On collection pages: `WebPage`, `ViewAction`, `DownloadAction`, `Thing`, `PropertyValue`, `EntryPoint`
+
+For FourlinQ, equivalent schema additions worth doing:
+- `Organization` + `ContactPoint` on home (with our showroom addresses as `PostalAddress` entries)
+- `LocalBusiness` on each showroom page (4 entries — Main, Ortigas, Alabang, Cebu)
+- `Product` schema on each System type
+- `WebPage` + `BreadcrumbList` on all content pages
+
 ---
 
 ## 5. Translation — what we take, what we don't, what's ours
@@ -390,6 +486,33 @@ Tokens to land before any component work begins. These supersede the current des
 
 ### 6.1 Color (revised against real Marvin values)
 
+**Full neutral scale to mirror Marvin's 8-step system:**
+
+```css
+--color-neutral-050: #F5F5F5;   /* lightest surface — exact Marvin */
+--color-neutral-100: #DFDFDF;   /* light border */
+--color-neutral-200: #B6B6B6;   /* faint */
+--color-neutral-300: #909090;   /* muted */
+--color-neutral-400: #686868;   /* secondary text */
+--color-neutral-500: #444444;   /* body de-emphasized */
+--color-neutral-600: #282B2F;   /* darkest surface var */
+--color-neutral-700: #242424;   /* primary text + dark surfaces — exact Marvin */
+```
+
+**FourlinQ primary scale (red — applied with Marvin's restraint):**
+
+```css
+--color-primary-050: #FFF5F6;   /* faintest red wash */
+--color-primary-100: #FCE8EB;
+--color-primary-200: #F4B8C2;
+--color-primary-300: #E88598;
+--color-primary-500: #C8102E;   /* FourlinQ red — used 23x-style restraint */
+--color-primary-600: #A00D26;   /* hover */
+--color-primary-700: #7A0A1D;   /* darkest */
+```
+
+**Semantic tokens (semantic role, not specific hex):**
+
 Marvin's actual neutrals are flat true greys, not warm cream. Their text-dark is `#242424` (14% lighter than I initially proposed). Aligning:
 
 ```css
@@ -419,6 +542,37 @@ Marvin's actual neutrals are flat true greys, not warm cream. Their text-dark is
 ```
 
 **Color rule:** Red is the *only* color outside the neutral scale. Marvin's brand color (yellow) appears 23 times in their entire CSS — once per important element. Our red must show the same discipline. NOT on nav links, NOT on hover states everywhere, NOT on chat bubble, NOT on icon badges.
+
+### 6.1.1 Elevation tokens (mirror Marvin's 7-step depth scale)
+
+```css
+--depth-1: 0 0 1px 0 rgba(36,36,36,.04), 0 .5px 1.5px 0 rgba(36,36,36,.19);
+--depth-2: 0 .25px 1px 0 rgba(36,36,36,.04), 0 .85px 3px 0 rgba(36,36,36,.19);
+--depth-4: 0 .5px 1.75px 0 rgba(36,36,36,.04), 0 1.85px 6.25px 0 rgba(36,36,36,.19);
+--depth-6: 0 .25px 3px 0 rgba(36,36,36,.04), 0 2.75px 9px 0 rgba(36,36,36,.19);
+--depth-8: 0 .5px 5px 0 rgba(36,36,36,.04), 0 3.75px 11px 0 rgba(36,36,36,.19);
+```
+
+**Use sparingly.** Marvin barely uses shadows — most surfaces have no shadow at all. Reserve depths for: header (depth-1 on scroll), modal (depth-6), tooltip (depth-2). Cards and tiles get NO shadow.
+
+### 6.1.2 Animation duration scale (mirror Marvin's 5-step scale)
+
+```css
+--dur-100: 100ms;   /* tiny interactions */
+--dur-200: 200ms;   /* hover changes (Marvin uses this most) */
+--dur-250: 250ms;   /* default transition (Marvin's most common) */
+--dur-300: 300ms;   /* state changes */
+--dur-400: 400ms;   /* component reveals */
+--dur-500: 500ms;   /* page transitions */
+--dur-carousel: 1200ms;   /* hero cross-fade (longer, not in Marvin's scale) */
+```
+
+### 6.1.3 Header tokens (matching Marvin's exact heights)
+
+```css
+--header-height-mobile:  64px;
+--header-height-desktop: 72px;
+```
 
 ### 6.2 Typography (free analogs to Marvin's commercial stack)
 
@@ -480,17 +634,23 @@ Reading max-width:          840px (52.5rem)          ← matches Marvin
 
 Grid gutter:                20px (--bs-gutter-x)     ← matches Marvin exactly
 
-Spacing scale (rem):
-  0     -> 0
-  100   -> 0.25rem (4px)
-  200   -> 0.5rem  (8px)
-  300   -> 1rem    (16px)
-  400   -> 1.5rem  (24px)
-  500   -> 2rem    (32px)
-  600   -> 3rem    (48px)
-  700   -> 4rem    (64px)
-  800   -> 6rem    (96px)
-  900   -> 7.5rem  (120px)
+Spacing scale (mirror Marvin's exact --v-space-* tokens):
+  000   -> 0px
+  050   -> 2px       ← matches Marvin
+  100   -> 4px
+  200   -> 8px
+  250   -> 12px      ← new vs Marvin (filling 8→16 gap)
+  300   -> 16px
+  350   -> 20px      ← matches Marvin (grid gutter value)
+  400   -> 24px
+  500   -> 32px
+  600   -> 40px      ← matches Marvin
+  700   -> 48px      ← matches Marvin
+  800   -> 56px      ← matches Marvin
+  900   -> 64px      ← matches Marvin (their MAX semantic spacing)
+  --section-pad-desktop: 120px   /* declared directly, not as v-space — matches Marvin */
+  --section-pad-tablet:  72px
+  --section-pad-mobile:  48px
 ```
 
 **Breakpoints (Bootstrap 5, matching Marvin):**
