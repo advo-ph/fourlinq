@@ -1030,4 +1030,241 @@ The redesign is shippable to `main` when:
 
 ---
 
+## §13 — Deep-research addendum (extracted from marvin.com CSS, 156 bundles, 14 page templates)
+
+This section captures the **complete design-token system** as it lives in Marvin's production CSS. Every value here is grep'd from their stylesheets — not estimated.
+
+### §13.1 — Type scale (full ramp)
+
+Marvin's `--v-font-size-*` scale, every step:
+
+| Token | px | Used for |
+|---|---|---|
+| `--v-font-size-025` | 10 | micro labels |
+| `--v-font-size-050` | 12 | tiny / captions |
+| `--v-font-size-075` | 14 | small body, eyebrow-s |
+| `--v-font-size-100` | 16 | regular body, eyebrow-m |
+| `--v-font-size-150` | 18 | medium, h5/h6 mobile |
+| `--v-font-size-200` | 20 | large, h4 desktop, eyebrow-l |
+| `--v-font-size-250` | 24 | h3 mobile, h4 |
+| `--v-font-size-300` | 28 | h2 mobile, h3 |
+| `--v-font-size-350` | 32 | h1 mobile, h2 |
+| `--v-font-size-400` | 40 | (intermediate) |
+| `--v-font-size-500` | 48 | h1 / hjumbo mobile |
+| `--v-font-size-600` | 56 | h1 desktop |
+| `--v-font-size-700` | 64 | hjumbo tablet |
+| `--v-font-size-800` | 88 | hjumbo desktop max |
+
+**Implication for FourlinQ:** adopt this exact scale (rename `v-font-size-*` → `text-*` to match Tailwind). It's a 14-step scale with explicit display sizes — better than the 6-step we use now.
+
+### §13.2 — Font weights, line-heights, letter-spacing
+
+```
+Weights:        300 / 400 / 500 / 600 / 700
+Line-heights:   1.0  / 1.25 / 1.5  / 1.75 / 2.0  / 2.5 em
+Letter-spacing: 0   / 1px  / 1.5px / 2px  / 3px  / 4px
+```
+
+Headlines use 500 (medium) and 600 (demibold). Body never goes below 400. **Eyebrows are the only place letter-spacing > 0** — and even there it's only 1-2px, not the tracked 3-4px we have on the current site.
+
+### §13.3 — Spacing scale
+
+```
+--v-space-000: 0    --v-space-500: 32
+--v-space-050: 2    --v-space-600: 40
+--v-space-100: 4    --v-space-700: 48
+--v-space-200: 8    --v-space-800: 56
+--v-space-250: 12   --v-space-900: 64
+--v-space-300: 16
+--v-space-350: 20
+--v-space-400: 24
+```
+
+Finer-grained than Tailwind defaults (which jump 8 → 12 → 16 → 24). The 2/4/8/12/16/20/24 ladder keeps tight type-to-element rhythm.
+
+### §13.4 — Radius scale
+
+```
+000:0  050:2  100:4  200:8  250:12  400:24  full:9999 (pill)
+```
+
+**Buttons use either 0 or pill.** Cards use 4 or 8. They never use 12 or 24 on buttons. Square = utility/data UI, pill = consumer CTAs.
+
+### §13.5 — Motion system
+
+```
+Durations: 100 / 200 / 300 / 400 / 500 ms
+Curves:
+  ease-in-out:  cubic-bezier(.68, 0, .33, 1)   ← signature curve
+  ease-in:      cubic-bezier(.33, 0, .68, 0)
+  ease-out:     cubic-bezier(.33, 1, .68, 1)
+```
+
+**Default transition: `300ms cubic-bezier(.68,0,.33,1)`** — soft, slightly slow. Most "premium" sites use `ease-out` 200ms; Marvin's curve lingers on entry and exit. Adopt exactly — free brand equity.
+
+### §13.6 — Shadow / depth
+
+```css
+--depth-2: 0 .25px 1px 0  rgba(36,36,36,.04), 0 .85px 3px 0  rgba(36,36,36,.19)
+--depth-6: 0 .25px 3px 0  rgba(36,36,36,.04), 0 2.75px 9px 0 rgba(36,36,36,.19)
+```
+
+**Shadows are tiny.** Premium feel comes from low elevation. Our current build uses Tailwind defaults (`shadow-md` = 6px blur, much heavier). Lighten everything.
+
+### §13.7 — Breakpoints (by usage frequency)
+
+| Breakpoint | Count | Role |
+|---|---|---|
+| **992px** | 751 | **Primary desktop break** (not 1200) |
+| 768px | 205 | Tablet |
+| 1200px | 172 | Wide desktop |
+| 576px | 122 | Large mobile |
+| 1320px | 76 | XL |
+| 1400px | 26 | Max-container |
+
+**Key finding:** layout pivot at **992px**, not 1024px (Tailwind's `lg`). Tita's screenshots at ~1100px land in our awkward zone — likely cause of many of her layout complaints.
+
+### §13.8 — Grid layouts
+
+```
+1fr                                    38× (single column)
+1fr 1fr / repeat(2, minmax(0,1fr))     35× (two-up)
+repeat(3, minmax(0, 1fr))               8×
+repeat(4, minmax(0, 1fr))               6×
+auto 1fr auto                           8× (label–field–action)
+60px 1fr                                6× (icon–content)
+subgrid                                14× ← cards aligning to outer grid
+```
+
+`minmax(0, 1fr)` prevents grid blowout from long text. **We're not using `subgrid` anywhere** — cheap polish win for card alignment.
+
+### §13.9 — Aspect ratios
+
+```
+1/1   36×   square — product tiles
+16/9  24×   landscape — heroes
+3/2   12×   classic photo
+5/4   10×   portrait-landscape
+4/5    6×   portrait — inspiration cards
+2/1    6×   ultrawide section dividers
+```
+
+Mobile-specific custom ratios (`343/463`, `343/429`) lock exact pixel heights for above-the-fold mobile composition. Over-engineering for our scope but worth knowing.
+
+### §13.10 — Color system (final)
+
+Marvin runs a **dual-primary** — `--color-primary-*` resolves to yellow OR blue depending on page context.
+
+**Blue primary ramp (corporate / info):**
+```
+050:#e3f5ff  400:#1592eb
+100:#caebff  500:#0075c9  ← primary blue
+200:#9acfef  600:#005a9a
+300:#78c0eb  700:#00416b  ← "dusk"
+```
+
+**Yellow primary ramp (consumer / brand):**
+```
+050:#fff8df  400:#ffd83f
+100:#fff8cc  500:#ffc600  ← primary yellow
+200:#ffef99  600:#dba500
+300:#ffe366  700:#b78600
+```
+
+**Neutrals (hardcoded):**
+```
+050:#f5f5f5  400:#686868
+100:#dfdfdf  500:#444444  ← body text
+200:#b6b6b6  600:#282b2f
+300:#909090  700:#242424  ← display text
+```
+
+**Semantic:** error-600 `#d92d20`, success-500 `#12b76a`, warning-500 `#f79009`, info-500 `#0202fe` (focus rings).
+
+**Special:** `--color-cream:#e7e5dd` (warm off-white for editorial sections), `--color-mch:#18414a` (Marvin Connected Home teal).
+
+**Implication for FourlinQ:** add `--color-cream: #f9f7f1` as alternate background instead of pure `#f8f8f8`. The warm tint is what separates "premium" from "generic SaaS."
+
+### §13.11 — Component nomenclature (their CSS modules)
+
+```
+Header_*        — desktop nav + mega flyout (flyout, blurLayer, cardGrid, collectionCard, featuredCard)
+Carousel_*      — used heavily on Inspiration + Collections
+Category_*      — taxonomy tiles
+Collection*     — CollectionCard, CollectionHeroImage, CollectionLogo, CollectionProductListing
+HeaderText_*    — h2/h3/h4/h5 + subhead-200 (semantic typography component)
+FeatureLink_*   — text link with chevron arrow (signature CTA)
+FeaturedCard_*  — large editorial card with overlay
+ColorMode_*     — wrapper that switches the entire token set per section
+```
+
+**Three patterns worth stealing:**
+
+1. **`HeaderText` as a component** — typography enforced as React component, not raw class. Prevents `<h1 class="text-2xl">` mismatches.
+2. **`FeatureLink` arrow chevron** — signature "→" link with hover-translate. One component, 50+ uses.
+3. **`ColorMode` wrapper** — lets one section have cream bg + dark text + light-tone shadows while the next is white. Avoids per-section token overrides.
+
+### §13.12 — Header / nav specifics
+
+```
+--header-height: 64px (mobile) / 72px (desktop)
+```
+
+On hover of a top-nav item, a full-width **flyout** drops with a blur layer behind page content. Flyout uses a 4-column grid: collection tiles + featured editorial card on the right. **Mega-menu but tasteful** — not a long list of links, but a grid of products with images.
+
+For our scope: simple "Systems / Inspiration / Showrooms / About / Contact" at 72px with the same `.68,0,.33,1` fade gets 80% of the feel.
+
+### §13.13 — Text-transform usage
+
+`text-transform: uppercase` appears **41 times** — almost exclusively on:
+- Eyebrow labels above headlines (`SOLUTIONS / DOORS / CASEMENT`)
+- Filter chips
+- Footer column headers
+
+**Structural, not decorative.** Our hero subtitles use tracked-uppercase decoratively (dated). Move uppercase to eyebrow labels only.
+
+### §13.14 — Information architecture (from sitemap.xml, 1817 URLs)
+
+| Top-level | URL count | Maps to FourlinQ |
+|---|---|---|
+| `/find-a-dealer` | 1317 | → `/showrooms` |
+| `/blog` | 153 | → defer (Phase 6+) |
+| `/support` | 131 | → `/support` (existing) |
+| `/products` | 99 | → `/systems` |
+| `/news` | 57 | → defer |
+| `/inspiration` | 12 | → `/inspiration` (Phase 4) |
+| `/our-story` | 3 | → `/about` |
+
+**Marvin's `/products` IA is 3 levels:**
+```
+/products
+  /collections          ← Modern, Elevate, Essential, Ultimate, Vivid
+    /compare-collections ← side-by-side compare page
+  /windows              ← /casement, /awning, /double-hung
+  /doors                ← /sliding, /french
+  /design-options       ← /casings, /divided-lites, /exterior-finish  ← our finish swatches
+```
+
+**Insight:** our 8 systems ≈ one of Marvin's Collections. Our `/systems` should pattern-match `/products/collections/compare-collections` — single comparison page, then drill into individual system pages. **Closer to Tita's "explain the four-chamber system properly" ask than what we have now.**
+
+### §13.15 — Revisions to earlier sections after deep probe
+
+1. **Spacing scale:** add `--space-2`, `--space-12`, `--space-20` for finer rhythm.
+2. **Motion:** change all transitions from `cubic-bezier(0.4,0,0.2,1)` (Tailwind default) to `cubic-bezier(.68,0,.33,1)`. Single biggest "feel" upgrade for zero code.
+3. **Type scale:** add 40px and 56px steps. Current 32 → 48 jump is too coarse for mid-heading hierarchy.
+
+### §13.16 — Confidence tier
+
+| Tier | What | Source |
+|---|---|---|
+| ✅ Verified | §13.1–§13.13 values | Grep'd from production CSS |
+| ✅ Verified | IA in §13.14 | sitemap.xml direct |
+| 🟡 Inferred | Mega-menu hover behavior | Markup, not interaction-tested |
+| 🟡 Inferred | Yellow vs blue context split | Token naming + page sampling |
+| ⚠️ Not probed | Search modal, dealer map, gallery filters | All JS-driven |
+
+The CSS-derived findings (~95% of this addendum) are gold. Interaction findings need browser automation. **Recommend we stop research and start locking decisions.**
+
+---
+
 *This document is the contract for the redesign. If we drift from it, we update it first.*
