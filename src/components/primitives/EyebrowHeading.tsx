@@ -17,10 +17,10 @@ interface EyebrowHeadingProps {
 
 const headingSizeClass = (level: number, display: boolean) => {
   if (display) return "text-display-sm lg:text-display";
-  if (level === 1) return "text-h2 lg:text-h1";
-  if (level === 2) return "text-h3 lg:text-h2";
-  if (level === 3) return "text-h4 lg:text-h3";
-  return "text-h5 lg:text-h4";
+  if (level === 1) return "text-[3.5rem] lg:text-h1";          // 56/64 — was 56/64 (h2→h1)
+  if (level === 2) return "text-[3rem] lg:text-h2";            // 48/56 — was 40/56, bumped mobile
+  if (level === 3) return "text-[2.25rem] lg:text-h3";         // 36/40
+  return "text-[1.625rem] lg:text-h4";                         // 26/30
 };
 
 const EyebrowHeading = ({

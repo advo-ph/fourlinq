@@ -52,7 +52,7 @@ const HeroCarousel = ({
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-[color:var(--canvas-dark)] -mt-20"
+      className="relative w-full overflow-hidden bg-[color:var(--canvas-dark)] -mt-[72px]"
       style={{ height: "min(100vh, 920px)" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -71,8 +71,8 @@ const HeroCarousel = ({
                 animate={{ opacity: 1, scale: 1.05 }}
                 exit={{ opacity: 0, scale: 1.08 }}
                 transition={{
-                  opacity: { duration: 1.2, ease: [0.215, 0.61, 0.355, 1] },
-                  scale:   { duration: 8.0, ease: [0.215, 0.61, 0.355, 1] },
+                  opacity: { duration: 1.2, ease: [0.68, 0, 0.33, 1] },
+                  scale:   { duration: 8.0, ease: [0.68, 0, 0.33, 1] },
                 }}
               >
                 <img
@@ -89,20 +89,19 @@ const HeroCarousel = ({
         </AnimatePresence>
       </div>
 
-      {/* Two-layer scrim — vertical bottom-darker + corner bottom-left intensifier */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/0 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-transparent to-transparent pointer-events-none" />
+      {/* Single bottom-up scrim — softer than double-layer */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/5 pointer-events-none" />
 
       {/* Hero text block */}
       <div className="absolute inset-0 flex items-end pb-16 md:pb-20 lg:pb-24">
         <div className="container-editorial w-full">
           <div className="max-w-[42rem]" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.35)" }}>
             {slides[active]?.caption && (
-              <p className="eyebrow text-white/95 mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-white/80">
+              <p className="eyebrow !text-white mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-white/80">
                 {slides[active].caption}
               </p>
             )}
-            <h1 className="font-serif font-normal tracking-tight text-white text-[2.5rem] sm:text-[3.5rem] lg:text-[5rem] xl:text-[5.5rem] leading-[1.02]">
+            <h1 className="font-serif font-normal tracking-tight text-white text-display-sm sm:text-[4rem] lg:text-h1 xl:text-display leading-[1.02]">
               {headline}
             </h1>
             <p className="mt-6 md:mt-8 text-body lg:text-body-lg text-white/90 max-w-[34rem]">
@@ -133,7 +132,7 @@ const HeroCarousel = ({
                 onClick={() => setActive(i)}
                 aria-label={`Go to slide ${i + 1}`}
                 className={cn(
-                  "transition-all duration-300 ease-out",
+                  "transition-all duration-300 ease-marvin",
                   "h-px",
                   isActive ? "w-12 bg-white" : "w-8 bg-white/40 hover:bg-white/70"
                 )}

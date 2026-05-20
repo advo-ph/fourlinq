@@ -145,9 +145,9 @@
     padding-inline: 1.5rem;
   }
 
-  /* Eyebrow utility — uppercase + tracked + small */
+  /* Eyebrow utility — uppercase + tracked. 14px on mobile, 13px on lg+ */
   .eyebrow {
-    @apply font-sans uppercase tracking-[0.12em] text-eyebrow text-[color:var(--ink-muted)] font-medium;
+    @apply font-sans uppercase tracking-[0.12em] text-[0.875rem] lg:text-eyebrow text-[color:var(--ink-muted)] font-medium;
   }
 
   /* Hairline rule (Marvin's 1px divider) */

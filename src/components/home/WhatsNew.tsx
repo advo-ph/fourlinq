@@ -36,14 +36,14 @@ const WhatsNew = () => (
                 alt={entry.title}
                 loading="lazy"
                 decoding="async"
-                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
               />
             </div>
             <div className="mt-5">
               <div className="flex items-center gap-3 mb-3">
-                <span className="eyebrow text-[color:var(--accent)]">{categoryLabel(entry.category)}</span>
+                <span className="eyebrow !text-[color:var(--ink-primary)]">{categoryLabel(entry.category)}</span>
                 <span className="text-[color:var(--rule-strong)]">·</span>
-                <span className="eyebrow text-[color:var(--ink-muted)]">{formatDate(entry.date)}</span>
+                <span className="eyebrow">{formatDate(entry.date)}</span>
               </div>
               <h3 className="font-serif text-h5 lg:text-h4 text-[color:var(--ink-primary)] tracking-tight leading-snug group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                 {entry.title}

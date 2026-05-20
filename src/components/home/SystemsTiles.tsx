@@ -57,7 +57,7 @@ const SystemsTiles = () => (
                 decoding="async"
                 className={cn(
                   "w-full h-full object-cover",
-                  "transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                  "transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                 )}
               />
             </div>

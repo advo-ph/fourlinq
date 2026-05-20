@@ -41,7 +41,7 @@ const InspirationStrip = () => (
                   alt={p.alt}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                 />
               </div>
               <div className="mt-4">
