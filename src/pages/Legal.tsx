@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import Layout from "@/components/layout/Layout";
+import PageHeader from "@/components/shared/PageHeader";
 
 const legalContent: Record<string, { title: string; lastUpdated: string; sections: { heading: string; body: string }[] }> = {
   privacy: {
@@ -85,33 +85,30 @@ const Legal = () => {
   const content = legalContent[page] || legalContent.privacy;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="pt-36 pb-20 px-6">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-semibold text-primary mb-2">
-            {content.title}
-          </h1>
-          <p className="text-sm text-muted-foreground mb-10">
-            Last updated: {content.lastUpdated}
-          </p>
-
-          <div className="space-y-8">
+    <Layout>
+      <PageHeader
+        eyebrow="Legal"
+        title={content.title}
+        breadcrumbLabel={content.title}
+        subtitle={`Last updated ${content.lastUpdated}.`}
+      />
+      <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
+        <div className="container-reading">
+          <div className="space-y-10 lg:space-y-12">
             {content.sections.map((section) => (
-              <div key={section.heading}>
-                <h2 className="text-lg font-medium text-primary mb-2">
+              <article key={section.heading}>
+                <h2 className="font-serif text-h5 lg:text-h4 text-[color:var(--ink-primary)] tracking-tight mb-3">
                   {section.heading}
                 </h2>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.7]">
                   {section.body}
                 </p>
-              </div>
+              </article>
             ))}
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </Layout>
   );
 };
 

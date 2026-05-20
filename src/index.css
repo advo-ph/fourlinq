@@ -14,9 +14,15 @@
 
     --ink-primary:   #242424;
     --ink-secondary: #444444;
-    --ink-muted:     #686868;
-    --ink-faint:     #909090;
+    --ink-muted:     #686868;   /* AA on white: 5.7:1 — safe for body */
+    --ink-faint:     #767676;   /* AA on white: 4.5:1 — decorative/disabled only */
     --ink-inverse:   #FFFFFF;
+
+    /* Ink-on-dark scale (for footer, BrandCTA, dark Section) */
+    --ink-on-dark-primary:   #FFFFFF;
+    --ink-on-dark-secondary: rgba(255,255,255,0.78);
+    --ink-on-dark-muted:     rgba(255,255,255,0.62);
+    --ink-on-dark-faint:     rgba(255,255,255,0.42);
 
     --rule-strong: #D4D4D4;
     --rule-soft:   #DFDFDF;
@@ -26,7 +32,12 @@
     --accent-hover: #A00D26;
     --accent-quiet: rgba(200, 16, 46, 0.08);
 
-    --header-h:         80px;
+    --header-h:         72px;
+
+    /* Focus ring — used by every interactive element */
+    --focus-ring-color: var(--accent);
+    --focus-ring-offset: 3px;
+    --focus-ring-width: 2px;
 
     --section-pad-mobile:  3rem;
     --section-pad-tablet:  4.5rem;
@@ -156,4 +167,42 @@
   /* Hide native scrollbar for horizontal scroll strips */
   .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Skip-to-content link — keyboard-only */
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink-primary);
+    color: white;
+    padding: 12px 20px;
+    z-index: 100;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: top 200ms var(--ease-marvin);
+  }
+  .skip-link:focus {
+    top: 12px;
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+/* ─── Global focus-visible — applies to every interactive element ─── */
+*:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: 1px;
+}
+
+/* ─── Honor user motion preferences ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

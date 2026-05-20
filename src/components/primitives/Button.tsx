@@ -42,7 +42,7 @@ const EditorialButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Editor
     const classes = cn(
       "inline-flex items-center justify-center font-sans font-medium tracking-wide",
       "transition-all duration-300 ease-marvin",
-      "focus-visible:outline-none",
+      "min-h-[44px]", // tap target floor
       sizeClass,
       variantClass,
       fullWidth && "w-full",

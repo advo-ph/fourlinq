@@ -87,6 +87,14 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
   useEffect(() => { if (isOpen && inputRef.current) inputRef.current.focus(); }, [isOpen]);
+  // Escape to close
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleClose = () => {
     resetChat();

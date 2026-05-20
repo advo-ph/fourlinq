@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 const COOKIE_KEY = "fourlinq_cookie_consent";
@@ -30,25 +29,34 @@ const CookieBanner = () => {
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ y: 100, opacity: 0 }}
+          initial={{ y: 60, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-4"
+          exit={{ y: 60, opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.68, 0, 0.33, 1] }}
+          className="fixed bottom-4 left-4 right-4 lg:left-6 lg:right-auto lg:max-w-[420px] z-[52]"
+          role="dialog"
+          aria-label="Cookie consent"
         >
-          <div className="max-w-3xl mx-auto bg-surface border border-border rounded-xl shadow-xl px-6 py-4 flex flex-col sm:flex-row items-center gap-4">
-            <p className="text-sm text-muted-foreground flex-1">
+          <div className="bg-white border border-[color:var(--rule-soft)] shadow-depth-6 p-5 lg:p-6">
+            <p className="text-body-sm text-[color:var(--ink-secondary)] leading-relaxed mb-4">
               We use cookies to improve your experience. By continuing to browse, you agree to our{" "}
-              <Link to="/legal?page=cookies" className="text-primary underline underline-offset-2">
+              <Link to="/legal?page=cookies" className="text-[color:var(--ink-primary)] underline underline-offset-2 hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                 Cookie Policy
               </Link>.
             </p>
-            <div className="flex gap-2 shrink-0">
-              <Button variant="outline" size="sm" onClick={decline}>
+            <div className="flex gap-3">
+              <button
+                onClick={decline}
+                className="flex-1 min-h-[44px] px-4 text-body-sm font-medium border border-[color:var(--rule-soft)] text-[color:var(--ink-primary)] hover:border-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin"
+              >
                 Decline
-              </Button>
-              <Button size="sm" onClick={accept}>
+              </button>
+              <button
+                onClick={accept}
+                className="flex-1 min-h-[44px] px-4 text-body-sm font-medium bg-[color:var(--ink-primary)] text-white hover:bg-[color:var(--ink-secondary)] transition-colors duration-300 ease-marvin"
+              >
                 Accept
-              </Button>
+              </button>
             </div>
           </div>
         </motion.div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
@@ -22,6 +22,16 @@ const filters: { label: string; value: Filter }[] = [
 
 const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => void }) => {
   const [quoteOpen, setQuoteOpen] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
 
   return (
     <>

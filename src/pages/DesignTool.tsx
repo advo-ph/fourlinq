@@ -98,44 +98,44 @@ const SaveModal = ({ isOpen, onClose, config, selectedType, selectedFinish, sele
         <div className="bg-surface rounded-xl shadow-2xl border border-border w-full max-w-md" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <h2 className="text-lg font-semibold text-primary">Save Your Configuration</h2>
-            <button onClick={handleClose} className="text-muted-foreground hover:text-primary p-1"><X size={18} /></button>
+            <button onClick={handleClose} className="text-[color:var(--ink-muted)] hover:text-primary p-1"><X size={18} /></button>
           </div>
 
           {result ? (
             <div className="px-6 py-8 text-center">
               <CheckCircle className="mx-auto mb-4 text-green-600" size={48} />
-              <p className="text-primary font-medium mb-2">Configuration Saved!</p>
-              <p className="text-xs text-muted-foreground">Reference: <span className="font-mono font-medium text-primary">{result.refId}</span></p>
-              <p className="text-sm text-muted-foreground mt-3">Our team will reach out with a detailed quotation.</p>
+              <p className="text-[color:var(--ink-primary)] font-medium mb-2">Configuration Saved!</p>
+              <p className="text-xs text-[color:var(--ink-muted)]">Reference: <span className="font-mono font-medium text-primary">{result.refId}</span></p>
+              <p className="text-sm text-[color:var(--ink-muted)] mt-3">Our team will reach out with a detailed quotation.</p>
               <Button onClick={handleClose} className="mt-6">Close</Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
               <div className="bg-muted rounded-lg p-3 text-xs space-y-1">
-                <div className="flex justify-between"><span className="text-muted-foreground">Type</span><span className="font-medium text-primary">{selectedType.name}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Finish</span><span className="font-medium text-primary">{selectedFinish.name}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Glass</span><span className="font-medium text-primary">{selectedGlass.name}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Size</span><span className="font-medium text-primary">{config.width} × {config.height} mm</span></div>
+                <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Type</span><span className="font-medium text-primary">{selectedType.name}</span></div>
+                <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Finish</span><span className="font-medium text-primary">{selectedFinish.name}</span></div>
+                <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Glass</span><span className="font-medium text-primary">{selectedGlass.name}</span></div>
+                <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Size</span><span className="font-medium text-primary">{config.width} × {config.height} mm</span></div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary mb-1">Name *</label>
                 <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="Your name" />
+                  className="w-full bg-transparent border-b border-[color:var(--rule-soft)] focus:border-[color:var(--ink-primary)] py-2.5 text-body-sm text-[color:var(--ink-primary)] outline-none placeholder:text-[color:var(--ink-faint)] transition-colors duration-300 ease-marvin" placeholder="Your name" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary mb-1">Email *</label>
                 <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="you@email.com" />
+                  className="w-full bg-transparent border-b border-[color:var(--rule-soft)] focus:border-[color:var(--ink-primary)] py-2.5 text-body-sm text-[color:var(--ink-primary)] outline-none placeholder:text-[color:var(--ink-faint)] transition-colors duration-300 ease-marvin" placeholder="you@email.com" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary mb-1">Phone</label>
                 <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary outline-none focus:border-primary" placeholder="+63 9XX XXX XXXX" />
+                  className="w-full bg-transparent border-b border-[color:var(--rule-soft)] focus:border-[color:var(--ink-primary)] py-2.5 text-body-sm text-[color:var(--ink-primary)] outline-none placeholder:text-[color:var(--ink-faint)] transition-colors duration-300 ease-marvin" placeholder="+63 9XX XXX XXXX" />
               </div>
               <Button type="submit" className="w-full font-medium" size="lg" disabled={submitting}>
                 {submitting ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : "Save & Get a Quote"}
               </Button>
-              <p className="text-[10px] text-muted-foreground text-center">We'll use your details to prepare a custom quotation.</p>
+              <p className="text-[10px] text-[color:var(--ink-muted)] text-center">We'll use your details to prepare a custom quotation.</p>
             </form>
           )}
         </div>
@@ -182,7 +182,7 @@ const DesignTool = () => {
         <div className="pb-20">
           <div className="page-container max-w-6xl">
             <div className="flex items-center justify-center py-20">
-              <div className="text-muted-foreground text-sm">Loading design tool…</div>
+              <div className="text-[color:var(--ink-muted)] text-sm">Loading design tool…</div>
             </div>
           </div>
         </div>
@@ -208,10 +208,10 @@ const DesignTool = () => {
                 <button
                   onClick={() => setStep(i)}
                   className={`w-8 h-8 rounded-full text-sm font-medium flex items-center justify-center transition-colors ${
-                    i === step ? "bg-primary text-primary-foreground" : i < step ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                    i === step ? "bg-primary text-primary-foreground" : i < step ? "bg-primary/20 text-primary" : "bg-muted text-[color:var(--ink-muted)]"
                   }`}
                 >{i + 1}</button>
-                <span className={`text-sm hidden sm:inline ${i === step ? "text-primary font-medium" : "text-muted-foreground"}`}>{label}</span>
+                <span className={`text-sm hidden sm:inline ${i === step ? "text-[color:var(--ink-primary)] font-medium" : "text-[color:var(--ink-muted)]"}`}>{label}</span>
                 {i < 3 && <div className={`w-8 h-px ${i < step ? "bg-primary" : "bg-border"}`} />}
               </div>
             ))}
@@ -222,28 +222,28 @@ const DesignTool = () => {
               {step === 0 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Select Product Type</h2>
-                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Windows</h3>
+                  <h3 className="eyebrow mb-3">Windows</h3>
                   <div className="grid grid-cols-3 gap-3 mb-6">
                     {productTypes.filter((t) => t.category === "windows").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
-                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
                           <div className="flex justify-center mb-2">
-                            {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-muted-foreground"} strokeWidth={1} />}
+                            {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-[color:var(--ink-muted)]"} strokeWidth={1} />}
                           </div>
                           <span className="text-xs font-medium text-primary">{type.name}</span>
                         </button>
                       );
                     })}
                   </div>
-                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Doors</h3>
+                  <h3 className="eyebrow mb-3">Doors</h3>
                   <div className="grid grid-cols-3 gap-3">
                     {productTypes.filter((t) => t.category === "doors").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
-                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
                           <div className="flex justify-center mb-2">
-                            {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-muted-foreground"} strokeWidth={1} />}
+                            {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-[color:var(--ink-muted)]"} strokeWidth={1} />}
                           </div>
                           <span className="text-xs font-medium text-primary">{type.name}</span>
                         </button>
@@ -255,21 +255,21 @@ const DesignTool = () => {
               {step === 1 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Choose Finish</h2>
-                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Solid</h3>
+                  <h3 className="eyebrow mb-3">Solid</h3>
                   <div className="grid grid-cols-4 gap-3 mb-6">
                     {finishOptions.filter((f) => f.finishType === "solid").map((finish) => (
                       <button key={finish.id} onClick={() => updateConfig("finish", finish.id)} className="flex flex-col items-center gap-2 group" title={finish.description}>
                         <FinishSwatch finishId={finish.id} color={finish.color} finishType="solid" selected={config.finish === finish.id} />
-                        <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-primary font-medium" : "text-muted-foreground"}`}>{finish.name}</span>
+                        <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-[color:var(--ink-primary)] font-medium" : "text-[color:var(--ink-muted)]"}`}>{finish.name}</span>
                       </button>
                     ))}
                   </div>
-                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Wood Grain</h3>
+                  <h3 className="eyebrow mb-3">Wood Grain</h3>
                   <div className="grid grid-cols-4 gap-3">
                     {finishOptions.filter((f) => f.finishType === "wood-grain").map((finish) => (
                       <button key={finish.id} onClick={() => updateConfig("finish", finish.id)} className="flex flex-col items-center gap-2 group" title={finish.description}>
                         <FinishSwatch finishId={finish.id} color={finish.color} finishType="wood-grain" selected={config.finish === finish.id} />
-                        <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-primary font-medium" : "text-muted-foreground"}`}>{finish.name}</span>
+                        <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-[color:var(--ink-primary)] font-medium" : "text-[color:var(--ink-muted)]"}`}>{finish.name}</span>
                       </button>
                     ))}
                   </div>
@@ -282,7 +282,7 @@ const DesignTool = () => {
                     {glassOptions.map((glass) => {
                       const visual = glassVisuals[glass.id] || { tint: "rgba(200,220,240,0.1)" };
                       return (
-                        <button key={glass.id} onClick={() => updateConfig("glass", glass.id)} className={`p-3 rounded-lg border-2 text-center transition-colors ${config.glass === glass.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+                        <button key={glass.id} onClick={() => updateConfig("glass", glass.id)} className={`p-3 border text-center transition-colors duration-300 ease-marvin ${config.glass === glass.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
                           <div className="w-10 h-14 mx-auto rounded mb-2 border border-border" style={{ backgroundColor: visual.tint }} />
                           <span className="text-xs font-medium text-primary">{glass.name}</span>
                         </button>
@@ -296,11 +296,11 @@ const DesignTool = () => {
                   <h2 className="text-lg font-medium text-primary mb-6">Set Dimensions</h2>
                   <div className="space-y-8">
                     <div>
-                      <div className="flex justify-between mb-2"><span className="text-sm text-muted-foreground">Width</span><span className="text-sm font-medium text-primary">{config.width} mm</span></div>
+                      <div className="flex justify-between mb-2"><span className="text-sm text-[color:var(--ink-muted)]">Width</span><span className="text-sm font-medium text-primary">{config.width} mm</span></div>
                       <Slider value={[config.width]} onValueChange={([v]) => updateConfig("width", v)} min={sizeConstraints.width.min} max={sizeConstraints.width.max} step={sizeConstraints.width.step} />
                     </div>
                     <div>
-                      <div className="flex justify-between mb-2"><span className="text-sm text-muted-foreground">Height</span><span className="text-sm font-medium text-primary">{config.height} mm</span></div>
+                      <div className="flex justify-between mb-2"><span className="text-sm text-[color:var(--ink-muted)]">Height</span><span className="text-sm font-medium text-primary">{config.height} mm</span></div>
                       <Slider value={[config.height]} onValueChange={([v]) => updateConfig("height", v)} min={sizeConstraints.height.min} max={sizeConstraints.height.max} step={sizeConstraints.height.step} />
                     </div>
                   </div>
@@ -324,10 +324,10 @@ const DesignTool = () => {
                 height={config.height}
               />
               <div className="mt-8 w-full border-t border-border pt-6 space-y-2">
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Type</span><span className="text-primary font-medium">{selectedType.name}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Finish</span><span className="text-primary font-medium">{selectedFinish.name}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Glass</span><span className="text-primary font-medium">{selectedGlass.name}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Dimensions</span><span className="text-primary font-medium">{config.width} × {config.height} mm</span></div>
+                <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Type</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedType.name}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Finish</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedFinish.name}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Glass</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedGlass.name}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Dimensions</span><span className="text-[color:var(--ink-primary)] font-medium">{config.width} × {config.height} mm</span></div>
               </div>
               <div className="flex gap-3 mt-6 w-full">
                 <Button variant="outline" className="flex-1 font-medium" onClick={() => setSaveOpen(true)}>Save & Get Quote</Button>

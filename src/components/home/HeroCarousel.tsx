@@ -53,7 +53,7 @@ const HeroCarousel = ({
   return (
     <section
       className="relative w-full overflow-hidden bg-[color:var(--canvas-dark)] -mt-[72px]"
-      style={{ height: "min(100vh, 920px)" }}
+      style={{ height: "min(100dvh, 920px)" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
@@ -121,9 +121,9 @@ const HeroCarousel = ({
         </div>
       </div>
 
-      {/* Pagination dots, bottom-center */}
+      {/* Pagination dots — hairlines on a 44px tap target */}
       {total > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10">
           {slides.map((_, i) => {
             const isActive = i === active;
             return (
@@ -131,12 +131,17 @@ const HeroCarousel = ({
                 key={i}
                 onClick={() => setActive(i)}
                 aria-label={`Go to slide ${i + 1}`}
-                className={cn(
-                  "transition-all duration-300 ease-marvin",
-                  "h-px",
-                  isActive ? "w-12 bg-white" : "w-8 bg-white/40 hover:bg-white/70"
-                )}
-              />
+                aria-current={isActive ? "true" : undefined}
+                className="group h-11 px-2 flex items-center justify-center"
+              >
+                <span
+                  className={cn(
+                    "block transition-all duration-300 ease-marvin",
+                    "h-[2px]",
+                    isActive ? "w-12 bg-white" : "w-8 bg-white/40 group-hover:bg-white/80"
+                  )}
+                />
+              </button>
             );
           })}
         </div>
