@@ -27,7 +27,53 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
-### Fixed
+### Branch: `redesign-marvin` (NOT YET MERGED — under client review)
+
+The Marvin-direction redesign is shipping on a feature branch separate from `main`. Vercel auto-deploys it to a preview URL that's distinct from production. All entries in this sub-block live only on that branch until Tita signs off and we merge. Detailed phase-by-phase log lives in [REDESIGN_ROADMAP.md §14 Implementation log](./REDESIGN_ROADMAP.md) — this is the user-visible-impact summary.
+
+#### Added
+- New [src/theme.config.ts](../src/theme.config.ts) — single documented source of truth for design tokens. Explains the three-mirror system between this file, `tailwind.config.ts`, and the `:root` CSS variables in `src/index.css`. Client-driven design changes (button shape, brand color, motion timing) now have one canonical entry point. Per user request during the P0 sweep: *"i just want a config file, i dont want hard coded values in the code, so if ever the client doesnt like the button, etc."*.
+- Editorial primitive component library at [src/components/primitives/](../src/components/primitives/): `Section`, `Container`, `EyebrowHeading`, `FeatureLink`, `AccentStripe`, `Spacer`, `Button` (exported as `EditorialButton`). Replaces shadcn-style page composition for everything except internal form controls.
+- Marvin signature easing curve `cubic-bezier(.68, 0, .33, 1)` exposed as `ease-marvin` Tailwind class and `--ease-marvin` CSS var. Grep'd from Marvin's production CSS during deep-research — replaces the easeOutCubic approximation site-wide. [tailwind.config.ts](../tailwind.config.ts), [src/index.css](../src/index.css)
+- Global `*:focus-visible` ring (2px accent, 3px offset) — every interactive element now has a visible keyboard-focus indicator. Replaces the previous `outline:none` on `EditorialButton`. [src/index.css](../src/index.css)
+- Skip-to-content link in [src/components/layout/Layout.tsx](../src/components/layout/Layout.tsx) for keyboard navigation.
+- `prefers-reduced-motion` handling — disables animations and the Ken Burns hero zoom for users who request reduced motion. [src/index.css](../src/index.css)
+- Escape-to-close on `ChatPanel`, `ProductDrawer`, and `QuoteModal`.
+- §13 deep-research addendum in [REDESIGN_ROADMAP.md](./REDESIGN_ROADMAP.md) — 230+ lines documenting every Marvin design token extracted from 156 production CSS bundles + 14 page templates (full type scale, spacing scale, motion curves, breakpoints, color ramps, component naming conventions). The branch's design contract is now backed by actual production values rather than estimates.
+
+#### Changed
+- **Navigation rebuild**: 80px → 72px height (matches Marvin desktop); 5 nav items → 4 (Design Tool moved to footer-only per the §11 design decision); all hover transitions migrated to `duration-300 ease-marvin`. [src/components/layout/QuietNavbar.tsx](../src/components/layout/QuietNavbar.tsx)
+- **Type scale recalibrated** to match Marvin's hjumbo ramp: display 88px / h1 64px / h2 56px (were 112 / 80 / 64). [tailwind.config.ts](../tailwind.config.ts)
+- **Hero**: cross-fade easing migrated to the Marvin signature curve; two-layer scrim simplified to single bottom-up gradient; `100vh` → `100dvh` to fix iOS Safari address-bar jump; pagination dots changed from `h-px` (invisible 1px target) to a visible 2px bar on a 44px-tall button. [src/components/home/HeroCarousel.tsx](../src/components/home/HeroCarousel.tsx)
+- **Editorial motion across all sections**: image hover-scale slowed from `duration-500 ease-out` to `duration-700 ease-marvin`. Card hover shadow lightened from `shadow-lg` to `shadow-depth-6`. SystemsTiles + InspirationStrip + WhatsNew all on the new pattern.
+- **`/products` page rebuilt**: shadcn card-with-border-shadow grid → editorial image-led 3-column grid matching home `SystemsTiles`. Filter pill row → hairline-underlined tab row with red active underline. Product drawer is now a full-height right-side panel matching the chat panel shape (red accent stripe + serif title + hairline-divided spec list + arrow-translate hovers). [src/pages/Products.tsx](../src/pages/Products.tsx)
+- **`/brand` page rebuilt**: Story / Warranty / Certifications / Contact / Showrooms / CTA all on the `Section` primitive with tone alternation (`canvas` → `dark` → `soft` → `canvas` → `soft` → `dark`). New `ContactRow` hairline-list component. Certifications + warranty scope rendered as 1px-gap mosaic instead of bordered cards. [src/pages/Brand.tsx](../src/pages/Brand.tsx)
+- **`/why-upvc` page rebuilt**: editorial comparison table with charcoal top rule + eyebrow column heads + no zebra striping. Climate factors as 3-up hairline mosaic. Icon colors muted to gray. [src/pages/WhyUpvc.tsx](../src/pages/WhyUpvc.tsx)
+- **`/legal` page**: removed old `Navbar` + `Footer` imports, swapped to `Layout` + new editorial `PageHeader`. Body uses serif h-styles + `container-reading` (840px max). [src/pages/Legal.tsx](../src/pages/Legal.tsx)
+- **`/404`**: shadcn `text-4xl font-bold` → full editorial layout with breadcrumb-style eyebrow and primary/ghost CTA pair. [src/pages/NotFound.tsx](../src/pages/NotFound.tsx)
+- **`/design-tool`**: page header updated to editorial voice; configurator option-buttons + form inputs swept to hairline pattern. Configurator interaction logic unchanged. [src/pages/DesignTool.tsx](../src/pages/DesignTool.tsx)
+- **Forms (`ContactForm`, `QuoteModal`, `CookieBanner`)**: all rewritten off shadcn chrome. `ContactForm` uses underline inputs with uppercase eyebrow labels. `QuoteModal` is now a right-side panel matching `ChatPanel` / `ProductDrawer`. `CookieBanner` is a flat editorial card with hairline Decline + solid charcoal Accept buttons (both enforce 44px tap-height floor). [src/components/shared/](../src/components/shared/)
+- **Chat window**: charcoal 48px icon dot (was loud-red 56px glassmorphism) hidden until user scrolls past 120px and 4s elapse. Panel rebuilt with 3px red accent stripe + serif "LinQ" header + soft-cream message area + hairline-bordered assistant bubbles + solid-red user bubbles. Editorial palette throughout but bubbles preserved as the standard chat affordance — see the §14 lesson in REDESIGN_ROADMAP after a slide-in sidebar variant was rejected with *"i dont like this, its not even a chat window anymore"*. [src/components/chat/](../src/components/chat/)
+- **Color contrast pass**: `--ink-faint` `#909090` (3.0:1 — failed WCAG AA) → `#767676` (4.5:1 — passes AA). New `--ink-on-dark-{primary,secondary,muted,faint}` scale documented for dark sections. [src/index.css](../src/index.css)
+- **`PageHeader` rewritten**: shadcn breadcrumb component → hairline-uppercase trail with `ChevronRight` separator. Title uses serif display with responsive scale; optional `eyebrow` prop with signature hairline-prefix. Used on every non-home page. [src/components/shared/PageHeader.tsx](../src/components/shared/PageHeader.tsx)
+- **`EditorialFooter`**: all hover transitions migrated to `duration-300 ease-marvin`. Eyebrow color tokens swapped to the new on-dark scale.
+
+#### Removed
+- 9 unused / replaced files in this branch: home components `HeroSection.tsx`, `DesignToolTeaser.tsx`, `WhyUpvcCards.tsx`, `ProductsPreview.tsx`, `TrustBar.tsx`, `InspirationGallery.tsx`; layout components `Navbar.tsx`, `Footer.tsx`, `NavLink.tsx`. Net –338 LOC after the pages-revamp commit, with additional cleanup in the subsequent P0 sweep.
+
+#### Open questions for the client (specific to this branch)
+- **Hero copy direction** — current placeholder is still the old "Precision. Performance. Perfection." style. Three editorial options to propose to Tita.
+- **Product spec confirmation** — does FourlinQ actually offer Large Panel up to 6m, 90 Series, Lift & Slide, Curtain Wall? Catalog held on the [project_fourlinq_verified_data.md](../../.claude/projects/-Users-angelonrevelo-Antigravity-fourlinq/memory/project_fourlinq_verified_data.md) rule (brochure-verified only) until she answers.
+- **Photo strategy** — Scenario A (current photos) / B (hi-res from her photographer) / C (commissioned shoot)? Phase 4 work (project gallery, finish switcher) is blocked on this answer.
+- **Tablet 992–1199 audit** — flagged in red-team analysis but not executed; the dominant Marvin breakpoint is 992px so this zone needs explicit testing.
+- **Carry-overs from round 1** — LinkedIn page status; 22-year founding date confirmation.
+
+### Honest open-items on this branch
+- Zero test coverage on any new component (PageHeader, ChatPanel, ChatMessage, ContactForm, QuoteModal, CookieBanner, editorial primitives, page revamps). The repo had only a placeholder `src/test/example.test.ts` before this branch as well — **not a regression**, but the redesign is large enough that Playwright smoke tests for the 4 critical flows (home → hero → CTA / `/products` filter + drawer / contact form submit / chat open + send) would meaningfully de-risk a future merge. Deferred until Phase 6+ stabilizes the design.
+- `Admin` page still on shadcn chrome — internal-only, deliberately skipped in the P0 brand-consistency sweep.
+- DesignTool live configurator preview SVG (`src/components/configurator/WindowPreview.tsx`) was not touched. Existing `case "special-shapes"` gap from round 1 still stands.
+
+### Fixed (main branch — predates redesign-marvin)
 - Products page: removed orphaned **Systems** filter pill that always produced an empty grid. The catalog has no `category: "systems"` products — the historical Entrance Prestige + Curtain Wall System entries were intentionally dropped during the 2026-03-23 verified-data pass because their specs and images were not brochure-backed. The pill stayed behind from that cleanup. Page title remains "All Systems" so the unfiltered view still reads naturally. ([products.ts:6](../src/data/products.ts#L6) keeps `"systems"` in the type union for forward-compat if/when the client confirms a real specialist-systems lineup.)
 
 ### Infrastructure

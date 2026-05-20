@@ -1272,4 +1272,89 @@ The CSS-derived findings (~95% of this addendum) are gold. Interaction findings 
 
 ---
 
+## §14 — Implementation log
+
+What has actually been built on the `redesign-marvin` branch. Reverse-chronological. Each entry lists the commit hash that landed the change and the files touched.
+
+### 2026-05-20 — P0 brand consistency + accessibility sweep
+Commit `34cccd9`. After the red-team UI audit (40+ items flagged), closed every P0 in a single pass.
+
+- Brand consistency: `ContactForm`, `QuoteModal`, `CookieBanner`, `Legal`, `NotFound`, and the `DesignTool` configurator inputs/option-buttons all migrated off shadcn chrome to editorial pattern. `QuoteModal` is now a right-side panel matching the `ChatPanel` + `ProductDrawer` shape (red accent stripe + serif title + hairline inputs).
+- Accessibility (WCAG AA pass): global `*:focus-visible` ring (2px accent, 3px offset) in `src/index.css`; `EditorialButton` stripped its `outline:none`; `--ink-faint` bumped `#909090` → `#767676` (was 3.0:1 contrast, now 4.5:1); new `--ink-on-dark-{primary,secondary,muted,faint}` scale documented for dark sections; `prefers-reduced-motion` honored globally; skip-to-content link added in `Layout.tsx`; `ChatPanel`, `ProductDrawer`, and `QuoteModal` all close on Escape; hero pagination dots moved from `h-px` (invisible 1px target) to a visible 2px bar on a 44px tap-height button.
+- Hero `100vh` → `100dvh` to fix iOS Safari address-bar jump.
+- New `src/theme.config.ts` introduced as documented single source of truth — explains the three-mirror system (this file ↔ `tailwind.config.ts` ↔ `src/index.css :root`) so client design changes have one entry point. Per user request: *"i just want a config file, i dont want hard coded values in the code, so if ever the client doesnt like the button, etc."*
+- Cleanup: deleted `src/components/layout/Navbar.tsx`, `Footer.tsx`, `NavLink.tsx` (replaced by `QuietNavbar` + `EditorialFooter`; `Legal.tsx` was the last remaining importer).
+
+**Files**: [src/index.css](../src/index.css), [src/theme.config.ts](../src/theme.config.ts) (new), [src/components/layout/Layout.tsx](../src/components/layout/Layout.tsx), [src/components/primitives/Button.tsx](../src/components/primitives/Button.tsx), [src/components/home/HeroCarousel.tsx](../src/components/home/HeroCarousel.tsx), [src/components/chat/ChatPanel.tsx](../src/components/chat/ChatPanel.tsx), [src/components/shared/ContactForm.tsx](../src/components/shared/ContactForm.tsx), [src/components/shared/QuoteModal.tsx](../src/components/shared/QuoteModal.tsx), [src/components/shared/CookieBanner.tsx](../src/components/shared/CookieBanner.tsx), [src/pages/Legal.tsx](../src/pages/Legal.tsx), [src/pages/NotFound.tsx](../src/pages/NotFound.tsx), [src/pages/DesignTool.tsx](../src/pages/DesignTool.tsx), [src/pages/Products.tsx](../src/pages/Products.tsx). Deleted: `src/components/layout/Navbar.tsx`, `Footer.tsx`, `NavLink.tsx`.
+
+### 2026-05-20 — Pages revamp + dead component purge
+Commit `342dd41`. Net –338 LOC across the surface.
+
+- `PageHeader` rewritten as editorial header: hairline-uppercase breadcrumb trail (no shadcn breadcrumb component), serif display title with `text-[3rem] sm:text-[3.5rem] lg:text-h1 xl:text-display`, optional `eyebrow` prop with hairline-prefix style. Used on every non-home page.
+- `/products`: killed `rounded-lg + border + shadow` card chrome. Editorial 3-column grid matching home `SystemsTiles`. Filter pill row → hairline-underlined tab row with red active underline. Product drawer rewritten as full-height side panel.
+- `/brand`: Story / Warranty / Certifications / Contact / Showrooms / CTA all on `Section` primitive with tone alternation. New `ContactRow` component for the phone+email rows (hairline list, arrow-translate hover). Certifications + warranty scope shown as 1px-gap hairline mosaic.
+- `/why-upvc`: editorial comparison table with charcoal top rule + eyebrow column heads + no zebra striping. Climate factors as 3-up hairline mosaic instead of bordered cards.
+- `/design-tool`: page header swapped to editorial; configurator UI untouched in this commit (cleaned in the later P0 sweep).
+- Deleted 6 unused home components: `HeroSection`, `DesignToolTeaser`, `WhyUpvcCards`, `ProductsPreview`, `TrustBar`, `InspirationGallery`.
+
+**Files**: [src/components/shared/PageHeader.tsx](../src/components/shared/PageHeader.tsx), [src/pages/Products.tsx](../src/pages/Products.tsx), [src/pages/Brand.tsx](../src/pages/Brand.tsx), [src/pages/WhyUpvc.tsx](../src/pages/WhyUpvc.tsx), [src/pages/DesignTool.tsx](../src/pages/DesignTool.tsx). Deleted: 6 home components listed above.
+
+### 2026-05-19 — Home section easing sweep + hero offset fix
+Commit `4b00786`. After the nav height changed from 80→72px, the hero had an 8px gap. Also tightened all card-hover motion to match the new signature curve.
+
+- Hero `-mt-20` → `-mt-[72px]` to clamp flush to the new nav.
+- Hero cross-fade easing migrated from the easeOutCubic approximation to the actual Marvin curve `cubic-bezier(.68,0,.33,1)` (grep'd from production CSS — see §13.5).
+- Hero scrim simplified from two-layer to single bottom-up gradient.
+- Hero headline now uses display tokens instead of ad-hoc px sizes.
+- SystemsTiles / InspirationStrip / WhatsNew: image hover-scale moved from `duration-500 ease-out` to `duration-700 ease-marvin` for the slower Marvin Ken-Burns feel.
+- WhatsNew category eyebrow demoted from red `--accent` to charcoal — eyebrows are now structural, not decorative (per §13.13 finding).
+
+**Files**: [src/components/home/HeroCarousel.tsx](../src/components/home/HeroCarousel.tsx), [src/components/home/SystemsTiles.tsx](../src/components/home/SystemsTiles.tsx), [src/components/home/InspirationStrip.tsx](../src/components/home/InspirationStrip.tsx), [src/components/home/WhatsNew.tsx](../src/components/home/WhatsNew.tsx).
+
+### 2026-05-19 — Chat window revamp (multiple iterations)
+Commits `3a6ea06` and `109bdef` partially, plus the in-session iterations recorded only as working-tree state at the time. Three rounds:
+
+- **Round 1**: Black-glass + red-glow + Playfair "Q" → white card with hairline rules, charcoal avatar circle, red send button. Stripped all backdrop-blur and multi-layer glow shadows.
+- **Round 2** (rejected): Slide-in editorial sidebar with no bubbles, serif assistant messages, hairline-divided suggestions. User feedback: *"i dont like this, its not even a chat window anymore"*.
+- **Round 3**: Back to floating 400×600 bottom-right panel WITH bubbles, but keeping the editorial palette — 3px red accent stripe at top edge, "L" avatar, soft-cream message area, hairline-bordered assistant bubbles with `depth-2` shadow, solid-red user bubbles, rounded-pill input + circular red send. Settled here.
+- Chat bubble icon: 56px loud-red glassmorphism → 48px solid charcoal, hidden until user scrolls past 120px and then 4 seconds elapse. Stops competing with the hero on first load.
+
+**Lesson**: Editorial restraint applies to *chrome and chrome only*. Bubbles are the universally-recognized chat affordance — removing them in pursuit of consistency with the rest of the site broke the user's pattern-recognition. Match the editorial *palette* to the rest of the site; keep the chat *shape* familiar.
+
+**Files**: [src/components/chat/ChatBubble.tsx](../src/components/chat/ChatBubble.tsx), [src/components/chat/ChatPanel.tsx](../src/components/chat/ChatPanel.tsx), [src/components/chat/ChatMessage.tsx](../src/components/chat/ChatMessage.tsx).
+
+### 2026-05-19 — Phase 1 foundations + token revisions from §13 deep-research
+Commits `109bdef` + `3a6ea06`.
+
+- §11 decisions locked with proposed defaults (typography = Instrument Serif + Inter; accent = `#C8102E`; Design Tool moved under Systems/footer; chat dimmed + delayed; hero copy and product spec confirmation remain open pending Tita).
+- Tailwind: added `ease-marvin: cubic-bezier(.68,0,.33,1)` plus `ease-marvin-in` / `ease-marvin-out` matching the actual Marvin production curves.
+- Tailwind: recalibrated type scale top end to match Marvin's hjumbo ramp (display 88px, h1 64px, h2 56px — were 112/80/64).
+- CSS: added `--canvas-cream: #F9F7F1` for warm editorial section backgrounds.
+- Nav: dropped Design Tool from main nav (now footer-only per §11 decision), reduced height 80→72px, swapped all hover transitions to `duration-300 ease-marvin`.
+- Token sweep across home + primitives: 6 occurrences of `duration-250 ease-out` migrated to `duration-300 ease-marvin`. Card hover shadow `shadow-lg` → `shadow-depth-6` on `Products` listing and `ProductsPreview`. Modal/sheet/drawer `shadow-2xl` left alone — those are floating panels, heavier elevation is correct.
+
+**Files**: [tailwind.config.ts](../tailwind.config.ts), [src/index.css](../src/index.css), [src/components/layout/QuietNavbar.tsx](../src/components/layout/QuietNavbar.tsx), [src/components/layout/EditorialFooter.tsx](../src/components/layout/EditorialFooter.tsx), [src/components/home/SystemsTiles.tsx](../src/components/home/SystemsTiles.tsx), [src/components/home/WhatsNew.tsx](../src/components/home/WhatsNew.tsx), [src/components/primitives/Button.tsx](../src/components/primitives/Button.tsx), [src/components/primitives/FeatureLink.tsx](../src/components/primitives/FeatureLink.tsx), [src/pages/Products.tsx](../src/pages/Products.tsx), [src/components/home/ProductsPreview.tsx](../src/components/home/ProductsPreview.tsx) (later deleted).
+
+### Open items on this branch (not yet shipped)
+
+- **Hero copy direction** — still placeholder. 3 options to propose to Tita.
+- **Product spec confirmation** — blocked on Tita: does FourlinQ actually offer Large Panel up to 6m, 90 Series, Lift & Slide, Curtain Wall? Catalog stays on brochure-verified rule until she answers.
+- **Photo strategy** — still on Scenario A ("work with current photos"). Tita's three-option message hasn't been sent / answered.
+- **Phase 4 (Project gallery + Finish switcher)** — blocked on photo decision.
+- **Phase 5 (Inspiration page + What's New)** — partial; What's New seed entries may need real content.
+- **Phase 6 (Editorial rewrite of Brand + Why uPVC copy)** — visual revamp shipped, but the prose is still the original copy. Editorial *voice* is a separate task.
+- **Tablet 992–1199 audit** — flagged in red-team analysis but not yet executed.
+- **Sticky mobile CTA bar** — recommended but not built.
+- **Price-range hints / brochure PDF download links** — recommended but not built (requires client data).
+- **Admin page rewrite** — internal-only, deliberately skipped in P0 sweep.
+
+### Test coverage status
+
+The branch added zero tests. This is **not a regression** — the repo had only `src/test/example.test.ts` (a placeholder) before this branch as well. Honest accounting:
+
+- **Untested**: every new component (`PageHeader` rewrite, `ChatPanel`, `ChatMessage`, `ContactForm`, `QuoteModal`, `CookieBanner`, all editorial primitives), every page revamp, the new `theme.config.ts` documentation file (not testable — it's a config doc).
+- **Recommend**: when Phase 6+ stabilizes the design, add Playwright smoke tests for the 4 critical user flows: home → hero → CTA, `/products` filter + drawer open, contact form submit, chat open + send. That's enough coverage to make the redesign deployable without manual QA every time.
+
+---
+
 *This document is the contract for the redesign. If we drift from it, we update it first.*
