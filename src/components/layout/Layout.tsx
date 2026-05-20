@@ -1,15 +1,15 @@
 import { ReactNode } from "react";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import QuietNavbar from "./QuietNavbar";
+import EditorialFooter from "./EditorialFooter";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   useAnalytics();
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <div className="min-h-screen flex flex-col bg-[color:var(--canvas)]">
+      <QuietNavbar />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <EditorialFooter />
     </div>
   );
 };
