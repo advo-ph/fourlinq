@@ -43,7 +43,7 @@ const QuietNavbar = () => {
         <div className="container-editorial h-full">
           <div className="flex items-center justify-between h-full">
             <Link to="/" className="shrink-0 flex items-center" aria-label="FourlinQ home">
-              <Logo variant="dark" className="h-11 lg:h-12" />
+              <Logo variant="dark" className="h-9 lg:h-10" />
             </Link>
 
             {/* Desktop nav — mixed-case, plain text, no all-caps */}

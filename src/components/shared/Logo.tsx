@@ -15,7 +15,6 @@ const Logo = ({ variant = "dark", className = "", compact = false }: LogoProps) 
       viewBox={compact ? "0 0 200 40" : "0 0 200 64"}
       className={`w-auto ${className || "h-14"}`}
       fill="none"
-      overflow="visible"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="FourlinQ Windows & Doors"
     >
