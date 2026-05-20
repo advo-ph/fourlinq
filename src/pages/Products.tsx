@@ -2,122 +2,147 @@ import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
-import AnimatedSection from "@/components/shared/AnimatedSection";
 import QuoteModal from "@/components/shared/QuoteModal";
 import { useProducts, Product } from "@/hooks/useProducts";
 import FinishSwatch from "@/components/shared/FinishSwatch";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
 import { trackProductView } from "@/hooks/useAnalytics";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
-  LiftAndSlideIcon, FrenchDoorIcon, SlidingDoorIcon, EntranceIcon, SpecialShapesIcon,
-} from "@/components/icons/WindowIcons";
+import { X, ArrowUpRight } from "lucide-react";
+import EditorialButton from "@/components/primitives/Button";
 
 type ProductCategory = "windows" | "doors" | "systems";
 type Filter = "all" | ProductCategory;
 
 const filters: { label: string; value: Filter }[] = [
-  { label: "All", value: "all" },
+  { label: "All Systems", value: "all" },
   { label: "Windows", value: "windows" },
   { label: "Doors", value: "doors" },
 ];
-
-const productIconMap: Record<string, React.FC<{ className?: string; size?: number; strokeWidth?: number }>> = {
-  casement: CasementIcon,
-  sliding: SlidingIcon,
-  "special-shapes": SpecialShapesIcon,
-  awning: AwningIcon,
-  "sliding-door": SlidingDoorIcon,
-  "slide-and-fold": BifoldIcon,
-  "french-door": FrenchDoorIcon,
-  "entrance-door": EntranceIcon,
-};
-
-const ProductIconBadge = ({ productId }: { productId: string }) => {
-  const Icon = productIconMap[productId];
-  if (!Icon) return null;
-  return (
-    <div className="absolute top-3 right-3 w-10 h-10 rounded-lg bg-surface/80 backdrop-blur-sm border border-border flex items-center justify-center">
-      <Icon size={24} strokeWidth={1} className="text-primary" />
-    </div>
-  );
-};
 
 const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => void }) => {
   const [quoteOpen, setQuoteOpen] = useState(false);
 
   return (
     <>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 z-50" onClick={onClose} />
       <motion.div
-        initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed top-0 right-0 h-full w-full max-w-lg bg-surface z-50 shadow-2xl overflow-y-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4, ease: [0.68, 0, 0.33, 1] }}
+        className="fixed inset-0 bg-[color:var(--ink-primary)]/30 backdrop-blur-sm z-[55]"
+        onClick={onClose}
+      />
+      <motion.aside
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ duration: 0.5, ease: [0.68, 0, 0.33, 1] }}
+        className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white z-[60] overflow-y-auto shadow-depth-8 flex flex-col"
       >
-        <div className="p-6">
-          <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-primary p-2"><X size={20} /></button>
-          <img src={product.image} alt={product.name} className="w-full aspect-[4/3] object-contain bg-white rounded-lg mb-6 p-4" />
-          <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">{product.category}</span>
-          <h2 className="text-2xl font-semibold text-primary mt-1 mb-3">{product.name}</h2>
-          <p className="text-muted-foreground leading-relaxed mb-6">{product.description}</p>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Specifications</h3>
-          <ul className="space-y-2 mb-6">
+        {/* Accent stripe */}
+        <div className="h-[3px] bg-[color:var(--accent)] shrink-0" />
+
+        {/* Header */}
+        <div className="px-6 lg:px-10 pt-6 pb-5 flex items-start justify-between shrink-0 border-b border-[color:var(--rule-soft)]">
+          <div>
+            <p className="text-[11px] tracking-[0.14em] uppercase text-[color:var(--ink-muted)] font-medium">
+              {product.category}
+            </p>
+            <h2 className="font-serif text-h4 lg:text-h3 mt-2 leading-[1.1] text-[color:var(--ink-primary)] tracking-tight">
+              {product.name}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="-mr-2 -mt-1 p-2 text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin"
+            aria-label="Close"
+          >
+            <X size={20} strokeWidth={1.5} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 lg:px-10 py-8 flex-1">
+          <div className="aspect-[4/3] bg-[color:var(--canvas-soft)] mb-8 overflow-hidden">
+            <img src={product.image} alt={product.name} className="w-full h-full object-contain p-6" />
+          </div>
+
+          <p className="text-body text-[color:var(--ink-secondary)] leading-[1.7] mb-10">
+            {product.description}
+          </p>
+
+          {/* Specifications */}
+          <p className="eyebrow mb-4">Specifications</p>
+          <ul className="flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)] mb-10">
             {product.specs.map((spec) => (
-              <li key={spec} className="text-sm text-muted-foreground flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+              <li key={spec} className="py-3 text-body-sm text-[color:var(--ink-primary)]">
                 {spec}
               </li>
             ))}
           </ul>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Available Finishes</h3>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Wood Grain</p>
-          <div className="flex gap-3 mb-4 flex-wrap">
-            {product.finishes
-              .filter((finish) => {
-                const v = FRAME_FINISHES.find((f) => f.label === finish.name);
-                return v?.category === "wood-grain";
-              })
-              .map((finish) => {
-                const verified = FRAME_FINISHES.find((f) => f.label === finish.name);
-                return (
-                  <div key={finish.name} className="flex flex-col items-center gap-1">
-                    <FinishSwatch finishId={verified?.id} color={finish.color} finishType="wood-grain" size="sm" />
-                    <span className="text-[10px] text-muted-foreground">{finish.name}</span>
-                  </div>
-                );
-              })}
-          </div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Solid</p>
-          <div className="flex gap-3 mb-6 flex-wrap">
-            {product.finishes
-              .filter((finish) => {
-                const v = FRAME_FINISHES.find((f) => f.label === finish.name);
-                return !v || v.category === "solid";
-              })
-              .map((finish) => {
-                const verified = FRAME_FINISHES.find((f) => f.label === finish.name);
-                return (
-                  <div key={finish.name} className="flex flex-col items-center gap-1">
-                    <FinishSwatch finishId={verified?.id} color={finish.color} finishType="solid" size="sm" />
-                    <span className="text-[10px] text-muted-foreground">{finish.name}</span>
-                  </div>
-                );
-              })}
-          </div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/60 mb-3">Glass Options</h3>
-          <div className="flex gap-2 flex-wrap mb-8">
+
+          {/* Finishes */}
+          <p className="eyebrow mb-4">Available Finishes</p>
+          {product.finishes.some((f) => FRAME_FINISHES.find((v) => v.label === f.name)?.category === "wood-grain") && (
+            <>
+              <p className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--ink-muted)] mb-3">Wood grain</p>
+              <div className="flex gap-3 mb-6 flex-wrap">
+                {product.finishes
+                  .filter((finish) => FRAME_FINISHES.find((f) => f.label === finish.name)?.category === "wood-grain")
+                  .map((finish) => {
+                    const verified = FRAME_FINISHES.find((f) => f.label === finish.name);
+                    return (
+                      <div key={finish.name} className="flex flex-col items-center gap-1.5">
+                        <FinishSwatch finishId={verified?.id} color={finish.color} finishType="wood-grain" size="sm" />
+                        <span className="text-[10px] text-[color:var(--ink-muted)]">{finish.name}</span>
+                      </div>
+                    );
+                  })}
+              </div>
+            </>
+          )}
+          {product.finishes.some((f) => {
+            const v = FRAME_FINISHES.find((vf) => vf.label === f.name);
+            return !v || v.category === "solid";
+          }) && (
+            <>
+              <p className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--ink-muted)] mb-3">Solid</p>
+              <div className="flex gap-3 mb-10 flex-wrap">
+                {product.finishes
+                  .filter((finish) => {
+                    const v = FRAME_FINISHES.find((f) => f.label === finish.name);
+                    return !v || v.category === "solid";
+                  })
+                  .map((finish) => {
+                    const verified = FRAME_FINISHES.find((f) => f.label === finish.name);
+                    return (
+                      <div key={finish.name} className="flex flex-col items-center gap-1.5">
+                        <FinishSwatch finishId={verified?.id} color={finish.color} finishType="solid" size="sm" />
+                        <span className="text-[10px] text-[color:var(--ink-muted)]">{finish.name}</span>
+                      </div>
+                    );
+                  })}
+              </div>
+            </>
+          )}
+
+          {/* Glass */}
+          <p className="eyebrow mb-4">Glass Options</p>
+          <div className="flex gap-2 flex-wrap mb-10">
             {product.glassOptions.map((glass) => (
-              <span key={glass} className="px-3 py-1 text-xs bg-secondary rounded-full text-secondary-foreground">{glass}</span>
+              <span key={glass} className="px-3 py-1.5 text-[12px] border border-[color:var(--rule-soft)] text-[color:var(--ink-primary)]">
+                {glass}
+              </span>
             ))}
           </div>
-          <Button className="w-full font-medium" size="lg" onClick={() => setQuoteOpen(true)}>
+
+          <EditorialButton onClick={() => setQuoteOpen(true)} variant="primary" size="md" fullWidth>
             Request a Quote
-          </Button>
+          </EditorialButton>
         </div>
-      </motion.div>
+      </motion.aside>
+
       <QuoteModal isOpen={quoteOpen} onClose={() => setQuoteOpen(false)} productName={product.name} productId={product.id} />
     </>
   );
@@ -139,69 +164,92 @@ const Products = () => {
   return (
     <Layout>
       <PageHeader
-        title="All Systems"
+        eyebrow="The catalog"
+        title="Systems engineered for the Philippine climate."
         breadcrumbLabel="Systems"
-        subtitle="Explore our complete range of uPVC windows, doors, and specialist systems engineered for the Philippine climate."
+        subtitle="Custom-made uPVC windows and doors — quiet, thermally efficient, corrosion-resistant. Each profile tested for the heat, humidity, salt air, and storms that test what a home is made of."
       />
 
-      <div className="pb-20">
-        <div className="page-container">
-          <div className="flex gap-2 mb-10 flex-wrap">
-            {filters.map((f) => (
-              <button
-                key={f.value}
-                onClick={() => setActiveFilter(f.value)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeFilter === f.value
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card border border-border text-muted-foreground hover:text-primary"
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
+      <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
+        <div className="container-editorial">
+          {/* Filter rail — Marvin-style hairline tabs, not pills */}
+          <div className="flex items-end gap-8 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16">
+            {filters.map((f) => {
+              const active = activeFilter === f.value;
+              return (
+                <button
+                  key={f.value}
+                  onClick={() => setActiveFilter(f.value)}
+                  className={`pb-4 text-body-sm font-medium transition-colors duration-300 ease-marvin border-b-2 -mb-px ${
+                    active
+                      ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
+                      : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
           </div>
 
           {isLoading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-card rounded-lg border border-border overflow-hidden">
-                  <div className="aspect-[4/3] bg-muted" />
-                  <div className="p-5 space-y-2">
-                    <div className="h-3 bg-border rounded w-16" />
-                    <div className="h-4 bg-border rounded w-32" />
-                    <div className="h-3 bg-border rounded w-48" />
+                <div key={i}>
+                  <div className="aspect-[4/5] bg-[color:var(--canvas-soft)]" />
+                  <div className="mt-6 space-y-3">
+                    <div className="h-2.5 bg-[color:var(--rule-soft)] w-16" />
+                    <div className="h-5 bg-[color:var(--rule-soft)] w-40" />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 relative overflow-hidden">
-              <AnimatePresence mode="wait">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14 relative">
+              <AnimatePresence mode="popLayout">
                 {filtered.map((product) => (
-                  <motion.div
+                  <motion.button
                     key={product.id}
-                    initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
+                    layout
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.35, ease: [0.68, 0, 0.33, 1] }}
                     onClick={() => { setSelectedProduct(product); trackProductView(product.name); }}
-                    className="group bg-card rounded-lg border border-border overflow-hidden cursor-pointer hover:shadow-depth-6 transition-shadow"
+                    className="group block text-left"
                   >
-                    <div className="aspect-[4/3] overflow-hidden relative">
-                      <img src={product.image} alt={product.name} className="w-full h-full object-contain bg-white p-4 group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                      <ProductIconBadge productId={product.id} />
+                    <div className="aspect-[4/5] bg-[color:var(--canvas-soft)] overflow-hidden">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-contain p-6 transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
+                      />
                     </div>
-                    <div className="p-5">
-                      <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">{product.category}</span>
-                      <h3 className="font-medium text-primary mt-1">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{product.shortDescription}</p>
+                    <div className="mt-6">
+                      <p className="eyebrow mb-3">{product.category}</p>
+                      <div className="flex items-start justify-between gap-4">
+                        <h3 className="font-serif text-h5 lg:text-h4 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+                          {product.name}
+                        </h3>
+                        <ArrowUpRight
+                          size={20}
+                          strokeWidth={1.5}
+                          className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-all duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
+                        />
+                      </div>
+                      <p className="mt-3 text-body-sm text-[color:var(--ink-secondary)] max-w-[24rem]">
+                        {product.shortDescription}
+                      </p>
                     </div>
-                  </motion.div>
+                  </motion.button>
                 ))}
               </AnimatePresence>
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       <AnimatePresence>
         {selectedProduct && <ProductDrawer product={selectedProduct} onClose={() => setSelectedProduct(null)} />}

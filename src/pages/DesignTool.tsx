@@ -193,9 +193,10 @@ const DesignTool = () => {
   return (
     <Layout>
       <PageHeader
-        title="Design Tool"
+        eyebrow="Configurator"
+        title="Build your window. Save it. Share it."
         breadcrumbLabel="Design Tool"
-        subtitle="Configure your perfect window or door system with our interactive tool."
+        subtitle="Choose a type, pick a finish, set the size — then save your spec or send it to our team for a tailored quote."
       />
 
       <div className="pb-20">

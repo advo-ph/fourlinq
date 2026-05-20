@@ -1,193 +1,183 @@
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
-import AnimatedSection from "@/components/shared/AnimatedSection";
-import CTABanner from "@/components/shared/CTABanner";
+import Section from "@/components/primitives/Section";
+import EditorialButton from "@/components/primitives/Button";
+import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import ContactForm from "@/components/shared/ContactForm";
 import { certifications, CONTACT, BRANCHES, BRAND } from "@/data/brand";
-import { ShieldCheck, BadgeCheck, Award, FileCheck, Leaf, Wind, MapPin, Phone, Mail, Clock, Shield, CloudRain, VolumeX, ExternalLink } from "lucide-react";
-import { motion } from "framer-motion";
+import { ShieldCheck, BadgeCheck, Award, FileCheck, Leaf, Wind, MapPin, Phone, Mail, Clock, Shield, CloudRain, VolumeX, ArrowUpRight } from "lucide-react";
 
 const certIconMap: Record<string, React.ReactNode> = {
-  "shield-check": <ShieldCheck size={20} />,
-  "badge-check": <BadgeCheck size={20} />,
-  award: <Award size={20} />,
-  "file-check": <FileCheck size={20} />,
-  leaf: <Leaf size={20} />,
-  wind: <Wind size={20} />,
-  shield: <Shield size={20} />,
-  clock: <Clock size={20} />,
-  "cloud-rain": <CloudRain size={20} />,
-  "volume-x": <VolumeX size={20} />,
+  "shield-check": <ShieldCheck size={18} strokeWidth={1.5} />,
+  "badge-check": <BadgeCheck size={18} strokeWidth={1.5} />,
+  award: <Award size={18} strokeWidth={1.5} />,
+  "file-check": <FileCheck size={18} strokeWidth={1.5} />,
+  leaf: <Leaf size={18} strokeWidth={1.5} />,
+  wind: <Wind size={18} strokeWidth={1.5} />,
+  shield: <Shield size={18} strokeWidth={1.5} />,
+  clock: <Clock size={18} strokeWidth={1.5} />,
+  "cloud-rain": <CloudRain size={18} strokeWidth={1.5} />,
+  "volume-x": <VolumeX size={18} strokeWidth={1.5} />,
 };
 
-const Brand = () => {
-  return (
-    <Layout>
-      <PageHeader
-        title="Our Brand"
-        breadcrumbLabel="Brand"
-        subtitle={BRAND.promise}
-      />
+const Brand = () => (
+  <Layout>
+    <PageHeader
+      eyebrow="Our brand"
+      title="Custom-made for the homes you actually live in."
+      breadcrumbLabel="Brand"
+      subtitle={BRAND.promise}
+    />
 
-      {/* Story + Image */}
-      <AnimatedSection className="py-16">
-        <div className="page-container">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">{BRAND.heroQuote}</h2>
-              <p className="text-muted-foreground leading-relaxed mb-4">
-                {BRAND.promiseSupport}
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                Available in 11 finishes — from classic white to rich wood grains — with a {BRAND.warranty} covering corrosion resistance, weather resistance, and long-lasting performance.
-              </p>
-            </div>
-            <img
-              src="/images/brand-story.jpg"
-              alt="A FourlinQ-equipped home in the Philippines"
-              className="w-full aspect-[4/3] object-cover rounded-lg"
-              loading="lazy"
-            />
+    {/* Story */}
+    <Section tone="canvas" size="lg">
+      <div className="grid lg:grid-cols-[5fr,6fr] gap-12 lg:gap-20 items-center">
+        <div>
+          <EyebrowHeading eyebrow="Our story" level={2}>
+            {BRAND.heroQuote}
+          </EyebrowHeading>
+          <div className="mt-8 lg:mt-10 space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[36rem]">
+            <p>{BRAND.promiseSupport}</p>
+            <p>
+              Available in 11 finishes — from classic white to rich wood grains —
+              backed by a {BRAND.warranty} covering corrosion resistance, weather
+              resistance, and long-lasting performance.
+            </p>
           </div>
         </div>
-      </AnimatedSection>
+        <div className="relative aspect-[4/5] lg:aspect-[5/6] overflow-hidden bg-[color:var(--canvas-soft)]">
+          <img src="/images/brand-story.jpg" alt="A FourlinQ-equipped home in the Philippines" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+        </div>
+      </div>
+    </Section>
 
-      {/* Warranty - dark section */}
-      <AnimatedSection className="py-16 bg-[#0a0a0a]">
-        <div className="page-container max-w-4xl text-center">
-          <h3 className="text-lg font-semibold text-white mb-3">{BRAND.warranty}</h3>
-          <p className="text-white/60 text-sm leading-relaxed mb-8">
-            {BRAND.promise}
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {/* Warranty — dark inset */}
+    <Section tone="dark" size="md">
+      <div className="grid lg:grid-cols-[1fr,2fr] gap-12 lg:gap-20 items-start">
+        <div>
+          <p className="eyebrow !text-white/50 mb-5">The promise</p>
+          <h2 className="font-serif text-h3 lg:text-h2 text-white tracking-tight leading-[1.1]">
+            {BRAND.warranty}
+          </h2>
+        </div>
+        <div>
+          <p className="text-body-lg text-white/70 mb-10 max-w-[34rem]">{BRAND.promise}</p>
+          <ul className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10">
             {BRAND.warrantyScope.map((scope) => (
-              <div key={scope} className="border border-white/10 rounded-lg p-4 text-center">
-                <p className="text-sm text-white font-medium">{scope}</p>
-              </div>
+              <li key={scope} className="bg-[color:var(--canvas-dark)] p-5">
+                <p className="text-body-sm text-white font-medium">{scope}</p>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
-      </AnimatedSection>
+      </div>
+    </Section>
 
-      {/* Certifications */}
-      <AnimatedSection id="certifications" className="py-16 scroll-mt-28">
-        <div className="page-container max-w-4xl">
-          <h2 className="text-2xl font-semibold text-foreground mb-8 text-center">Certifications</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {certifications.map((cert, i) => (
-              <motion.div
-                key={cert.name}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.06, duration: 0.4, ease: "easeOut" }}
-                className="bg-card border border-border rounded-lg p-4 flex items-center gap-3"
-              >
-                <div className="text-accent shrink-0">{certIconMap[cert.icon]}</div>
-                <span className="text-sm font-medium text-foreground">{cert.name}</span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </AnimatedSection>
+    {/* Certifications */}
+    <Section id="certifications" tone="soft" size="lg" className="scroll-mt-28">
+      <EyebrowHeading eyebrow="Trust" level={2} align="left">
+        Certifications & standards.
+      </EyebrowHeading>
+      <ul className="mt-12 lg:mt-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-[color:var(--rule-soft)]">
+        {certifications.map((cert) => (
+          <li key={cert.name} className="bg-white p-6 flex items-start gap-3">
+            <div className="text-[color:var(--ink-muted)] shrink-0 mt-0.5">{certIconMap[cert.icon]}</div>
+            <span className="text-body-sm font-medium text-[color:var(--ink-primary)] leading-tight">{cert.name}</span>
+          </li>
+        ))}
+      </ul>
+    </Section>
 
-      {/* Contact */}
-      <AnimatedSection id="contact" className="py-16 bg-neutral-50 scroll-mt-28">
-        <div className="page-container max-w-5xl">
-          <h2 className="text-3xl font-semibold text-foreground mb-2 text-center">Contact Us</h2>
-          <p className="text-muted-foreground text-center mb-10 text-sm">
+    {/* Contact */}
+    <Section id="contact" tone="canvas" size="lg" className="scroll-mt-28">
+      <div className="grid lg:grid-cols-[5fr,7fr] gap-12 lg:gap-20">
+        <div>
+          <EyebrowHeading eyebrow="Get in touch" level={2}>
+            Start a conversation.
+          </EyebrowHeading>
+          <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[28rem]">
             Whether you need a quote, consultation, or just have a question — we're here to help.
           </p>
 
-          {/* Contact Info */}
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <div className="space-y-6">
-              <div className="flex gap-3">
-                <div className="text-accent shrink-0 mt-0.5"><Phone size={20} /></div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Sales</p>
-                  <a href={`tel:${CONTACT.mobileSales.replace(/-/g, "")}`} className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.mobileSales}</a>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="text-accent shrink-0 mt-0.5"><Phone size={20} /></div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Assistance</p>
-                  <a href={`tel:${CONTACT.mobileAssist.replace(/-/g, "")}`} className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.mobileAssist}</a>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="text-accent shrink-0 mt-0.5"><Phone size={20} /></div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Landline</p>
-                  <a href={`tel:${CONTACT.landline.replace(/[()]/g, "")}`} className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.landline}</a>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="text-accent shrink-0 mt-0.5"><Mail size={20} /></div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Email</p>
-                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-foreground hover:text-accent transition-colors">{CONTACT.email}</a>
-                </div>
-              </div>
-            </div>
-            <ContactForm />
-          </div>
-
-          {/* Branches */}
-          <h3 id="showrooms" className="text-lg font-semibold text-foreground mb-6 text-center scroll-mt-28">Our Locations</h3>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {BRANCHES.map((branch) => (
-              <motion.div
-                key={branch.id}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="bg-card border border-border rounded-lg overflow-hidden"
-              >
-                <iframe
-                  title={`Map — ${branch.label}`}
-                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${branch.lng - 0.005},${branch.lat - 0.003},${branch.lng + 0.005},${branch.lat + 0.003}&layer=mapnik&marker=${branch.lat},${branch.lng}`}
-                  className="w-full h-40 border-0"
-                  loading="lazy"
-                />
-                <div className="p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="text-accent shrink-0 mt-0.5"><MapPin size={16} /></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground mb-1">{branch.label}</p>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{branch.address}</p>
-                      <div className="flex items-center justify-between mt-3">
-                        <p className="text-[10px] uppercase tracking-wider text-accent">{branch.region}</p>
-                        <a
-                          href={`https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
-                        >
-                          Get Directions <ExternalLink size={12} />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <ul className="mt-10 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
+            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Sales" value={CONTACT.mobileSales} href={`tel:${CONTACT.mobileSales.replace(/-/g, "")}`} />
+            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Assistance" value={CONTACT.mobileAssist} href={`tel:${CONTACT.mobileAssist.replace(/-/g, "")}`} />
+            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Landline" value={CONTACT.landline} href={`tel:${CONTACT.landline.replace(/[()]/g, "")}`} />
+            <ContactRow icon={<Mail size={16} strokeWidth={1.5} />} label="Email" value={CONTACT.email} href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`} external />
+          </ul>
         </div>
-      </AnimatedSection>
+        <ContactForm />
+      </div>
+    </Section>
 
-      <CTABanner
-        headline="Start Your Project"
-        subtext="From consultation to installation, we're with you every step."
-        primaryLabel="Explore Systems"
-        primaryTo="/products"
-        secondaryLabel="Open Design Tool"
-        secondaryTo="/design-tool"
-      />
-    </Layout>
-  );
-};
+    {/* Showrooms */}
+    <Section id="showrooms" tone="soft" size="lg" className="scroll-mt-28">
+      <div className="grid lg:grid-cols-[1fr,auto] items-end gap-8 mb-12 lg:mb-16">
+        <EyebrowHeading eyebrow="Where to find us" level={2}>
+          Four showrooms across the Philippines.
+        </EyebrowHeading>
+      </div>
+      <ul className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+        {BRANCHES.map((branch) => (
+          <li key={branch.id} className="bg-white border border-[color:var(--rule-soft)] overflow-hidden flex flex-col">
+            <iframe
+              title={`Map — ${branch.label}`}
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${branch.lng - 0.005},${branch.lat - 0.003},${branch.lng + 0.005},${branch.lat + 0.003}&layer=mapnik&marker=${branch.lat},${branch.lng}`}
+              className="w-full h-44 border-0"
+              loading="lazy"
+            />
+            <div className="p-6 flex-1 flex flex-col">
+              <p className="eyebrow mb-3">{branch.region}</p>
+              <h3 className="font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight mb-3">{branch.label}</h3>
+              <p className="text-body-sm text-[color:var(--ink-secondary)] leading-relaxed flex-1">{branch.address}</p>
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-5 inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+              >
+                Get directions
+                <ArrowUpRight size={14} strokeWidth={1.5} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300 ease-marvin" />
+              </a>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Section>
+
+    {/* CTA */}
+    <Section tone="dark" size="md">
+      <div className="grid lg:grid-cols-[1fr,1fr] gap-12 lg:gap-24 items-center">
+        <EyebrowHeading eyebrow="Start your project" level={2} toneInverse>
+          From consultation to installation, we're with you every step.
+        </EyebrowHeading>
+        <div className="flex flex-wrap items-center gap-5">
+          <EditorialButton to="/products" variant="primary" size="md">Explore Systems</EditorialButton>
+          <EditorialButton to="/design-tool" variant="ghost" size="md" className="text-white hover:text-white">
+            Open Design Tool
+          </EditorialButton>
+        </div>
+      </div>
+    </Section>
+  </Layout>
+);
+
+const ContactRow = ({ icon, label, value, href, external }: { icon: React.ReactNode; label: string; value: string; href: string; external?: boolean }) => (
+  <li>
+    <a
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      className="group flex items-center gap-4 py-4 hover:bg-[color:var(--canvas-soft)] -mx-2 px-2 transition-colors duration-300 ease-marvin"
+    >
+      <div className="text-[color:var(--ink-muted)] shrink-0">{icon}</div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-[0.12em] text-[color:var(--ink-muted)] mb-0.5">{label}</p>
+        <p className="text-body-sm text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">{value}</p>
+      </div>
+      <ArrowUpRight size={14} strokeWidth={1.5} className="text-[color:var(--ink-muted)] group-hover:text-[color:var(--accent)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 ease-marvin" />
+    </a>
+  </li>
+);
 
 export default Brand;
