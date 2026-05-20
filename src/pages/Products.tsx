@@ -182,24 +182,33 @@ const Products = () => {
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
-          {/* Filter rail — Marvin-style hairline tabs, not pills */}
-          <div className="flex items-end gap-8 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16">
-            {filters.map((f) => {
-              const active = activeFilter === f.value;
-              return (
-                <button
-                  key={f.value}
-                  onClick={() => setActiveFilter(f.value)}
-                  className={`pb-4 text-body-sm font-medium transition-colors duration-300 ease-marvin border-b-2 -mb-px ${
-                    active
-                      ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
-                      : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              );
-            })}
+          {/* Filter rail + help-me-choose entry point */}
+          <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16">
+            <div className="flex items-end gap-8">
+              {filters.map((f) => {
+                const active = activeFilter === f.value;
+                return (
+                  <button
+                    key={f.value}
+                    onClick={() => setActiveFilter(f.value)}
+                    className={`pb-4 text-body-sm font-medium transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end ${
+                      active
+                        ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
+                        : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
+            <a
+              href="/help-me-choose"
+              className="group inline-flex items-center gap-1.5 pb-4 text-body-sm font-medium text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+            >
+              Not sure which one? Help me choose
+              <span className="inline-block transition-transform duration-300 ease-marvin group-hover:translate-x-1">→</span>
+            </a>
           </div>
 
           {isLoading ? (

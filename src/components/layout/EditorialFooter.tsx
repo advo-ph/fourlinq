@@ -15,16 +15,18 @@ const columns: Record<string, FooterLink[]> = {
     { label: "Windows", to: "/products?filter=windows" },
     { label: "Doors", to: "/products?filter=doors" },
     { label: "Design Tool", to: "/design-tool" },
+    { label: "Help me choose", to: "/help-me-choose" },
   ],
-  Brand: [
-    { label: "Our Story", to: "/brand" },
+  Resources: [
     { label: "Why uPVC", to: "/why-upvc" },
+    { label: "FAQ", to: "/faq" },
+    { label: "Care guide", to: "/care" },
     { label: "Certifications", to: "/brand#certifications" },
   ],
-  Showrooms: [
+  Visit: [
     { label: "Visit a Showroom", to: "/brand#showrooms" },
     { label: "Request a Quote", to: "/brand#contact" },
-    { label: "Book Consultation", to: "/brand#contact" },
+    { label: "Our Story", to: "/brand" },
   ],
   Legal: [
     { label: "Privacy", to: "/legal?page=privacy" },
