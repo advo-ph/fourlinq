@@ -32,15 +32,15 @@ export default {
         "body":      ["1rem",     { lineHeight: "1.65" }],
         "body-lg":   ["1.125rem", { lineHeight: "1.6" }],
         "lead":      ["1.25rem",  { lineHeight: "1.55" }],
-        "h6":        ["1.125rem", { lineHeight: "1.4", letterSpacing: "-0.005em" }],
-        "h5":        ["1.25rem",  { lineHeight: "1.35", letterSpacing: "-0.01em" }],
-        "h4":        ["1.5rem",   { lineHeight: "1.3", letterSpacing: "-0.01em" }],
-        "h3":        ["2rem",     { lineHeight: "1.2", letterSpacing: "-0.015em" }],
-        "h2":        ["3rem",     { lineHeight: "1.15", letterSpacing: "-0.02em" }],
-        "h1":        ["3.5rem",   { lineHeight: "1.1", letterSpacing: "-0.02em" }],
-        "display":   ["5.5rem",   { lineHeight: "1.05", letterSpacing: "-0.025em" }],
+        "h6":        ["1.25rem",  { lineHeight: "1.4", letterSpacing: "-0.005em" }],
+        "h5":        ["1.5rem",   { lineHeight: "1.35", letterSpacing: "-0.01em" }],
+        "h4":        ["1.875rem", { lineHeight: "1.25", letterSpacing: "-0.01em" }],
+        "h3":        ["2.5rem",   { lineHeight: "1.15", letterSpacing: "-0.015em" }],
+        "h2":        ["4rem",     { lineHeight: "1.1", letterSpacing: "-0.02em" }],
+        "h1":        ["5rem",     { lineHeight: "1.05", letterSpacing: "-0.02em" }],
+        "display":   ["7rem",     { lineHeight: "1.0", letterSpacing: "-0.025em" }],
         // Mobile display fallback (use via responsive utilities)
-        "display-sm": ["3rem",    { lineHeight: "1.1", letterSpacing: "-0.02em" }],
+        "display-sm": ["3.5rem",  { lineHeight: "1.05", letterSpacing: "-0.02em" }],
       },
       spacing: {
         // Marvin's v-space-* scale (000-900) + section-pad direct values
