@@ -53,11 +53,11 @@ const QuietNavbar = () => {
         <div className="container-editorial h-full">
           <div className="flex items-center justify-between h-full">
             <Link to="/" className="shrink-0 flex items-center" aria-label="FourlinQ home">
-              <Logo variant="dark" className="h-9 lg:h-10" />
+              <Logo variant="dark" className="h-11 lg:h-12" />
             </Link>
 
             {/* Desktop nav — mixed-case, plain text, no all-caps */}
-            <ul className="hidden lg:flex items-center gap-v900">
+            <ul className="hidden lg:flex items-center gap-8 xl:gap-10">
               {navLinks.map((link) => {
                 const active = location.pathname === link.to ||
                                (link.to !== "/" && location.pathname.startsWith(link.to));
@@ -66,7 +66,7 @@ const QuietNavbar = () => {
                     <Link
                       to={link.to}
                       className={cn(
-                        "text-body-sm font-medium transition-colors duration-250 ease-out",
+                        "whitespace-nowrap text-body-sm font-medium transition-colors duration-250 ease-out",
                         "border-b-[1.5px] pb-1",
                         active
                           ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
