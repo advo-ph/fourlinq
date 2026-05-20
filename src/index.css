@@ -150,4 +150,8 @@
 
   /* Hairline rule (Marvin's 1px divider) */
   .rule-hairline { border-color: var(--rule-soft); }
+
+  /* Hide native scrollbar for horizontal scroll strips */
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
 }
