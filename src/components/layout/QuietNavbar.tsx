@@ -20,16 +20,7 @@ const navLinks: NavLink[] = [
 
 const QuietNavbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-
-  // Sticky behavior — gain a faint shadow on scroll
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // Close mobile drawer on route change
   useEffect(() => { setMobileOpen(false); }, [location]);
@@ -46,8 +37,7 @@ const QuietNavbar = () => {
         className={cn(
           "fixed top-0 inset-x-0 z-50 bg-white",
           "h-16 lg:h-[72px]",
-          "border-b transition-shadow duration-250 ease-out",
-          scrolled ? "border-[color:var(--rule-soft)] shadow-depth-1" : "border-transparent"
+          "border-b border-[color:var(--rule-soft)]"
         )}
       >
         <div className="container-editorial h-full">
