@@ -14,7 +14,6 @@ const navLinks: NavLink[] = [
   { label: "Systems", to: "/products" },
   { label: "Inspiration", to: "/inspiration" },
   { label: "Why uPVC", to: "/why-upvc" },
-  { label: "Design Tool", to: "/design-tool" },
   { label: "Brand", to: "/brand" },
 ];
 
@@ -36,7 +35,7 @@ const QuietNavbar = () => {
       <nav
         className={cn(
           "fixed top-0 inset-x-0 z-50 bg-white",
-          "h-20",
+          "h-[72px]",
           "border-b border-[color:var(--rule-soft)]"
         )}
       >
@@ -56,7 +55,7 @@ const QuietNavbar = () => {
                     <Link
                       to={link.to}
                       className={cn(
-                        "whitespace-nowrap text-body-sm font-medium transition-colors duration-250 ease-out",
+                        "whitespace-nowrap text-body-sm font-medium transition-colors duration-300 ease-marvin",
                         "border-b-[1.5px] pb-1",
                         active
                           ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
@@ -92,7 +91,7 @@ const QuietNavbar = () => {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-20 animate-fade-in">
+        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-[72px] animate-fade-in">
           <div className="container-editorial py-v600">
             <ul className="flex flex-col">
               {navLinks.map((link) => {
@@ -122,7 +121,7 @@ const QuietNavbar = () => {
       )}
 
       {/* Page spacer to push content below fixed nav */}
-      <div aria-hidden="true" className="h-20" />
+      <div aria-hidden="true" className="h-[72px]" />
     </>
   );
 };

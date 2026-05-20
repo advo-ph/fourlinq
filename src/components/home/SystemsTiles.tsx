@@ -64,12 +64,12 @@ const SystemsTiles = () => (
             <div className="mt-6">
               <AccentStripe width="sm" color="accent" className="mb-4" />
               <div className="flex items-start justify-between gap-4">
-                <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-250 ease-out">
+                <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                   {sys.name}
                 </h3>
                 <ArrowUpRight
                   size={20}
-                  className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-250 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
+                  className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
                 />
               </div>
               <p className="mt-3 text-body-sm lg:text-body text-[color:var(--ink-secondary)] max-w-[24rem]">

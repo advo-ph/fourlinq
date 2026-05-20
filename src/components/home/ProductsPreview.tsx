@@ -46,7 +46,7 @@ const ProductsPreview = () => {
             >
               <Link
                 to={cat.to}
-                className="group block bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow duration-300"
+                className="group block bg-card rounded-lg overflow-hidden border border-border hover:shadow-depth-6 transition-shadow duration-300"
               >
                 <div className="aspect-[4/3] overflow-hidden">
                   <img

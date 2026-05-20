@@ -45,7 +45,7 @@ const WhatsNew = () => (
                 <span className="text-[color:var(--rule-strong)]">·</span>
                 <span className="eyebrow text-[color:var(--ink-muted)]">{formatDate(entry.date)}</span>
               </div>
-              <h3 className="font-serif text-h5 lg:text-h4 text-[color:var(--ink-primary)] tracking-tight leading-snug group-hover:text-[color:var(--accent)] transition-colors duration-250 ease-out">
+              <h3 className="font-serif text-h5 lg:text-h4 text-[color:var(--ink-primary)] tracking-tight leading-snug group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                 {entry.title}
               </h3>
               <p className="mt-3 text-body-sm text-[color:var(--ink-secondary)]">

@@ -41,7 +41,7 @@ const EditorialButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Editor
 
     const classes = cn(
       "inline-flex items-center justify-center font-sans font-medium tracking-wide",
-      "transition-all duration-250 ease-out",
+      "transition-all duration-300 ease-marvin",
       "focus-visible:outline-none",
       sizeClass,
       variantClass,

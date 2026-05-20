@@ -184,7 +184,7 @@ const Products = () => {
                     initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                     onClick={() => { setSelectedProduct(product); trackProductView(product.name); }}
-                    className="group bg-card rounded-lg border border-border overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                    className="group bg-card rounded-lg border border-border overflow-hidden cursor-pointer hover:shadow-depth-6 transition-shadow"
                   >
                     <div className="aspect-[4/3] overflow-hidden relative">
                       <img src={product.image} alt={product.name} className="w-full h-full object-contain bg-white p-4 group-hover:scale-105 transition-transform duration-500" loading="lazy" />

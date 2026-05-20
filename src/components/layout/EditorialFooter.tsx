@@ -60,12 +60,12 @@ const EditorialFooter = () => {
               href={gmail}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 mt-4 lg:mt-2 text-body-lg font-sans border-b border-white/40 pb-1 hover:border-white transition-colors duration-250 ease-out"
+              className="group inline-flex items-center gap-2 mt-4 lg:mt-2 text-body-lg font-sans border-b border-white/40 pb-1 hover:border-white transition-colors duration-300 ease-marvin"
             >
               {CONTACT.email}
-              <ArrowUpRight size={16} className="transition-transform duration-250 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <ArrowUpRight size={16} className="transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
-            <a href={tel} className="text-body text-white/70 hover:text-white transition-colors duration-250 ease-out">
+            <a href={tel} className="text-body text-white/70 hover:text-white transition-colors duration-300 ease-marvin">
               {CONTACT.mobileSales}
             </a>
           </div>
@@ -81,7 +81,7 @@ const EditorialFooter = () => {
                   <li key={link.label}>
                     <Link
                       to={link.to}
-                      className="text-body-sm text-white/85 hover:text-white transition-colors duration-250 ease-out"
+                      className="text-body-sm text-white/85 hover:text-white transition-colors duration-300 ease-marvin"
                     >
                       {link.label}
                     </Link>
@@ -104,7 +104,7 @@ const EditorialFooter = () => {
                 href={s.to}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-body-sm text-white/60 hover:text-white transition-colors duration-250 ease-out"
+                className="text-body-sm text-white/60 hover:text-white transition-colors duration-300 ease-marvin"
               >
                 {s.label}
               </a>

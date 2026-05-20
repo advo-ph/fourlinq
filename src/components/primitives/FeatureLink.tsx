@@ -32,7 +32,7 @@ const FeatureLink = ({
   const inner = (
     <span className={cn(
       "group inline-flex items-center gap-2 font-sans font-medium",
-      "transition-colors duration-250 ease-out",
+      "transition-colors duration-300 ease-marvin",
       sizeClass,
       inkClass,
       "hover:text-[color:var(--accent)]",
@@ -40,7 +40,7 @@ const FeatureLink = ({
       className
     )}>
       <span>{children}</span>
-      <ArrowRight size={16} className="transition-transform duration-250 ease-out group-hover:translate-x-1" />
+      <ArrowRight size={16} className="transition-transform duration-300 ease-marvin group-hover:translate-x-1" />
     </span>
   );
 
