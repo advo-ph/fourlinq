@@ -23,8 +23,7 @@
     --accent-hover: #A00D26;
     --accent-quiet: rgba(200, 16, 46, 0.08);
 
-    --header-h-mobile:  64px;
-    --header-h-desktop: 72px;
+    --header-h:         80px;
 
     --section-pad-mobile:  3rem;
     --section-pad-tablet:  4.5rem;

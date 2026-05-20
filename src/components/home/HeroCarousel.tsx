@@ -52,7 +52,7 @@ const HeroCarousel = ({
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-[color:var(--canvas-dark)] -mt-16 lg:-mt-[72px]"
+      className="relative w-full overflow-hidden bg-[color:var(--canvas-dark)] -mt-20"
       style={{ height: "min(100vh, 920px)" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}

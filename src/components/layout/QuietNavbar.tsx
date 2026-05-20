@@ -36,14 +36,14 @@ const QuietNavbar = () => {
       <nav
         className={cn(
           "fixed top-0 inset-x-0 z-50 bg-white",
-          "h-16 lg:h-[72px]",
+          "h-20",
           "border-b border-[color:var(--rule-soft)]"
         )}
       >
         <div className="container-editorial h-full">
           <div className="flex items-center justify-between h-full">
             <Link to="/" className="shrink-0 flex items-center" aria-label="FourlinQ home">
-              <Logo variant="dark" className="h-9 lg:h-10" />
+              <Logo variant="dark" className="h-11" />
             </Link>
 
             {/* Desktop nav — mixed-case, plain text, no all-caps */}
@@ -92,7 +92,7 @@ const QuietNavbar = () => {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-16 animate-fade-in">
+        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-20 animate-fade-in">
           <div className="container-editorial py-v600">
             <ul className="flex flex-col">
               {navLinks.map((link) => {
@@ -122,7 +122,7 @@ const QuietNavbar = () => {
       )}
 
       {/* Page spacer to push content below fixed nav */}
-      <div aria-hidden="true" className="h-16 lg:h-[72px]" />
+      <div aria-hidden="true" className="h-20" />
     </>
   );
 };
