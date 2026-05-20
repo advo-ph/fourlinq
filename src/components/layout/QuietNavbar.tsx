@@ -45,15 +45,15 @@ const QuietNavbar = () => {
       <nav
         className={cn(
           "fixed top-0 inset-x-0 z-50 bg-white",
+          "h-16 lg:h-[72px]",
           "border-b transition-shadow duration-250 ease-out",
           scrolled ? "border-[color:var(--rule-soft)] shadow-depth-1" : "border-transparent"
         )}
-        style={{ height: "var(--header-h-mobile)" }}
       >
         <div className="container-editorial h-full">
-          <div className="flex items-center justify-between h-full lg:h-[var(--header-h-desktop)]">
-            <Link to="/" className="shrink-0 -ml-1">
-              <Logo variant="dark" className="h-10 lg:h-11" />
+          <div className="flex items-center justify-between h-full">
+            <Link to="/" className="shrink-0 flex items-center" aria-label="FourlinQ home">
+              <Logo variant="dark" className="h-9 lg:h-10" />
             </Link>
 
             {/* Desktop nav — mixed-case, plain text, no all-caps */}
@@ -98,17 +98,11 @@ const QuietNavbar = () => {
           </div>
         </div>
 
-        {/* Desktop header height is taller — adjust via inline style on mount */}
-        <style>{`
-          @media (min-width: 992px) {
-            nav.fixed { height: var(--header-h-desktop); }
-          }
-        `}</style>
       </nav>
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-[var(--header-h-mobile)] animate-fade-in">
+        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-16 animate-fade-in">
           <div className="container-editorial py-v600">
             <ul className="flex flex-col">
               {navLinks.map((link) => {
@@ -138,7 +132,7 @@ const QuietNavbar = () => {
       )}
 
       {/* Page spacer to push content below fixed nav */}
-      <div aria-hidden="true" style={{ height: "var(--header-h-mobile)" }} className="lg:!h-[var(--header-h-desktop)]" />
+      <div aria-hidden="true" className="h-16 lg:h-[72px]" />
     </>
   );
 };
