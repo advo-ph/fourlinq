@@ -50,7 +50,7 @@ const EyebrowHeading = ({
           {eyebrow}
         </p>
       )}
-      <HeadingTag className={cn("font-serif font-medium tracking-tight", headingSizeClass(level, display), inkClass)}>
+      <HeadingTag className={cn("font-serif font-normal tracking-tight", headingSizeClass(level, display), inkClass)}>
         {children}
       </HeadingTag>
       {lede && (

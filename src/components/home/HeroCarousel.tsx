@@ -89,22 +89,23 @@ const HeroCarousel = ({
         </AnimatePresence>
       </div>
 
-      {/* Bottom-left scrim gradient + content */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-black/55 via-black/15 to-transparent pointer-events-none" />
+      {/* Two-layer scrim — vertical bottom-darker + corner bottom-left intensifier */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/0 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-transparent to-transparent pointer-events-none" />
 
       {/* Hero text block */}
       <div className="absolute inset-0 flex items-end pb-16 md:pb-20 lg:pb-24">
         <div className="container-editorial w-full">
-          <div className="max-w-[44rem]">
+          <div className="max-w-[42rem]" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.35)" }}>
             {slides[active]?.caption && (
-              <p className="eyebrow text-white/85 mb-4 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-white/60">
+              <p className="eyebrow text-white/95 mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-white/80">
                 {slides[active].caption}
               </p>
             )}
-            <h1 className="font-serif font-medium tracking-tight text-white text-[2.5rem] sm:text-h1 lg:text-display leading-[1.05]">
+            <h1 className="font-serif font-normal tracking-tight text-white text-[2.5rem] sm:text-[3.5rem] lg:text-[5rem] xl:text-[5.5rem] leading-[1.02]">
               {headline}
             </h1>
-            <p className="mt-6 md:mt-8 text-body lg:text-body-lg text-white/85 max-w-[36rem]">
+            <p className="mt-6 md:mt-8 text-body lg:text-body-lg text-white/90 max-w-[34rem]">
               {lede}
             </p>
             <div className="mt-8 md:mt-10 flex flex-wrap items-center gap-4">

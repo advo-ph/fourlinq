@@ -20,8 +20,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Inter"', '"Inter Fallback"', "system-ui", "sans-serif"],
-        serif: ['"Newsreader"', '"Newsreader Fallback"', "Georgia", "serif"],
-        display: ['"Newsreader"', '"Newsreader Fallback"', "Georgia", "serif"],
+        serif: ['"Instrument Serif"', '"Instrument Serif Fallback"', "Georgia", "serif"],
+        display: ['"Instrument Serif"', '"Instrument Serif Fallback"', "Georgia", "serif"],
       },
       fontSize: {
         // Editorial scale calibrated to Marvin's hjumbo 88px → body 16px (5.5× ratio)
