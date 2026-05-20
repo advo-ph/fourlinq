@@ -7,7 +7,10 @@
     /* === Marvin-mirrored editorial tokens === */
     --canvas: #FFFFFF;
     --canvas-soft: #F8F8F8;
+    --canvas-cream: #F9F7F1;        /* warm editorial backdrop (Marvin: #E7E5DD) */
     --canvas-dark: #242424;
+
+    --ease-marvin: cubic-bezier(.68, 0, .33, 1);   /* signature easing */
 
     --ink-primary:   #242424;
     --ink-secondary: #444444;

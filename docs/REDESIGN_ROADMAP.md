@@ -989,14 +989,19 @@ The visual ceiling is set by photo quality. Three scenarios mapped to Tita's pos
 
 ## 11. Decisions to lock before Phase 1
 
-Block this list. Don't start Phase 1 until each is checked.
+Locked 2026-05-20 — Angelo defaults applied (revisable any time, but build off these).
 
-- [ ] Typography choice — Option A / B / C from §6.2
-- [ ] Accent color confirmation — keep FourlinQ red or shift to a calmer tone (charcoal? a warmer wood-tone?)
-- [ ] Hero copy direction — editorial sentence vs. existing "Precision. Performance. Perfection." style (Tita preference; we should propose 3 options)
-- [ ] Whether to keep `/design-tool` as a top-level nav item or move it under Systems
-- [ ] How aggressive to be on removing chat bubble — Tita didn't mention it but it's visually loud
-- [ ] Confirm with Tita: does FourlinQ actually offer Large Panel up to 6m, 90 Series, Lift & Slide, Curtain Wall? If she answers no, those products come out of the spec.
+- [x] **Typography** — Option A: **Instrument Serif (display) + Inter (sans)**. Both free via Google Fonts. Already wired in tailwind.config.ts. Closest free analog to Marvin's TabacG1 + Nationale.
+- [x] **Accent color** — Keep **FourlinQ red `#C8102E`** (brand-500). Apply with Marvin-style restraint: hairlines, eyebrow color, single CTA per fold. No red blocks.
+- [ ] **Hero copy** — Open. Propose 3 options in Phase 2 kickoff; pick with Tita before Phase 2 builds.
+- [x] **Design Tool nav location** — Move **under Systems** (footer link + Systems-page sub-CTA). Not main nav. Reduces top-nav weight to 5 items.
+- [x] **Chat bubble** — Keep, but **dim to neutral charcoal**, smaller footprint, only appears after 4s scroll. Removes visual loudness without losing the channel.
+- [ ] **Product spec confirmation** — BLOCKED on Tita. Catalog stays on §13-memory rule: brochure-verified only.
+
+§13.15 implementations completed on this branch:
+- [x] Tailwind: signature easing `cubic-bezier(.68, 0, .33, 1)` exposed as `marvin` / `ease-marvin`
+- [x] Tailwind: type scale extended (h1 64, h2 56, display 88) to match Marvin's hjumbo ramp
+- [x] CSS: `--canvas-cream: #F9F7F1` added for warm editorial backdrop
 
 ---
 

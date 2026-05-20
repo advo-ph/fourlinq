@@ -35,10 +35,10 @@ export default {
         "h6":        ["1.25rem",  { lineHeight: "1.4", letterSpacing: "-0.005em" }],
         "h5":        ["1.5rem",   { lineHeight: "1.35", letterSpacing: "-0.01em" }],
         "h4":        ["1.875rem", { lineHeight: "1.25", letterSpacing: "-0.01em" }],
-        "h3":        ["2.5rem",   { lineHeight: "1.15", letterSpacing: "-0.015em" }],
-        "h2":        ["4rem",     { lineHeight: "1.1", letterSpacing: "-0.02em" }],
-        "h1":        ["5rem",     { lineHeight: "1.05", letterSpacing: "-0.02em" }],
-        "display":   ["7rem",     { lineHeight: "1.0", letterSpacing: "-0.025em" }],
+        "h3":        ["2.5rem",   { lineHeight: "1.15", letterSpacing: "-0.015em" }],     // 40 — Marvin h2 desktop
+        "h2":        ["3.5rem",   { lineHeight: "1.1",  letterSpacing: "-0.02em" }],      // 56 — Marvin h1 desktop step
+        "h1":        ["4rem",     { lineHeight: "1.05", letterSpacing: "-0.02em" }],      // 64 — Marvin hjumbo tablet
+        "display":   ["5.5rem",   { lineHeight: "1.0",  letterSpacing: "-0.025em" }],     // 88 — Marvin hjumbo desktop max
         // Mobile display fallback (use via responsive utilities)
         "display-sm": ["3.5rem",  { lineHeight: "1.05", letterSpacing: "-0.02em" }],
       },
@@ -143,8 +143,11 @@ export default {
         "depth-8": "0 0.5px 5px 0 rgba(36,36,36,0.04), 0 3.75px 11px 0 rgba(36,36,36,0.19)",
       },
       transitionTimingFunction: {
-        // Marvin's actual easings
-        out: "cubic-bezier(0.215, 0.61, 0.355, 1)", // easeOutCubic — their dominant curve
+        // Marvin's actual easings (grep'd from production CSS)
+        marvin: "cubic-bezier(.68, 0, .33, 1)",     // signature — slow ease in/out, lingers
+        "marvin-in": "cubic-bezier(.33, 0, .68, 0)",
+        "marvin-out": "cubic-bezier(.33, 1, .68, 1)",
+        out: "cubic-bezier(0.215, 0.61, 0.355, 1)",
         soft: "cubic-bezier(0.4, 0, 0.2, 1)",
       },
       transitionDuration: {
