@@ -1,6 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
-import HeroCarousel, { type HeroSlide } from "@/components/home/HeroCarousel";
+import { type HeroSlide } from "@/components/home/HeroCarousel";
+import VideoHero from "@/components/home/VideoHero";
 import EditorialIntro from "@/components/home/EditorialIntro";
 import SystemsTiles from "@/components/home/SystemsTiles";
 import InspirationStrip from "@/components/home/InspirationStrip";
@@ -20,8 +21,11 @@ const heroSlides: HeroSlide[] = [
 const Index = () => {
   return (
     <Layout>
-      <HeroCarousel
-        slides={heroSlides}
+      <VideoHero
+        videoSrc="/videos/hero-loop.mp4"
+        posterSrc="/images/wp-export/FourlinQ-Project-7.jpg"
+        fallbackSlides={heroSlides}
+        caption="Featured residence"
         headline="A lifetime of satisfaction and peace of mind."
         lede="Custom-made uPVC windows and doors engineered for the Philippine climate. Available in 11 finishes, backed by a 10-year warranty."
         ctaLabel="Explore Systems"
