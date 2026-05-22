@@ -2,17 +2,21 @@ import { useState } from "react";
 import HeroCarousel, { type HeroSlide } from "./HeroCarousel";
 import EditorialButton from "@/components/primitives/Button";
 
-/** Decide once, synchronously on mount — no useEffect flicker. */
+/**
+ * Decide once, synchronously on mount — no useEffect flicker.
+ * Falls back to carousel only on EXPLICIT user opt-outs (reduced motion,
+ * data saver) or actively bad network (slow-2g / 2g). Mobile width alone
+ * is not a fallback trigger — we want the video on phones too.
+ */
 function shouldUseVideo(): boolean {
   if (typeof window === "undefined") return true; // SSR: optimistic
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const narrow = window.matchMedia("(max-width: 767px)").matches;
   const conn = (navigator as Navigator & {
     connection?: { saveData?: boolean; effectiveType?: string };
   }).connection;
   const dataSaver = conn?.saveData === true;
   const slowNetwork = conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g";
-  return !reduceMotion && !narrow && !dataSaver && !slowNetwork;
+  return !reduceMotion && !dataSaver && !slowNetwork;
 }
 
 interface VideoHeroProps {
