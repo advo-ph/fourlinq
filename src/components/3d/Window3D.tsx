@@ -94,6 +94,16 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
   useEffect(() => {
     const prefixes = SYSTEMS[systemType].visiblePrefixes;
 
+    // CRITICAL: reset existing transforms before computing bbox. Otherwise
+    // the bbox includes the previous system's offset and the new system
+    // gets displaced.
+    if (innerRef.current) {
+      innerRef.current.position.set(0, 0, 0);
+    }
+    if (groupRef.current) {
+      groupRef.current.scale.setScalar(1);
+    }
+
     sceneClone.traverse((child) => {
       if (child.type !== "Mesh") return;
       const mesh = child as THREE.Mesh;
