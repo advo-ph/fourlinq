@@ -7,29 +7,10 @@ import { trackChatOpen } from "@/hooks/useAnalytics";
 const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [lift, setLift] = useState(false);
-  const [visible, setVisible] = useState(false);
   const { pathname } = useLocation();
 
-  // Delayed reveal — only show bubble after user has scrolled at least once
-  // and ~4s after that, so it doesn't compete with the hero at first load.
-  useEffect(() => {
-    let timeout: number | null = null;
-    let scrolled = false;
-    const onScroll = () => {
-      if (scrolled) return;
-      if (window.scrollY > 120) {
-        scrolled = true;
-        timeout = window.setTimeout(() => setVisible(true), 4000);
-        window.removeEventListener("scroll", onScroll);
-      }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (timeout) window.clearTimeout(timeout);
-    };
-  }, []);
-
+  // Lift the bubble above the footer when the footer enters viewport, so it
+  // never overlaps the footer's content.
   useEffect(() => {
     setLift(false);
     let cancelled = false;
@@ -64,9 +45,6 @@ const ChatBubble = () => {
         className="fixed bottom-6 right-6 z-[61] transition-transform duration-500 ease-marvin will-change-transform"
         style={{
           transform: lift && !isOpen ? "translateY(-100px)" : "translateY(0)",
-          opacity: visible || isOpen ? 1 : 0,
-          pointerEvents: visible || isOpen ? "auto" : "none",
-          transitionProperty: "transform, opacity",
         }}
       >
         <button
