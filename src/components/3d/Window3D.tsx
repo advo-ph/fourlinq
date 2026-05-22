@@ -165,25 +165,38 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     });
   }, [finish, sceneClone]);
 
-  // Animation playback — same clip controls all systems; only visible
-  // meshes register the motion visually.
-  useEffect(() => {
-    const clip = actions["Scene"] || (animations[0] && actions[animations[0].name]);
-    if (!clip) return;
-    clip.setLoop(THREE.LoopOnce, 1);
-    clip.clampWhenFinished = true;
+  // Animation control — the source clip is 4 seconds (0-2s open, 2-4s close-back),
+  // so playing it through cycles open AND closed in one shot. We don't want
+  // that. Instead, scrub the action.time manually toward a target:
+  //   - target 0   when closed
+  //   - target 2.0 when fully open (peak of the model's animation)
+  // Lerp via useFrame for a smooth motion regardless of click cadence.
+  const OPEN_TIME = 2.0;
+  const targetTimeRef = useRef(0);
 
-    if (isOpen) {
-      clip.reset().setEffectiveTimeScale(1).play();
-    } else {
-      if (clip.time > 0) {
-        clip.setEffectiveTimeScale(-1).play();
-      }
-    }
-  }, [isOpen, actions, animations]);
+  useEffect(() => {
+    targetTimeRef.current = isOpen ? OPEN_TIME : 0;
+  }, [isOpen]);
+
+  useEffect(() => {
+    const action = actions["Scene"] || (animations[0] && actions[animations[0].name]);
+    if (!action) return;
+    action.play();
+    action.paused = true; // we control time manually
+    action.time = 0;
+  }, [actions, animations]);
 
   useFrame((_, delta) => {
-    mixer.update(delta);
+    const action = actions["Scene"] || (animations[0] && actions[animations[0].name]);
+    if (!action) return;
+    const target = targetTimeRef.current;
+    const diff = target - action.time;
+    if (Math.abs(diff) > 0.005) {
+      const speed = 2.5; // seconds of clip per second of real time → ~0.8s open/close
+      const step = Math.sign(diff) * Math.min(Math.abs(diff), delta * speed);
+      action.time = action.time + step;
+      mixer.update(0); // re-evaluate pose at the new time without auto-advancing
+    }
   });
 
   return (
