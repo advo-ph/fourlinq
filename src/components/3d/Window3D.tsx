@@ -6,7 +6,6 @@ import {
   ContactShadows,
   useGLTF,
   useAnimations,
-  Center,
 } from "@react-three/drei";
 import * as THREE from "three";
 import { FRAME_FINISHES, type FrameFinish } from "@/data/fourlinq-data";
@@ -82,16 +81,19 @@ interface WindowModelProps {
 
 function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const innerRef = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(MODEL_URL);
 
   // Fresh clone per system — avoids cross-pollution of material overrides.
   const sceneClone = useMemo(() => scene.clone(true), [scene]);
   const { actions, mixer } = useAnimations(animations, groupRef);
 
-  // Mount: hide non-matching subtrees; clone visible mesh materials so the
-  // color override is local to this system + this render.
+  // Mount/system-change: hide non-matching subtrees, clone visible materials,
+  // then compute the bounding box of just the visible meshes and offset the
+  // inner group so the visible subtree is centered at origin.
   useEffect(() => {
     const prefixes = SYSTEMS[systemType].visiblePrefixes;
+
     sceneClone.traverse((child) => {
       if (child.type !== "Mesh") return;
       const mesh = child as THREE.Mesh;
@@ -111,6 +113,38 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
         mesh.material = (mat as THREE.MeshStandardMaterial).clone();
       }
     });
+
+    // Update world matrices then build bbox from VISIBLE meshes only
+    sceneClone.updateMatrixWorld(true);
+    const bbox = new THREE.Box3();
+    let foundAny = false;
+    sceneClone.traverse((child) => {
+      if (child.type !== "Mesh") return;
+      const mesh = child as THREE.Mesh;
+      if (!mesh.visible) return;
+      const meshBox = new THREE.Box3().setFromObject(mesh);
+      if (!meshBox.isEmpty()) {
+        bbox.union(meshBox);
+        foundAny = true;
+      }
+    });
+
+    if (foundAny && innerRef.current) {
+      const center = bbox.getCenter(new THREE.Vector3());
+      const size = bbox.getSize(new THREE.Vector3());
+      // Offset the inner group to center the visible subtree at origin.
+      // Multiplied by -1 since we want to shift the model the opposite way.
+      innerRef.current.position.set(-center.x, -center.y, -center.z);
+      // Scale to fit a ~1.6m world height regardless of source units
+      const longestSide = Math.max(size.x, size.y);
+      const targetSize = 1.6;
+      const scale = targetSize / longestSide;
+      if (groupRef.current) {
+        groupRef.current.scale.setScalar(scale);
+        // Ground the bottom of the bbox at y=-(targetSize/2) so contact shadow sits right
+        groupRef.current.position.set(0, 0, 0);
+      }
+    }
   }, [sceneClone, systemType]);
 
   // Finish swap — recolor frame1/frame2 materials on visible meshes.
@@ -154,11 +188,9 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
 
   return (
     <group ref={groupRef}>
-      <Center top>
-        <group scale={[0.008, 0.008, 0.008]}>
-          <primitive object={sceneClone} />
-        </group>
-      </Center>
+      <group ref={innerRef}>
+        <primitive object={sceneClone} />
+      </group>
     </group>
   );
 }
