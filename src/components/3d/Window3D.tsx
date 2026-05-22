@@ -260,17 +260,20 @@ const Window3D = ({
         })}
       </div>
 
-      {/* 3D viewer */}
-      <div className="relative w-full aspect-[5/6] lg:aspect-[4/5] bg-[color:var(--canvas-soft)] overflow-hidden">
+      {/* 3D viewer — soft gradient backdrop (CSS) lets glass refraction read */}
+      <div
+        className="relative w-full aspect-[5/6] lg:aspect-[4/5] overflow-hidden"
+        style={{
+          background: "linear-gradient(180deg, #F4F4F4 0%, #E2E2E2 60%, #D0D0D0 100%)",
+        }}
+      >
         <Canvas
-          camera={{ position: config.cameraPos ?? [0, 0.1, 4.2], fov: 30 }}
+          camera={{ position: config.cameraPos ?? [0, 0.05, 3.4], fov: 28 }}
           dpr={[1, 2]}
           shadows
-          gl={{ antialias: true, alpha: false, preserveDrawingBuffer: false }}
+          gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
         >
-          <color attach="background" args={["#ECECEC"]} />
-
-          <ambientLight intensity={0.35} />
+          <ambientLight intensity={0.4} />
           <directionalLight
             position={[3, 4, 5]}
             intensity={1.4}
@@ -293,11 +296,11 @@ const Window3D = ({
             </PresentationControls>
 
             <ContactShadows
-              position={[0, -0.92, 0]}
-              opacity={0.45}
-              scale={4}
-              blur={2.4}
-              far={1.2}
+              position={[0, -0.85, 0]}
+              opacity={0.22}
+              scale={2.4}
+              blur={1.6}
+              far={0.6}
               resolution={1024}
             />
           </Suspense>
