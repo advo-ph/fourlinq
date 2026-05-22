@@ -1,12 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import HeroCarousel, { type HeroSlide } from "./HeroCarousel";
 import EditorialButton from "@/components/primitives/Button";
+
+/** Decide once, synchronously on mount — no useEffect flicker. */
+function shouldUseVideo(): boolean {
+  if (typeof window === "undefined") return true; // SSR: optimistic
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const narrow = window.matchMedia("(max-width: 767px)").matches;
+  const conn = (navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+  }).connection;
+  const dataSaver = conn?.saveData === true;
+  const slowNetwork = conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g";
+  return !reduceMotion && !narrow && !dataSaver && !slowNetwork;
+}
 
 interface VideoHeroProps {
   /** Path to the looping hero video (mp4/webm). Served from /public. */
   videoSrc: string;
-  /** Static poster shown before video loads + on mobile/slow connections. */
-  posterSrc: string;
+  /** Optional static poster. Omit to let the dark canvas show through
+   *  before first frame (no flash of an unrelated photo). */
+  posterSrc?: string;
   /** Carousel slides used as the fallback when video can't / shouldn't play
    *  (reduced motion, save-data, narrow viewport). */
   fallbackSlides: HeroSlide[];
@@ -38,21 +52,8 @@ interface VideoHeroProps {
  *  - First frame should match the poster image exactly
  */
 const VideoHero = (props: VideoHeroProps) => {
-  const [useVideo, setUseVideo] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const narrow = window.matchMedia("(max-width: 767px)").matches;
-
-    // Data-saver / slow connection — Chrome / Edge only, fail-open
-    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
-    const dataSaver = conn?.saveData === true;
-    const slowNetwork = conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g";
-
-    setUseVideo(!reduceMotion && !narrow && !dataSaver && !slowNetwork);
-  }, []);
+  // Decide on FIRST RENDER — no useEffect-driven swap, no flash of carousel.
+  const [useVideo] = useState(shouldUseVideo);
 
   // Fallback to the existing photo carousel when video isn't appropriate
   if (!useVideo) {

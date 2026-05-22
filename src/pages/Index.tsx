@@ -23,9 +23,7 @@ const Index = () => {
     <Layout>
       <VideoHero
         videoSrc="/videos/hero-loop.mp4"
-        posterSrc="/images/wp-export/FourlinQ-Project-7.jpg"
         fallbackSlides={heroSlides}
-        caption="Featured residence"
         headline="A lifetime of satisfaction and peace of mind."
         lede="Custom-made uPVC windows and doors engineered for the Philippine climate. Available in 11 finishes, backed by a 10-year warranty."
         ctaLabel="Explore Systems"
