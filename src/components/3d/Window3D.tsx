@@ -13,68 +13,107 @@ import { FRAME_FINISHES, type FrameFinish } from "@/data/fourlinq-data";
 import { cn } from "@/lib/utils";
 
 /**
- * Real GLB-loaded casement window from "Animated Window Systems" by makinwhat
- * (Sketchfab). Original license CC-BY-NC; commercial use granted by author for
- * fourlinq.ph.
+ * Interactive 3D viewer for FourlinQ window systems.
  *
- * The source model contains 10 window types in a single scene. We:
- *  - Hide all non-casement subtrees on load
- *  - Center the casement at the world origin
- *  - Override frame1 + frame2 materials with the selected finish color
- *  - Play the model's built-in "Scene" animation on Open click (only the
- *    casement panels are visible, so only those rotations register visually)
+ * Loads makinwhat's "Animated Window Systems" GLB and shows ONE subtree at a
+ * time, configurable via the `systemType` prop. Same underlying model is
+ * reused across all types (drei's useGLTF caches the load).
+ *
+ * Original license CC-BY-NC; commercial use granted by makinwhat for
+ * fourlinq.ph (see docs/LICENSES.md).
  */
 
 const MODEL_URL = "/models/animated-window-systems.glb";
 useGLTF.preload(MODEL_URL);
 
-/** Which top-level node prefixes belong to the simple (non-bridged) casement. */
-const CASEMENT_PREFIXES = ["casement_frame", "casement_panelL", "casement_panelR"];
+/* ─── System config map ─── */
 
-function isCasementNode(name: string): boolean {
-  return CASEMENT_PREFIXES.some((p) => name.startsWith(p));
+export type SystemType = "casement" | "sliding" | "awning" | "slide-and-fold";
+
+interface SystemConfig {
+  label: string;
+  /** Match these prefixes against any ancestor node name to decide visibility. */
+  visiblePrefixes: string[];
+  /** Pretty action label for the open/close button. */
+  openLabel: string;
+  closeLabel: string;
+  /** Camera tweak — some systems read better from slightly off-axis. */
+  cameraPos?: [number, number, number];
 }
 
-/* ────────────────────────────────────────────────────────── */
+const SYSTEMS: Record<SystemType, SystemConfig> = {
+  casement: {
+    label: "Casement",
+    visiblePrefixes: ["casement_frame", "casement_panelL", "casement_panelR"],
+    openLabel: "Open window",
+    closeLabel: "Close window",
+  },
+  sliding: {
+    label: "Sliding",
+    visiblePrefixes: [
+      "sliding_horizontal_frame",
+      "sliding_horizontal_windowL",
+      "sliding_horizontal_windowR",
+    ],
+    openLabel: "Slide open",
+    closeLabel: "Slide closed",
+  },
+  awning: {
+    label: "Awning",
+    visiblePrefixes: ["awning_frame", "awning_armature"],
+    openLabel: "Open awning",
+    closeLabel: "Close awning",
+  },
+  "slide-and-fold": {
+    label: "Slide & Fold",
+    visiblePrefixes: ["holding_frame", "holding_panels"],
+    openLabel: "Fold open",
+    closeLabel: "Fold closed",
+  },
+};
 
-interface CasementModelProps {
+/* ─── Model component ─── */
+
+interface WindowModelProps {
   finish: FrameFinish;
   isOpen: boolean;
+  systemType: SystemType;
 }
 
-function CasementModel({ finish, isOpen }: CasementModelProps) {
+function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(MODEL_URL);
+
+  // Fresh clone per system — avoids cross-pollution of material overrides.
   const sceneClone = useMemo(() => scene.clone(true), [scene]);
   const { actions, mixer } = useAnimations(animations, groupRef);
 
-  // On mount: hide everything that isn't the simple casement; clone+override materials
+  // Mount: hide non-matching subtrees; clone visible mesh materials so the
+  // color override is local to this system + this render.
   useEffect(() => {
+    const prefixes = SYSTEMS[systemType].visiblePrefixes;
     sceneClone.traverse((child) => {
       if (child.type !== "Mesh") return;
       const mesh = child as THREE.Mesh;
-      // Walk up to find the top-level window-type ancestor
-      let topName: string | null = null;
+      let isVisible = false;
       let cur: THREE.Object3D | null = mesh;
       while (cur) {
         const n = cur.name || "";
-        if (isCasementNode(n)) {
-          topName = n;
+        if (prefixes.some((p) => n.startsWith(p))) {
+          isVisible = true;
           break;
         }
         cur = cur.parent;
       }
-      mesh.visible = topName !== null;
-
-      // Clone the material so our color override doesn't leak into other instances
-      if (mesh.visible && mesh.material) {
+      mesh.visible = isVisible;
+      if (isVisible && mesh.material) {
         const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
         mesh.material = (mat as THREE.MeshStandardMaterial).clone();
       }
     });
-  }, [sceneClone]);
+  }, [sceneClone, systemType]);
 
-  // Color-swap on finish change: any visible frame1/frame2 mesh gets the new color
+  // Finish swap — recolor frame1/frame2 materials on visible meshes.
   useEffect(() => {
     const target = new THREE.Color(finish.swatchHex);
     sceneClone.traverse((child) => {
@@ -92,9 +131,10 @@ function CasementModel({ finish, isOpen }: CasementModelProps) {
     });
   }, [finish, sceneClone]);
 
-  // Play / pause the animation when isOpen toggles
+  // Animation playback — same clip controls all systems; only visible
+  // meshes register the motion visually.
   useEffect(() => {
-    const clip = actions["Scene"] || actions[animations[0]?.name];
+    const clip = actions["Scene"] || (animations[0] && actions[animations[0].name]);
     if (!clip) return;
     clip.setLoop(THREE.LoopOnce, 1);
     clip.clampWhenFinished = true;
@@ -102,7 +142,6 @@ function CasementModel({ finish, isOpen }: CasementModelProps) {
     if (isOpen) {
       clip.reset().setEffectiveTimeScale(1).play();
     } else {
-      // Reverse playback to close
       if (clip.time > 0) {
         clip.setEffectiveTimeScale(-1).play();
       }
@@ -116,7 +155,6 @@ function CasementModel({ finish, isOpen }: CasementModelProps) {
   return (
     <group ref={groupRef}>
       <Center top>
-        {/* Scale the model — source units are ~cm; we normalize to ~1.6m world height */}
         <group scale={[0.008, 0.008, 0.008]}>
           <primitive object={sceneClone} />
         </group>
@@ -125,27 +163,62 @@ function CasementModel({ finish, isOpen }: CasementModelProps) {
   );
 }
 
-/* ────────────────────────────────────────────────────────── */
+/* ─── Public component ─── */
 
-interface CasementWindow3DProps {
+interface Window3DProps {
   className?: string;
+  initialSystem?: SystemType;
   initialFinishId?: string;
 }
 
-const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWindow3DProps) => {
+const Window3D = ({
+  className,
+  initialSystem = "casement",
+  initialFinishId = "white",
+}: Window3DProps) => {
+  const [systemType, setSystemType] = useState<SystemType>(initialSystem);
   const [selectedId, setSelectedId] = useState(initialFinishId);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Auto-close when switching system, otherwise the new system would appear mid-animation
+  useEffect(() => {
+    setIsOpen(false);
+  }, [systemType]);
 
   const selected = useMemo(
     () => FRAME_FINISHES.find((f) => f.id === selectedId) ?? FRAME_FINISHES.find((f) => f.id === "white")!,
     [selectedId]
   );
 
+  const config = SYSTEMS[systemType];
+
   return (
     <div className={cn("relative w-full", className)}>
+      {/* System tab rail — hairline-underlined */}
+      <div className="flex items-end gap-6 border-b border-[color:var(--rule-soft)] mb-5 overflow-x-auto no-scrollbar">
+        {(Object.keys(SYSTEMS) as SystemType[]).map((id) => {
+          const active = systemType === id;
+          return (
+            <button
+              key={id}
+              onClick={() => setSystemType(id)}
+              className={cn(
+                "pb-3 text-body-sm font-medium whitespace-nowrap transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end",
+                active
+                  ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
+                  : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
+              )}
+            >
+              {SYSTEMS[id].label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 3D viewer */}
       <div className="relative w-full aspect-[5/6] lg:aspect-[4/5] bg-[color:var(--canvas-soft)] overflow-hidden">
         <Canvas
-          camera={{ position: [0, 0.1, 4.2], fov: 30 }}
+          camera={{ position: config.cameraPos ?? [0, 0.1, 4.2], fov: 30 }}
           dpr={[1, 2]}
           shadows
           gl={{ antialias: true, alpha: false, preserveDrawingBuffer: false }}
@@ -171,7 +244,7 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
               polar={[-Math.PI / 6, Math.PI / 6]}
               azimuth={[-Math.PI / 2.5, Math.PI / 2.5]}
             >
-              <CasementModel finish={selected} isOpen={isOpen} />
+              <WindowModel finish={selected} isOpen={isOpen} systemType={systemType} />
             </PresentationControls>
 
             <ContactShadows
@@ -187,7 +260,7 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
 
         {/* Status badge */}
         <div className="absolute top-4 left-4 flex items-center gap-2 bg-[color:var(--ink-primary)]/90 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium pointer-events-none">
-          Live 3D · {selected.label}
+          Live 3D · {config.label} · {selected.label}
         </div>
 
         {/* Drag hint */}
@@ -195,17 +268,25 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
           Drag to rotate
         </div>
 
-        {/* Open / close trigger */}
+        {/* Open / close */}
         <button
           onClick={() => setIsOpen((v) => !v)}
           className="absolute bottom-4 right-4 px-4 py-3 bg-[color:var(--accent)] text-white text-body-sm font-medium hover:bg-[color:var(--accent-hover)] transition-colors duration-300 ease-marvin"
         >
-          {isOpen ? "Close window" : "Open window"}
+          {isOpen ? config.closeLabel : config.openLabel}
         </button>
 
         {/* Attribution */}
-        <div className="absolute top-4 right-4 text-[10px] tracking-[0.06em] text-[color:var(--ink-muted)] bg-white/85 backdrop-blur-sm px-2 py-1 pointer-events-none">
-          3D model by <a href="https://sketchfab.com/makinwhat" target="_blank" rel="noopener noreferrer" className="underline pointer-events-auto">makinwhat</a>
+        <div className="absolute top-4 right-4 text-[10px] tracking-[0.06em] text-[color:var(--ink-muted)] bg-white/85 backdrop-blur-sm px-2 py-1">
+          3D model by{" "}
+          <a
+            href="https://sketchfab.com/makinwhat"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            makinwhat
+          </a>
         </div>
       </div>
 
@@ -245,4 +326,4 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
   );
 };
 
-export default CasementWindow3D;
+export default Window3D;
