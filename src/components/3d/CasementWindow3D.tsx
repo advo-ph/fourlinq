@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, PresentationControls } from "@react-three/drei";
+import { Environment, PresentationControls, ContactShadows, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import { FRAME_FINISHES, type FrameFinish } from "@/data/fourlinq-data";
 import { cn } from "@/lib/utils";
@@ -24,41 +24,52 @@ const WIN = {
   totalWidth:   1200 * M,
   totalHeight:  1600 * M,
   frameDepth:    70  * M,
-  frameThickness: 60 * M,
-  sashThickness:  50 * M,
+  frameThickness: 55 * M,   // slimmer uPVC sight-line
+  sashThickness:  45 * M,
   glassThickness:  6 * M,
-  hingeRadius:    8 * M,
-  hingeLength:   40 * M,
+  hingeRadius:    7 * M,
+  hingeLength:   35 * M,
+  edgeRadius:     3 * M,    // subtle bevel — injection-molded uPVC, not raw box
 };
+
+/** Reusable uPVC material — low gloss, slight clearcoat for plastic feel. */
+function uPVCMaterial(color: string) {
+  return (
+    <meshPhysicalMaterial
+      color={color}
+      roughness={0.7}
+      metalness={0}
+      clearcoat={0.15}
+      clearcoatRoughness={0.5}
+      reflectivity={0.25}
+    />
+  );
+}
 
 /** Frame component — the outer fixed rectangle that doesn't move. */
 function OuterFrame({ color }: { color: string }) {
-  const { totalWidth, totalHeight, frameDepth, frameThickness: t } = WIN;
+  const { totalWidth, totalHeight, frameDepth, frameThickness: t, edgeRadius } = WIN;
   const halfW = totalWidth / 2;
   const halfH = totalHeight / 2;
 
   return (
     <group>
-      {/* Top horizontal */}
-      <mesh position={[0, halfH - t / 2, 0]}>
-        <boxGeometry args={[totalWidth, t, frameDepth]} />
-        <meshStandardMaterial color={color} roughness={0.45} metalness={0.1} />
-      </mesh>
-      {/* Bottom horizontal */}
-      <mesh position={[0, -halfH + t / 2, 0]}>
-        <boxGeometry args={[totalWidth, t, frameDepth]} />
-        <meshStandardMaterial color={color} roughness={0.45} metalness={0.1} />
-      </mesh>
-      {/* Left vertical */}
-      <mesh position={[-halfW + t / 2, 0, 0]}>
-        <boxGeometry args={[t, totalHeight - 2 * t, frameDepth]} />
-        <meshStandardMaterial color={color} roughness={0.45} metalness={0.1} />
-      </mesh>
-      {/* Right vertical */}
-      <mesh position={[halfW - t / 2, 0, 0]}>
-        <boxGeometry args={[t, totalHeight - 2 * t, frameDepth]} />
-        <meshStandardMaterial color={color} roughness={0.45} metalness={0.1} />
-      </mesh>
+      {/* Top */}
+      <RoundedBox args={[totalWidth, t, frameDepth]} radius={edgeRadius} smoothness={3} position={[0, halfH - t / 2, 0]} castShadow receiveShadow>
+        {uPVCMaterial(color)}
+      </RoundedBox>
+      {/* Bottom */}
+      <RoundedBox args={[totalWidth, t, frameDepth]} radius={edgeRadius} smoothness={3} position={[0, -halfH + t / 2, 0]} castShadow receiveShadow>
+        {uPVCMaterial(color)}
+      </RoundedBox>
+      {/* Left */}
+      <RoundedBox args={[t, totalHeight - 2 * t, frameDepth]} radius={edgeRadius} smoothness={3} position={[-halfW + t / 2, 0, 0]} castShadow receiveShadow>
+        {uPVCMaterial(color)}
+      </RoundedBox>
+      {/* Right */}
+      <RoundedBox args={[t, totalHeight - 2 * t, frameDepth]} radius={edgeRadius} smoothness={3} position={[halfW - t / 2, 0, 0]} castShadow receiveShadow>
+        {uPVCMaterial(color)}
+      </RoundedBox>
     </group>
   );
 }
@@ -86,49 +97,47 @@ function Sash({ color, openAmount }: { color: string; openAmount: number }) {
     // Group origin at LEFT edge of sash so rotation pivots on hinge
     <group ref={groupRef} position={[-halfSW, 0, frameDepth / 2 - s / 2]}>
       <group position={[halfSW, 0, 0]}>
-        {/* Sash frame — inner rectangle */}
-        {/* Top */}
-        <mesh position={[0, halfSH - s / 2, 0]}>
-          <boxGeometry args={[sashWidth, s, s]} />
-          <meshStandardMaterial color={color} roughness={0.45} metalness={0.1} />
-        </mesh>
-        {/* Bottom */}
-        <mesh position={[0, -halfSH + s / 2, 0]}>
-          <boxGeometry args={[sashWidth, s, s]} />
-          <meshStandardMaterial color={color} roughness={0.45} metalness={0.1} />
-        </mesh>
-        {/* Left */}
-        <mesh position={[-halfSW + s / 2, 0, 0]}>
-          <boxGeometry args={[s, sashHeight - 2 * s, s]} />
-          <meshStandardMaterial color={color} roughness={0.45} metalness={0.1} />
-        </mesh>
-        {/* Right */}
-        <mesh position={[halfSW - s / 2, 0, 0]}>
-          <boxGeometry args={[s, sashHeight - 2 * s, s]} />
-          <meshStandardMaterial color={color} roughness={0.45} metalness={0.1} />
-        </mesh>
+        {/* Sash frame */}
+        <RoundedBox args={[sashWidth, s, s]} radius={WIN.edgeRadius} smoothness={3} position={[0, halfSH - s / 2, 0]} castShadow>
+          {uPVCMaterial(color)}
+        </RoundedBox>
+        <RoundedBox args={[sashWidth, s, s]} radius={WIN.edgeRadius} smoothness={3} position={[0, -halfSH + s / 2, 0]} castShadow>
+          {uPVCMaterial(color)}
+        </RoundedBox>
+        <RoundedBox args={[s, sashHeight - 2 * s, s]} radius={WIN.edgeRadius} smoothness={3} position={[-halfSW + s / 2, 0, 0]} castShadow>
+          {uPVCMaterial(color)}
+        </RoundedBox>
+        <RoundedBox args={[s, sashHeight - 2 * s, s]} radius={WIN.edgeRadius} smoothness={3} position={[halfSW - s / 2, 0, 0]} castShadow>
+          {uPVCMaterial(color)}
+        </RoundedBox>
 
-        {/* Glass */}
+        {/* Glass — refractive transmissive */}
         <mesh position={[0, 0, 0]}>
           <planeGeometry args={[sashWidth - 2 * s, sashHeight - 2 * s]} />
           <meshPhysicalMaterial
-            color="#ffffff"
-            transmission={0.92}
-            opacity={0.4}
+            color="#e8f0f4"
+            transmission={0.96}
+            opacity={0.5}
             transparent
-            roughness={0.05}
+            roughness={0.02}
             thickness={glassThickness * 1000}
-            ior={1.45}
-            clearcoat={0.6}
+            ior={1.5}
+            clearcoat={1}
+            clearcoatRoughness={0.05}
             side={THREE.DoubleSide}
           />
         </mesh>
 
-        {/* Handle — small protrusion on the right side, opposite the hinge */}
-        <mesh position={[halfSW - s, -sashHeight * 0.05, s]}>
-          <boxGeometry args={[s * 0.5, s * 2.5, s * 0.6]} />
-          <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.6} />
-        </mesh>
+        {/* Handle — chrome */}
+        <group position={[halfSW - s * 0.7, -sashHeight * 0.05, s * 0.8]}>
+          <RoundedBox args={[s * 0.4, s * 2.6, s * 0.5]} radius={s * 0.1} smoothness={2} castShadow>
+            <meshStandardMaterial color="#888" roughness={0.25} metalness={0.85} />
+          </RoundedBox>
+          {/* Lever */}
+          <RoundedBox args={[s * 1.6, s * 0.4, s * 0.4]} radius={s * 0.1} smoothness={2} position={[s * 0.7, 0, s * 0.3]} castShadow>
+            <meshStandardMaterial color="#888" roughness={0.25} metalness={0.85} />
+          </RoundedBox>
+        </group>
       </group>
     </group>
   );
@@ -185,17 +194,29 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
       {/* The 3D scene */}
       <div className="relative w-full aspect-[5/6] lg:aspect-[4/5] bg-[color:var(--canvas-soft)] overflow-hidden">
         <Canvas
-          camera={{ position: [0, 0, 2.2], fov: 35 }}
+          camera={{ position: [0, 0.1, 3.6], fov: 32 }}
           dpr={[1, 2]}
+          shadows
           gl={{ antialias: true, alpha: false }}
         >
-          <color attach="background" args={["#f8f8f8"]} />
+          <color attach="background" args={["#ECECEC"]} />
 
-          {/* Lighting setup */}
-          <ambientLight intensity={0.4} />
-          <directionalLight position={[3, 4, 5]} intensity={1.6} castShadow />
-          <directionalLight position={[-3, 2, 3]} intensity={0.6} />
-          <directionalLight position={[0, -2, 4]} intensity={0.3} />
+          {/* Soft studio lighting */}
+          <ambientLight intensity={0.35} />
+          <directionalLight
+            position={[3, 4, 5]}
+            intensity={1.4}
+            castShadow
+            shadow-mapSize={[2048, 2048]}
+            shadow-camera-near={0.1}
+            shadow-camera-far={10}
+            shadow-camera-left={-2}
+            shadow-camera-right={2}
+            shadow-camera-top={2}
+            shadow-camera-bottom={-2}
+          />
+          <directionalLight position={[-3, 2, 3]} intensity={0.4} />
+          <directionalLight position={[0, -2, 4]} intensity={0.2} />
 
           <Suspense fallback={null}>
             <Environment preset="apartment" />
@@ -204,12 +225,22 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
               cursor
               snap
               speed={1.2}
-              polar={[-Math.PI / 8, Math.PI / 8]}
-              azimuth={[-Math.PI / 3, Math.PI / 3]}
+              polar={[-Math.PI / 6, Math.PI / 6]}
+              azimuth={[-Math.PI / 2.5, Math.PI / 2.5]}
               rotation={[0, 0, 0]}
             >
               <WindowScene finish={selected} openAmount={isOpen ? 1 : 0} />
             </PresentationControls>
+
+            {/* Soft contact shadow under the window — gives it weight */}
+            <ContactShadows
+              position={[0, -0.92, 0]}
+              opacity={0.45}
+              scale={4}
+              blur={2.4}
+              far={1.2}
+              resolution={1024}
+            />
           </Suspense>
         </Canvas>
 
