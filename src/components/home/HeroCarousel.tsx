@@ -53,7 +53,7 @@ const HeroCarousel = ({
   return (
     <section
       className="relative w-full overflow-hidden bg-[color:var(--canvas-dark)] -mt-[72px]"
-      style={{ height: "min(100dvh, 920px)" }}
+      style={{ height: "100dvh" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
