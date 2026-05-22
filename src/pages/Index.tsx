@@ -1,6 +1,10 @@
+import { lazy, Suspense } from "react";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
 import CapizDivider from "@/components/primitives/CapizDivider";
+import EyebrowHeading from "@/components/primitives/EyebrowHeading";
+
+const CasementWindow3D = lazy(() => import("@/components/3d/CasementWindow3D"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
 import EditorialIntro from "@/components/home/EditorialIntro";
@@ -40,6 +44,36 @@ const Index = () => {
 
       <Section tone="soft" size="lg">
         <SystemsTiles />
+      </Section>
+
+      {/* Interactive 3D window — procedural, no AI assets needed */}
+      <Section tone="canvas" size="lg">
+        <div className="grid lg:grid-cols-[5fr,6fr] gap-12 lg:gap-16 items-start">
+          <div>
+            <EyebrowHeading eyebrow="Try the window" level={2}>
+              See it open. Pick its finish.
+            </EyebrowHeading>
+            <div className="mt-8 lg:mt-10 space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.6]">
+              <p>
+                A real 3D casement system you can rotate, open, and refinish in your browser. Drag to look from any angle. Click any of the eleven finishes and the frame updates instantly. Click the button to swing it open on its hinges.
+              </p>
+              <p className="text-body-sm text-[color:var(--ink-muted)]">
+                This is a procedural reference model — the actual profile geometry on a real FourlinQ order is more detailed than what we render here.
+              </p>
+            </div>
+          </div>
+          <div>
+            <Suspense
+              fallback={
+                <div className="w-full aspect-[5/6] lg:aspect-[4/5] bg-[color:var(--canvas-soft)] flex items-center justify-center">
+                  <p className="eyebrow">Loading 3D…</p>
+                </div>
+              }
+            >
+              <CasementWindow3D />
+            </Suspense>
+          </div>
+        </div>
       </Section>
 
       <Section tone="canvas" size="lg">

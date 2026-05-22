@@ -1357,4 +1357,91 @@ The branch added zero tests. This is **not a regression** — the repo had only 
 
 ---
 
+## §15 — Phase 7+ wow upgrades (post-launch, upsell-able)
+
+Ambitions parked for after the current redesign ships. Each is a distinct paid scope of work, gated on the precondition listed.
+
+### 15.1 — Gaussian splat walkthroughs
+
+**The wow:** an interactive 3D walkthrough of an actual FourlinQ-equipped home. Visitor uses mouse/touch to navigate through the space, walk up to a window, see the frame from any angle, look out at the view, see how light passes through. Renders at 60fps in any modern browser via SuperSplat / antimatter15/splat. 10–50 MB per scene. No PH fenestration competitor has this.
+
+**Why we skipped it for the launch:**
+- 50–200 high-quality photos per scene (drone + DSLR)
+- 30 min – 4 hours of GPU processing
+- First-time splatters typically need 1+ day to nail their first scene
+- Requires homeowner cooperation for hours-long photographing of an entire interior
+
+**Precondition to unlock:**
+- Tita commits to a **flagship project home** (Tagaytay residence, Cebu modernist build, coastal Batangas — flagship-grade). Owner enthusiastic about being featured.
+- 2–3 week timeline carved out for capture + processing + integration
+
+**Estimated effort:** ₱30–80k per scene (varies by interior complexity). 1 scene per 1–2 weeks end-to-end if outsourced; 2–4 weeks if learned in-house.
+
+**When it ships, it replaces the looping hero video.** Splat scene becomes the new homepage hero. Old video becomes the fallback.
+
+### 15.2 — Interactive 3D window models with mechanical animation
+
+**The wow:** a 3D model of each window system (casement, sliding, awning, slide-and-fold, lift-and-slide) that the visitor can rotate, zoom, and **click to actuate** — the casement swings open on its hinge, the sliding panel glides on its track, the bifold folds, etc. Each system rendered in the user's currently-selected finish.
+
+**Why this is harder than it looks:**
+- AI text-to-3D tools (Meshy, Luma Genie, Tripo, Rodin) produce mediocre precision for engineered mechanical parts. Hinges, sliding tracks, multi-panel articulation — these still need traditional Blender/Maya modeling by a human 3D artist.
+- Or: get the actual CAD files from the uPVC profile manufacturer (REHAU, Veka, Kömmerling — depends on which Tita imports from). They typically supply glTF / step files to certified fabricators. **Check if FourlinQ already has these in their engineering files.** This is the goldmine route.
+
+**Precondition to unlock:**
+- Either FourlinQ has manufacturer-supplied CAD files for the profiles
+- OR budget for commissioning a Blender freelancer (~₱15–60k per system × 5 systems = ₱75–300k)
+
+**Estimated effort:** 1–2 weeks per system end-to-end if outsourced. Less if CAD files exist.
+
+**Workaround we shipped instead (this sprint):** a procedurally-built 3D casement window in Three.js — see §14 entry for `WindowExperience3D`. Not photoreal but interactive, real 3D, and demonstrates the pattern. Acts as proof-of-concept until commissioned models replace it.
+
+### 15.3 — AI-generated finish variants at scale
+
+**The wow:** every system catalog photo shown in the visitor's currently-selected finish. The hero on `/products/casement` shows a real casement window in their picked finish. Hover any system tile, the photo subtly tints to match the active finish. This makes the entire site feel like a personalized showroom.
+
+**Why we skipped it for the launch:**
+- 8 systems × 11 finishes = 88 images
+- AI inpainting (Flux / Photoshop Generative Fill / SDXL ControlNet) is the right tool, but takes ~30 min per image at production quality with QA
+- Total: ~50 hours of generation + QA work
+- Costs ~$10–30 in AI credits + 1–2 weeks of dedicated production
+
+**Precondition to unlock:**
+- The hero `/finishes` scene (11 variants) ships and validates the visual treatment
+- Then scale the same workflow to system catalog as a follow-up batch
+
+**Estimated effort:** 1–2 weeks of dedicated production for the full 88-image set.
+
+**Workaround we shipped:** the `public/images/finishes/README.md` runbook handles the 11-variant Finishes hero. Same workflow scales to systems — just multiply.
+
+### 15.4 — Commissioned project photography (Scenario C)
+
+The roadmap §9 photography strategy already documents this. Belongs in this Phase 7+ list because:
+- Tita-blocked
+- Significant budget commitment
+- Once it ships, the whole site visibly upgrades — every page that has a photo benefits
+
+**Estimated effort:** 1 half-day shoot per project + post-production. ~₱100–200k per project. 3–5 projects is the realistic anchor scene set.
+
+---
+
+### How these stack against the current launch
+
+What the launch (this redesign branch) delivers:
+- Editorial design language calibrated to Marvin
+- Hero video (client-supplied)
+- /finishes interactive page with placeholder + handoff for 11 AI variants
+- /help-me-choose, /faq, /care content pages
+- Fraunces serif + capiz divider as differentiation
+- Procedural 3D casement window (§15.2 workaround)
+
+What §15 unlocks beyond that:
+- §15.1 Gaussian splat — category-defining, but needs flagship project
+- §15.2 Production-grade 3D models — needs CAD files or Blender budget
+- §15.3 88 finish-variant photos — needs production time + AI credits
+- §15.4 Commissioned photography — needs Tita's project access + budget
+
+Each is independently sellable as a Phase 7+ upgrade after launch. They are **not** required for the redesign to ship.
+
+---
+
 *This document is the contract for the redesign. If we drift from it, we update it first.*
