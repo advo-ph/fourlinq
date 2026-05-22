@@ -83,7 +83,9 @@ const VideoHero = (props: VideoHeroProps) => {
         loop
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
+        disablePictureInPicture
+        disableRemotePlayback
       />
 
       {/* Same single bottom-up scrim as photo hero — keeps text legible */}
