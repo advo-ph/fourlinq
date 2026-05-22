@@ -5,7 +5,9 @@ import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
-import { ArrowRight } from "lucide-react";
+import { FINISH_SCENES, getFinishVariantSrc } from "@/data/finish-scenes";
+import { ArrowRight, Camera } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type FinishFilter = "all" | "wood-grain" | "solid";
 
@@ -23,6 +25,7 @@ const FILTER_TABS: { id: FinishFilter; label: string }[] = [
 const Finishes = () => {
   const [selectedId, setSelectedId] = useState(FRAME_FINISHES[0].id);
   const [filter, setFilter] = useState<FinishFilter>("all");
+  const scene = FINISH_SCENES[0]; // single scene for now
 
   const selected = useMemo(
     () => FRAME_FINISHES.find((f) => f.id === selectedId) ?? FRAME_FINISHES[0],
@@ -33,11 +36,6 @@ const Finishes = () => {
     if (filter === "all") return FRAME_FINISHES;
     return FRAME_FINISHES.filter((f) => f.category === filter);
   }, [filter]);
-
-  // Fake wood grain via repeating linear-gradient overlay
-  const grainOverlay = selected.category === "wood-grain"
-    ? `repeating-linear-gradient(90deg, rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 1px, transparent 1px, transparent 4px), repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 2px, transparent 2px, transparent 7px)`
-    : "none";
 
   return (
     <Layout>
@@ -52,37 +50,44 @@ const Finishes = () => {
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
           <div className="grid lg:grid-cols-[7fr,5fr] gap-10 lg:gap-16 items-start">
-            {/* The "window" preview — backdrop photo with overlaid frame */}
-            <div className="relative aspect-[4/5] lg:aspect-[5/6] bg-[color:var(--canvas-soft)] overflow-hidden">
-              {/* Backdrop photo */}
-              <img
-                src="/images/wp-export/FQC-Project-17.jpg"
-                alt="Interior with casement windows showing finish preview"
-                className="absolute inset-0 w-full h-full object-cover"
-                loading="eager"
-                decoding="async"
-              />
+            {/* Hero preview — stacked images, cross-fade to selected variant */}
+            <div className={cn("relative bg-[color:var(--canvas-soft)] overflow-hidden", scene.aspect)}>
+              {scene.hasAssets ? (
+                // Real variants — preload all 11, cross-fade to selected
+                FRAME_FINISHES.map((f) => (
+                  <img
+                    key={f.id}
+                    src={getFinishVariantSrc(scene, f)}
+                    alt={`${scene.label} with ${f.label} frame`}
+                    className={cn(
+                      "absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-marvin",
+                      f.id === selected.id ? "opacity-100" : "opacity-0"
+                    )}
+                    loading={f.id === selected.id ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                ))
+              ) : (
+                // No assets yet — show the base scene cleanly, no fake overlay
+                <img
+                  src={scene.fallbackSrc}
+                  alt={scene.label}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                />
+              )}
 
-              {/* The "frame" — sits over the photo as a colored rectangle that changes per finish */}
-              <div
-                className="absolute inset-x-[12%] inset-y-[8%] border-[12px] lg:border-[18px] transition-colors duration-500 ease-marvin shadow-depth-8"
-                style={{
-                  borderColor: selected.swatchHex,
-                  backgroundImage: grainOverlay !== "none" ? grainOverlay : undefined,
-                  backgroundColor: grainOverlay !== "none" ? selected.swatchHex : "transparent",
-                  backgroundBlendMode: grainOverlay !== "none" ? "multiply" : undefined,
-                  // The "glass" — a softly translucent panel that lets some of the backdrop through
-                  boxShadow: `inset 0 0 0 2px ${selected.swatchHex}, inset 0 0 60px rgba(255,255,255,0.15)`,
-                }}
-                aria-hidden="true"
-              >
-                {/* Soft glass overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-white/5 to-white/10 pointer-events-none" />
-              </div>
-
-              {/* Live-preview badge */}
-              <div className="absolute top-4 left-4 bg-[color:var(--ink-primary)]/85 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium">
-                Live preview · {selected.label}
+              {/* Status badge — honest about asset state */}
+              <div className="absolute top-4 left-4 flex items-center gap-2 bg-[color:var(--ink-primary)]/90 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium">
+                {scene.hasAssets ? (
+                  <>Preview · {selected.label}</>
+                ) : (
+                  <>
+                    <Camera size={12} strokeWidth={1.5} />
+                    Photo previews coming soon
+                  </>
+                )}
               </div>
             </div>
 
