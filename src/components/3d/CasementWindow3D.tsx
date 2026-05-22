@@ -1,179 +1,131 @@
-import { useRef, useState, useMemo, Suspense } from "react";
+import { useRef, useState, useMemo, useEffect, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, PresentationControls, ContactShadows, RoundedBox } from "@react-three/drei";
+import {
+  Environment,
+  PresentationControls,
+  ContactShadows,
+  useGLTF,
+  useAnimations,
+  Center,
+} from "@react-three/drei";
 import * as THREE from "three";
 import { FRAME_FINISHES, type FrameFinish } from "@/data/fourlinq-data";
 import { cn } from "@/lib/utils";
 
 /**
- * Procedural 3D casement window built with Three.js + react-three-fiber.
+ * Real GLB-loaded casement window from "Animated Window Systems" by makinwhat
+ * (Sketchfab). Original license CC-BY-NC; commercial use granted by author for
+ * fourlinq.ph.
  *
- * Not photoreal — built from primitive boxes / planes. But it is REAL 3D:
- * - User can rotate the window (PresentationControls)
- * - Click to open / close the sash on its hinge
- * - Finish selector live-updates the frame material
- *
- * This is the §15.2 workaround until commissioned models replace it.
- * See docs/REDESIGN_ROADMAP.md §15.2 for the full ambition statement.
+ * The source model contains 10 window types in a single scene. We:
+ *  - Hide all non-casement subtrees on load
+ *  - Center the casement at the world origin
+ *  - Override frame1 + frame2 materials with the selected finish color
+ *  - Play the model's built-in "Scene" animation on Open click (only the
+ *    casement panels are visible, so only those rotations register visually)
  */
 
-/* ─── Geometry constants (mm-scaled, converted to scene units) ─── */
-const M = 1 / 1000; // 1 unit = 1 meter; mm → meters
+const MODEL_URL = "/models/animated-window-systems.glb";
+useGLTF.preload(MODEL_URL);
 
-const WIN = {
-  totalWidth:   1200 * M,
-  totalHeight:  1600 * M,
-  frameDepth:    70  * M,
-  frameThickness: 55 * M,   // slimmer uPVC sight-line
-  sashThickness:  45 * M,
-  glassThickness:  6 * M,
-  hingeRadius:    7 * M,
-  hingeLength:   35 * M,
-  edgeRadius:     3 * M,    // subtle bevel — injection-molded uPVC, not raw box
-};
+/** Which top-level node prefixes belong to the simple (non-bridged) casement. */
+const CASEMENT_PREFIXES = ["casement_frame", "casement_panelL", "casement_panelR"];
 
-/** Reusable uPVC material — low gloss, slight clearcoat for plastic feel. */
-function uPVCMaterial(color: string) {
-  return (
-    <meshPhysicalMaterial
-      color={color}
-      roughness={0.7}
-      metalness={0}
-      clearcoat={0.15}
-      clearcoatRoughness={0.5}
-      reflectivity={0.25}
-    />
-  );
+function isCasementNode(name: string): boolean {
+  return CASEMENT_PREFIXES.some((p) => name.startsWith(p));
 }
 
-/** Frame component — the outer fixed rectangle that doesn't move. */
-function OuterFrame({ color }: { color: string }) {
-  const { totalWidth, totalHeight, frameDepth, frameThickness: t, edgeRadius } = WIN;
-  const halfW = totalWidth / 2;
-  const halfH = totalHeight / 2;
+/* ────────────────────────────────────────────────────────── */
 
-  return (
-    <group>
-      {/* Top */}
-      <RoundedBox args={[totalWidth, t, frameDepth]} radius={edgeRadius} smoothness={3} position={[0, halfH - t / 2, 0]} castShadow receiveShadow>
-        {uPVCMaterial(color)}
-      </RoundedBox>
-      {/* Bottom */}
-      <RoundedBox args={[totalWidth, t, frameDepth]} radius={edgeRadius} smoothness={3} position={[0, -halfH + t / 2, 0]} castShadow receiveShadow>
-        {uPVCMaterial(color)}
-      </RoundedBox>
-      {/* Left */}
-      <RoundedBox args={[t, totalHeight - 2 * t, frameDepth]} radius={edgeRadius} smoothness={3} position={[-halfW + t / 2, 0, 0]} castShadow receiveShadow>
-        {uPVCMaterial(color)}
-      </RoundedBox>
-      {/* Right */}
-      <RoundedBox args={[t, totalHeight - 2 * t, frameDepth]} radius={edgeRadius} smoothness={3} position={[halfW - t / 2, 0, 0]} castShadow receiveShadow>
-        {uPVCMaterial(color)}
-      </RoundedBox>
-    </group>
-  );
+interface CasementModelProps {
+  finish: FrameFinish;
+  isOpen: boolean;
 }
 
-/** Sash — the openable inner part. Pivots on the LEFT hinge axis. */
-function Sash({ color, openAmount }: { color: string; openAmount: number }) {
+function CasementModel({ finish, isOpen }: CasementModelProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const { totalWidth, totalHeight, frameThickness: t, sashThickness: s, glassThickness, frameDepth } = WIN;
-  const sashWidth = totalWidth - 2 * t;
-  const sashHeight = totalHeight - 2 * t;
-  const halfSW = sashWidth / 2;
-  const halfSH = sashHeight / 2;
+  const { scene, animations } = useGLTF(MODEL_URL);
+  const sceneClone = useMemo(() => scene.clone(true), [scene]);
+  const { actions, mixer } = useAnimations(animations, groupRef);
 
-  // Open angle: 0 = closed, 1 = full ~85deg open
-  const targetAngle = openAmount * (-Math.PI * 0.47);
+  // On mount: hide everything that isn't the simple casement; clone+override materials
+  useEffect(() => {
+    sceneClone.traverse((child) => {
+      if (child.type !== "Mesh") return;
+      const mesh = child as THREE.Mesh;
+      // Walk up to find the top-level window-type ancestor
+      let topName: string | null = null;
+      let cur: THREE.Object3D | null = mesh;
+      while (cur) {
+        const n = cur.name || "";
+        if (isCasementNode(n)) {
+          topName = n;
+          break;
+        }
+        cur = cur.parent;
+      }
+      mesh.visible = topName !== null;
+
+      // Clone the material so our color override doesn't leak into other instances
+      if (mesh.visible && mesh.material) {
+        const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+        mesh.material = (mat as THREE.MeshStandardMaterial).clone();
+      }
+    });
+  }, [sceneClone]);
+
+  // Color-swap on finish change: any visible frame1/frame2 mesh gets the new color
+  useEffect(() => {
+    const target = new THREE.Color(finish.swatchHex);
+    sceneClone.traverse((child) => {
+      if (child.type !== "Mesh") return;
+      const mesh = child as THREE.Mesh;
+      if (!mesh.visible || !mesh.material) return;
+      const mat = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as THREE.MeshStandardMaterial;
+      const name = mat.name || "";
+      if (name === "frame1" || name === "frame2") {
+        mat.color = target;
+        mat.roughness = 0.65;
+        mat.metalness = 0;
+        mat.needsUpdate = true;
+      }
+    });
+  }, [finish, sceneClone]);
+
+  // Play / pause the animation when isOpen toggles
+  useEffect(() => {
+    const clip = actions["Scene"] || actions[animations[0]?.name];
+    if (!clip) return;
+    clip.setLoop(THREE.LoopOnce, 1);
+    clip.clampWhenFinished = true;
+
+    if (isOpen) {
+      clip.reset().setEffectiveTimeScale(1).play();
+    } else {
+      // Reverse playback to close
+      if (clip.time > 0) {
+        clip.setEffectiveTimeScale(-1).play();
+      }
+    }
+  }, [isOpen, actions, animations]);
 
   useFrame((_, delta) => {
-    if (!groupRef.current) return;
-    const current = groupRef.current.rotation.y;
-    // Smooth interp toward target
-    groupRef.current.rotation.y = current + (targetAngle - current) * Math.min(1, delta * 4);
+    mixer.update(delta);
   });
 
   return (
-    // Group origin at LEFT edge of sash so rotation pivots on hinge
-    <group ref={groupRef} position={[-halfSW, 0, frameDepth / 2 - s / 2]}>
-      <group position={[halfSW, 0, 0]}>
-        {/* Sash frame */}
-        <RoundedBox args={[sashWidth, s, s]} radius={WIN.edgeRadius} smoothness={3} position={[0, halfSH - s / 2, 0]} castShadow>
-          {uPVCMaterial(color)}
-        </RoundedBox>
-        <RoundedBox args={[sashWidth, s, s]} radius={WIN.edgeRadius} smoothness={3} position={[0, -halfSH + s / 2, 0]} castShadow>
-          {uPVCMaterial(color)}
-        </RoundedBox>
-        <RoundedBox args={[s, sashHeight - 2 * s, s]} radius={WIN.edgeRadius} smoothness={3} position={[-halfSW + s / 2, 0, 0]} castShadow>
-          {uPVCMaterial(color)}
-        </RoundedBox>
-        <RoundedBox args={[s, sashHeight - 2 * s, s]} radius={WIN.edgeRadius} smoothness={3} position={[halfSW - s / 2, 0, 0]} castShadow>
-          {uPVCMaterial(color)}
-        </RoundedBox>
-
-        {/* Glass — refractive transmissive */}
-        <mesh position={[0, 0, 0]}>
-          <planeGeometry args={[sashWidth - 2 * s, sashHeight - 2 * s]} />
-          <meshPhysicalMaterial
-            color="#e8f0f4"
-            transmission={0.96}
-            opacity={0.5}
-            transparent
-            roughness={0.02}
-            thickness={glassThickness * 1000}
-            ior={1.5}
-            clearcoat={1}
-            clearcoatRoughness={0.05}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-
-        {/* Handle — chrome */}
-        <group position={[halfSW - s * 0.7, -sashHeight * 0.05, s * 0.8]}>
-          <RoundedBox args={[s * 0.4, s * 2.6, s * 0.5]} radius={s * 0.1} smoothness={2} castShadow>
-            <meshStandardMaterial color="#888" roughness={0.25} metalness={0.85} />
-          </RoundedBox>
-          {/* Lever */}
-          <RoundedBox args={[s * 1.6, s * 0.4, s * 0.4]} radius={s * 0.1} smoothness={2} position={[s * 0.7, 0, s * 0.3]} castShadow>
-            <meshStandardMaterial color="#888" roughness={0.25} metalness={0.85} />
-          </RoundedBox>
+    <group ref={groupRef}>
+      <Center top>
+        {/* Scale the model — source units are ~cm; we normalize to ~1.6m world height */}
+        <group scale={[0.008, 0.008, 0.008]}>
+          <primitive object={sceneClone} />
         </group>
-      </group>
+      </Center>
     </group>
   );
 }
 
-/** Hinges — two cylinders on the left side of the frame, visual detail. */
-function Hinges({ color }: { color: string }) {
-  const { totalWidth, totalHeight, frameThickness: t, hingeRadius, hingeLength, frameDepth } = WIN;
-  const x = -totalWidth / 2 + t;
-  const upperY = totalHeight / 2 - t - totalHeight * 0.18;
-  const lowerY = -totalHeight / 2 + t + totalHeight * 0.18;
-
-  return (
-    <group>
-      {[upperY, lowerY].map((y, i) => (
-        <mesh key={i} position={[x, y, frameDepth / 2]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[hingeRadius, hingeRadius, hingeLength, 16]} />
-          <meshStandardMaterial color={color} roughness={0.4} metalness={0.7} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/** Scene — composed window + hinges + sash. */
-function WindowScene({ finish, openAmount }: { finish: FrameFinish; openAmount: number }) {
-  return (
-    <group>
-      <OuterFrame color={finish.swatchHex} />
-      <Hinges color="#3a3a3a" />
-      <Sash color={finish.swatchHex} openAmount={openAmount} />
-    </group>
-  );
-}
-
-/* ─── Wrapper Component ─── */
+/* ────────────────────────────────────────────────────────── */
 
 interface CasementWindow3DProps {
   className?: string;
@@ -191,32 +143,23 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
 
   return (
     <div className={cn("relative w-full", className)}>
-      {/* The 3D scene */}
       <div className="relative w-full aspect-[5/6] lg:aspect-[4/5] bg-[color:var(--canvas-soft)] overflow-hidden">
         <Canvas
-          camera={{ position: [0, 0.1, 3.6], fov: 32 }}
+          camera={{ position: [0, 0.1, 4.2], fov: 30 }}
           dpr={[1, 2]}
           shadows
-          gl={{ antialias: true, alpha: false }}
+          gl={{ antialias: true, alpha: false, preserveDrawingBuffer: false }}
         >
           <color attach="background" args={["#ECECEC"]} />
 
-          {/* Soft studio lighting */}
           <ambientLight intensity={0.35} />
           <directionalLight
             position={[3, 4, 5]}
             intensity={1.4}
             castShadow
             shadow-mapSize={[2048, 2048]}
-            shadow-camera-near={0.1}
-            shadow-camera-far={10}
-            shadow-camera-left={-2}
-            shadow-camera-right={2}
-            shadow-camera-top={2}
-            shadow-camera-bottom={-2}
           />
           <directionalLight position={[-3, 2, 3]} intensity={0.4} />
-          <directionalLight position={[0, -2, 4]} intensity={0.2} />
 
           <Suspense fallback={null}>
             <Environment preset="apartment" />
@@ -227,12 +170,10 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
               speed={1.2}
               polar={[-Math.PI / 6, Math.PI / 6]}
               azimuth={[-Math.PI / 2.5, Math.PI / 2.5]}
-              rotation={[0, 0, 0]}
             >
-              <WindowScene finish={selected} openAmount={isOpen ? 1 : 0} />
+              <CasementModel finish={selected} isOpen={isOpen} />
             </PresentationControls>
 
-            {/* Soft contact shadow under the window — gives it weight */}
             <ContactShadows
               position={[0, -0.92, 0]}
               opacity={0.45}
@@ -244,26 +185,31 @@ const CasementWindow3D = ({ className, initialFinishId = "white" }: CasementWind
           </Suspense>
         </Canvas>
 
-        {/* Status badge — top-left, matches Finishes preview style */}
+        {/* Status badge */}
         <div className="absolute top-4 left-4 flex items-center gap-2 bg-[color:var(--ink-primary)]/90 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium pointer-events-none">
           Live 3D · {selected.label}
         </div>
 
-        {/* Controls hint — bottom-left */}
+        {/* Drag hint */}
         <div className="absolute bottom-4 left-4 text-[11px] tracking-[0.08em] uppercase text-[color:var(--ink-muted)] bg-white/85 backdrop-blur-sm px-3 py-2 pointer-events-none">
           Drag to rotate
         </div>
 
-        {/* Open / close trigger — bottom-right */}
+        {/* Open / close trigger */}
         <button
           onClick={() => setIsOpen((v) => !v)}
           className="absolute bottom-4 right-4 px-4 py-3 bg-[color:var(--accent)] text-white text-body-sm font-medium hover:bg-[color:var(--accent-hover)] transition-colors duration-300 ease-marvin"
         >
           {isOpen ? "Close window" : "Open window"}
         </button>
+
+        {/* Attribution */}
+        <div className="absolute top-4 right-4 text-[10px] tracking-[0.06em] text-[color:var(--ink-muted)] bg-white/85 backdrop-blur-sm px-2 py-1 pointer-events-none">
+          3D model by <a href="https://sketchfab.com/makinwhat" target="_blank" rel="noopener noreferrer" className="underline pointer-events-auto">makinwhat</a>
+        </div>
       </div>
 
-      {/* Finish picker — compact row */}
+      {/* Finish picker */}
       <div className="mt-6">
         <p className="eyebrow mb-3">Finish</p>
         <ul className="flex flex-wrap gap-2">
