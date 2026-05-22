@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
+import CapizDivider from "@/components/primitives/CapizDivider";
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
 import EditorialIntro from "@/components/home/EditorialIntro";
@@ -33,6 +34,7 @@ const Index = () => {
       />
 
       <Section tone="canvas" size="lg">
+        <CapizDivider className="mb-section-mobile md:mb-section-tablet lg:mb-section-desktop" />
         <EditorialIntro />
       </Section>
 

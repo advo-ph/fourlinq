@@ -19,6 +19,7 @@ const Admin = lazy(() => import("./pages/Admin"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Care = lazy(() => import("./pages/Care"));
 const HowToChoose = lazy(() => import("./pages/HowToChoose"));
+const Finishes = lazy(() => import("./pages/Finishes"));
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/faq" element={<FAQ />} />
             <Route path="/care" element={<Care />} />
             <Route path="/help-me-choose" element={<HowToChoose />} />
+            <Route path="/finishes" element={<Finishes />} />
             <Route path="/legal" element={<Legal />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />

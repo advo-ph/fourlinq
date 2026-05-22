@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: FourlinQ-design-analysis
-description: A photography-first editorial interface for a premium uPVC windows and doors brand, calibrated against marvin.com production CSS. Full-bleed project photography, hairline rules, a serif display headline (Instrument Serif) paired with a clean sans (Inter), a single FourlinQ red (#C8102E) used as state and accent only, and the Marvin signature easing curve cubic-bezier(.68, 0, .33, 1) on every transition. UI chrome recedes — no decorative gradients, no heavy shadows, no rounded card chrome. The catalog stays brochure-verified; everything else stays out of the visual.
+description: A photography-first editorial interface for a premium uPVC windows and doors brand, calibrated against marvin.com production CSS. Full-bleed project photography, hairline rules, a serif display headline (Fraunces) paired with a clean sans (Inter), a single FourlinQ red (#C8102E) used as state and accent only, and the Marvin signature easing curve cubic-bezier(.68, 0, .33, 1) on every transition. UI chrome recedes — no decorative gradients, no heavy shadows, no rounded card chrome. The catalog stays brochure-verified; everything else stays out of the visual.
 
 colors:
   accent: "#C8102E"
@@ -28,49 +28,49 @@ colors:
 
 typography:
   display:
-    fontFamily: "Instrument Serif, Georgia, serif"
+    fontFamily: "Fraunces, Georgia, serif"
     fontSize: 88px
     fontWeight: 400
     lineHeight: 1.0
     letterSpacing: -0.025em
   display-sm:
-    fontFamily: "Instrument Serif, Georgia, serif"
+    fontFamily: "Fraunces, Georgia, serif"
     fontSize: 56px
     fontWeight: 400
     lineHeight: 1.05
     letterSpacing: -0.02em
   h1:
-    fontFamily: "Instrument Serif, Georgia, serif"
+    fontFamily: "Fraunces, Georgia, serif"
     fontSize: 64px
     fontWeight: 400
     lineHeight: 1.05
     letterSpacing: -0.02em
   h2:
-    fontFamily: "Instrument Serif, Georgia, serif"
+    fontFamily: "Fraunces, Georgia, serif"
     fontSize: 56px
     fontWeight: 400
     lineHeight: 1.1
     letterSpacing: -0.02em
   h3:
-    fontFamily: "Instrument Serif, Georgia, serif"
+    fontFamily: "Fraunces, Georgia, serif"
     fontSize: 40px
     fontWeight: 400
     lineHeight: 1.15
     letterSpacing: -0.015em
   h4:
-    fontFamily: "Instrument Serif, Georgia, serif"
+    fontFamily: "Fraunces, Georgia, serif"
     fontSize: 30px
     fontWeight: 400
     lineHeight: 1.25
     letterSpacing: -0.01em
   h5:
-    fontFamily: "Instrument Serif, Georgia, serif"
+    fontFamily: "Fraunces, Georgia, serif"
     fontSize: 24px
     fontWeight: 400
     lineHeight: 1.35
     letterSpacing: -0.01em
   h6:
-    fontFamily: "Instrument Serif, Georgia, serif"
+    fontFamily: "Fraunces, Georgia, serif"
     fontSize: 20px
     fontWeight: 400
     lineHeight: 1.4
@@ -310,7 +310,7 @@ FourlinQ is a premium uPVC windows and doors brand serving the Philippine market
 
 ## Typography
 
-**Pairing:** Instrument Serif (display) + Inter (sans). Both load free via Google Fonts. The pairing is the closest free analog to Marvin's commercial TabacG1 + Nationale.
+**Pairing:** Fraunces (display, variable opsz) + Inter (sans). Both load free via Google Fonts. The pairing is the closest free analog to Marvin's commercial TabacG1 + Nationale.
 
 **Scale rules:**
 - The display scale (`display`, `display-sm`, `h1`–`h6`) is **always serif**. No sans h1.

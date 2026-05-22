@@ -14,6 +14,7 @@ const columns: Record<string, FooterLink[]> = {
     { label: "All Systems", to: "/products" },
     { label: "Windows", to: "/products?filter=windows" },
     { label: "Doors", to: "/products?filter=doors" },
+    { label: "Finishes", to: "/finishes" },
     { label: "Design Tool", to: "/design-tool" },
     { label: "Help me choose", to: "/help-me-choose" },
   ],

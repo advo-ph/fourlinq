@@ -80,6 +80,28 @@ const SystemsTiles = () => (
         </li>
       ))}
     </ul>
+
+    {/* Finishes wow-link */}
+    <div className="mt-20 lg:mt-28 border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 grid lg:grid-cols-[1fr,1fr] gap-10 items-center">
+      <div>
+        <p className="eyebrow mb-4">Every system, eleven ways</p>
+        <h3 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] max-w-[18ch]">
+          Pick a finish. Watch it change.
+        </h3>
+      </div>
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[24rem] leading-relaxed">
+          Seven heat-fused wood-grain laminates, four solid colors — engineered to hold their finish through 25 years of tropical sun.
+        </p>
+        <Link
+          to="/finishes"
+          className="group inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+        >
+          Explore the 11 finishes
+          <ArrowUpRight size={16} strokeWidth={1.5} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300 ease-marvin" />
+        </Link>
+      </div>
+    </div>
   </div>
 );
 
