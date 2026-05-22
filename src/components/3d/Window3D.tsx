@@ -124,8 +124,12 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
       }
     });
 
-    // Update world matrices then build bbox from VISIBLE meshes only
-    sceneClone.updateMatrixWorld(true);
+    // Force the entire ancestor chain to recompute world matrices BEFORE we
+    // measure. setFromObject(mesh) reads mesh.matrixWorld; if innerRef's
+    // matrix is stale (carrying the previous system's offset), the mesh's
+    // world position will be wrong even though innerRef.position was reset.
+    if (groupRef.current) groupRef.current.updateMatrixWorld(true);
+
     const bbox = new THREE.Box3();
     let foundAny = false;
     sceneClone.traverse((child) => {
@@ -142,16 +146,12 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     if (foundAny && innerRef.current) {
       const center = bbox.getCenter(new THREE.Vector3());
       const size = bbox.getSize(new THREE.Vector3());
-      // Offset the inner group to center the visible subtree at origin.
-      // Multiplied by -1 since we want to shift the model the opposite way.
       innerRef.current.position.set(-center.x, -center.y, -center.z);
-      // Scale to fit a ~1.6m world height regardless of source units
       const longestSide = Math.max(size.x, size.y);
       const targetSize = 1.6;
       const scale = targetSize / longestSide;
       if (groupRef.current) {
         groupRef.current.scale.setScalar(scale);
-        // Ground the bottom of the bbox at y=-(targetSize/2) so contact shadow sits right
         groupRef.current.position.set(0, 0, 0);
       }
     }
