@@ -483,3 +483,5 @@ These are deliberate omissions on the active redesign branch, tracked in [docs/R
 *This file is the single canonical design contract for the FourlinQ codebase. Three mirrors consume from it: [tailwind.config.ts](./tailwind.config.ts) for build-time tokens, [src/index.css](./src/index.css) `:root` for runtime CSS vars, [src/theme.config.ts](./src/theme.config.ts) for JS imports. Changing a value here requires updating all three mirrors — they are caches of this spec.*
 
 *For the full extraction story (how every value was grep'd from marvin.com production CSS), see [docs/REDESIGN_ROADMAP.md §13](./docs/REDESIGN_ROADMAP.md).*
+
+*For DESIGN.md files of other premium fenestration brands (Marvin, Sky-Frame, Vitrocsa, Schüco) — used as references when iterating on FourlinQ — see [docs/references/design-systems/](./docs/references/design-systems/).*
