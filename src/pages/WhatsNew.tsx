@@ -5,13 +5,19 @@ import PageHeader from "@/components/shared/PageHeader";
 import { whatsNew, type WhatsNewCategory, type WhatsNewEntry } from "@/data/whats-new";
 import { cn } from "@/lib/utils";
 
-const filters: { label: string; value: "all" | WhatsNewCategory }[] = [
+const ALL_FILTERS: { label: string; value: "all" | WhatsNewCategory }[] = [
   { label: "All updates", value: "all" },
   { label: "Product", value: "product" },
   { label: "Project", value: "project" },
   { label: "Event", value: "event" },
   { label: "Press", value: "press" },
 ];
+
+/** Only surface filter tabs that have at least one entry — empty filters
+ *  make the filter look broken. */
+const filters = ALL_FILTERS.filter(
+  (f) => f.value === "all" || whatsNew.some((e) => e.category === f.value)
+);
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase();
