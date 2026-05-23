@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BRAND, FRAME_FINISHES, BRANCHES } from "@/data/fourlinq-data";
+import { FRAME_FINISHES, BRANCHES } from "@/data/fourlinq-data";
 
 /**
  * Authority strip — Tier 1 of the Kenneth & Mock punch list.
@@ -27,8 +27,8 @@ const stats = [
     label: "Showrooms across Metro Manila and Cebu",
   },
   {
-    value: BRAND.warranty.split(" ")[0], // "10-Year" → "10-Year"
-    label: "Standard system warranty",
+    value: 10,
+    label: "Year standard system warranty",
   },
 ];
 
@@ -40,10 +40,10 @@ const AuthorityStrip = () => (
         <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
           Engineered for Philippine homes — not imported into them.
         </h2>
-        <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] max-w-[34rem]">
-          Every FourlinQ system is custom-fabricated in our Manila workshop,
-          tested against the heat, humidity, salt air, and storms that test
-          what a Philippine home is made of.
+        <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[34rem]">
+          Every FourlinQ system is custom-fabricated in our Manila workshop —
+          measured to your architect's drawings, finished in any of eleven
+          colors, installed by our own team.
         </p>
         <Link
           to="/why-upvc"

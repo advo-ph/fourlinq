@@ -30,8 +30,9 @@ const Index = () => {
       <VideoHero
         videoSrc="/videos/hero-loop.mp4"
         fallbackSlides={heroSlides}
-        headline="A lifetime of satisfaction and peace of mind."
-        lede="Custom-made uPVC windows and doors engineered for the Philippine climate. Available in 11 finishes, backed by a 10-year warranty."
+        caption="For the Philippine climate"
+        headline="Built for the houses we share with the weather."
+        lede="Custom-made uPVC windows and doors. Eleven finishes. One promise."
         ctaLabel="Explore Systems"
         ctaTo="/products"
       />

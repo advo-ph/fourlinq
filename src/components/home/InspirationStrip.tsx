@@ -7,9 +7,9 @@ const categoryLabel: Record<string, string> = {
   casement: "Casement + Sliding",
   sliding: "Sliding",
   specialist: "Special shapes",
-  interior: "Interior",
-  exterior: "Full home",
-  doors: "Door systems",
+  interior: "Casement + Fixed",
+  exterior: "Casement + Sliding",
+  doors: "Slide & Fold",
 };
 
 const InspirationStrip = () => (

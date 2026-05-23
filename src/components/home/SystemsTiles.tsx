@@ -14,19 +14,19 @@ interface SystemTile {
 const systems: SystemTile[] = [
   {
     name: "Window Systems",
-    description: "Casement, sliding, awning, and fixed-glass panels engineered for tropical climate performance.",
+    description: "Casement, sliding, awning, and fixed glass — sized and sealed for the way light moves through a Philippine home.",
     image: "/images/wp-export/FourlinQ-Project-7.jpg",
     to: "/products/windows",
   },
   {
     name: "Door Systems",
-    description: "Slide-and-fold, large panel doors up to 6m, 90 series, lift-and-slide, and French doors.",
+    description: "Slide & Fold, Large Panel up to six metres, Lift & Slide, 90 Series — the wall that opens when you want it to.",
     image: "/images/wp-export/FQC-Project-18.jpg",
     to: "/products/doors",
   },
   {
     name: "Specialist Systems",
-    description: "Arch shapes, curtain walls, and custom-shaped panels for architectural projects.",
+    description: "Arches, curtain walls, and bespoke geometry — for the projects that refuse the standard catalog.",
     image: "/images/brand-story.jpg",
     to: "/products/specialist",
   },
@@ -36,12 +36,11 @@ const SystemsTiles = () => (
   <div>
     <div className="grid lg:grid-cols-[1fr,1fr] gap-12 lg:gap-16 mb-16 lg:mb-20">
       <EyebrowHeading eyebrow="Our Systems" level={2}>
-        Custom-made windows and doors for the Philippine climate.
+        Three families. Every shape a Philippine home needs.
       </EyebrowHeading>
-      <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] lg:self-end">
-        Three systems engineered for the architecture of life in the tropics —
-        from quiet bedroom casements to 6-metre folding doors that open the
-        whole house to a garden.
+      <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] lg:self-end leading-[1.65]">
+        From a quiet bedroom casement to a six-metre folding wall that opens
+        the whole house to the garden — and the bespoke geometry in between.
       </p>
     </div>
 
