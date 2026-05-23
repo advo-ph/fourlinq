@@ -200,20 +200,36 @@ const Finishes = () => {
                   aria-pressed={isSelected}
                 >
                   <div
-                    className={`aspect-square w-full transition-all duration-300 ease-marvin ${
+                    className={cn(
+                      "aspect-square w-full overflow-hidden transition-all duration-300 ease-marvin",
                       isSelected
                         ? "ring-2 ring-[color:var(--accent)] ring-offset-2 ring-offset-[color:var(--canvas-soft)]"
                         : "ring-1 ring-[color:var(--rule-soft)] hover:ring-[color:var(--ink-primary)]"
-                    }`}
-                    style={{
-                      backgroundColor: f.swatchHex,
-                      backgroundImage: fakeGrain !== "none" ? fakeGrain : undefined,
-                      backgroundBlendMode: fakeGrain !== "none" ? "multiply" : undefined,
-                    }}
-                  />
-                  <p className={`mt-3 text-body-sm font-medium transition-colors duration-300 ease-marvin ${
+                    )}
+                    style={
+                      f.profilePhotoPath
+                        ? undefined
+                        : {
+                            backgroundColor: f.swatchHex,
+                            backgroundImage: fakeGrain !== "none" ? fakeGrain : undefined,
+                            backgroundBlendMode: fakeGrain !== "none" ? "multiply" : undefined,
+                          }
+                    }
+                  >
+                    {f.profilePhotoPath && (
+                      <img
+                        src={f.profilePhotoPath}
+                        alt={`${f.label} finish on FourlinQ profile`}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                  <p className={cn(
+                    "mt-3 text-body-sm font-medium transition-colors duration-300 ease-marvin",
                     isSelected ? "text-[color:var(--accent)]" : "text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)]"
-                  }`}>
+                  )}>
                     {f.label}
                   </p>
                   <p className="text-[11px] uppercase tracking-[0.1em] text-[color:var(--ink-muted)] mt-1">

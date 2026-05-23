@@ -363,7 +363,11 @@ export interface FrameFinish {
   swatchHex: string;
   description: string;
   hasTexture: boolean;
-  textureImagePath?: string; // e.g. "/textures/walnut.jpg" — add when assets available
+  textureImagePath?: string; // e.g. "/textures/walnut.jpg" — for 3D viewer material maps
+  /** Real brochure photo of the finish applied to a uPVC profile. Used on
+   *  the /finishes swatch grid in place of the synthetic hex + stripe
+   *  overlay. Falls back to swatchHex when undefined. */
+  profilePhotoPath?: string;
 }
 
 export const FRAME_FINISHES: FrameFinish[] = [
@@ -420,6 +424,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Rich chocolatey brown with prominent, swirling grain. Bold contrast between dark base and lighter streaks. Luxurious and heavy-feeling — the most premium timber look in the lineup.",
     hasTexture: false,
+    profilePhotoPath: "/images/wp-export/Walnut-Profile.jpg",
   },
   {
     id: "golden-oak",
@@ -429,6 +434,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Bright honey-amber with a strong open-grain pattern — almost orange-gold in direct light. The most vivid wood finish. Warm and inviting; suits traditional Filipino and Spanish colonial interiors.",
     hasTexture: false,
+    profilePhotoPath: "/images/wp-export/Golden-Oak-Profile.jpg",
   },
   {
     id: "white",
@@ -438,6 +444,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Clean, bright white with a smooth uniform surface. The most versatile option — matches any wall color, reads as modern or classic depending on context.",
     hasTexture: false,
+    profilePhotoPath: "/images/wp-export/White-Profile.jpg",
   },
   {
     id: "jet-black",
@@ -447,6 +454,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Deep, near-total black with a smooth matte-to-satin surface. Completely uniform — no grain. High contrast and architectural. The darkest and most dramatic option.",
     hasTexture: false,
+    profilePhotoPath: "/images/wp-export/Black-Profile.jpg",
   },
   {
     id: "charcoal-gray",
@@ -456,6 +464,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Mid-dark gray, softer than Jet Black with a slightly cooler tone. Sits between anthracite and concrete in character — industrial but not aggressive. Very popular on contemporary facades.",
     hasTexture: false,
+    profilePhotoPath: "/images/wp-export/Gray-Profile.jpg",
   },
   {
     id: "matte-quartz",
@@ -465,6 +474,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Flat medium gray with almost no sheen — stone-like and understated. Lighter and warmer than Charcoal. Closest visually to polished concrete or a quartz countertop.",
     hasTexture: false,
+    profilePhotoPath: "/images/wp-export/Matte-Quartz-Profile.jpg",
   },
 ];
 
