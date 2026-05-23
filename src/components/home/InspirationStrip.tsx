@@ -7,8 +7,8 @@ const categoryLabel: Record<string, string> = {
   casement: "Casement + Sliding",
   sliding: "Sliding",
   specialist: "Special shapes",
-  interior: "Interior install",
-  exterior: "Full home package",
+  interior: "Interior",
+  exterior: "Full home",
   doors: "Door systems",
 };
 

@@ -143,31 +143,31 @@ const Warranty = () => (
           </ol>
         </div>
 
-        {/* Authority — 22 years operating */}
+        {/* Authority — numeric trust strip */}
         <div className="border-t border-[color:var(--rule-soft)] pt-16 lg:pt-20 mb-24 lg:mb-32">
           <div className="grid lg:grid-cols-12 gap-x-8 gap-y-8 items-end">
             <div className="lg:col-span-7">
               <p className="eyebrow mb-3">Why we can stand behind it</p>
               <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
-                Twenty-two years of installations across the Philippines.
+                Engineered for Philippine homes — not imported into them.
               </h2>
               <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-xl">
-                The warranty isn't a marketing decision. It's the number that matches what we've seen — twenty-two years of FourlinQ installations across Metro Manila, Cebu, Tagaytay, and the coast. Profiles that look the same after fifteen years of sun. Hardware that still operates smoothly after a thousand monsoons.
+                The warranty isn't a marketing decision. It's the number that matches what we've seen — FourlinQ installations across Metro Manila, Cebu, Tagaytay, and the coast. Profiles that look the same after a decade of sun. Hardware that still operates smoothly after a thousand monsoons.
               </p>
             </div>
             <div className="lg:col-span-4 lg:col-start-9">
               <ul className="space-y-6">
                 <li>
-                  <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">22</p>
-                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Years engineering uPVC for the Philippine climate</p>
+                  <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">11</p>
+                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Brochure-verified finishes</p>
                 </li>
                 <li className="border-t border-[color:var(--rule-soft)] pt-6">
                   <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">4</p>
                   <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Showrooms across Metro Manila and Cebu</p>
                 </li>
                 <li className="border-t border-[color:var(--rule-soft)] pt-6">
-                  <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">11</p>
-                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Brochure-verified finishes</p>
+                  <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">10</p>
+                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Year standard system warranty</p>
                 </li>
               </ul>
             </div>

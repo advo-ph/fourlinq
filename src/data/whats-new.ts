@@ -34,7 +34,7 @@ export const whatsNew: WhatsNewEntry[] = [
     title: "Quezon City residence — full home installation",
     excerpt: "A three-story modern home outfitted with FourlinQ casement, sliding, and large panel doors throughout.",
     image: "/images/brand-story.jpg",
-    link: "/inspiration",
+    link: "/projects/three-storey-residence",
   },
   {
     id: "11-finishes",
@@ -43,6 +43,6 @@ export const whatsNew: WhatsNewEntry[] = [
     title: "11 finish options now available",
     excerpt: "From classic White to Wood Gray and Walnut — every FourlinQ system available in 11 brochure-verified finishes.",
     image: "/images/wp-export/Walnut-Profile.jpg",
-    link: "/design-tool",
+    link: "/finishes",
   },
 ];

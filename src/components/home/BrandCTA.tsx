@@ -12,10 +12,10 @@ const BrandCTA = () => (
     </div>
     <div className="lg:pl-8">
       <p className="text-body-lg text-white/80 max-w-[34rem]">
-        Twenty-two years of engineering custom uPVC windows and doors for the
-        Philippine climate. Eleven brochure-verified finishes. Four showrooms
-        across Metro Manila and Cebu. One promise: built to outlast the
-        weather that surrounds it.
+        Custom-made uPVC windows and doors, engineered for the Philippine
+        climate. Eleven brochure-verified finishes. Four showrooms across
+        Metro Manila and Cebu. One promise: built to outlast the weather
+        that surrounds it.
       </p>
       <div className="mt-10 flex flex-wrap items-center gap-5">
         <EditorialButton to="/brand" variant="primary" size="md">
