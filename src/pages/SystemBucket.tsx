@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import QuoteModal from "@/components/shared/QuoteModal";
+import ProjectPhotoSwitcher, { type ProjectPhoto } from "@/components/shared/ProjectPhotoSwitcher";
 import EditorialButton from "@/components/primitives/Button";
 import { useProducts, Product } from "@/hooks/useProducts";
 import { trackProductView } from "@/hooks/useAnalytics";
@@ -28,9 +29,11 @@ export interface BucketCopy {
   subSystemList: string;
   /** Which products.ts category to filter by */
   filterCategory: "windows" | "doors" | "specialist";
-  /** Hero image — full-bleed background of the bucket header */
-  heroImage: string;
-  heroAlt: string;
+  /**
+   * Project photos for the cursor-switching gallery (Tita §2.1.3).
+   * 4-6 photos recommended; the switcher zones the hero width by photo count.
+   */
+  projectPhotos: ProjectPhoto[];
   breadcrumbLabel: string;
 }
 
@@ -69,14 +72,11 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
             </div>
           </div>
 
-          {/* Hero image */}
-          <div className="relative w-full aspect-[16/9] lg:aspect-[21/9] overflow-hidden mb-16 lg:mb-24">
-            <img
-              src={copy.heroImage}
-              alt={copy.heroAlt}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover"
+          {/* Cursor-switching project gallery — Tita §2.1.3 */}
+          <div className="mb-16 lg:mb-24">
+            <ProjectPhotoSwitcher
+              eyebrow="From recent projects"
+              photos={copy.projectPhotos}
             />
           </div>
 

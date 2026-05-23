@@ -12,8 +12,13 @@ const DoorSystems = () => (
       subSystemList:
         "Slide & Fold, Large Panel Doors (up to 6 metres), Lift & Slide, and the 90 Series — alongside Casement Door, French Door, and Sliding Door configurations.",
       filterCategory: "doors",
-      heroImage: "/images/wp-export/FQC-Project-18.jpg",
-      heroAlt: "FourlinQ slide-and-fold door system in a Las Piñas residence",
+      projectPhotos: [
+        { src: "/images/wp-export/FQC-Project-18.jpg",  alt: "Slide-and-fold door system in a Las Piñas residence",  caption: "Las Piñas residence" },
+        { src: "/images/wp-export/Sliding-Door.jpg",    alt: "Large sliding door opening to a garden",                caption: "Garden-facing slider" },
+        { src: "/images/wp-export/Slide-and-Fold.jpg",  alt: "Slide-and-fold panels fully extended",                  caption: "Slide & Fold detail" },
+        { src: "/images/wp-export/Door-1.jpg",          alt: "French door with multi-point locking",                  caption: "French door installation" },
+        { src: "/images/wp-export/Door-5.jpg",          alt: "Casement entrance door, dark frame finish",             caption: "Casement Door" },
+      ],
     }}
   />
 );

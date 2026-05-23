@@ -12,8 +12,12 @@ const SpecialistSystems = () => (
       subSystemList:
         "Arch Shapes, Curtain Wall systems, and bespoke Custom Shapes — designed to architect drawings and fabricated in our Manila workshop.",
       filterCategory: "specialist",
-      heroImage: "/images/wp-export/FourlinQ-Project-8.jpg",
-      heroAlt: "FourlinQ curved-glass curtain wall in a Tagaytay residence",
+      projectPhotos: [
+        { src: "/images/wp-export/FourlinQ-Project-8.jpg", alt: "Curved-glass home with custom shaped panels",       caption: "Tagaytay residence" },
+        { src: "/images/wp-export/FourlinQ-Project-7.jpg", alt: "Full glass facade detail",                            caption: "Quezon City facade" },
+        { src: "/images/wp-export/Windows.jpg",            alt: "Combined window configuration",                       caption: "Combined panel configuration" },
+        { src: "/images/brand-story.jpg",                  alt: "Three-storey modern home with full FourlinQ system",  caption: "Three-storey installation" },
+      ],
     }}
   />
 );
