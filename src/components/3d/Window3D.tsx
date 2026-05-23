@@ -39,13 +39,17 @@ interface SystemConfig {
   /**
    * Known center of the visible subtree in the source GLB's local space.
    * Captured from gltf-transform inspection of the model. Used directly to
-   * offset the model so the visible system lands at world origin — avoids
-   * the bbox-computation timing/skinned-mesh issues that plagued auto-fit.
+   * offset the model so the visible system lands at world origin.
    */
   center: [number, number, number];
+  /**
+   * Known scale factor for this system. Eliminates bbox auto-fit, which
+   * was non-deterministic (race with useAnimations applying time-0 pose
+   * vs. our setFromObject measurement). Each value tuned per system so
+   * the visible subtree fills ~80% of the viewer canvas height.
+   */
+  scale: number;
 }
-
-const SCENE_SCALE = 0.0075;
 
 const SYSTEMS: Record<SystemType, SystemConfig> = {
   casement: {
@@ -54,6 +58,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Open window",
     closeLabel: "Close window",
     center: [-225, 552, -12],
+    scale: 0.0026,
   },
   sliding: {
     label: "Sliding",
@@ -65,6 +70,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Slide open",
     closeLabel: "Slide closed",
     center: [-395, 860, -13],
+    scale: 0.0048,
   },
   awning: {
     label: "Awning",
@@ -72,6 +78,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Open awning",
     closeLabel: "Close awning",
     center: [120, 470, -7],
+    scale: 0.006,
   },
   "slide-and-fold": {
     label: "Slide & Fold",
@@ -79,6 +86,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Fold open",
     closeLabel: "Fold closed",
     center: [290, 573, -17],
+    scale: 0.0036,
   },
 };
 
@@ -126,38 +134,17 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
       }
     });
 
-    // Update matrices, then measure visible-mesh bbox via setFromObject.
-    // Use the bbox for both auto-scaling and centering. If bbox comes back
-    // empty (skinned meshes that didn't fill it), fall back to the hardcoded
-    // SYSTEMS[systemType].center with a default scale.
-    sceneClone.updateMatrixWorld(true);
-    const bbox = new THREE.Box3();
-    let foundAny = false;
-    sceneClone.traverse((child) => {
-      if (child.type !== "Mesh") return;
-      const mesh = child as THREE.Mesh;
-      if (!mesh.visible) return;
-      const meshBox = new THREE.Box3().setFromObject(mesh);
-      if (!meshBox.isEmpty() && isFinite(meshBox.min.x) && isFinite(meshBox.max.x)) {
-        bbox.union(meshBox);
-        foundAny = true;
-      }
-    });
-
+    // Apply known-good transform per system. No bbox auto-fit — that was
+    // racing with useAnimations' time-0 pose application and setFromObject's
+    // matrixWorld reads, producing different bbox values on different mounts
+    // depending on which effect ran first. Hardcoded center + scale per
+    // system is deterministic.
     if (innerRef.current) {
-      if (foundAny) {
-        const center = bbox.getCenter(new THREE.Vector3());
-        const size = bbox.getSize(new THREE.Vector3());
-        const planar = Math.max(size.x, size.y) || 1;
-        const scale = 1.4 / planar;
-        innerRef.current.scale.setScalar(scale);
-        innerRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
-      } else {
-        // Skinned-mesh fallback — use the captured center, default scale.
-        const [cx, cy, cz] = SYSTEMS[systemType].center;
-        innerRef.current.scale.setScalar(SCENE_SCALE);
-        innerRef.current.position.set(-cx * SCENE_SCALE, -cy * SCENE_SCALE, -cz * SCENE_SCALE);
-      }
+      const cfg = SYSTEMS[systemType];
+      const [cx, cy, cz] = cfg.center;
+      const s = cfg.scale;
+      innerRef.current.scale.setScalar(s);
+      innerRef.current.position.set(-cx * s, -cy * s, -cz * s);
     }
   }, [sceneClone, systemType]);
 
