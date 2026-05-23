@@ -58,7 +58,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Open window",
     closeLabel: "Close window",
     center: [-225, 552, -12],
-    scale: 0.0026,
+    scale: 0.0014,
   },
   sliding: {
     label: "Sliding",
@@ -70,7 +70,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Slide open",
     closeLabel: "Slide closed",
     center: [-395, 860, -13],
-    scale: 0.0048,
+    scale: 0.0024,
   },
   awning: {
     label: "Awning",
@@ -78,7 +78,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Open awning",
     closeLabel: "Close awning",
     center: [120, 470, -7],
-    scale: 0.006,
+    scale: 0.003,
   },
   "slide-and-fold": {
     label: "Slide & Fold",
@@ -86,7 +86,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Fold open",
     closeLabel: "Fold closed",
     center: [290, 573, -17],
-    scale: 0.0036,
+    scale: 0.0018,
   },
 };
 
@@ -269,7 +269,7 @@ const Window3D = ({
         }}
       >
         <Canvas
-          camera={{ position: config.cameraPos ?? [0, 0.05, 3.4], fov: 28 }}
+          camera={{ position: [0, 0.05, 3.4], fov: 28 }}
           dpr={[1, 2]}
           shadows
           gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
