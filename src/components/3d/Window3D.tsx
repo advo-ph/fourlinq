@@ -36,9 +36,16 @@ interface SystemConfig {
   /** Pretty action label for the open/close button. */
   openLabel: string;
   closeLabel: string;
-  /** Camera tweak — some systems read better from slightly off-axis. */
-  cameraPos?: [number, number, number];
+  /**
+   * Known center of the visible subtree in the source GLB's local space.
+   * Captured from gltf-transform inspection of the model. Used directly to
+   * offset the model so the visible system lands at world origin — avoids
+   * the bbox-computation timing/skinned-mesh issues that plagued auto-fit.
+   */
+  center: [number, number, number];
 }
+
+const SCENE_SCALE = 0.0075;
 
 const SYSTEMS: Record<SystemType, SystemConfig> = {
   casement: {
@@ -46,6 +53,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     visiblePrefixes: ["casement_frame", "casement_panelL", "casement_panelR"],
     openLabel: "Open window",
     closeLabel: "Close window",
+    center: [-225, 632, -12],
   },
   sliding: {
     label: "Sliding",
@@ -56,18 +64,21 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     ],
     openLabel: "Slide open",
     closeLabel: "Slide closed",
+    center: [-395, 860, -13],
   },
   awning: {
     label: "Awning",
     visiblePrefixes: ["awning_frame", "awning_armature"],
     openLabel: "Open awning",
     closeLabel: "Close awning",
+    center: [120, 470, -7],
   },
   "slide-and-fold": {
     label: "Slide & Fold",
     visiblePrefixes: ["holding_frame", "holding_panels"],
     openLabel: "Fold open",
     closeLabel: "Fold closed",
+    center: [290, 573, -17],
   },
 };
 
@@ -115,36 +126,13 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
       }
     });
 
-    // Update sceneClone's internal world matrices (independent of whether
-    // it's currently attached to the React tree via primitive).
-    sceneClone.updateMatrixWorld(true);
-
-    // Use setFromObject (with precise=true for skinned meshes) on each
-    // visible mesh. Walking the visible meshes one at a time means we don't
-    // pull in hidden siblings — only the descendants of the visible mesh.
-    const bbox = new THREE.Box3();
-    let foundAny = false;
-    sceneClone.traverse((child) => {
-      if (child.type !== "Mesh") return;
-      const mesh = child as THREE.Mesh;
-      if (!mesh.visible) return;
-      const meshBox = new THREE.Box3().setFromObject(mesh, true);
-      if (!meshBox.isEmpty() && isFinite(meshBox.min.x) && isFinite(meshBox.max.x)) {
-        bbox.union(meshBox);
-        foundAny = true;
-      }
-    });
-
-    if (foundAny && innerRef.current) {
-      const center = bbox.getCenter(new THREE.Vector3());
-      const size = bbox.getSize(new THREE.Vector3());
-      // Normalize against the larger of x/y only — z is depth (frame thickness)
-      // and shouldn't drive scale, otherwise thin wide windows render tiny.
-      const planar = Math.max(size.x, size.y) || 1;
-      const targetSize = 1.4;
-      const scale = targetSize / planar;
-      innerRef.current.scale.setScalar(scale);
-      innerRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+    // Apply known center offset + uniform scale. Hardcoded centers are more
+    // reliable than bbox auto-fit for this GLB — some meshes are skinned /
+    // armature-driven and their world bboxes don't reflect rendered extent.
+    if (innerRef.current) {
+      const [cx, cy, cz] = SYSTEMS[systemType].center;
+      innerRef.current.scale.setScalar(SCENE_SCALE);
+      innerRef.current.position.set(-cx * SCENE_SCALE, -cy * SCENE_SCALE, -cz * SCENE_SCALE);
     }
   }, [sceneClone, systemType]);
 
