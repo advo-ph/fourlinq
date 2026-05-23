@@ -5,20 +5,7 @@ import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import ConsultationForm from "@/components/shared/ConsultationForm";
 import { certifications, CONTACT, BRANCHES, BRAND } from "@/data/brand";
-import { ShieldCheck, BadgeCheck, Award, FileCheck, Leaf, Wind, MapPin, Phone, Mail, Clock, Shield, CloudRain, VolumeX, ArrowUpRight } from "lucide-react";
-
-const certIconMap: Record<string, React.ReactNode> = {
-  "shield-check": <ShieldCheck size={18} strokeWidth={1.5} />,
-  "badge-check": <BadgeCheck size={18} strokeWidth={1.5} />,
-  award: <Award size={18} strokeWidth={1.5} />,
-  "file-check": <FileCheck size={18} strokeWidth={1.5} />,
-  leaf: <Leaf size={18} strokeWidth={1.5} />,
-  wind: <Wind size={18} strokeWidth={1.5} />,
-  shield: <Shield size={18} strokeWidth={1.5} />,
-  clock: <Clock size={18} strokeWidth={1.5} />,
-  "cloud-rain": <CloudRain size={18} strokeWidth={1.5} />,
-  "volume-x": <VolumeX size={18} strokeWidth={1.5} />,
-};
+import { Phone, Mail, ArrowUpRight } from "lucide-react";
 
 const Brand = () => (
   <Layout>
@@ -29,6 +16,19 @@ const Brand = () => (
       subtitle={BRAND.promise}
     />
 
+    {/* Brand hero — full-bleed editorial image right after the PageHeader */}
+    <Section tone="canvas" size="md" className="!pb-0">
+      <div className="aspect-[21/9] lg:aspect-[21/9] overflow-hidden bg-[color:var(--canvas-soft)]">
+        <img
+          src="/images/wp-export/Our_Brand.jpg"
+          alt="A modern Philippine residence outfitted with FourlinQ systems"
+          loading="eager"
+          decoding="async"
+          className="w-full h-full object-cover"
+        />
+      </div>
+    </Section>
+
     {/* Story */}
     <Section tone="canvas" size="lg">
       <div className="grid lg:grid-cols-[5fr,6fr] gap-12 lg:gap-20 items-center">
@@ -36,17 +36,15 @@ const Brand = () => (
           <EyebrowHeading eyebrow="Our story" level={2}>
             {BRAND.heroQuote}
           </EyebrowHeading>
-          <div className="mt-8 lg:mt-10 space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[36rem]">
+          <div className="mt-8 lg:mt-10 space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.65]">
             <p>{BRAND.promiseSupport}</p>
             <p>
-              Available in 11 finishes — from classic white to rich wood grains —
-              backed by a {BRAND.warranty} covering corrosion resistance, weather
-              resistance, and long-lasting performance.
+              Eleven finishes from classic white to rich wood grains. Backed by a {BRAND.warranty} covering corrosion resistance, weather resistance, and long-lasting performance.
             </p>
           </div>
         </div>
         <div className="relative aspect-[4/5] lg:aspect-[5/6] overflow-hidden bg-[color:var(--canvas-soft)]">
-          <img src="/images/brand-story.jpg" alt="A FourlinQ-equipped home in the Philippines" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+          <img src="/images/wp-export/FQC-Brand.jpg" alt="A FourlinQ-equipped home in the Philippines" loading="lazy" decoding="async" className="w-full h-full object-cover" />
         </div>
       </div>
     </Section>
@@ -75,14 +73,22 @@ const Brand = () => (
 
     {/* Certifications */}
     <Section id="certifications" tone="soft" size="lg" className="scroll-mt-28">
-      <EyebrowHeading eyebrow="Trust" level={2} align="left">
-        Certifications & standards.
-      </EyebrowHeading>
-      <ul className="mt-12 lg:mt-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-[color:var(--rule-soft)]">
+      <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-12 lg:mb-16">
+        <div className="lg:col-span-5">
+          <EyebrowHeading eyebrow="Trust" level={2} align="left">
+            Certifications & standards.
+          </EyebrowHeading>
+        </div>
+        <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
+          Every FourlinQ system is engineered, fabricated, and installed against the standards listed below. The certifications hold whether your project is a private residence or a commercial fitout.
+        </p>
+      </div>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
         {certifications.map((cert) => (
-          <li key={cert.name} className="bg-white p-6 flex items-start gap-3">
-            <div className="text-[color:var(--ink-muted)] shrink-0 mt-0.5">{certIconMap[cert.icon]}</div>
-            <span className="text-body-sm font-medium text-[color:var(--ink-primary)] leading-tight">{cert.name}</span>
+          <li key={cert.name} className="border-t border-[color:var(--rule-soft)] pt-5">
+            <p className="text-body-sm font-medium text-[color:var(--ink-primary)] leading-snug">
+              {cert.name}
+            </p>
           </li>
         ))}
       </ul>
