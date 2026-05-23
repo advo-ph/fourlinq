@@ -126,13 +126,38 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
       }
     });
 
-    // Apply known center offset + uniform scale. Hardcoded centers are more
-    // reliable than bbox auto-fit for this GLB — some meshes are skinned /
-    // armature-driven and their world bboxes don't reflect rendered extent.
+    // Update matrices, then measure visible-mesh bbox via setFromObject.
+    // Use the bbox for both auto-scaling and centering. If bbox comes back
+    // empty (skinned meshes that didn't fill it), fall back to the hardcoded
+    // SYSTEMS[systemType].center with a default scale.
+    sceneClone.updateMatrixWorld(true);
+    const bbox = new THREE.Box3();
+    let foundAny = false;
+    sceneClone.traverse((child) => {
+      if (child.type !== "Mesh") return;
+      const mesh = child as THREE.Mesh;
+      if (!mesh.visible) return;
+      const meshBox = new THREE.Box3().setFromObject(mesh);
+      if (!meshBox.isEmpty() && isFinite(meshBox.min.x) && isFinite(meshBox.max.x)) {
+        bbox.union(meshBox);
+        foundAny = true;
+      }
+    });
+
     if (innerRef.current) {
-      const [cx, cy, cz] = SYSTEMS[systemType].center;
-      innerRef.current.scale.setScalar(SCENE_SCALE);
-      innerRef.current.position.set(-cx * SCENE_SCALE, -cy * SCENE_SCALE, -cz * SCENE_SCALE);
+      if (foundAny) {
+        const center = bbox.getCenter(new THREE.Vector3());
+        const size = bbox.getSize(new THREE.Vector3());
+        const planar = Math.max(size.x, size.y) || 1;
+        const scale = 1.4 / planar;
+        innerRef.current.scale.setScalar(scale);
+        innerRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+      } else {
+        // Skinned-mesh fallback — use the captured center, default scale.
+        const [cx, cy, cz] = SYSTEMS[systemType].center;
+        innerRef.current.scale.setScalar(SCENE_SCALE);
+        innerRef.current.position.set(-cx * SCENE_SCALE, -cy * SCENE_SCALE, -cz * SCENE_SCALE);
+      }
     }
   }, [sceneClone, systemType]);
 
