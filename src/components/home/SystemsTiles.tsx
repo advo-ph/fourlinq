@@ -16,19 +16,19 @@ const systems: SystemTile[] = [
     name: "Window Systems",
     description: "Casement, sliding, awning, and fixed-glass panels engineered for tropical climate performance.",
     image: "/images/wp-export/FourlinQ-Project-7.jpg",
-    to: "/products?filter=windows",
+    to: "/products/windows",
   },
   {
     name: "Door Systems",
     description: "Slide-and-fold, large panel doors up to 6m, 90 series, lift-and-slide, and French doors.",
     image: "/images/wp-export/FQC-Project-18.jpg",
-    to: "/products?filter=doors",
+    to: "/products/doors",
   },
   {
     name: "Specialist Systems",
     description: "Arch shapes, curtain walls, and custom-shaped panels for architectural projects.",
     image: "/images/brand-story.jpg",
-    to: "/products",
+    to: "/products/specialist",
   },
 ];
 

@@ -25,7 +25,7 @@ export const whatsNew: WhatsNewEntry[] = [
     title: "Casement Door joins the lineup",
     excerpt: "Our reinforced single-leaf entrance — now formally named the Casement Door — adds multi-point locking for premium security.",
     image: "/images/wp-export/Door-5.jpg",
-    link: "/products?filter=doors",
+    link: "/products/doors",
   },
   {
     id: "quezon-project-launch",
