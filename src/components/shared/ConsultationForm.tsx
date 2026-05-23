@@ -162,7 +162,7 @@ const ConsultationForm = () => {
       {/* Step content */}
       <div className="min-h-[260px]">
         {step === 0 && (
-          <Step title="What kind of project?" subtitle="So we route you to the right FourlinQ specialist.">
+          <Step eyebrow="Tell us about your project" title="What kind of project?" subtitle="So we route you to the right FourlinQ specialist.">
             <ChipGrid
               options={PROJECT_TYPES}
               value={form.projectType}
@@ -171,7 +171,7 @@ const ConsultationForm = () => {
           </Step>
         )}
         {step === 1 && (
-          <Step title="When are you planning to install?" subtitle="A rough window — we'll calibrate the consultation around it.">
+          <Step eyebrow="Project timeline" title="When are you planning to install?" subtitle="A rough window — we'll calibrate the consultation around it.">
             <ChipGrid
               options={TIMELINES}
               value={form.timeline}
@@ -180,7 +180,7 @@ const ConsultationForm = () => {
           </Step>
         )}
         {step === 2 && (
-          <Step title="Where is the project?" subtitle="So we know which showroom (Manila / Cebu) and which engineer is closest.">
+          <Step eyebrow="Project location" title="Where is the project?" subtitle="So we know which showroom (Manila / Cebu) and which engineer is closest.">
             <div className="max-w-md">
               <label className={labelClass}>Region or province</label>
               <select
@@ -197,7 +197,7 @@ const ConsultationForm = () => {
           </Step>
         )}
         {step === 3 && (
-          <Step title="How do we reach you?" subtitle="We'll respond within one business day.">
+          <Step eyebrow="Your details" title="How do we reach you?" subtitle="We'll respond within one business day.">
             <div className="grid sm:grid-cols-2 gap-7 max-w-2xl">
               <div>
                 <label className={labelClass}>Name *</label>
@@ -276,9 +276,9 @@ const ConsultationForm = () => {
 
 /* ────────────────────────────────────────────────────── */
 
-const Step = ({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) => (
+const Step = ({ eyebrow, title, subtitle, children }: { eyebrow: string; title: string; subtitle: string; children: React.ReactNode }) => (
   <div>
-    <p className="eyebrow mb-3">Tell us about your project</p>
+    <p className="eyebrow mb-3">{eyebrow}</p>
     <h3 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] mb-3">
       {title}
     </h3>

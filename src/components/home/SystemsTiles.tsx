@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
-import AccentStripe from "@/components/primitives/AccentStripe";
 import { cn } from "@/lib/utils";
 
 interface SystemTile {
@@ -61,7 +60,6 @@ const SystemsTiles = () => (
               />
             </div>
             <div className="mt-6">
-              <AccentStripe width="sm" color="accent" className="mb-4" />
               <div className="flex items-start justify-between gap-4">
                 <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                   {sys.name}

@@ -28,7 +28,7 @@ const columns: Record<string, FooterLink[]> = {
   ],
   Visit: [
     { label: "Visit a Showroom", to: "/brand#showrooms" },
-    { label: "Request a Quote", to: "/brand#contact" },
+    { label: "Book a Consultation", to: "/brand#contact" },
     { label: "Our Story", to: "/brand" },
   ],
   Legal: [
@@ -62,7 +62,7 @@ const EditorialFooter = () => {
           </div>
           <div className="flex flex-col gap-4 lg:items-end">
             <p className="font-serif text-h3 lg:text-h2 leading-[1.15] tracking-tight max-w-[28rem] lg:text-right">
-              Custom-made for the Philippine climate.
+              Built for the houses we share with the weather.
             </p>
             <a
               href={gmail}

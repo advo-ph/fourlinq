@@ -265,7 +265,7 @@ const Window3D = ({
       <div
         className="relative w-full aspect-[5/6] lg:aspect-[4/5] overflow-hidden"
         style={{
-          background: "linear-gradient(180deg, #F4F4F4 0%, #E2E2E2 60%, #D0D0D0 100%)",
+          background: "linear-gradient(180deg, #FAFAFA 0%, #F0F0EE 55%, #E4E2DF 100%)",
         }}
       >
         <Canvas
