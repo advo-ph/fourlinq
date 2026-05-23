@@ -986,7 +986,22 @@ The 3D viewer / Design Tool / Finishes page all fall back to the existing `swatc
 
 ---
 
-## 11. Automated batch generation — one command via Gemini API
+## 11. Automated batch generation — two scripts, same manifest
+
+Manual generation in the Gemini web app works but doesn't scale: each prompt is a copy-paste + wait + right-click-save round trip. For the 11 finish textures plus the 48 product/project variants, that's 59 manual sessions.
+
+There are **two automated paths** that share the same `scripts/image-prompts.json` manifest. Pick one:
+
+| Path | When to use | Setup time | Speed |
+|---|---|---|---|
+| **§11A — API** (`scripts/generate-images.mjs`) | You can get a free API key from aistudio.google.com | 2 min | 5-15s per image |
+| **§11B — Browser** (`scripts/generate-images-browser.mjs`) | You don't want an API key OR you want to use your existing Gemini web account | 5 min (Playwright install) | 30-90s per image |
+
+The API path is faster and more reliable. The browser path uses your existing Google account session — no key needed.
+
+---
+
+## 11A. Automated batch generation — Gemini API
 
 Manual generation in the Gemini web app works but doesn't scale: each prompt is a copy-paste + wait + right-click-save round trip. For the 11 finish textures plus the 48 product/project variants, that's 59 manual sessions.
 
@@ -1084,13 +1099,74 @@ Generated outputs land at the manifest path. Open each, run through the QC check
 - No `--no` negative block — prompts use natural-language exclusion ("Without showing: people, logos, text on glass...").
 - Per-image generation takes 5-15 seconds. The full 14-job default manifest runs in ~3 minutes.
 
-### Why not browser automation of gemini.google.com
+### Why API is preferred over browser
 
-Considered and rejected:
-- Gemini web requires Google account login (session cookies, OAuth flow)
-- Image outputs in the chat UI are blob URLs — not direct downloads
-- DOM selectors are fragile and break weekly on a product Google iterates on
-- Rate limits are stricter on the web app than on the API
-- One DOM change and every script breaks
+If you have a choice, pick §11A over §11B:
+- Deterministic JSON in/out — no DOM scraping
+- 5-15s per image vs 30-90s per image (browser has UI render lag)
+- No login state to maintain
+- No fragile selectors that break when Google ships a Gemini redesign
+- Same Gemini models (or better via Imagen 3 on Vertex)
 
-The API path is the same Gemini, the same models (or better), with deterministic JSON in/out. Use it.
+That said — if you can't or won't get an API key, §11B is fully functional.
+
+---
+
+## 11B. Automated batch generation — browser (no API key)
+
+Same `scripts/image-prompts.json` manifest, same per-job output paths. Instead of hitting the API, this script drives gemini.google.com via Playwright with a persistent browser profile that remembers your Google login.
+
+### Setup (once)
+
+1. **Install Playwright** (one-time, ~150 MB Chromium download):
+   ```bash
+   npm install -D playwright
+   npx playwright install chromium
+   ```
+
+2. **First run — log in:**
+   ```bash
+   node scripts/generate-images-browser.mjs
+   ```
+   - Chromium opens to gemini.google.com
+   - Log in to your Google account (the one with Gemini access)
+   - Wait until you see the chat UI
+   - Switch back to the terminal and press ENTER
+
+   Session is saved to `.gemini-browser-state/` (gitignored). All future runs reuse the cookies — no re-login needed.
+
+### Run (every time)
+
+```bash
+node scripts/generate-images-browser.mjs
+```
+
+The script:
+- Opens the browser to gemini.google.com (uses saved login)
+- For each manifest job: starts a new chat → types the prompt → clicks Send → waits up to 60s for the generated image to appear → extracts the blob URL via in-page fetch → decodes base64 → writes PNG to the manifest's `output` path
+- Idempotent: skips jobs whose output file already exists
+- Polite throttle: 2s between jobs to avoid looking like a bot
+
+### Cost
+
+**Zero.** Uses your existing Gemini web account. Free-tier limits apply (Gemini 1.5 Flash on the web has a daily image-generation cap — typically 50-100 images depending on your account tier).
+
+### Fragility — read this
+
+Google iterates gemini.google.com weekly. The DOM selectors in the script **will eventually break.** When that happens:
+
+1. The script prints which selector failed (e.g., `prompt input not found (selectors: rich-textarea div[contenteditable="true"], textarea[aria-label*="prompt" i])`)
+2. Open gemini.google.com manually
+3. Inspect the prompt input via DevTools — copy the new selector
+4. Update `SELECTORS` block at the top of `scripts/generate-images-browser.mjs`
+5. Re-run
+
+The four selectors that matter are at lines 47-58 of the script. Each is a comma-separated list of fallbacks — keep the old selector and prepend the new one so older Gemini builds keep working.
+
+### Limitations
+
+- **Headed mode required** — the browser window stays visible (Gemini's UI doesn't fully render in headless Chrome). Run on a machine you can leave alone for the duration of the batch.
+- **One Gemini account per profile dir** — if you need to switch accounts, delete `.gemini-browser-state/` and re-login.
+- **Image output is whatever Gemini gives you** — usually PNG. Aspect ratio is described in prompt, not flag-controlled. Sometimes Gemini ignores aspect-ratio hints; the QC checklist (§6 / §10C) catches these.
+- **CAPTCHA risk** — if Google flags the activity as bot-like, you may see a "verify you're human" challenge. Solve it manually in the open browser window; the script will continue on the next prompt.
+- **No bulk parallelism** — one prompt at a time. The 14-job default manifest runs in ~10-20 minutes (vs ~3 min on the API path).
