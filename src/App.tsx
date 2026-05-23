@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import ChatBubble from "@/components/chat/ChatBubble";
 import CookieBanner from "@/components/shared/CookieBanner";
 import ScrollToTop from "@/components/shared/ScrollToTop";
 
@@ -68,7 +67,6 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-        <ChatBubble />
         <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>
