@@ -9,7 +9,6 @@ import NotFound from "./pages/NotFound";
 import ChatBubble from "@/components/chat/ChatBubble";
 import CookieBanner from "@/components/shared/CookieBanner";
 import ScrollToTop from "@/components/shared/ScrollToTop";
-import StickyShowroomCTA from "@/components/shared/StickyShowroomCTA";
 
 const Products = lazy(() => import("./pages/Products"));
 const WindowSystems = lazy(() => import("./pages/WindowSystems"));
@@ -68,7 +67,6 @@ const App = () => (
           </Routes>
         </Suspense>
         <ChatBubble />
-        <StickyShowroomCTA />
         <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>

@@ -49,7 +49,7 @@ const AuthorityStrip = () => (
           to="/why-upvc"
           className="group inline-flex items-center gap-2 mt-8 text-body-sm font-medium text-[color:var(--ink-primary)] border-b-[1.5px] border-[color:var(--ink-primary)] pb-1 hover:text-[color:var(--accent)] hover:border-[color:var(--accent)] transition-colors duration-300 ease-marvin"
         >
-          Why uPVC for the tropics
+          Why uPVC
           <span className="transition-transform duration-300 ease-marvin group-hover:translate-x-0.5">→</span>
         </Link>
       </div>

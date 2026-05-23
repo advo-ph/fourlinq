@@ -325,18 +325,6 @@ const Window3D = ({
           {isOpen ? config.closeLabel : config.openLabel}
         </button>
 
-        {/* Attribution */}
-        <div className="absolute top-4 right-4 text-[10px] tracking-[0.06em] text-[color:var(--ink-muted)] bg-white/85 backdrop-blur-sm px-2 py-1">
-          3D model by{" "}
-          <a
-            href="https://sketchfab.com/makinwhat"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            makinwhat
-          </a>
-        </div>
       </div>
 
       {/* Finish picker */}
@@ -371,6 +359,21 @@ const Window3D = ({
           })}
         </ul>
       </div>
+
+      {/* Attribution — small microline below the viewer; CC-BY satisfied
+          without compromising authorship of the FourlinQ surface. */}
+      <p className="mt-6 text-[10px] tracking-[0.06em] text-[color:var(--ink-muted)] text-right">
+        3D model by{" "}
+        <a
+          href="https://sketchfab.com/makinwhat"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline-offset-2 hover:underline"
+        >
+          makinwhat
+        </a>
+        {" "}· used with commercial permission
+      </p>
     </div>
   );
 };

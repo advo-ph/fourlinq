@@ -7,7 +7,7 @@ const BrandCTA = () => (
       <AccentStripe width="sm" color="accent" className="mb-6" />
       <p className="eyebrow text-white/60 mb-6">A lifetime of satisfaction</p>
       <h2 className="font-serif font-normal tracking-tight text-white text-h2 lg:text-h1 leading-[1.1]">
-        Built to last.<br />Backed by a 10-year warranty.
+        Built to last. Backed by a 10-year warranty.
       </h2>
     </div>
     <div className="lg:pl-8">

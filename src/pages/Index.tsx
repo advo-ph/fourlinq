@@ -34,8 +34,6 @@ const Index = () => {
         lede="Custom-made uPVC windows and doors engineered for the Philippine climate. Available in 11 finishes, backed by a 10-year warranty."
         ctaLabel="Explore Systems"
         ctaTo="/products"
-        secondaryLabel="Visit a Showroom →"
-        secondaryTo="/brand#showrooms"
       />
 
       <Section tone="canvas" size="lg">
@@ -58,14 +56,9 @@ const Index = () => {
             <EyebrowHeading eyebrow="Try the systems" level={2}>
               Rotate. Open. Refinish.
             </EyebrowHeading>
-            <div className="mt-8 lg:mt-10 space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.6]">
-              <p>
-                Real 3D models of four FourlinQ systems — Casement, Sliding, Awning, and Slide &amp; Fold. Pick a system, drag to look from any angle, swap any of the eleven finishes, and click to see it actuate exactly as it would on a real installation.
-              </p>
-              <p className="text-body-sm text-[color:var(--ink-muted)]">
-                The actual profile geometry on a real FourlinQ order is more detailed than what we render here.
-              </p>
-            </div>
+            <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.6]">
+              Drag to rotate. Click to open. Swap any of the eleven finishes.
+            </p>
           </div>
           <div>
             <Suspense
