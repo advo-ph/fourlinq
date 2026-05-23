@@ -56,6 +56,9 @@ const EditorialFooter = () => {
             <Link to="/" className="inline-block">
               <Logo variant="light" className="h-12" />
             </Link>
+            <p className="mt-4 text-[11px] uppercase tracking-[0.12em] text-white/50 font-medium">
+              Custom-made in the Philippines
+            </p>
           </div>
           <div className="flex flex-col gap-4 lg:items-end">
             <p className="font-serif text-h3 lg:text-h2 leading-[1.15] tracking-tight max-w-[28rem] lg:text-right">

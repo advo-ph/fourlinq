@@ -8,6 +8,7 @@ const Window3D = lazy(() => import("@/components/3d/Window3D"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
 import EditorialIntro from "@/components/home/EditorialIntro";
+import AuthorityStrip from "@/components/home/AuthorityStrip";
 import SystemsTiles from "@/components/home/SystemsTiles";
 import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
@@ -40,6 +41,10 @@ const Index = () => {
       <Section tone="canvas" size="lg">
         <CapizDivider className="mb-section-mobile md:mb-section-tablet lg:mb-section-desktop" />
         <EditorialIntro />
+      </Section>
+
+      <Section tone="canvas" size="md">
+        <AuthorityStrip />
       </Section>
 
       <Section tone="soft" size="lg">

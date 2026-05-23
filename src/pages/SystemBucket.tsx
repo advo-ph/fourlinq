@@ -6,6 +6,7 @@ import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import QuoteModal from "@/components/shared/QuoteModal";
 import ProjectPhotoSwitcher, { type ProjectPhoto } from "@/components/shared/ProjectPhotoSwitcher";
+import UPVCAdvantageStrip from "@/components/shared/UPVCAdvantageStrip";
 import EditorialButton from "@/components/primitives/Button";
 import { useProducts, Product } from "@/hooks/useProducts";
 import { trackProductView } from "@/hooks/useAnalytics";
@@ -140,6 +141,12 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
                 ))}
               </AnimatePresence>
             </div>
+          </div>
+
+          {/* uPVC Advantage Strip — PH-context-specific counter to K&M's
+              European-boilerplate "8 Advantages" list. */}
+          <div className="mt-24 lg:mt-32 pt-12 lg:pt-16 border-t border-[color:var(--rule-soft)]">
+            <UPVCAdvantageStrip />
           </div>
 
           {/* Consultation CTA */}
