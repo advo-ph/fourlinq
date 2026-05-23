@@ -3,7 +3,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
-import ContactForm from "@/components/shared/ContactForm";
+import ConsultationForm from "@/components/shared/ConsultationForm";
 import { certifications, CONTACT, BRANCHES, BRAND } from "@/data/brand";
 import { ShieldCheck, BadgeCheck, Award, FileCheck, Leaf, Wind, MapPin, Phone, Mail, Clock, Shield, CloudRain, VolumeX, ArrowUpRight } from "lucide-react";
 
@@ -92,11 +92,11 @@ const Brand = () => (
     <Section id="contact" tone="canvas" size="lg" className="scroll-mt-28">
       <div className="grid lg:grid-cols-[5fr,7fr] gap-12 lg:gap-20">
         <div>
-          <EyebrowHeading eyebrow="Get in touch" level={2}>
-            Start a conversation.
+          <EyebrowHeading eyebrow="Book a consultation" level={2}>
+            Start with a conversation.
           </EyebrowHeading>
-          <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[28rem]">
-            Whether you need a quote, consultation, or just have a question — we're here to help.
+          <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[28rem] leading-[1.65]">
+            Tell us about your project in four quick questions. A FourlinQ engineer will respond within one business day to schedule your ninety-minute showroom visit.
           </p>
 
           <ul className="mt-10 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
@@ -106,7 +106,7 @@ const Brand = () => (
             <ContactRow icon={<Mail size={16} strokeWidth={1.5} />} label="Email" value={CONTACT.email} href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`} external />
           </ul>
         </div>
-        <ContactForm />
+        <ConsultationForm />
       </div>
     </Section>
 
