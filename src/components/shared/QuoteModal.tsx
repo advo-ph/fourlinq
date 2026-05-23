@@ -67,7 +67,7 @@ const QuoteModal = ({ isOpen, onClose, productName, productId }: QuoteModalProps
           />
           <motion.aside
             initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-            transition={{ duration: 0.5, ease: [0.68, 0, 0.33, 1] }}
+            transition={{ duration: 0.4, ease: [0.68, 0, 0.33, 1] }}
             className="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-white z-[60] overflow-y-auto shadow-depth-8 flex flex-col"
           >
             <div className="h-[3px] bg-[color:var(--accent)] shrink-0" />

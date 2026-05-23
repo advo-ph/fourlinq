@@ -15,6 +15,7 @@ const WindowSystems = lazy(() => import("./pages/WindowSystems"));
 const DoorSystems = lazy(() => import("./pages/DoorSystems"));
 const SpecialistSystems = lazy(() => import("./pages/SpecialistSystems"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
+const Warranty = lazy(() => import("./pages/Warranty"));
 const DesignTool = lazy(() => import("./pages/DesignTool"));
 const WhyUpvc = lazy(() => import("./pages/WhyUpvc"));
 const Brand = lazy(() => import("./pages/Brand"));
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/products/doors" element={<DoorSystems />} />
             <Route path="/products/specialist" element={<SpecialistSystems />} />
             <Route path="/whats-new" element={<WhatsNew />} />
+            <Route path="/warranty" element={<Warranty />} />
             <Route path="/design-tool" element={<DesignTool />} />
             <Route path="/why-upvc" element={<WhyUpvc />} />
             <Route path="/brand" element={<Brand />} />

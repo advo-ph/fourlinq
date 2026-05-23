@@ -48,7 +48,7 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
-        transition={{ duration: 0.5, ease: [0.68, 0, 0.33, 1] }}
+        transition={{ duration: 0.4, ease: [0.68, 0, 0.33, 1] }}
         className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white z-[60] overflow-y-auto shadow-depth-8 flex flex-col"
       >
         {/* Accent stripe */}
@@ -234,7 +234,7 @@ const Products = () => {
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.35, ease: [0.68, 0, 0.33, 1] }}
+                    transition={{ duration: 0.3, ease: [0.68, 0, 0.33, 1] }}
                     onClick={() => { setSelectedProduct(product); trackProductView(product.name); }}
                     className="group block text-left"
                   >

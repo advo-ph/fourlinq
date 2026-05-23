@@ -107,7 +107,7 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.3, ease: [0.68, 0, 0.33, 1] }}
                     onClick={() => { setSelected(product); trackProductView(product.name); }}
                     className="group block text-left"
                   >
@@ -183,7 +183,7 @@ const ProductPeek = ({ product, onClose }: { product: Product; onClose: () => vo
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.3, ease: [0.68, 0, 0.33, 1] }}
         className="fixed inset-0 bg-[color:var(--ink-primary)]/30 backdrop-blur-sm z-[55]"
         onClick={onClose}
       />
@@ -191,7 +191,7 @@ const ProductPeek = ({ product, onClose }: { product: Product; onClose: () => vo
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.4, ease: [0.68, 0, 0.33, 1] }}
         className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white z-[60] overflow-y-auto shadow-depth-8"
       >
         <div className="h-[3px] bg-[color:var(--accent)]" />

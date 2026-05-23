@@ -113,11 +113,23 @@ const QuietNavbar = () => {
               })}
             </ul>
 
-            {/* Right side: single primary CTA */}
-            <div className="hidden lg:block shrink-0">
-              <EditorialButton to="/brand#contact" size="sm" variant="primary">
-                Request a Quote
-              </EditorialButton>
+            {/* Right side: tertiary text link to showroom — Marvin pattern.
+                Tita's brief §3 called out the red square CTA as too aggressive.
+                Showroom-visit-as-funnel is shipped across product pages now. */}
+            <div className="hidden lg:flex items-center shrink-0">
+              <Link
+                to="/brand#showrooms"
+                className={cn(
+                  "whitespace-nowrap text-body-sm font-medium text-[color:var(--ink-primary)]",
+                  "transition-colors duration-300 ease-marvin hover:text-[color:var(--accent)]",
+                  "inline-flex items-center gap-1.5 group/cta"
+                )}
+              >
+                Visit a Showroom
+                <span className="inline-block transition-transform duration-300 ease-marvin group-hover/cta:translate-x-0.5">
+                  →
+                </span>
+              </Link>
             </div>
 
             {/* Mobile toggle */}
@@ -171,8 +183,8 @@ const QuietNavbar = () => {
               })}
             </ul>
             <div className="mt-v700">
-              <EditorialButton to="/brand#contact" size="lg" variant="primary" fullWidth>
-                Request a Quote
+              <EditorialButton to="/brand#showrooms" size="lg" variant="primary" fullWidth>
+                Visit a Showroom
               </EditorialButton>
             </div>
           </div>

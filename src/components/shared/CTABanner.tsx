@@ -12,10 +12,10 @@ interface CTABannerProps {
 }
 
 const CTABanner = ({
-  headline = "Ready to Transform Your Space?",
-  subtext = "Book a free consultation with our fenestration specialists or browse our complete range of uPVC systems.",
-  primaryLabel = "Book Consultation",
-  primaryTo = "/brand#contact",
+  headline = "Start with a conversation.",
+  subtext = "Ninety minutes with a FourlinQ engineer at one of our four showrooms across Metro Manila and Cebu. Bring your floor plan, or just your questions.",
+  primaryLabel = "Visit a Showroom",
+  primaryTo = "/brand#showrooms",
   secondaryLabel = "Browse Products",
   secondaryTo = "/products",
 }: CTABannerProps) => {
