@@ -119,13 +119,18 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     // it's currently attached to the React tree via primitive).
     sceneClone.updateMatrixWorld(true);
 
+    // Measure bbox using each visible mesh's geometry.boundingBox transformed
+    // by its world matrix. This avoids setFromObject's recursive walk pulling
+    // in hidden descendants, and avoids quirks with skinned/armature meshes.
     const bbox = new THREE.Box3();
     let foundAny = false;
     sceneClone.traverse((child) => {
       if (child.type !== "Mesh") return;
       const mesh = child as THREE.Mesh;
-      if (!mesh.visible) return;
-      const meshBox = new THREE.Box3().setFromObject(mesh);
+      if (!mesh.visible || !mesh.geometry) return;
+      if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+      if (!mesh.geometry.boundingBox) return;
+      const meshBox = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld);
       if (!meshBox.isEmpty()) {
         bbox.union(meshBox);
         foundAny = true;
@@ -135,11 +140,11 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     if (foundAny && innerRef.current) {
       const center = bbox.getCenter(new THREE.Vector3());
       const size = bbox.getSize(new THREE.Vector3());
-      const longestSide = Math.max(size.x, size.y, size.z) || 1;
-      const targetSize = 1.6;
-      const scale = targetSize / longestSide;
-      // Apply scale + offset together on innerRef so world position of
-      // bbox center lands at origin: world = scale * (local - center)
+      // Normalize against the larger of x/y only — z is depth (frame thickness)
+      // and shouldn't drive scale, otherwise thin wide windows render tiny.
+      const planar = Math.max(size.x, size.y) || 1;
+      const targetSize = 1.4;
+      const scale = targetSize / planar;
       innerRef.current.scale.setScalar(scale);
       innerRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
     }
