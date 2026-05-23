@@ -18,6 +18,37 @@ const FILTER_TABS: { id: FinishFilter; label: string }[] = [
 ];
 
 /**
+ * Per-finish editorial pairing — where in a Philippine home this finish reads
+ * best, what architectural register it belongs to, what to pair it with.
+ * Brochure-verified description lives in FRAME_FINISHES.description; this
+ * adds the context that turns a swatch grid into a design conversation.
+ */
+const finishPairing: Record<string, string> = {
+  "oak-light":
+    "The finish that quietly disappears. Sits well in modern Antipolo or Tagaytay residences with a Scandinavian-Filipino register — pale-oak floors, white plaster walls, indoor planting. Reads as warm white from across the room and as soft natural timber up close. Pairs flawlessly with concrete + linen.",
+  "oak-malt":
+    "The honest middle. Less rustic than golden oak, less austere than woodgray. Works on the lanai-facing facade of a coastal Batangas home where the warm tone catches afternoon light, and on heritage-modern interiors that need a wood note without committing to dark timber. Pairs with bone-white walls and brushed-bronze hardware.",
+  woodgray:
+    "The driftwood register. The most architectural of the wood-grains — reads as weathered timber on a beachfront install, as soft warm grey in an urban condo. Specifies particularly well for mid-century-leaning Filipino architecture and for projects where the architect doesn't want to declare 'wood' or 'paint' definitively. Pairs with white oak, polished concrete, and any natural stone.",
+  "2-wood-black":
+    "The moody alternative to Jet Black. When the architect wants drama but doesn't want a flat-black industrial read. Reads as wenge or ebonized oak in raking light, as deep espresso in direct sun. Works on the contrasting wall of a tropical-modern home and on contemporary commercial interiors. Pairs with travertine, brass, and high-contrast white.",
+  "dark-oak":
+    "The classic Filipino hardwood register without the hardwood maintenance. Reads as narra or aged kamagong from across a room — warm, deep, grounded. Specifies for heritage homes, ancestral-house renovations, and projects that want a soft nod to traditional Filipino architecture. Pairs with capiz light fixtures, terracotta, and limewashed walls.",
+  walnut:
+    "The richest wood-grain in the catalog. Specifies for projects where the window is meant to be noticed — feature walls in formal living rooms, statement entries, double-height openings in Tagaytay homes. Reads as solid American walnut up close. Pairs with brass, cream linen, and deep emerald or olive interiors.",
+  "golden-oak":
+    "The warmest wood-grain. The finish for a sun-drenched lanai opening or a kitchen window above the sink. Specifies particularly well for tropical-traditional Filipino homes — bahay-na-bato influences, capiz screens, rattan furniture. Pairs with terracotta tile, mango wood, and warm-white interiors.",
+  white:
+    "The default and the discipline. The matte white finish that lets the architecture lead and the windows recede. Works everywhere — the gold standard for modern Quezon City facades, condominium interiors, white-on-white kitchens, and any project where the window is meant to disappear into the wall. Pairs with everything.",
+  "jet-black":
+    "The flat black. No grain, no texture, no softening. The choice when the architect wants the window read as a graphic gesture — a black frame against a white wall, a dark line in a minimalist facade. Specifies for modernist projects and contemporary commercial conversions. Pairs with raw concrete, white oak, and bright planting.",
+  "charcoal-gray":
+    "Black without the commitment. The softer alternative to Jet Black — reads as deep graphite, dark stone, gunmetal. Works on the seaside elevation of a Batangas residence where it matches the late-afternoon storm light, and on industrial-modern condos. Pairs with pale concrete, brushed steel, and any warm timber.",
+  "matte-quartz":
+    "The mid-tone grey. The most neutral non-white finish — reads as architectural concrete from across the room. Specifies for projects where the architect wants the window to feel structural rather than decorative. Works on commercial conversions, modernist residential, and any facade where the grey of the frame should match the grey of the structure. Pairs with concrete, white, and natural greenery.",
+};
+
+/**
  * The wow-factor page: interactive finish explorer.
  * Click a finish; the window frame in the hero photo changes to that finish.
  * No competitor in the Philippine fenestration market has anything like this.
@@ -102,6 +133,14 @@ const Finishes = () => {
               <p className="text-body-lg lg:text-lead text-[color:var(--ink-secondary)] leading-[1.55] max-w-[34rem]">
                 {selected.description}
               </p>
+              {finishPairing[selected.id] && (
+                <div className="mt-6 max-w-[34rem]">
+                  <p className="eyebrow mb-3">Where it works</p>
+                  <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.7]">
+                    {finishPairing[selected.id]}
+                  </p>
+                </div>
+              )}
 
               <div className="mt-10 flex flex-wrap items-center gap-5">
                 <EditorialButton to="/products" variant="primary" size="md">
