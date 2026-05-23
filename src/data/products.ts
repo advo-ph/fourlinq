@@ -69,7 +69,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "special-shapes")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "special-shapes")!.tagline,
-    image: "/images/wp-export/Windows.jpg",
+    image: "/images/wp-export/Special-Shape-Window-1.jpg",
     specs: [
       "Custom geometry — arches, circles, triangles",
       "Combinable with other window types",
@@ -85,7 +85,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "awning")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "awning")!.tagline,
-    image: "/images/wp-export/Casement-Window.jpg",
+    image: "/images/wp-export/Awning-Window.jpg",
     specs: [
       "Top-hinged, opens outward",
       "Ventilation even during rain",
@@ -169,7 +169,7 @@ export const products: Product[] = [
     description:
       "Large-format panel doors engineered for openings up to 6 metres wide. Built for ground-floor living rooms and lanai-facing walls where the door itself becomes part of the architecture. Custom-specified per project.",
     shortDescription: "Door openings up to 6 metres wide.",
-    image: "/images/wp-export/FQC-Project-18.jpg",
+    image: "/images/wp-export/Door-14.jpg",
     specs: [
       "Spans up to 6 metres wide",
       "Multi-chamber reinforced profile",
@@ -186,7 +186,7 @@ export const products: Product[] = [
     description:
       "Lift-and-slide door system. The panel lifts off its seal to slide effortlessly along the track, then settles back onto the seal when closed for a fully weather-tight finish. Ideal for large openings where smooth daily operation matters.",
     shortDescription: "Effortless operation on large openings.",
-    image: "/images/wp-export/Sliding-Door.jpg",
+    image: "/images/wp-export/Door-6.jpg",
     specs: [
       "Lift mechanism for low-effort operation",
       "Weather-tight closed-position seal",
@@ -203,7 +203,7 @@ export const products: Product[] = [
     description:
       "FourlinQ 90 Series door system — engineered for premium residential applications where performance and finish matter. Custom-specified profile family.",
     shortDescription: "Premium residential door system.",
-    image: "/images/wp-export/Door-1.jpg",
+    image: "/images/wp-export/Door-7.jpg",
     specs: [
       "90 Series profile family",
       "Multi-chamber reinforced profile",
@@ -221,7 +221,7 @@ export const products: Product[] = [
     description:
       "Custom-curved profile work for arched windows and doors. Designed and fabricated to architect-specified geometry. Common in heritage homes and statement entries.",
     shortDescription: "Custom-curved geometry for architectural statements.",
-    image: "/images/wp-export/FourlinQ-Project-8.jpg",
+    image: "/images/wp-export/Arc-Window.jpg",
     specs: [
       "Architect-specified arc geometry",
       "Multi-chamber uPVC profile",
@@ -255,7 +255,7 @@ export const products: Product[] = [
     description:
       "Non-standard panel geometries — triangles, trapezoids, hexagons, and full bespoke shapes. Designed to architect drawings, fabricated in our workshop. The panels that other manufacturers say can't be done.",
     shortDescription: "Bespoke geometry to architect drawings.",
-    image: "/images/wp-export/Windows.jpg",
+    image: "/images/wp-export/Special-Shape-Window.jpg",
     specs: [
       "Architect-drawn geometry",
       "Workshop-fabricated",

@@ -54,12 +54,12 @@ const MANIFEST_PATH = process.argv[2] || resolve(__dirname, "image-prompts.json"
 const SELECTORS = {
   promptInput: 'rich-textarea div[contenteditable="true"], textarea[aria-label*="prompt" i]',
   sendButton: 'button[aria-label*="Send" i]:not([disabled]), button[aria-label*="send" i]:not([disabled])',
-  // The "newest" image in the conversation — Gemini renders generated
-  // images as <img> elements inside the response stream
-  generatedImage: 'model-response img[src^="blob:"], div[data-test-id*="response"] img[src^="blob:"], message-content img[src^="blob:"]',
+  // The "newest" generated image. Order matters — most specific first. We
+  // intentionally include any large <img> inside response containers, then
+  // any <img> with a blob/data/google URL, to catch whatever rendering
+  // pattern Gemini uses today.
+  generatedImage: 'model-response img:not([src*="googleusercontent"]):not([alt*="avatar" i]):not([alt*="logo" i]):not([alt=""]):not([width="32"]):not([width="40"]), message-content img:not([alt=""]), response-content img:not([alt=""]), [data-message-id] img:not([src*="avatar" i]):not([alt=""])',
   newChatButton: 'button[aria-label*="New chat" i], a[aria-label*="New chat" i]',
-  // A signal that generation is done — the loading spinner disappears
-  loadingIndicator: 'mat-progress-spinner, [class*="loading"], [class*="generating"]',
 };
 
 const PROMPT_TIMEOUT_MS = 90_000;  // generous — image gen can take 30-60s
@@ -163,30 +163,74 @@ async function submitPrompt(promptText) {
 
 async function waitForGeneratedImage() {
   const deadline = Date.now() + IMAGE_WAIT_MS;
+  let img = null;
   while (Date.now() < deadline) {
-    const img = await findFirst(SELECTORS.generatedImage);
-    if (img) return img.el;
+    img = await findFirst(SELECTORS.generatedImage);
+    if (img) {
+      // Wait for the image to be at least 200×200px (avoid catching icons)
+      // and to have a stable src (avoid the brief intermediate loading state)
+      const ready = await page.evaluate((el) => {
+        if (!el) return false;
+        return el.naturalWidth >= 200 && el.naturalHeight >= 200 && !!el.src;
+      }, img.el);
+      if (ready) return img.el;
+    }
     await sleep(POLL_INTERVAL_MS);
   }
-  throw new Error(`no generated image appeared within ${IMAGE_WAIT_MS / 1000}s (selectors: ${SELECTORS.generatedImage})`);
+  // On failure, capture some diagnostics so we know what was on the page
+  const lastImgInfo = await page.evaluate(() => {
+    const imgs = Array.from(document.querySelectorAll("img"));
+    return imgs.slice(0, 10).map((i) => ({
+      src: (i.src || "").slice(0, 80),
+      alt: i.alt,
+      w: i.naturalWidth,
+      h: i.naturalHeight,
+    }));
+  });
+  throw new Error(`no qualifying image within ${IMAGE_WAIT_MS / 1000}s. ${JSON.stringify(lastImgInfo).slice(0, 400)}`);
 }
 
 async function extractImageBytes(imgHandle) {
-  // Use in-page fetch to grab the blob, return as base64.
-  const dataUrl = await page.evaluate(async (img) => {
-    if (!img?.src) return null;
-    const res = await fetch(img.src);
-    const blob = await res.blob();
-    return await new Promise((r) => {
-      const reader = new FileReader();
-      reader.onloadend = () => r(reader.result);
-      reader.readAsDataURL(blob);
-    });
+  // Three-tier extraction. Each tier reports back what it tried so failures are debuggable.
+  const result = await page.evaluate(async (img) => {
+    if (!img) return { ok: false, why: "img element is null" };
+    const src = img.src || img.currentSrc || img.getAttribute("src");
+    if (!src) return { ok: false, why: "img has no src attribute" };
+
+    // Tier 1: src is already a data: URL — just extract base64
+    if (src.startsWith("data:image/")) {
+      const base64 = src.split(",")[1];
+      return { ok: true, tier: "data-url", srcKind: "data", base64, size: base64.length };
+    }
+
+    // Tier 2: try in-page fetch (works for blob: and same-origin https:)
+    try {
+      const res = await fetch(src, { credentials: "include" });
+      if (!res.ok) return { ok: false, why: `fetch HTTP ${res.status}`, src };
+      const blob = await res.blob();
+      const dataUrl = await new Promise((r, rej) => {
+        const reader = new FileReader();
+        reader.onloadend = () => r(reader.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(blob);
+      });
+      const base64 = dataUrl.split(",")[1];
+      return { ok: true, tier: "in-page-fetch", srcKind: src.split(":")[0], base64, size: base64.length };
+    } catch (fetchErr) {
+      return { ok: false, why: `fetch threw: ${fetchErr.message}`, src };
+    }
   }, imgHandle);
 
-  if (!dataUrl) throw new Error("in-page fetch returned empty result");
-  const base64 = dataUrl.split(",")[1];
-  return Buffer.from(base64, "base64");
+  if (result.ok) {
+    process.stdout.write(`[${result.tier}/${result.srcKind}] `);
+    return Buffer.from(result.base64, "base64");
+  }
+
+  // Tier 3: screenshot the image element directly — guaranteed to produce PNG bytes
+  // even when the src can't be fetched (CORS, expired blob, weird URL scheme).
+  process.stdout.write(`[fallback: screenshot — ${result.why}] `);
+  const buf = await imgHandle.screenshot({ omitBackground: true });
+  return buf;
 }
 
 // ----- Run -----

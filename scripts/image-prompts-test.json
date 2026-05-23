@@ -1,0 +1,12 @@
+[
+  {
+    "id": "test-walnut-texture",
+    "output": "public/textures/finishes/walnut.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: solid American black walnut hardwood, rich chocolate brown with strong straight grain pattern, premium feature wood, vertical grain orientation. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "test-white-texture",
+    "output": "public/textures/finishes/white.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: matte white uPVC plastic surface, perfectly smooth with no grain or texture, subtle sheen, micro-fine satin finish only visible up close. Photorealistic, 8K, ultra detailed."
+  }
+]
