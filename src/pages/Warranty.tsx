@@ -6,13 +6,11 @@ import { BRAND, CONTACT } from "@/data/fourlinq-data";
 
 /**
  * /warranty — dedicated warranty page.
- * Milgard audit §6 pattern: warranty as oxygen, not footer. This is the
- * landing destination for the warranty trust signals scattered across
- * product pages and the home hero subhead.
+ * Milgard audit §6 pattern: warranty as oxygen, not footer.
  *
- * Scope deliberately matches what's in BRAND.warrantyScope — no
- * fabricated coverage areas. If the brochure adds more later, this page
- * will reflect that automatically via the data import.
+ * Photo-led layout: hero install, per-scope material/hardware photo,
+ * per-step contextual photo. Each section gets a real photograph instead
+ * of a wall of text.
  */
 
 const Warranty = () => (
@@ -26,7 +24,7 @@ const Warranty = () => (
 
     <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
       <div className="container-editorial">
-        {/* Headline statement */}
+        {/* Headline statement + the 10 stat — split with hero install photo */}
         <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-20 lg:mb-28">
           <div className="lg:col-span-7">
             <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
@@ -44,31 +42,58 @@ const Warranty = () => (
           </div>
         </div>
 
-        {/* What's covered */}
+        {/* Hero install photo */}
+        <div className="mb-24 lg:mb-32">
+          <div className="aspect-[16/9] lg:aspect-[21/9] overflow-hidden bg-[color:var(--canvas-soft)]">
+            <img
+              src="/images/wp-export/FourlinQ-Project-7.jpg"
+              alt="Modern residence with FourlinQ casement and sliding windows installed throughout"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* What's covered — 4 scope cards each with their own photo */}
         <div className="border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 mb-24 lg:mb-32">
           <p className="eyebrow mb-5">What's covered</p>
           <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)] mb-12 lg:mb-16 max-w-3xl">
             Four areas, no surprises.
           </h2>
 
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-            {BRAND.warrantyScope.map((scope, i) => (
-              <li key={scope} className="border-t border-[color:var(--rule-soft)] pt-6">
-                <p className="font-serif text-[40px] lg:text-[56px] leading-none text-[color:var(--ink-faint)] mb-4 tracking-tight">
-                  {String(i + 1).padStart(2, "0")}
-                </p>
-                <h3 className="font-serif text-h4 text-[color:var(--ink-primary)] tracking-tight mb-3">
-                  {scope}
-                </h3>
-                <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.65] max-w-md">
-                  {scopeDescriptions[scope] || "Covered for the full 10-year warranty term."}
-                </p>
-              </li>
-            ))}
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-14 lg:gap-y-20">
+            {BRAND.warrantyScope.map((scope, i) => {
+              const photo = scopePhoto[scope];
+              return (
+                <li key={scope}>
+                  {photo && (
+                    <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)] mb-6">
+                      <img
+                        src={photo.src}
+                        alt={photo.alt}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <p className="font-serif text-[32px] lg:text-[40px] leading-none text-[color:var(--ink-faint)] mb-3 tracking-tight">
+                    {String(i + 1).padStart(2, "0")}
+                  </p>
+                  <h3 className="font-serif text-h4 text-[color:var(--ink-primary)] tracking-tight mb-3">
+                    {scope}
+                  </h3>
+                  <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.65] max-w-md">
+                    {scopeDescriptions[scope] || "Covered for the full 10-year warranty term."}
+                  </p>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
-        {/* The honest part */}
+        {/* The honest part — kept text-only, this is the legal-disclosure tone */}
         <div className="border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 mb-24 lg:mb-32">
           <div className="grid lg:grid-cols-12 gap-x-8 gap-y-8">
             <div className="lg:col-span-4">
@@ -103,32 +128,27 @@ const Warranty = () => (
           </div>
         </div>
 
-        {/* How to register / claim */}
+        {/* How it works — 3 steps each with their own photo */}
         <div className="border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 mb-24 lg:mb-32">
           <p className="eyebrow mb-3">How it works</p>
           <h2 className="font-serif text-h3 lg:text-h2 leading-[1.1] tracking-tight text-[color:var(--ink-primary)] mb-10 lg:mb-14">
             Three steps. No paperwork burden.
           </h2>
 
-          <ol className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10">
-            {[
-              {
-                step: "01",
-                title: "Installed",
-                body: "When the FourlinQ team finishes your install, the warranty period begins automatically. Your project file is logged in our database; you don't need to do anything.",
-              },
-              {
-                step: "02",
-                title: "Recorded",
-                body: "We send you a signed warranty certificate by email and post within fourteen days. Keep it with your house papers. Or call us if you can't find it. We have the record.",
-              },
-              {
-                step: "03",
-                title: "Honored",
-                body: `If anything covered by the warranty fails within ten years, call ${CONTACT.mobileAssist} or email ${CONTACT.email}. We'll schedule a site visit within a week and resolve it at no cost.`,
-              },
-            ].map(({ step, title, body }) => (
+          <ol className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
+            {STEPS.map(({ step, title, body, photo }) => (
               <li key={step}>
+                {photo && (
+                  <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)] mb-6">
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <p className="font-serif text-[40px] leading-none text-[color:var(--accent)] mb-4 tracking-tight">
                   {step}
                 </p>
@@ -174,23 +194,36 @@ const Warranty = () => (
           </div>
         </div>
 
-        {/* Closing CTA */}
+        {/* Closing CTA — paired with a showroom-feel photo */}
         <div className="border-t border-[color:var(--rule-soft)] pt-16 lg:pt-20">
-          <div className="max-w-2xl">
-            <p className="eyebrow mb-4">Next</p>
-            <h2 className="font-serif text-h2 lg:text-h1 tracking-tight text-[color:var(--ink-primary)] leading-[1.05] mb-6">
-              Walk into a showroom. See the warranty in person.
-            </h2>
-            <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] mb-10">
-              The fastest way to feel confident about a 10-year promise is to feel a 10-year-old FourlinQ window in your hands. There's one at every showroom, installed back when we were founding the company.
-            </p>
-            <div className="flex flex-wrap gap-x-8 gap-y-3 items-center">
-              <EditorialButton to="/brand#showrooms" variant="primary" size="lg">
-                Visit a Showroom
-              </EditorialButton>
-              <Link to="/why-upvc" className="text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin underline-offset-4 hover:underline">
-                Why uPVC →
-              </Link>
+          <div className="grid lg:grid-cols-12 gap-x-12 gap-y-12 items-center">
+            <div className="lg:col-span-7">
+              <p className="eyebrow mb-4">Next</p>
+              <h2 className="font-serif text-h2 lg:text-h1 tracking-tight text-[color:var(--ink-primary)] leading-[1.05] mb-6">
+                Walk into a showroom. See the warranty in person.
+              </h2>
+              <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] mb-10">
+                The fastest way to feel confident about a 10-year promise is to feel a 10-year-old FourlinQ window in your hands. There's one at every showroom, installed back when we were founding the company.
+              </p>
+              <div className="flex flex-wrap gap-x-8 gap-y-3 items-center">
+                <EditorialButton to="/brand#showrooms" variant="primary" size="lg">
+                  Visit a Showroom
+                </EditorialButton>
+                <Link to="/why-upvc" className="text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin underline-offset-4 hover:underline">
+                  Why uPVC →
+                </Link>
+              </div>
+            </div>
+            <div className="lg:col-span-4 lg:col-start-9">
+              <div className="aspect-[4/5] overflow-hidden bg-[color:var(--canvas-soft)]">
+                <img
+                  src="/images/wp-export/FQC-Project-17.jpg"
+                  alt="A FourlinQ installation seen from inside, garden view through the glass"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -198,6 +231,26 @@ const Warranty = () => (
     </section>
   </Layout>
 );
+
+// Per-scope photo: real brochure material/hardware shots
+const scopePhoto: Record<string, { src: string; alt: string }> = {
+  "Corrosion resistance": {
+    src: "/images/wp-export/Corrosion-Resistance.jpg",
+    alt: "uPVC profile demonstrating corrosion resistance",
+  },
+  "Long lasting performance": {
+    src: "/images/wp-export/Stainless-Mechanism-e1568775693636.jpg",
+    alt: "FourlinQ stainless steel operating hardware",
+  },
+  "Weather resistance": {
+    src: "/images/wp-export/Air-Water-Tight.jpg",
+    alt: "Air and water tight EPDM gasket assembly on FourlinQ profile",
+  },
+  "Sound insulation": {
+    src: "/images/wp-export/Sound-Insulation.jpg",
+    alt: "Sound-insulating multi-chamber uPVC profile assembly",
+  },
+};
 
 // Short descriptions per warranty scope, sourced from BRAND.warrantyScope semantics.
 const scopeDescriptions: Record<string, string> = {
@@ -210,5 +263,36 @@ const scopeDescriptions: Record<string, string> = {
   "Sound insulation":
     "Multi-chamber profiles plus 6–12 mm glazing options reduce exterior noise. Covered against acoustic degradation of the seal assembly through the warranty term.",
 };
+
+// Three steps with contextual photos
+const STEPS = [
+  {
+    step: "01",
+    title: "Installed",
+    body: "When the FourlinQ team finishes your install, the warranty period begins automatically. Your project file is logged in our database; you don't need to do anything.",
+    photo: {
+      src: "/images/wp-export/Casement-Window.jpg",
+      alt: "A finished FourlinQ casement window installation",
+    },
+  },
+  {
+    step: "02",
+    title: "Recorded",
+    body: "We send you a signed warranty certificate by email and post within fourteen days. Keep it with your house papers. Or call us if you can't find it. We have the record.",
+    photo: {
+      src: "/images/wp-export/Black-Profile.jpg",
+      alt: "FourlinQ profile finish detail",
+    },
+  },
+  {
+    step: "03",
+    title: "Honored",
+    body: `If anything covered by the warranty fails within ten years, call ${CONTACT.mobileAssist} or email ${CONTACT.email}. We'll schedule a site visit within a week and resolve it at no cost.`,
+    photo: {
+      src: "/images/wp-export/Stainless-Mechanisms.jpg",
+      alt: "FourlinQ stainless steel mechanism close-up",
+    },
+  },
+];
 
 export default Warranty;
