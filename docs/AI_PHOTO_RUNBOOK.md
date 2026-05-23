@@ -983,3 +983,114 @@ If you're working through textures one at a time, do them in this order:
 4. **Charcoal Gray, Matte Quartz, Oak Light** (remaining solids + bleached oak)
 
 The 3D viewer / Design Tool / Finishes page all fall back to the existing `swatchHex` flat color if `texturePath` is undefined — so you can ship textures one finish at a time and the rest keep working.
+
+---
+
+## 11. Automated batch generation — one command via Gemini API
+
+Manual generation in the Gemini web app works but doesn't scale: each prompt is a copy-paste + wait + right-click-save round trip. For the 11 finish textures plus the 48 product/project variants, that's 59 manual sessions.
+
+Instead — one Node script that reads a manifest of `{prompt, output}` jobs and writes each generated image directly to disk via the Gemini API. Same prompts as §3/§4/§10, no DOM automation, no login state, no rate-limit theater.
+
+### Setup (once)
+
+1. **Get a free Gemini API key.** Visit https://aistudio.google.com/apikey — login with the same Google account you use for Gemini web, click "Create API key in new project." Copy the key.
+2. **Export it.** Either:
+   ```bash
+   export GEMINI_API_KEY=your-key-here
+   ```
+   …or add to `.env.local`:
+   ```
+   GEMINI_API_KEY=your-key-here
+   ```
+
+### Run
+
+From the project root:
+
+```bash
+node scripts/generate-images.mjs
+```
+
+The script:
+- Reads `scripts/image-prompts.json` (default manifest — 11 finish textures + 3 priority product shots already pre-loaded)
+- Generates each missing image via `gemini-2.5-flash-image-preview`
+- Writes PNG bytes directly to the `output` path (relative to repo root)
+- Skips any job whose output file already exists — re-runs are idempotent
+- Logs status, file size, and timing per job
+- Throttles politely (800ms between requests)
+
+To re-generate a specific image:
+```bash
+rm public/textures/finishes/walnut.jpg
+node scripts/generate-images.mjs
+```
+
+To use a different model:
+```bash
+GEMINI_MODEL=imagen-3.0-generate-002 node scripts/generate-images.mjs
+```
+
+To use a different manifest:
+```bash
+node scripts/generate-images.mjs path/to/other-manifest.json
+```
+
+### Manifest format
+
+`scripts/image-prompts.json` is an array of jobs:
+
+```json
+[
+  {
+    "id": "texture-walnut",
+    "output": "public/textures/finishes/walnut.jpg",
+    "prompt": "Tileable seamless texture of solid American black walnut hardwood..."
+  }
+]
+```
+
+- `id` — for logging only
+- `output` — relative path from repo root; directory will be created if missing
+- `prompt` — verbatim text sent to Gemini; **paste any prompt from §3 / §4 / §10 directly**
+- Optional `skip: true` — keep the job in the manifest but skip it this run
+
+### Adding new prompts
+
+Open `scripts/image-prompts.json`, append a new entry, run the script again. Existing files won't regenerate (idempotent), so you'll only pay for new ones.
+
+### Cost
+
+Gemini 2.5 Flash Image is roughly **$0.039 per generated image** (as of 2026). So:
+
+| Batch | Cost |
+|---|---|
+| 11 finish textures | ~$0.43 |
+| 3 priority product shots (Lift & Slide, 90 Series, Large Panel) | ~$0.12 |
+| All 48 product variants (per §3 matrix) | ~$1.87 |
+| All 18 project hero variants (per §4) | ~$0.70 |
+| **Full site re-generation** | **~$3.50 total** |
+
+Free tier on AI Studio includes 1500 requests/day at no charge — well above what we need.
+
+### Quality control
+
+Generated outputs land at the manifest path. Open each, run through the QC checklist in §6 (for product/project shots) or §10C (for textures). Reject any failures by deleting the file and re-running the script — Gemini's stochastic, second attempts usually catch up.
+
+### Limitations
+
+- Gemini's image output is **PNG by default**, saved with `.jpg` extension if that's what the manifest says. Browsers don't care, but a strict file inspector will flag the mismatch. If it matters, change the manifest extensions to `.png` and the path references in code accordingly.
+- No `--ar 4:5` flag — the prompt has to *describe* the desired aspect ratio ("portrait orientation, 4:5 aspect ratio"). Gemini honors it most of the time; not 100%.
+- No `--no` negative block — prompts use natural-language exclusion ("Without showing: people, logos, text on glass...").
+- Per-image generation takes 5-15 seconds. The full 14-job default manifest runs in ~3 minutes.
+
+### Why not browser automation of gemini.google.com
+
+Considered and rejected:
+- Gemini web requires Google account login (session cookies, OAuth flow)
+- Image outputs in the chat UI are blob URLs — not direct downloads
+- DOM selectors are fragile and break weekly on a product Google iterates on
+- Rate limits are stricter on the web app than on the API
+- One DOM change and every script breaks
+
+The API path is the same Gemini, the same models (or better), with deterministic JSON in/out. Use it.

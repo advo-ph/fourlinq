@@ -1,0 +1,72 @@
+[
+  {
+    "id": "texture-oak-light",
+    "output": "public/textures/finishes/oak-light.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: pale Scandinavian oak veneer, fine straight grain with subtle cream and off-white tones, sanded smooth, almost bleached appearance, vertical grain orientation. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-oak-malt",
+    "output": "public/textures/finishes/oak-malt.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: medium-blonde oak veneer with warm golden-amber tones, slightly pronounced straight grain, natural unfinished timber look, vertical grain orientation. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-woodgray",
+    "output": "public/textures/finishes/woodgray.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: weathered driftwood with cool gray base and subtle brown-taupe grain lines, fine grain, slightly aged appearance, vertical grain orientation. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-2-wood-black",
+    "output": "public/textures/finishes/2-wood-black.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: ebonized dark wenge wood, deep espresso brown-black with subtle perceptible wood grain still visible in raking light, moody and rich, vertical grain orientation. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-dark-oak",
+    "output": "public/textures/finishes/dark-oak.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: classic dark Filipino narra or aged kamagong hardwood, deep warm brown with pronounced wood grain, traditional and grounded, vertical grain orientation. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-walnut",
+    "output": "public/textures/finishes/walnut.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: solid American black walnut hardwood, rich chocolate brown with strong straight grain pattern, premium feature wood, vertical grain orientation. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-golden-oak",
+    "output": "public/textures/finishes/golden-oak.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: warm golden oak with honey-orange tones, pronounced wood grain, sun-drenched timber appearance, vertical grain orientation. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-white",
+    "output": "public/textures/finishes/white.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: matte white uPVC plastic surface, perfectly smooth with no grain or texture, subtle sheen, micro-fine satin finish only visible up close. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-jet-black",
+    "output": "public/textures/finishes/jet-black.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: matte deep black uPVC plastic surface, perfectly smooth no grain, slight micro-texture only visible up close, no reflections. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-charcoal-gray",
+    "output": "public/textures/finishes/charcoal-gray.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: matte charcoal-graphite uPVC plastic surface, deep neutral dark gray, smooth no grain, subtle micro-texture, no reflections. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "texture-matte-quartz",
+    "output": "public/textures/finishes/matte-quartz.jpg",
+    "prompt": "Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even diffuse daylight, no shadow gradient across the surface, photographed straight down from above, no edges or borders visible, ready to be used as a repeating material texture for 3D rendering. Subject: matte mid-tone gray uPVC plastic surface, architectural concrete-gray tone, perfectly smooth no grain, no reflections. Photorealistic, 8K, ultra detailed."
+  },
+  {
+    "id": "product-lift-and-slide-A",
+    "output": "public/images/products/lift-and-slide-A.jpg",
+    "prompt": "Without showing: people, faces, hands, logos, brand names, text on the glass, mirrors with reflections, plastic-looking finishes, lens flare, HDR-overcooked sky, watermark. Portrait orientation, 4:5 aspect ratio. Editorial architectural photography of a wide three-panel lift-and-slide glass door in matte white uPVC, full-height floor-to-ceiling, the middle panel slid open by 40 percent so the lifted seal mechanism is visible at the bottom rail, slim profile mullions, mounted as the threshold between a modern Philippine kitchen and a covered lanai, polished concrete floor extending through, soft side daylight from the lanai side, single fiddle-leaf fig in a matte ceramic pot to the right of the doorway, neutral palette of warm whites and pale oak with tropical foliage outside (banana leaves, monstera). Shot on a Hasselblad 80mm at f/5.6, ISO 100, sharp focus on the door, subtle shallow depth of field on the foliage beyond. Marvin Windows advertisement aesthetic, Architectural Digest tier, 8K photorealistic."
+  },
+  {
+    "id": "product-90-series-A",
+    "output": "public/images/products/90-series-A.jpg",
+    "prompt": "Without showing: people, faces, hands, logos, brand names, text on the door, mirrors, vehicles, watermark. Portrait orientation, 4:5 aspect ratio. Editorial architectural photography of a single-leaf solid uPVC residential entry door in matte white, premium 90-Series profile (visibly deeper and more substantial than a standard door), mounted as the front entry of a modern Philippine residence, slim profile, polished concrete entry porch in the foreground, simple matte black brushed lever handle, a single fiddle-leaf fig in a matte ceramic planter to the left of the door, late afternoon golden hour light raking across the facade, tropical foliage visible beyond — banana leaves and frangipani. Shot on a Hasselblad 80mm at f/5.6, ISO 100, sharp focus on the door's profile depth. Marvin Windows advertisement aesthetic, 8K photorealistic."
+  },
+  {
+    "id": "product-large-panel-A",
+    "output": "public/images/products/large-panel-A.jpg",
+    "prompt": "Without showing: people, faces, hands, logos, brand names, text on glass, motion blur, watermark, neon, screens. Portrait orientation, 4:5 aspect ratio. Editorial architectural photography of a massive six-meter-wide single-panel glass door in matte white uPVC, full floor-to-ceiling spanning the entire lanai-facing wall of a modern Philippine living room with a triple-height ceiling, the panel closed at rest, slim profile around the glass edge, polished concrete floor in the foreground for scale, single low pale-oak bench in the foreground, golden hour light, view through the glass of a tropical garden with banana leaves and a single mature fiddle-leaf fig. Architectural editorial composition emphasizing the dramatic scale of the door. Shot on a Hasselblad 50mm at f/5.6, ISO 100. Marvin Windows advertisement aesthetic, Architectural Digest tier, 8K photorealistic."
+  }
+]
