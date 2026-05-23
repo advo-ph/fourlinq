@@ -89,20 +89,11 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
   const { actions, mixer } = useAnimations(animations, groupRef);
 
   // Mount/system-change: hide non-matching subtrees, clone visible materials,
-  // then compute the bounding box of just the visible meshes and offset the
-  // inner group so the visible subtree is centered at origin.
+  // then measure the visible subtree's bbox in the sceneClone's LOCAL space
+  // (independent of the outer group transforms) and apply both centering +
+  // scaling on innerRef in one go.
   useEffect(() => {
     const prefixes = SYSTEMS[systemType].visiblePrefixes;
-
-    // CRITICAL: reset existing transforms before computing bbox. Otherwise
-    // the bbox includes the previous system's offset and the new system
-    // gets displaced.
-    if (innerRef.current) {
-      innerRef.current.position.set(0, 0, 0);
-    }
-    if (groupRef.current) {
-      groupRef.current.scale.setScalar(1);
-    }
 
     sceneClone.traverse((child) => {
       if (child.type !== "Mesh") return;
@@ -124,11 +115,9 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
       }
     });
 
-    // Force the entire ancestor chain to recompute world matrices BEFORE we
-    // measure. setFromObject(mesh) reads mesh.matrixWorld; if innerRef's
-    // matrix is stale (carrying the previous system's offset), the mesh's
-    // world position will be wrong even though innerRef.position was reset.
-    if (groupRef.current) groupRef.current.updateMatrixWorld(true);
+    // Update sceneClone's internal world matrices (independent of whether
+    // it's currently attached to the React tree via primitive).
+    sceneClone.updateMatrixWorld(true);
 
     const bbox = new THREE.Box3();
     let foundAny = false;
@@ -146,14 +135,13 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     if (foundAny && innerRef.current) {
       const center = bbox.getCenter(new THREE.Vector3());
       const size = bbox.getSize(new THREE.Vector3());
-      innerRef.current.position.set(-center.x, -center.y, -center.z);
-      const longestSide = Math.max(size.x, size.y);
+      const longestSide = Math.max(size.x, size.y, size.z) || 1;
       const targetSize = 1.6;
       const scale = targetSize / longestSide;
-      if (groupRef.current) {
-        groupRef.current.scale.setScalar(scale);
-        groupRef.current.position.set(0, 0, 0);
-      }
+      // Apply scale + offset together on innerRef so world position of
+      // bbox center lands at origin: world = scale * (local - center)
+      innerRef.current.scale.setScalar(scale);
+      innerRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
     }
   }, [sceneClone, systemType]);
 
