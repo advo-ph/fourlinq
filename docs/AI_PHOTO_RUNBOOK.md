@@ -795,3 +795,191 @@ If you only have time for some, do them in this order:
 ## 9. License + attribution
 
 Generated images are **commercially licensed** to FourlinQ via Midjourney/FLUX/DALL-E commercial-use terms. **Document the source tool + date** in the commit message so future audits can trace provenance. Add to `docs/LICENSES.md` after first batch ships.
+
+---
+
+## 10. Finish texture extraction — for the 3D viewer + Design Tool
+
+The 3D casement-frame viewer on home and the Design Tool's WindowPreview SVG both currently render finishes as **flat hex colors + a synthetic stripe overlay**. Real photographic textures of the actual FourlinQ finish samples will read 10× more premium — and Tita has the physical sample board.
+
+There are **two valid paths**. Pick one per finish.
+
+### 10A — Path 1: extract from physical sample-board photograph (preferred)
+
+Cleanest, most honest, no AI required.
+
+**Required input:** one well-lit straight-on photo of the FourlinQ finish sample board (the one Tita showed in the May 24 message — 11 swatches in a row with labels). Save the source photo at:
+
+```
+/public/textures/source/swatchboard.jpg
+```
+
+**Steps:**
+
+1. **Re-shoot if needed.** The reference photo Tita supplied is shot at a slight angle with mixed lighting. For texture extraction we want **perfectly straight-on, even daylight, no shadow gradient across the board.** If you can re-shoot on an overcast morning at noon — better. If not, the existing photo is workable but the wood-grain swatches may have a slight tonal gradient that telegraphs as "this was a photo, not a manufactured tile."
+2. **Crop each swatch.** Each finish is roughly 110px wide × 90px tall in the source photo. Use any tool (Preview / Photoshop / Photopea / Pixlr) to extract a tight rectangle of JUST the swatch surface — no label, no shadow, no adjacent swatch bleed.
+3. **Resize to 1024×1024.** Square format. JPG at quality 85 (~150 KB each).
+4. **Save** to the path manifest below.
+
+**File path manifest (one per finish):**
+
+```
+/public/textures/finishes/oak-light.jpg
+/public/textures/finishes/oak-malt.jpg
+/public/textures/finishes/woodgray.jpg
+/public/textures/finishes/2-wood-black.jpg
+/public/textures/finishes/dark-oak.jpg
+/public/textures/finishes/walnut.jpg
+/public/textures/finishes/golden-oak.jpg
+/public/textures/finishes/white.jpg
+/public/textures/finishes/jet-black.jpg
+/public/textures/finishes/charcoal-gray.jpg
+/public/textures/finishes/matte-quartz.jpg
+```
+
+(Filename = `FRAME_FINISHES.id` from `src/data/fourlinq-data.ts`. If "Silicia Cream" is confirmed as a 12th finish, add `silicia-cream.jpg`.)
+
+**Optional — normal maps (only for wood-grain finishes):**
+
+```
+/public/textures/finishes/oak-light-normal.jpg
+... etc
+```
+
+A normal map gives the 3D viewer the recessed/raised look of real wood grain rather than just a flat color decal. Generate from the diffuse map using:
+- Photoshop > Filter > 3D > Generate Normal Map (built in)
+- NormalMap-Online (free web tool — drag a diffuse JPG, get a normal map)
+- Materialize (free desktop app)
+
+Skip normal maps for solid finishes (White, Jet Black, Charcoal Gray, Matte Quartz) — they're flat surfaces in real life.
+
+### 10B — Path 2: AI-generate per-finish texture tiles (fallback only)
+
+Use only if Path 1's photo is unsalvageable or if you want to add finishes not on the physical sample board. AI-generated wood grain is convincing for visualization but **must be approved by Tita** before shipping since it's representing a real product finish.
+
+#### Universal texture-tile style anchor (Gemini / Midjourney)
+
+```
+Tileable seamless texture, 1024 by 1024 pixels, perfectly square, even
+diffuse daylight, no shadow gradient across the surface, photographed
+straight down from above, no edges or borders visible, ready to be
+used as a repeating material texture for 3D rendering, photorealistic,
+8K, ultra detailed.
+```
+
+Append to every prompt below. **Aspect ratio for all tile prompts: square 1:1.** Drop the architectural-lifestyle style anchor from §1 — that's for project shots, not material tiles.
+
+#### Per-finish tile prompts
+
+**Oak Light** (`oak-light.jpg`):
+```
+Tileable seamless texture of pale Scandinavian oak veneer, fine straight grain
+with subtle cream and off-white tones, sanded smooth, almost bleached,
+photographed straight down, even daylight, no shadow.
+```
+
+**Oak Malt** (`oak-malt.jpg`):
+```
+Tileable seamless texture of medium-blonde oak veneer with warm golden-amber
+tones, slightly pronounced straight grain, natural unfinished timber look,
+photographed straight down, even daylight, no shadow.
+```
+
+**Woodgray** (`woodgray.jpg`):
+```
+Tileable seamless texture of weathered driftwood with cool gray base and
+subtle brown-taupe grain lines, fine grain, slightly aged appearance,
+photographed straight down, even daylight, no shadow.
+```
+
+**2 Wood Black** (`2-wood-black.jpg`):
+```
+Tileable seamless texture of ebonized dark wenge wood, deep espresso brown-
+black with subtle perceptible wood grain visible in raking light, moody and
+rich, photographed straight down, even daylight, no shadow.
+```
+
+**Dark Oak** (`dark-oak.jpg`):
+```
+Tileable seamless texture of classic dark Filipino narra or aged kamagong
+hardwood, deep warm brown with pronounced wood grain, traditional and
+grounded, photographed straight down, even daylight, no shadow.
+```
+
+**Walnut** (`walnut.jpg`):
+```
+Tileable seamless texture of solid American black walnut hardwood, rich
+chocolate brown with strong straight grain pattern, premium feature wood,
+photographed straight down, even daylight, no shadow.
+```
+
+**Golden Oak** (`golden-oak.jpg`):
+```
+Tileable seamless texture of warm golden oak with honey-orange tones,
+pronounced wood grain, sun-drenched timber appearance, photographed straight
+down, even daylight, no shadow.
+```
+
+**White** (`white.jpg`):
+```
+Tileable seamless texture of matte white uPVC plastic surface, perfectly
+smooth with no grain or texture, subtle sheen, photographed straight down,
+even diffuse daylight, no shadow.
+```
+
+**Jet Black** (`jet-black.jpg`):
+```
+Tileable seamless texture of matte deep black uPVC plastic surface,
+perfectly smooth no grain, slight micro-texture only visible up close,
+photographed straight down, even diffuse daylight, no shadow.
+```
+
+**Charcoal Gray** (`charcoal-gray.jpg`):
+```
+Tileable seamless texture of matte charcoal-graphite uPVC plastic surface,
+deep neutral dark gray, smooth, no grain, subtle micro-texture, photographed
+straight down, even diffuse daylight, no shadow.
+```
+
+**Matte Quartz** (`matte-quartz.jpg`):
+```
+Tileable seamless texture of matte mid-tone gray uPVC plastic surface,
+architectural concrete-gray tone, perfectly smooth, no grain, photographed
+straight down, even diffuse daylight, no shadow.
+```
+
+### 10C — QC checklist for textures
+
+Before committing a texture file, run through:
+
+- [ ] **Perfectly square** 1024×1024
+- [ ] **No visible label, no swatch edge, no adjacent-swatch bleed** in the crop
+- [ ] **No shadow gradient** across the tile (a tile that's lighter on one side will look like crap when tiled — visible diagonal bands)
+- [ ] **Color matches the brochure swatch hex** (check `FRAME_FINISHES[i].swatchHex` in `src/data/fourlinq-data.ts` — if the texture reads obviously different, re-crop or color-correct)
+- [ ] **Wood grain runs vertically** (window frames are vertical — texture should align)
+- [ ] **No AI giveaways** for path-2 tiles (warped grain, impossible joint patterns, etc.)
+- [ ] **File size under 200 KB** (compress JPG quality to 80-85)
+
+### 10D — Once textures are in place
+
+When all 11 (or 12) texture files exist at the manifest paths, tell me and I'll wire them up in one commit:
+
+1. Add `texturePath?: string` field to `FrameFinish` in `src/data/fourlinq-data.ts`, populate for each entry.
+2. `src/components/3d/Window3D.tsx` — switch the finish-swap effect from `mat.color = new Color(hex)` to `mat.map = new TextureLoader().load(texturePath)`. Add optional normalMap when present.
+3. `src/components/configurator/WindowPreview.tsx` — replace `<rect fill={hex}/>` with `<rect fill="url(#finish-pattern)" />` + `<pattern>` definition referencing the texture.
+4. `src/pages/Finishes.tsx` — swatch grid swaps from hex+stripe to actual texture tiles.
+
+**The visible effect:** click "Walnut" in the home 3D viewer → the casement frame shows real walnut grain, not a flat brown rectangle. Open the Design Tool → the live preview SVG renders the same. Open `/finishes` → the swatch grid feels like a sample book, not a color picker.
+
+This is the single highest-leverage premium-feel improvement we can ship after the photo runbook.
+
+### 10E — Priority within Section 10
+
+If you're working through textures one at a time, do them in this order:
+
+1. **Walnut, Dark Oak, Oak Malt** (the 3 most-clicked wood-grains based on PH residential preference)
+2. **White, Jet Black** (the 2 most-clicked solids)
+3. **Golden Oak, Woodgray, 2 Wood Black** (remaining wood-grains)
+4. **Charcoal Gray, Matte Quartz, Oak Light** (remaining solids + bleached oak)
+
+The 3D viewer / Design Tool / Finishes page all fall back to the existing `swatchHex` flat color if `texturePath` is undefined — so you can ship textures one finish at a time and the rest keep working.
