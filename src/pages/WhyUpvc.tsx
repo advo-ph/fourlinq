@@ -4,24 +4,50 @@ import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import { benefits, comparisonData } from "@/data/benefits";
-import { Eye, Flame, Sun, Shield, Clock, CloudRain, VolumeX, Droplets, Wind } from "lucide-react";
-
-const iconMap: Record<string, React.ReactNode> = {
-  sparkles: <Eye size={22} strokeWidth={1.5} />,
-  flame: <Flame size={22} strokeWidth={1.5} />,
-  sun: <Sun size={22} strokeWidth={1.5} />,
-  shield: <Shield size={22} strokeWidth={1.5} />,
-  clock: <Clock size={22} strokeWidth={1.5} />,
-  "cloud-rain": <CloudRain size={22} strokeWidth={1.5} />,
-  "volume-x": <VolumeX size={22} strokeWidth={1.5} />,
-};
+import { Check, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /**
- * Editorial PH-climate elaboration per benefit. Brochure-verified short
- * descriptions are in src/data/fourlinq-data.ts ADVANTAGES — these expansions
- * add the WHY context that turns a feature list into an authority page.
- * Keep facts conservative; lean on Philippine climate specifics.
+ * /why-upvc — photo-led category-authority page.
+ *
+ * Rewritten 2026-05-24 from the prior icon-only/text-wall version that
+ * Tita flagged as bad. Now each of the 7 brochure-verified advantages
+ * gets its own photo-paragraph row (alternating L/R for visual rhythm)
+ * using real product/material photos from /public/images/wp-export/.
  */
+
+/** Real photo per benefit, sourced from brochure assets. */
+const benefitPhoto: Record<string, { src: string; alt: string }> = {
+  "attractive-appearance": {
+    src: "/images/wp-export/Walnut-Profile.jpg",
+    alt: "Close-up of FourlinQ Walnut profile finish",
+  },
+  "fire-retardant": {
+    src: "/images/wp-export/Fire-Retardant.jpg",
+    alt: "uPVC fire-retardant material test",
+  },
+  "thermal-efficiency": {
+    src: "/images/wp-export/White-Profile.jpg",
+    alt: "FourlinQ multi-chamber uPVC profile cross-section",
+  },
+  "corrosion-resistant": {
+    src: "/images/wp-export/Corrosion-Resistance.jpg",
+    alt: "uPVC profile demonstrating corrosion resistance",
+  },
+  "long-lasting-performance": {
+    src: "/images/wp-export/Stainless-Mechanism-e1568775693636.jpg",
+    alt: "FourlinQ stainless steel operating hardware",
+  },
+  "weather-resistance": {
+    src: "/images/wp-export/Air-Water-Tight.jpg",
+    alt: "Air and water tight EPDM gasket assembly on FourlinQ profile",
+  },
+  "sound-insulation": {
+    src: "/images/wp-export/Sound-Insulation.jpg",
+    alt: "Sound-insulating multi-chamber uPVC + glazing assembly",
+  },
+};
+
 const benefitElaboration: Record<string, string> = {
   "attractive-appearance":
     "Eleven heat-fused finishes. From a clean matte white that flatters tropical-modern facades to deep wood-grain laminates that read as solid timber from across the room. The finish is bonded to the profile at the factory, not painted on after. It does not chip when the contractor leans a ladder against it. It does not fade to a different color than the next window in the same elevation. A FourlinQ window installed in 2014 still matches one installed in 2026 if the same finish was specified.",
@@ -39,24 +65,6 @@ const benefitElaboration: Record<string, string> = {
     "Multi-chamber profiles plus glazing thicknesses from 6 mm to 12 mm produce 24–32 dB of acoustic attenuation in standard residential installations. A bedroom on a busy street feels noticeably quieter than a single-glazed aluminum room next door. The reduction is largest at the frequency band of road traffic, which is exactly where homeowners feel the difference between a restful bedroom and one that needs a white-noise machine.",
 };
 
-const climate = [
-  {
-    icon: <Sun size={20} strokeWidth={1.5} />,
-    title: "Tropical heat",
-    body: "Sun load on a Philippine house is not a temperate-climate problem. Multi-chamber profile design traps air to reduce heat transfer, which keeps interior surface temperatures down on the frame and reduces radiant heat into the room.",
-  },
-  {
-    icon: <Droplets size={20} strokeWidth={1.5} />,
-    title: "Coastal humidity",
-    body: "From the salt air of Anilao to the year-round humidity of Iloilo, the materials in a window frame are tested constantly. uPVC does not rust, does not corrode, does not require sacrificial coatings to survive.",
-  },
-  {
-    icon: <Wind size={20} strokeWidth={1.5} />,
-    title: "Storm conditions",
-    body: "Engineered EPDM gaskets, drainage chambers, and galvanized steel reinforcement let a FourlinQ frame ride out the kinds of typhoons that drive rain horizontally for hours at a stretch.",
-  },
-];
-
 const WhyUpvc = () => (
   <Layout>
     <PageHeader
@@ -66,87 +74,142 @@ const WhyUpvc = () => (
       subtitle="A material chosen for what a Philippine home actually goes through. The heat. The humidity. The salt air along the coast. The storms that test what a house is made of."
     />
 
-    {/* Opening editorial */}
+    {/* Opening editorial — split with hero spec photo */}
     <Section tone="canvas" size="lg">
-      <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12">
-        <div className="lg:col-span-7">
+      <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 items-center">
+        <div className="lg:col-span-6">
           <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
-            uPVC is the material that quietly out-engineers every alternative in tropical residential construction. It does not rust like steel, warp like timber, oxidize like aluminum, or fade like painted finishes. It is the material we chose because it is the material that survives twenty Philippine summers without asking for help.
+            uPVC is the material that quietly out-engineers every alternative in tropical residential construction. It does not rust like steel, warp like timber, oxidize like aluminum, or fade like painted finishes.
+          </p>
+          <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[36rem]">
+            It is the material we chose because it is the material that survives twenty Philippine summers without asking for help.
           </p>
         </div>
-        <div className="lg:col-span-4 lg:col-start-9">
-          <p className="eyebrow mb-4">At a glance</p>
-          <ul className="space-y-4 text-body-sm text-[color:var(--ink-secondary)] leading-[1.6]">
-            <li className="border-t border-[color:var(--rule-soft)] pt-4">
-              <span className="font-serif text-h6 text-[color:var(--ink-primary)] block mb-1">Multi-chamber</span>
-              Profile engineered with internal air pockets to break the path of heat
-            </li>
-            <li className="border-t border-[color:var(--rule-soft)] pt-4">
-              <span className="font-serif text-h6 text-[color:var(--ink-primary)] block mb-1">Steel-reinforced</span>
-              Galvanized core gives structural rigidity for full-height openings
-            </li>
-            <li className="border-t border-[color:var(--rule-soft)] pt-4">
-              <span className="font-serif text-h6 text-[color:var(--ink-primary)] block mb-1">EPDM-sealed</span>
-              Compression gasket holds an airtight, watertight seal across the lifetime of the system
-            </li>
-          </ul>
+        <div className="lg:col-span-5 lg:col-start-8">
+          <div className="aspect-[4/5] overflow-hidden bg-[color:var(--canvas-soft)]">
+            <img
+              src="/images/wp-export/Walnut-Profile.jpg"
+              alt="Close-up of FourlinQ multi-chamber uPVC profile with Walnut finish"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
       </div>
     </Section>
 
-    {/* Benefits — editorial cards with elaboration */}
+    {/* The 7 benefits — alternating photo-paragraph rows */}
     <Section tone="soft" size="lg">
       <EyebrowHeading eyebrow="What you get" level={2}>
         Built for how you actually live.
       </EyebrowHeading>
-      <ul className="mt-12 lg:mt-16 grid md:grid-cols-2 gap-x-10 gap-y-14 lg:gap-y-20">
-        {benefits.map((benefit) => (
-          <li key={benefit.id} className="border-t border-[color:var(--rule-soft)] pt-7">
-            <div className="flex gap-4 items-start mb-4">
-              <div className="shrink-0 text-[color:var(--ink-muted)] mt-1">{iconMap[benefit.icon]}</div>
-              <h3 className="font-serif text-h4 text-[color:var(--ink-primary)] tracking-tight leading-snug">
-                {benefit.title}
-              </h3>
-            </div>
-            <p className="text-body-sm lg:text-body text-[color:var(--ink-primary)] leading-[1.65] mb-4 font-medium">
-              {benefit.shortDescription}
-            </p>
-            {benefitElaboration[benefit.id] && (
-              <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.7]">
-                {benefitElaboration[benefit.id]}
-              </p>
-            )}
-          </li>
-        ))}
+
+      <ul className="mt-16 lg:mt-24 space-y-24 lg:space-y-32">
+        {benefits.map((benefit, i) => {
+          const photo = benefitPhoto[benefit.id];
+          const elaboration = benefitElaboration[benefit.id];
+          const reverse = i % 2 === 1;
+          return (
+            <li key={benefit.id}>
+              <div className={cn(
+                "grid lg:grid-cols-12 gap-x-8 lg:gap-x-12 gap-y-10 items-center",
+              )}>
+                {/* Photo column */}
+                <div className={cn(
+                  "lg:col-span-6",
+                  reverse ? "lg:col-start-7 lg:row-start-1" : ""
+                )}>
+                  {photo && (
+                    <div className="aspect-[4/3] lg:aspect-[5/4] overflow-hidden bg-[color:var(--canvas-soft)]">
+                      <img
+                        src={photo.src}
+                        alt={photo.alt}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Text column */}
+                <div className={cn(
+                  "lg:col-span-5",
+                  reverse ? "lg:col-start-1 lg:row-start-1" : "lg:col-start-8"
+                )}>
+                  <p className="eyebrow mb-4 text-[color:var(--accent)]">
+                    0{i + 1}
+                  </p>
+                  <h3 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] mb-5">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-body-lg text-[color:var(--ink-primary)] leading-[1.55] mb-4 font-medium">
+                    {benefit.shortDescription}
+                  </p>
+                  {elaboration && (
+                    <p className="text-body text-[color:var(--ink-secondary)] leading-[1.7]">
+                      {elaboration}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </Section>
 
-    {/* Comparison — editorial table */}
+    {/* Comparison — visual check/X table */}
     <Section tone="canvas" size="lg">
-      <EyebrowHeading eyebrow="Material comparison" level={2}>
-        How uPVC stacks up.
-      </EyebrowHeading>
-      <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.65]">
-        Side-by-side against the two materials uPVC most often replaces in Philippine residential construction. The differences read as feature lists; they show up in homes as different sounds, different surface temperatures, and different maintenance calendars.
-      </p>
+      <div className="grid lg:grid-cols-12 gap-x-8 mb-12 lg:mb-16">
+        <div className="lg:col-span-5">
+          <EyebrowHeading eyebrow="Material comparison" level={2}>
+            How uPVC stacks up.
+          </EyebrowHeading>
+        </div>
+        <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
+          The differences read as a feature list. They show up in homes as different sounds, different surface temperatures, and different maintenance calendars.
+        </p>
+      </div>
 
-      <div className="mt-12 lg:mt-16 overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-t-2 border-b border-[color:var(--ink-primary)]">
-              <th className="py-4 pr-6 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Feature</th>
-              <th className="py-4 px-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-primary)]">uPVC</th>
-              <th className="py-4 px-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Aluminium</th>
-              <th className="py-4 pl-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Timber</th>
+              <th className="py-5 pr-6 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Feature</th>
+              <th className="py-5 px-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]">
+                <span className="block">uPVC</span>
+                <span className="block text-[10px] tracking-[0.12em] normal-case text-[color:var(--accent)] mt-1 font-medium">FourlinQ</span>
+              </th>
+              <th className="py-5 px-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Aluminium</th>
+              <th className="py-5 pl-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Timber</th>
             </tr>
           </thead>
           <tbody>
             {comparisonData.map((row) => (
               <tr key={row.feature} className="border-b border-[color:var(--rule-soft)]">
-                <td className="py-4 pr-6 text-body-sm font-medium text-[color:var(--ink-primary)] align-top">{row.feature}</td>
-                <td className="py-4 px-4 text-body-sm text-[color:var(--ink-primary)] font-medium align-top">{row.upvc}</td>
-                <td className="py-4 px-4 text-body-sm text-[color:var(--ink-muted)] align-top">{row.aluminium}</td>
-                <td className="py-4 pl-4 text-body-sm text-[color:var(--ink-muted)] align-top">{row.timber}</td>
+                <td className="py-5 pr-6 text-body-sm font-medium text-[color:var(--ink-primary)] align-top">
+                  {row.feature}
+                </td>
+                <td className="py-5 px-4 text-body-sm text-[color:var(--ink-primary)] font-medium align-top bg-[color:var(--canvas-soft)]">
+                  <div className="flex items-start gap-2">
+                    <Check size={16} strokeWidth={2} className="text-[color:var(--accent)] shrink-0 mt-0.5" />
+                    <span>{row.upvc}</span>
+                  </div>
+                </td>
+                <td className="py-5 px-4 text-body-sm text-[color:var(--ink-muted)] align-top">
+                  <div className="flex items-start gap-2">
+                    <X size={16} strokeWidth={1.5} className="text-[color:var(--ink-faint)] shrink-0 mt-0.5" />
+                    <span>{row.aluminium}</span>
+                  </div>
+                </td>
+                <td className="py-5 pl-4 text-body-sm text-[color:var(--ink-muted)] align-top">
+                  <div className="flex items-start gap-2">
+                    <X size={16} strokeWidth={1.5} className="text-[color:var(--ink-faint)] shrink-0 mt-0.5" />
+                    <span>{row.timber}</span>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -154,23 +217,49 @@ const WhyUpvc = () => (
       </div>
     </Section>
 
-    {/* Climate */}
+    {/* Climate context — photo-paragraph instead of icon cards */}
     <Section tone="soft" size="lg">
-      <EyebrowHeading eyebrow="The Philippine climate" level={2}>
-        Three forces. One material.
-      </EyebrowHeading>
-      <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.65]">
-        We do not import European spec sheets. The material in our profiles is the same uPVC formulation used across northern Europe. The way we specify it (chamber count, steel reinforcement gauge, gasket compound, glazing thickness) is calibrated for what a Philippine house actually goes through.
-      </p>
-      <ul className="mt-12 lg:mt-16 grid md:grid-cols-3 gap-px bg-[color:var(--rule-soft)]">
-        {climate.map((item) => (
-          <li key={item.title} className="bg-white p-8 lg:p-10">
-            <div className="text-[color:var(--ink-muted)] mb-5">{item.icon}</div>
-            <h3 className="font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight mb-3">{item.title}</h3>
-            <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.7]">{item.body}</p>
-          </li>
-        ))}
-      </ul>
+      <div className="grid lg:grid-cols-12 gap-x-8 lg:gap-x-12 gap-y-12 items-center">
+        <div className="lg:col-span-5">
+          <EyebrowHeading eyebrow="The Philippine climate" level={2}>
+            Three forces. One material.
+          </EyebrowHeading>
+          <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[36rem]">
+            We do not import European spec sheets. The material in our profiles is the same uPVC formulation used across northern Europe. The way we specify it (chamber count, steel reinforcement gauge, gasket compound, glazing thickness) is calibrated for what a Philippine house actually goes through.
+          </p>
+          <ul className="mt-10 space-y-6">
+            <li className="border-t border-[color:var(--rule-soft)] pt-5">
+              <h3 className="font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight mb-2">Tropical heat</h3>
+              <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.65]">
+                Multi-chamber profile design traps air to reduce heat transfer. Lower interior surface temperatures, less radiant heat into the room.
+              </p>
+            </li>
+            <li className="border-t border-[color:var(--rule-soft)] pt-5">
+              <h3 className="font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight mb-2">Coastal humidity</h3>
+              <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.65]">
+                From the salt air of the coast to year-round humidity inland, uPVC does not rust, does not corrode, does not require sacrificial coatings to survive.
+              </p>
+            </li>
+            <li className="border-t border-[color:var(--rule-soft)] pt-5">
+              <h3 className="font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight mb-2">Storm conditions</h3>
+              <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.65]">
+                Engineered EPDM gaskets, drainage chambers, and galvanized steel reinforcement let a FourlinQ frame ride out the kinds of typhoons that drive rain horizontally for hours.
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div className="lg:col-span-6 lg:col-start-7">
+          <div className="aspect-[4/5] overflow-hidden bg-[color:var(--canvas-soft)]">
+            <img
+              src="/images/wp-export/FQC-Project-17.jpg"
+              alt="A FourlinQ installation seen from the inside, garden view through the glass"
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
     </Section>
 
     {/* Honest limits */}
