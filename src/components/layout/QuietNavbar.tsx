@@ -8,11 +8,22 @@ import { cn } from "@/lib/utils";
 interface NavLink {
   label: string;
   to: string;
+  /** Optional dropdown of sub-buckets, surfaced on hover (desktop) and as a nested list (mobile). */
+  children?: { label: string; to: string; description?: string }[];
 }
 
 const navLinks: NavLink[] = [
-  { label: "Systems", to: "/products" },
+  {
+    label: "Systems",
+    to: "/products",
+    children: [
+      { label: "Window Systems", to: "/products/windows", description: "Casement, Sliding, Awning, Special Shapes" },
+      { label: "Door Systems", to: "/products/doors", description: "Slide & Fold, Large Panel, Lift & Slide, 90 Series" },
+      { label: "Specialist Systems", to: "/products/specialist", description: "Arch, Curtain Wall, Custom Shapes" },
+    ],
+  },
   { label: "Inspiration", to: "/inspiration" },
+  { label: "What's New", to: "/whats-new" },
   { label: "Why uPVC", to: "/why-upvc" },
   { label: "Brand", to: "/brand" },
 ];
@@ -45,18 +56,18 @@ const QuietNavbar = () => {
               <Logo variant="dark" className="h-11" />
             </Link>
 
-            {/* Desktop nav — mixed-case, plain text, no all-caps */}
+            {/* Desktop nav — mixed-case, plain text, no all-caps. Items with children get an on-hover mega-panel. */}
             <ul className="hidden lg:flex items-center gap-8 xl:gap-10">
               {navLinks.map((link) => {
                 const active = location.pathname === link.to ||
                                (link.to !== "/" && location.pathname.startsWith(link.to));
                 return (
-                  <li key={link.label}>
+                  <li key={link.label} className="group/nav relative">
                     <Link
                       to={link.to}
                       className={cn(
                         "whitespace-nowrap text-body-sm font-medium transition-colors duration-300 ease-marvin",
-                        "border-b-[1.5px] pb-1",
+                        "border-b-[1.5px] pb-1 inline-flex items-center gap-1",
                         active
                           ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
                           : "text-[color:var(--ink-primary)] border-transparent hover:text-[color:var(--accent)]"
@@ -64,6 +75,39 @@ const QuietNavbar = () => {
                     >
                       {link.label}
                     </Link>
+
+                    {link.children && (
+                      <div
+                        className={cn(
+                          "absolute left-1/2 -translate-x-1/2 top-full mt-3 w-[420px]",
+                          "bg-white border border-[color:var(--rule-soft)] shadow-depth-4",
+                          "opacity-0 invisible translate-y-1 pointer-events-none",
+                          "group-hover/nav:opacity-100 group-hover/nav:visible group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto",
+                          "transition-all duration-300 ease-marvin",
+                          "p-6"
+                        )}
+                      >
+                        <ul className="flex flex-col">
+                          {link.children.map((c) => (
+                            <li key={c.to}>
+                              <Link
+                                to={c.to}
+                                className="block py-3 -mx-3 px-3 hover:bg-[color:var(--canvas-soft)] transition-colors duration-300 ease-marvin"
+                              >
+                                <p className="text-body-sm font-medium text-[color:var(--ink-primary)]">
+                                  {c.label}
+                                </p>
+                                {c.description && (
+                                  <p className="text-[12px] mt-0.5 text-[color:var(--ink-muted)] leading-snug">
+                                    {c.description}
+                                  </p>
+                                )}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </li>
                 );
               })}
@@ -95,7 +139,8 @@ const QuietNavbar = () => {
           <div className="container-editorial py-v600">
             <ul className="flex flex-col">
               {navLinks.map((link) => {
-                const active = location.pathname.startsWith(link.to);
+                const active = location.pathname === link.to ||
+                               (link.to !== "/" && location.pathname.startsWith(link.to));
                 return (
                   <li key={link.label} className="border-b border-[color:var(--rule-soft)]">
                     <Link
@@ -107,6 +152,20 @@ const QuietNavbar = () => {
                     >
                       {link.label}
                     </Link>
+                    {link.children && (
+                      <ul className="pb-4 pl-3 -mt-2">
+                        {link.children.map((c) => (
+                          <li key={c.to}>
+                            <Link
+                              to={c.to}
+                              className="block py-2 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+                            >
+                              {c.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 );
               })}

@@ -11,13 +11,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowUpRight } from "lucide-react";
 import EditorialButton from "@/components/primitives/Button";
 
-type ProductCategory = "windows" | "doors" | "systems";
+type ProductCategory = "windows" | "doors" | "specialist" | "systems";
 type Filter = "all" | ProductCategory;
 
 const filters: { label: string; value: Filter }[] = [
   { label: "All Systems", value: "all" },
   { label: "Windows", value: "windows" },
   { label: "Doors", value: "doors" },
+  { label: "Specialist", value: "specialist" },
 ];
 
 const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => void }) => {
