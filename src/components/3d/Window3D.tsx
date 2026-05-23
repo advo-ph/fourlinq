@@ -53,7 +53,7 @@ const SYSTEMS: Record<SystemType, SystemConfig> = {
     visiblePrefixes: ["casement_frame", "casement_panelL", "casement_panelR"],
     openLabel: "Open window",
     closeLabel: "Close window",
-    center: [-225, 632, -12],
+    center: [-225, 552, -12],
   },
   sliding: {
     label: "Sliding",
