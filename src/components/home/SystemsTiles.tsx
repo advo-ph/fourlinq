@@ -13,19 +13,19 @@ interface SystemTile {
 const systems: SystemTile[] = [
   {
     name: "Window Systems",
-    description: "Casement, sliding, awning, and fixed glass — sized and sealed for the way light moves through a Philippine home.",
+    description: "Casement, sliding, awning, and fixed glass. Sized and sealed for the way light moves through a Philippine home.",
     image: "/images/wp-export/FourlinQ-Project-7.jpg",
     to: "/products/windows",
   },
   {
     name: "Door Systems",
-    description: "Slide & Fold, Large Panel up to six metres, Lift & Slide, 90 Series — the wall that opens when you want it to.",
+    description: "Slide & Fold, Large Panel up to six metres, Lift & Slide, 90 Series. The wall that opens when you want it to.",
     image: "/images/wp-export/FQC-Project-18.jpg",
     to: "/products/doors",
   },
   {
     name: "Specialist Systems",
-    description: "Arches, curtain walls, and bespoke geometry — for the projects that refuse the standard catalog.",
+    description: "Arches, curtain walls, and bespoke geometry. For projects that refuse the standard catalog.",
     image: "/images/brand-story.jpg",
     to: "/products/specialist",
   },
@@ -38,8 +38,7 @@ const SystemsTiles = () => (
         Three families. Every shape a Philippine home needs.
       </EyebrowHeading>
       <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] lg:self-end leading-[1.65]">
-        From a quiet bedroom casement to a six-metre folding wall that opens
-        the whole house to the garden — and the bespoke geometry in between.
+        From a quiet bedroom casement to a six-metre folding wall that opens the whole house to the garden. Plus the bespoke geometry in between.
       </p>
     </div>
 

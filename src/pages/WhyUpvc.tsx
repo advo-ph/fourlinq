@@ -24,19 +24,19 @@ const iconMap: Record<string, React.ReactNode> = {
  */
 const benefitElaboration: Record<string, string> = {
   "attractive-appearance":
-    "Eleven heat-fused finishes — from a clean matte white that flatters tropical-modern facades to deep wood-grain laminates that read as solid timber from across the room. The finish is bonded to the profile at the factory, not painted on after — which means it does not chip when the contractor leans a ladder against it, and it does not fade to a different color than the next window in the same elevation. A FourlinQ window installed in 2014 still matches one installed in 2026 if the same finish was specified.",
+    "Eleven heat-fused finishes. From a clean matte white that flatters tropical-modern facades to deep wood-grain laminates that read as solid timber from across the room. The finish is bonded to the profile at the factory, not painted on after. It does not chip when the contractor leans a ladder against it. It does not fade to a different color than the next window in the same elevation. A FourlinQ window installed in 2014 still matches one installed in 2026 if the same finish was specified.",
   "fire-retardant":
-    "uPVC is self-extinguishing. The material does not propagate flame and stops burning when the heat source is removed. This is engineered into the polymer, not added as a coating. For a Philippine home — where electrical fires in older condominium stock and provincial residences are a real category of risk — the difference between a frame that contributes to a fire and one that resists it is the difference between losing a window and losing a wing of the house.",
+    "uPVC is self-extinguishing. The material does not propagate flame and stops burning when the heat source is removed. This is engineered into the polymer, not added as a coating. Electrical fires in older condominium stock and provincial residences are a real category of risk. The difference between a frame that contributes to a fire and one that resists it is the difference between losing a window and losing a wing of the house.",
   "thermal-efficiency":
-    "A multi-chamber uPVC profile is not a hollow tube — it is a series of air pockets engineered to break the path of heat. Each chamber adds a small thermal break that compounds across the depth of the profile. The west-facing wall of a Quezon City house in May, hit by direct afternoon sun, transfers measurably less heat through a multi-chamber uPVC frame than through a single-chamber aluminum one. Lower interior surface temperature on the frame means less radiant heat into the room, which means the airconditioner runs less often, which means a quieter, cheaper home.",
+    "A multi-chamber uPVC profile is not a hollow tube. It is a series of air pockets engineered to break the path of heat. Each chamber adds a small thermal break that compounds across the depth of the profile. A west-facing wall hit by direct afternoon sun transfers measurably less heat through a multi-chamber uPVC frame than through a single-chamber aluminum one. Lower interior surface temperature on the frame means less radiant heat into the room, which means the airconditioner runs less often, which means a quieter, cheaper home.",
   "corrosion-resistant":
-    "Aluminum oxidizes. Steel rusts. uPVC does neither. In the salt-air conditions of a coastal Batangas residence, a Cebu beachfront install, or a high-floor Manila condo unit exposed to amihan, this is the difference between a window frame that needs servicing inside a decade and one that does not. There is no sacrificial coating to fail; the material itself is the protection. A FourlinQ profile installed within a kilometer of the South China Sea will look the same in 2036 as it does the day the install crew leaves.",
+    "Aluminum oxidizes. Steel rusts. uPVC does neither. In salt-air conditions on the coast, or on a high-floor unit exposed to amihan, this is the difference between a window frame that needs servicing inside a decade and one that does not. There is no sacrificial coating to fail. The material itself is the protection. A FourlinQ profile installed within a kilometer of the sea will look the same in ten years as it does the day the install crew leaves.",
   "long-lasting-performance":
-    "The 10-year FourlinQ system warranty covers structural performance, the weather seal, and the finish — not just the profile. This is the warranty term that matches what we have actually observed in our installs over more than two decades. uPVC does not warp in tropical humidity, does not rot when a typhoon drives water against it for six hours, and does not require sanding, repainting, or resealing on the maintenance schedule a timber frame demands.",
+    "The 10-year FourlinQ system warranty covers structural performance, the weather seal, and the finish. Not just the profile. This warranty term matches what we have observed in our installs over more than two decades. uPVC does not warp in tropical humidity, does not rot when a typhoon drives water against it for six hours, and does not require sanding, repainting, or resealing on the maintenance schedule a timber frame demands.",
   "weather-resistance":
-    "Two engineering details do most of the work: EPDM gaskets that compress under sash pressure to form an airtight seal, and drainage holes machined into the frame that let any water that does penetrate run back out rather than pool inside the chamber. In a Tagaytay home during a Habagat-driven afternoon storm — where rain is wind-driven horizontally at 60 km/h — a properly installed FourlinQ system stays dry inside.",
+    "Two engineering details do most of the work. EPDM gaskets compress under sash pressure to form an airtight seal. Drainage holes machined into the frame let any water that does penetrate run back out rather than pool inside the chamber. During a Habagat-driven afternoon storm where rain is wind-driven horizontally at 60 km/h, a properly installed FourlinQ system stays dry inside.",
   "sound-insulation":
-    "Multi-chamber profiles plus glazing thicknesses from 6 mm to 12 mm produce 24–32 dB of acoustic attenuation in standard residential installations. The practical effect: a bedroom on a busy Quezon City street feels noticeably quieter than a single-glazed aluminum room next door. The reduction is largest at the frequency band of road traffic — exactly where homeowners feel the difference between a restful bedroom and one that needs a white-noise machine.",
+    "Multi-chamber profiles plus glazing thicknesses from 6 mm to 12 mm produce 24–32 dB of acoustic attenuation in standard residential installations. A bedroom on a busy street feels noticeably quieter than a single-glazed aluminum room next door. The reduction is largest at the frequency band of road traffic, which is exactly where homeowners feel the difference between a restful bedroom and one that needs a white-noise machine.",
 };
 
 const climate = [
@@ -63,7 +63,7 @@ const WhyUpvc = () => (
       eyebrow="The material"
       title="Why uPVC."
       breadcrumbLabel="Why uPVC"
-      subtitle="A material chosen for what a Philippine home actually goes through — the heat, the humidity, the salt air along the coast, and the storms that test what a house is made of."
+      subtitle="A material chosen for what a Philippine home actually goes through. The heat. The humidity. The salt air along the coast. The storms that test what a house is made of."
     />
 
     {/* Opening editorial */}
@@ -160,7 +160,7 @@ const WhyUpvc = () => (
         Three forces. One material.
       </EyebrowHeading>
       <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.65]">
-        We do not import European spec sheets. The material in our profiles is the same uPVC formulation used across northern Europe, but the way we specify it — chamber count, steel reinforcement gauge, gasket compound, glazing thickness — is calibrated for what a Philippine house actually goes through.
+        We do not import European spec sheets. The material in our profiles is the same uPVC formulation used across northern Europe. The way we specify it (chamber count, steel reinforcement gauge, gasket compound, glazing thickness) is calibrated for what a Philippine house actually goes through.
       </p>
       <ul className="mt-12 lg:mt-16 grid md:grid-cols-3 gap-px bg-[color:var(--rule-soft)]">
         {climate.map((item) => (
@@ -184,10 +184,10 @@ const WhyUpvc = () => (
         </div>
         <div className="lg:col-span-7 lg:col-start-6 space-y-5 text-body text-[color:var(--ink-secondary)] leading-[1.65]">
           <p>
-            uPVC is the right answer for residential windows and doors in the Philippines for almost every common application. It is not always the right answer for very large unbroken spans — past a certain pane size, glass weight + wind load math pushes the spec toward aluminum-reinforced systems. We will say so during your consultation rather than over-specify.
+            uPVC is the right answer for residential windows and doors in the Philippines for almost every common application. It is not always the right answer for very large unbroken spans. Past a certain pane size, glass weight and wind load math push the spec toward aluminum-reinforced systems. We will say so during your consultation rather than over-specify.
           </p>
           <p>
-            uPVC also does not pretend to be timber. If you want the look of solid hardwood, we offer wood-grain laminated finishes that do an honest job — but if hardwood is the texture you want under your hand, we will tell you that and recommend a hardwood door from a specialist.
+            uPVC also does not pretend to be timber. If you want the look of solid hardwood, we offer wood-grain laminated finishes that do an honest job. If hardwood is the texture you want under your hand, we will tell you that and recommend a hardwood door from a specialist.
           </p>
           <p>
             Premium is not the same thing as universal. The right question is not <em>"is uPVC the best material"</em>; it is <em>"is uPVC the right material for this specific opening, in this specific climate, with this specific budget and design intent."</em> The answer is usually yes. When it is no, we will say so.

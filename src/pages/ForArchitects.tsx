@@ -97,7 +97,7 @@ const ForArchitects = () => (
       eyebrow="For architects + specifiers"
       title="The resources to specify a FourlinQ system."
       breadcrumbLabel="For Architects"
-      subtitle="Technical drawings, BIM families, finish catalogs, and direct access to the FourlinQ engineering team. No bot — just an email to the people who size the profile and stamp the spec."
+      subtitle="Technical drawings, BIM families, finish catalogs, and direct access to the FourlinQ engineering team. No bot. Just an email to the people who size the profile and stamp the spec."
     />
 
     {/* Intro */}
@@ -106,7 +106,7 @@ const ForArchitects = () => (
         <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-20 lg:mb-28">
           <div className="lg:col-span-7">
             <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
-              FourlinQ is a single-brand uPVC system. The spec is consistent across every project — same profile, same hardware, same finish library, same {BRAND.warranty.toLowerCase()}. What changes from project to project is the geometry of the opening and the architect's intent.
+              FourlinQ is a single-brand uPVC system. The spec is consistent across every project. Same profile, same hardware, same finish library, same {BRAND.warranty.toLowerCase()}. What changes from project to project is the geometry of the opening and the architect's intent.
             </p>
           </div>
           <div className="lg:col-span-4 lg:col-start-9">
@@ -145,7 +145,7 @@ const ForArchitects = () => (
               </h2>
             </div>
             <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
-              We hand-deliver these by email rather than maintain a public download portal — keeps the file versions current, lets us know which firms are using us, and means you have an actual human to ask the follow-up question. Email {CONTACT.email} with the title from the list below.
+              We hand-deliver these by email rather than maintain a public download portal. Keeps the file versions current. Lets us know which firms are using us. And it means you have a real human to ask the follow-up question. Email {CONTACT.email} with the title from the list below.
             </p>
           </div>
 

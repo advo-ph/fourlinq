@@ -30,7 +30,7 @@ const advantages: Advantage[] = [
   {
     number: "03",
     title: "Quiet, thermally sealed",
-    body: "EPDM gasket assembly plus 6–12 mm glazing options reduce exterior noise and slow heat transfer — relevant on bedrooms next to busy roads and west-facing walls that take afternoon sun.",
+    body: "EPDM gasket assembly plus 6–12 mm glazing options reduce exterior noise and slow heat transfer. Relevant for bedrooms next to busy roads and west-facing walls that take afternoon sun.",
   },
   {
     number: "04",
@@ -40,7 +40,7 @@ const advantages: Advantage[] = [
   {
     number: "05",
     title: "10-year system warranty",
-    body: "Structural performance, weather seal integrity, and finish stability — covered for ten years from installation. The warranty period matches what we have actually seen in the field across our installs.",
+    body: "Structural performance, weather seal integrity, and finish stability. Covered for ten years from installation. The warranty period matches what we have observed in the field across our installs.",
   },
   {
     number: "06",
@@ -61,7 +61,7 @@ const UPVCAdvantageStrip = () => (
       <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
         Other uPVC manufacturers publish the same European boilerplate
         advantages list. Ours is rewritten around the actual conditions a
-        Philippine home will put a window through — typhoon-driven rain,
+        Philippine home will put a window through. Typhoon-driven rain,
         salt air, west-facing afternoon sun, and twenty monsoon seasons.
       </p>
     </div>

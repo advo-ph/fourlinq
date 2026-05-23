@@ -25,27 +25,27 @@ const FILTER_TABS: { id: FinishFilter; label: string }[] = [
  */
 const finishPairing: Record<string, string> = {
   "oak-light":
-    "The finish that quietly disappears. Sits well in modern Antipolo or Tagaytay residences with a Scandinavian-Filipino register — pale-oak floors, white plaster walls, indoor planting. Reads as warm white from across the room and as soft natural timber up close. Pairs flawlessly with concrete + linen.",
+    "The finish that quietly disappears. Sits well with a Scandinavian-Filipino register: pale oak floors, white plaster walls, indoor planting. Reads as warm white from across the room. Pairs with concrete and linen.",
   "oak-malt":
-    "The honest middle. Less rustic than golden oak, less austere than woodgray. Works on the lanai-facing facade of a coastal Batangas home where the warm tone catches afternoon light, and on heritage-modern interiors that need a wood note without committing to dark timber. Pairs with bone-white walls and brushed-bronze hardware.",
+    "The honest middle. Less rustic than Golden Oak, less austere than Woodgray. Works on a lanai facade where the warm tone catches afternoon light. Pairs with bone-white walls and brushed bronze.",
   woodgray:
-    "The driftwood register. The most architectural of the wood-grains — reads as weathered timber on a beachfront install, as soft warm grey in an urban condo. Specifies particularly well for mid-century-leaning Filipino architecture and for projects where the architect doesn't want to declare 'wood' or 'paint' definitively. Pairs with white oak, polished concrete, and any natural stone.",
+    "The driftwood register. The most architectural of the wood-grains. Reads as weathered timber on a beachfront install, as soft warm grey in an urban condo. Pairs with white oak, polished concrete, and natural stone.",
   "2-wood-black":
-    "The moody alternative to Jet Black. When the architect wants drama but doesn't want a flat-black industrial read. Reads as wenge or ebonized oak in raking light, as deep espresso in direct sun. Works on the contrasting wall of a tropical-modern home and on contemporary commercial interiors. Pairs with travertine, brass, and high-contrast white.",
+    "The moody alternative to Jet Black. When the architect wants drama without a flat industrial read. Reads as wenge in raking light, as deep espresso in direct sun. Pairs with travertine, brass, and high-contrast white.",
   "dark-oak":
-    "The classic Filipino hardwood register without the hardwood maintenance. Reads as narra or aged kamagong from across a room — warm, deep, grounded. Specifies for heritage homes, ancestral-house renovations, and projects that want a soft nod to traditional Filipino architecture. Pairs with capiz light fixtures, terracotta, and limewashed walls.",
+    "Filipino hardwood register without the hardwood maintenance. Reads as narra or aged kamagong from across a room. Specifies for heritage homes and ancestral-house renovations. Pairs with capiz, terracotta, limewashed walls.",
   walnut:
-    "The richest wood-grain in the catalog. Specifies for projects where the window is meant to be noticed — feature walls in formal living rooms, statement entries, double-height openings in Tagaytay homes. Reads as solid American walnut up close. Pairs with brass, cream linen, and deep emerald or olive interiors.",
+    "The richest wood-grain in the catalog. For projects where the window is meant to be noticed: feature walls, statement entries, double-height openings. Reads as solid American walnut up close. Pairs with brass and deep emerald.",
   "golden-oak":
-    "The warmest wood-grain. The finish for a sun-drenched lanai opening or a kitchen window above the sink. Specifies particularly well for tropical-traditional Filipino homes — bahay-na-bato influences, capiz screens, rattan furniture. Pairs with terracotta tile, mango wood, and warm-white interiors.",
+    "The warmest wood-grain. The finish for a sun-drenched lanai or a kitchen window above the sink. Specifies well in tropical-traditional homes: bahay-na-bato influences, capiz screens, rattan furniture. Pairs with terracotta and mango wood.",
   white:
-    "The default and the discipline. The matte white finish that lets the architecture lead and the windows recede. Works everywhere — the gold standard for modern Quezon City facades, condominium interiors, white-on-white kitchens, and any project where the window is meant to disappear into the wall. Pairs with everything.",
+    "The default and the discipline. The matte white that lets the architecture lead. The gold standard for modern facades, condominium interiors, white-on-white kitchens. Pairs with everything.",
   "jet-black":
-    "The flat black. No grain, no texture, no softening. The choice when the architect wants the window read as a graphic gesture — a black frame against a white wall, a dark line in a minimalist facade. Specifies for modernist projects and contemporary commercial conversions. Pairs with raw concrete, white oak, and bright planting.",
+    "Flat black. No grain, no texture, no softening. The choice when the window is a graphic gesture: a black frame against a white wall, a dark line in a minimalist facade. Pairs with raw concrete, white oak, bright planting.",
   "charcoal-gray":
-    "Black without the commitment. The softer alternative to Jet Black — reads as deep graphite, dark stone, gunmetal. Works on the seaside elevation of a Batangas residence where it matches the late-afternoon storm light, and on industrial-modern condos. Pairs with pale concrete, brushed steel, and any warm timber.",
+    "Black without the commitment. Softer than Jet Black. Reads as deep graphite, dark stone, gunmetal. Works on seaside elevations and industrial-modern condos. Pairs with pale concrete, brushed steel, warm timber.",
   "matte-quartz":
-    "The mid-tone grey. The most neutral non-white finish — reads as architectural concrete from across the room. Specifies for projects where the architect wants the window to feel structural rather than decorative. Works on commercial conversions, modernist residential, and any facade where the grey of the frame should match the grey of the structure. Pairs with concrete, white, and natural greenery.",
+    "The mid-tone grey. The most neutral non-white finish. Reads as architectural concrete from across the room. For projects where the window should feel structural, not decorative. Pairs with concrete, white, and natural greenery.",
 };
 
 /**
@@ -74,7 +74,7 @@ const Finishes = () => {
         eyebrow="The catalog"
         title="Eleven finishes. One window."
         breadcrumbLabel="Finishes"
-        subtitle="Each FourlinQ system is available in eleven brochure-verified finishes — seven wood-grain laminates and four solid colors. Pick one. See it on the frame."
+        subtitle="Each FourlinQ system is available in eleven brochure-verified finishes. Seven wood-grain laminates and four solid colors. Pick one. See it on the frame."
       />
 
       {/* Interactive hero — photo + overlaid frame swatch + description */}
@@ -237,14 +237,10 @@ const Finishes = () => {
           </div>
           <div className="space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.7] max-w-[40rem]">
             <p>
-              Other brands offer hundreds of swatches and call it choice. We chose eleven —
-              the ones that work in Filipino homes, hold up in Filipino sun, and pair
-              cleanly with the architectural materials already common here.
+              Other brands offer hundreds of swatches and call it choice. We chose eleven. The ones that work in Filipino homes, hold up in Filipino sun, and pair cleanly with the architectural materials already common here.
             </p>
             <p>
-              The seven wood-grain laminates are heat-fused — not painted or printed —
-              so they don't peel, chip, or fade. The four solid finishes use UV-stabilized
-              pigments that hold their color through 25 years of tropical sun.
+              The seven wood-grain laminates are heat-fused (not painted or printed), so they don't peel, chip, or fade. The four solid finishes use UV-stabilized pigments that hold their color through 25 years of tropical sun.
             </p>
             <p>
               Every finish is brochure-verified. None are conceptual. If you see it here, you

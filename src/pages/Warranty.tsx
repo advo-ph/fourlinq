@@ -30,7 +30,7 @@ const Warranty = () => (
         <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-20 lg:mb-28">
           <div className="lg:col-span-7">
             <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
-              A FourlinQ system is engineered to last decades. The 10-year warranty is our way of putting that engineering in writing — and standing behind it long after the install crew has gone home.
+              A FourlinQ system is engineered to last decades. The 10-year warranty is our way of putting that engineering in writing. And we stand behind it long after the install crew has gone home.
             </p>
           </div>
           <div className="lg:col-span-4 lg:col-start-9">
@@ -85,7 +85,7 @@ const Warranty = () => (
                 </li>
                 <li className="flex gap-4">
                   <span className="text-[color:var(--ink-faint)] font-serif shrink-0 w-8">—</span>
-                  <span>Cosmetic wear that doesn't affect structural performance — minor surface scuffs from cleaning equipment, hardware patina from repeated use.</span>
+                  <span>Cosmetic wear that doesn't affect structural performance, like minor surface scuffs from cleaning equipment or hardware patina from repeated use.</span>
                 </li>
                 <li className="flex gap-4">
                   <span className="text-[color:var(--ink-faint)] font-serif shrink-0 w-8">—</span>
@@ -97,7 +97,7 @@ const Warranty = () => (
                 </li>
               </ul>
               <p className="mt-8 text-body-sm text-[color:var(--ink-muted)] italic leading-[1.65]">
-                Full terms ship with every order — printed, signed, and dated. We'll walk you through them at the showroom.
+                Full terms ship with every order. Printed, signed, and dated. We'll walk you through them at the showroom.
               </p>
             </div>
           </div>
@@ -120,7 +120,7 @@ const Warranty = () => (
               {
                 step: "02",
                 title: "Recorded",
-                body: "We send you a signed warranty certificate by email and post within fourteen days. Keep it with your house papers — or just call us if you can't find it. We have the record.",
+                body: "We send you a signed warranty certificate by email and post within fourteen days. Keep it with your house papers. Or call us if you can't find it. We have the record.",
               },
               {
                 step: "03",
@@ -152,7 +152,7 @@ const Warranty = () => (
                 Engineered for Philippine homes — not imported into them.
               </h2>
               <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-xl">
-                The warranty isn't a marketing decision. It's the number that matches what we've seen — FourlinQ installations across Metro Manila, Cebu, Tagaytay, and the coast. Profiles that look the same after a decade of sun. Hardware that still operates smoothly after a thousand monsoons.
+                The warranty isn't a marketing decision. It's the number that matches what we've seen across FourlinQ installations in Metro Manila, Cebu, Tagaytay, and the coast. Profiles that look the same after a decade of sun. Hardware that still operates smoothly after a thousand monsoons.
               </p>
             </div>
             <div className="lg:col-span-4 lg:col-start-9">
@@ -182,7 +182,7 @@ const Warranty = () => (
               Walk into a showroom. See the warranty in person.
             </h2>
             <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] mb-10">
-              The fastest way to feel confident about a 10-year promise is to feel a 10-year-old FourlinQ window in your hands. There's one at every showroom — installed back when we were founding the company.
+              The fastest way to feel confident about a 10-year promise is to feel a 10-year-old FourlinQ window in your hands. There's one at every showroom, installed back when we were founding the company.
             </p>
             <div className="flex flex-wrap gap-x-8 gap-y-3 items-center">
               <EditorialButton to="/brand#showrooms" variant="primary" size="lg">
@@ -204,7 +204,7 @@ const scopeDescriptions: Record<string, string> = {
   "Corrosion resistance":
     "uPVC profiles never rust or corrode. Multi-chamber design, galvanized-steel reinforcement, and EPDM gaskets are warranted against material degradation through the full term.",
   "Long lasting performance":
-    "Operating hardware — hinges, rollers, locks, handles — is engineered for decades of daily use. Covered against mechanical failure under normal residential operation.",
+    "Operating hardware (hinges, rollers, locks, handles) engineered for decades of daily use. Covered against mechanical failure under normal residential operation.",
   "Weather resistance":
     "Sealed against monsoon rain, salt-air corrosion, and the daily thermal cycling of the Philippine climate. Covered against air-water-wind penetration that arises from the system itself, not from building movement.",
   "Sound insulation":

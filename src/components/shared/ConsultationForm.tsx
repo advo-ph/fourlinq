@@ -129,7 +129,7 @@ const ConsultationForm = () => {
           Consultation request received.
         </h3>
         <p className="text-body text-[color:var(--ink-secondary)] mb-8 max-w-[32rem] mx-auto leading-[1.65]">
-          {result.message} A FourlinQ engineer will reach out within one business day to schedule your showroom visit — bring your floor plan, or just your questions.
+          {result.message} A FourlinQ engineer will reach out within one business day to schedule your showroom visit. Bring your floor plan, or just your questions.
         </p>
         <EditorialButton onClick={() => { setResult(null); setStep(0); setForm({ name: "", email: "", phone: "", notes: "" }); }} variant="secondary" size="sm">
           Start another request
@@ -171,7 +171,7 @@ const ConsultationForm = () => {
           </Step>
         )}
         {step === 1 && (
-          <Step eyebrow="Project timeline" title="When are you planning to install?" subtitle="A rough window — we'll calibrate the consultation around it.">
+          <Step eyebrow="Project timeline" title="When are you planning to install?" subtitle="A rough window. We'll calibrate the consultation around it.">
             <ChipGrid
               options={TIMELINES}
               value={form.timeline}
@@ -222,7 +222,7 @@ const ConsultationForm = () => {
                 <textarea value={form.notes}
                           onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
                           rows={4} className={cn(inputClass, "resize-none")}
-                          placeholder="Optional — floor plan reference, expected window count, key dates…" />
+                          placeholder="Floor plan reference, expected window count, key dates…" />
               </div>
             </div>
           </Step>

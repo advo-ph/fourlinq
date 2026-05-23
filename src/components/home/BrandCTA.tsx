@@ -12,9 +12,7 @@ const BrandCTA = () => (
     </div>
     <div className="lg:pl-8">
       <p className="text-body-lg text-white/80 max-w-[34rem] leading-[1.6]">
-        FourlinQ makes uPVC windows and doors that disappear into the
-        architecture and stay there. Eleven finishes. Four showrooms.
-        One promise — the weather outside is the only weather that matters.
+        FourlinQ makes uPVC windows and doors that disappear into the architecture and stay there. Eleven finishes. Four showrooms. One promise. The weather outside is the only weather that matters.
       </p>
       <div className="mt-10 flex flex-wrap items-center gap-5">
         <EditorialButton to="/brand" variant="primary" size="md">
