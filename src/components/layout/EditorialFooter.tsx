@@ -22,6 +22,7 @@ const columns: Record<string, FooterLink[]> = {
   Resources: [
     { label: "Why uPVC", to: "/why-upvc" },
     { label: "Warranty", to: "/warranty" },
+    { label: "For Architects", to: "/for-architects" },
     { label: "FAQ", to: "/faq" },
     { label: "Care guide", to: "/care" },
     { label: "Certifications", to: "/brand#certifications" },

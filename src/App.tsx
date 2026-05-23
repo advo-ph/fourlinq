@@ -18,6 +18,7 @@ const WhatsNew = lazy(() => import("./pages/WhatsNew"));
 const Warranty = lazy(() => import("./pages/Warranty"));
 const Inspiration = lazy(() => import("./pages/Inspiration"));
 const ProjectDetail = lazy(() => import("./pages/ProjectDetail"));
+const ForArchitects = lazy(() => import("./pages/ForArchitects"));
 const DesignTool = lazy(() => import("./pages/DesignTool"));
 const WhyUpvc = lazy(() => import("./pages/WhyUpvc"));
 const Brand = lazy(() => import("./pages/Brand"));
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/warranty" element={<Warranty />} />
             <Route path="/inspiration" element={<Inspiration />} />
             <Route path="/projects/:slug" element={<ProjectDetail />} />
+            <Route path="/for-architects" element={<ForArchitects />} />
             <Route path="/design-tool" element={<DesignTool />} />
             <Route path="/why-upvc" element={<WhyUpvc />} />
             <Route path="/brand" element={<Brand />} />
