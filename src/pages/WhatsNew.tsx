@@ -40,7 +40,7 @@ const WhatsNew = () => {
         eyebrow="What's New"
         title="From the workshop."
         breadcrumbLabel="What's New"
-        subtitle="New projects, new systems, and quiet updates from FourlinQ. Sorted by date — most recent first."
+        subtitle="New projects, new systems, and quiet updates from FourlinQ. Sorted by date. Most recent first."
       />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">

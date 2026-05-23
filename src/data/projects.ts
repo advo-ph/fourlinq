@@ -1,17 +1,22 @@
 // Project catalog — for /inspiration and individual /projects/:slug pages.
 //
-// CRITICAL: Names + locations + architects + years are intentionally NEUTRAL
-// until Tita supplies real attribution. Earlier versions of this file invented
-// city names ("Quezon City residence", "Tagaytay residence", etc.) propagating
-// placeholder copy from a prior codebase as if it were truth. We don't know
-// where these photos were taken. The descriptions below describe ONLY what's
-// visibly in the photo — they make no claims about location, architect, owner,
-// or year.
+// CRITICAL: Names, locations, architects, years, AND gallery pairings are all
+// intentionally minimal until Tita supplies real attribution.
 //
-// Once Tita confirms attribution per project, update the corresponding entry
-// with real city + architect + year + optional quote. Until then, every
-// optional field stays undefined and the detail page renders gracefully
-// (Vitrocsa-style restraint).
+// Earlier versions invented city names ("Quezon City residence",
+// "Tagaytay residence", etc.) propagating placeholder copy as if it were truth.
+// They also paired photos with the same filename stem (e.g.
+// FourlinQ-Project-7.jpg + FourlinQ_Project-7.jpg) on the assumption they
+// were the same project at different angles. Neither assumption was verified.
+//
+// As of 2026-05-24:
+//   - Names describe ONLY what is visibly in the hero photo
+//   - Location is always "Private residence"
+//   - Galleries are removed (one hero photo per project, no invented pairings)
+//   - architect / year / quote / systemsUsed all remain undefined
+//
+// When Tita supplies per-project attribution AND confirms which photos belong
+// together, restore the gallery field and populate the other optionals.
 
 export type ProjectCategory =
   | "casement"      // casement-window-led residence
@@ -59,52 +64,36 @@ export const projects: Project[] = [
     name: "Modern white residence",
     location: "Private residence",
     image: "/images/wp-export/FourlinQ-Project-7.jpg",
-    gallery: [
-      "/images/wp-export/FourlinQ_Project-7.jpg",
-      "/images/wp-export/FQC-Project-17.jpg",
-    ],
     category: "casement",
     caption: "A modern white residence with floor-to-ceiling casement and sliding window systems opening to a planted garden.",
     description:
-      "Casement and sliding window systems specified throughout this modern white residence. Daylight is the brief — the windows are sized to disappear into the wall and let the garden show through.",
+      "Casement and sliding window systems specified throughout this modern white residence. Daylight is the brief. The windows are sized to disappear into the wall and let the garden show through.",
   },
   {
     id: "curved-glass-residence",
     name: "Curved-glass residence",
     location: "Private residence",
     image: "/images/wp-export/FourlinQ-Project-8.jpg",
-    gallery: [
-      "/images/wp-export/FourlinQ_Project-8.jpg",
-      "/images/wp-export/FourlinQ-Project-4.jpg",
-    ],
     category: "specialist",
     caption: "Custom-curved glazing forms the feature wall of this hillside residence.",
     description:
-      "Curved-glass feature work and custom-shaped panels engineered to architect-specified geometry. The curve is unique to this project — fabricated in our Manila workshop.",
+      "Curved-glass feature work and custom-shaped panels engineered to architect-specified geometry. The curve is unique to this project. Fabricated in our Manila workshop.",
   },
   {
     id: "garden-view-residence",
     name: "Garden-view residence",
     location: "Private residence",
     image: "/images/wp-export/FQC-Project-17.jpg",
-    gallery: [
-      "/images/wp-export/FourlinQ-Project-1.jpg",
-      "/images/wp-export/FourlinQ_Project-1.jpg",
-    ],
     category: "interior",
     caption: "Full-height casement and fixed-panel windows opening onto a planted garden.",
     description:
-      "Casement and fixed-panel installations spanning the full height of the living wall. The garden reads continuously through the glass — minimal sightlines, maximum daylight.",
+      "Casement and fixed-panel installations spanning the full height of the living wall. The garden reads continuously through the glass. Minimal sightlines, maximum daylight.",
   },
   {
     id: "lanai-facing-residence",
     name: "Lanai-facing residence",
     location: "Private residence",
     image: "/images/wp-export/FQC-Project-18.jpg",
-    gallery: [
-      "/images/wp-export/FourlinQ-Project-2.jpg",
-      "/images/wp-export/FourlinQ_Project-2.jpg",
-    ],
     category: "doors",
     caption: "Slide-and-fold door system opening the living room to the lanai.",
     description:
@@ -115,27 +104,19 @@ export const projects: Project[] = [
     name: "Three-storey modern residence",
     location: "Private residence",
     image: "/images/brand-story.jpg",
-    gallery: [
-      "/images/wp-export/FourlinQ-Project-3.jpg",
-      "/images/wp-export/FourlinQ_Project-3.jpg",
-    ],
     category: "exterior",
-    caption: "A three-storey home outfitted with FourlinQ systems throughout — casement, sliding, and large panel doors.",
+    caption: "A three-storey home outfitted with FourlinQ systems throughout: casement, sliding, and large panel doors.",
     description:
-      "Whole-home FourlinQ specification across all three floors — windows, doors, and feature glazing specified together for a coherent facade and consistent material spec.",
+      "Whole-home FourlinQ specification across all three floors. Windows, doors, and feature glazing specified together for a coherent facade and consistent material spec.",
   },
   {
     id: "french-door-residence",
     name: "French door residence",
     location: "Private residence",
     image: "/images/wp-export/FQC-Project-10.jpg",
-    gallery: [
-      "/images/wp-export/FourlinQ-Project-6.jpg",
-      "/images/wp-export/FourlinQ_Project-6.jpg",
-    ],
     category: "interior",
     caption: "French door installation with multi-point locking, framed in white.",
     description:
-      "French door system between interior spaces. Multi-chamber uPVC profile with galvanized-steel reinforcement, multi-point locking — specified for both security and acoustic isolation.",
+      "French door system between interior spaces. Multi-chamber uPVC profile with galvanized-steel reinforcement, multi-point locking. Specified for both security and acoustic isolation.",
   },
 ];

@@ -29,14 +29,14 @@ const SYSTEMS: Record<SystemId, SystemSummary> = {
     id: "casement",
     label: "Casement",
     tagline: "Maximum ventilation. Easy cleaning.",
-    why: "Hinged on one side and opens outward. Best when you want the whole window to swing fully open — bedrooms, living rooms, kitchens with countertops below.",
+    why: "Hinged on one side and opens outward. Best when you want the whole window to swing fully open. Best in bedrooms, living rooms, kitchens with countertops below.",
     link: "/products/windows",
   },
   sliding: {
     id: "sliding",
     label: "Sliding",
     tagline: "Space-saving. Versatile.",
-    why: "Slides horizontally along a track. Best where outward clearance is limited — balconies, walkways, narrow corridors, or above kitchen counters.",
+    why: "Slides horizontally along a track. Best where outward clearance is limited: balconies, walkways, narrow corridors, or above kitchen counters.",
     link: "/products/windows",
   },
   awning: {
@@ -50,7 +50,7 @@ const SYSTEMS: Record<SystemId, SystemSummary> = {
     id: "special-shapes",
     label: "Special Shapes",
     tagline: "Architectural impact.",
-    why: "Custom geometry — arches, circles, trapezoids, triangles. Combine with other systems to create a feature wall of glass. Specify with architectural drawings.",
+    why: "Custom geometry: arches, circles, trapezoids, triangles. Combine with other systems to create a feature wall of glass. Specify with architectural drawings.",
     link: "/products",
   },
   "slide-and-fold": {
@@ -78,12 +78,12 @@ const QUESTIONS: Question[] = [
     q: "Where will it go?",
     helper: "Pick the option that best matches the room or wall.",
     choices: [
-      { label: "Bedroom or living room — facing outside",                                scores: { casement: 3, awning: 1, sliding: 1 } },
+      { label: "Bedroom or living room, facing outside",                                scores: { casement: 3, awning: 1, sliding: 1 } },
       { label: "Kitchen, with a counter or sink below the window",                       scores: { sliding: 3, awning: 2, casement: 0 } },
       { label: "Balcony, walkway, or narrow exterior clearance",                         scores: { sliding: 3, awning: 1 } },
       { label: "Patio, lanai, or living room opening onto a garden",                     scores: { "slide-and-fold": 4, sliding: 2 } },
       { label: "High wall, gable, or above-door transom",                                scores: { awning: 3, "special-shapes": 3, casement: 1 } },
-      { label: "Custom shape — arch, circle, trapezoid, triangle",                       scores: { "special-shapes": 5 } },
+      { label: "Custom shape (arch, circle, trapezoid, triangle)",                       scores: { "special-shapes": 5 } },
     ],
   },
   {
@@ -92,7 +92,7 @@ const QUESTIONS: Question[] = [
     choices: [
       { label: "Maximum airflow when open",                                              scores: { casement: 3, "slide-and-fold": 3, sliding: 1 } },
       { label: "Letting in air even during heavy rain",                                  scores: { awning: 4 } },
-      { label: "Saving space — nothing protruding inward or outward",                    scores: { sliding: 4, "slide-and-fold": 1 } },
+      { label: "Saving space (nothing protruding inward or outward)",                    scores: { sliding: 4, "slide-and-fold": 1 } },
       { label: "Architectural drama or unusual geometry",                                scores: { "special-shapes": 4 } },
       { label: "Seamless indoor–outdoor connection",                                     scores: { "slide-and-fold": 5 } },
       { label: "Easy to clean from inside",                                              scores: { casement: 3, sliding: 2 } },
@@ -100,13 +100,13 @@ const QUESTIONS: Question[] = [
   },
   {
     q: "Roughly how wide is the opening?",
-    helper: "Estimate is fine — we measure on site.",
+    helper: "Estimate is fine. We measure on site.",
     choices: [
-      { label: "Under 1 m — small window",                                               scores: { casement: 2, awning: 2 } },
-      { label: "1 to 2 m — standard window",                                             scores: { casement: 3, sliding: 3, awning: 1 } },
-      { label: "2 to 3 m — wide window or single sliding door",                          scores: { sliding: 4, casement: 1 } },
-      { label: "3 m or more — full wall opening, doors",                                 scores: { "slide-and-fold": 5, sliding: 2 } },
-      { label: "Non-rectangular — needs custom shape",                                   scores: { "special-shapes": 5 } },
+      { label: "Under 1 m (small window)",                                               scores: { casement: 2, awning: 2 } },
+      { label: "1 to 2 m (standard window)",                                             scores: { casement: 3, sliding: 3, awning: 1 } },
+      { label: "2 to 3 m (wide window or single sliding door)",                          scores: { sliding: 4, casement: 1 } },
+      { label: "3 m or more (full wall opening, doors)",                                 scores: { "slide-and-fold": 5, sliding: 2 } },
+      { label: "Non-rectangular (needs custom shape)",                                   scores: { "special-shapes": 5 } },
     ],
   },
 ];
@@ -159,7 +159,7 @@ const HowToChoose = () => {
         eyebrow="Help me choose"
         title="Three questions. One recommendation."
         breadcrumbLabel="Help me choose"
-        subtitle="If you're not sure which window or door system fits your project, answer three quick questions. We'll point you at the one or two systems most likely to work — then you can dive into the catalog from there."
+        subtitle="If you're not sure which window or door system fits your project, answer three quick questions. We'll point you at the one or two systems most likely to work. Then you can dive into the catalog from there."
       />
 
       <Section tone="canvas" size="lg" className="!pt-0">

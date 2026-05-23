@@ -10,13 +10,13 @@ const routines = [
     icon: <Droplets size={20} strokeWidth={1.5} />,
     label: "Every few months",
     title: "Clean the frames.",
-    body: "Warm soapy water and a soft cloth. Wipe down both sides of the frame and the sash. The wood-grain finishes wipe down the same way as solids — no oiling, no refinishing required.",
+    body: "Warm soapy water and a soft cloth. Wipe down both sides of the frame and the sash. The wood-grain finishes wipe down the same way as solids. No oiling, no refinishing required.",
   },
   {
     icon: <Wrench size={20} strokeWidth={1.5} />,
     label: "Every 6 months",
     title: "Lubricate the hardware.",
-    body: "A single drop of light machine oil on hinge pins, lock cylinders, and roller bearings keeps everything smooth. Don't over-apply — excess oil collects dust.",
+    body: "A single drop of light machine oil on hinge pins, lock cylinders, and roller bearings keeps everything smooth. Don't over-apply. Excess oil collects dust.",
   },
   {
     icon: <Sparkles size={20} strokeWidth={1.5} />,
@@ -28,21 +28,21 @@ const routines = [
     icon: <ShieldCheck size={20} strokeWidth={1.5} />,
     label: "Once a year",
     title: "Inspect the weatherseals.",
-    body: "Run a finger along the rubber gasket inside the frame. It should be soft, continuous, and seated in its channel. If you find a gap or a flattened section, take a photo and send it to us — we replace gaskets under warranty.",
+    body: "Run a finger along the rubber gasket inside the frame. It should be soft, continuous, and seated in its channel. If you find a gap or a flattened section, take a photo and send it to us. We replace gaskets under warranty.",
   },
   {
     icon: <Calendar size={20} strokeWidth={1.5} />,
     label: "After a major storm",
     title: "Walk the perimeter.",
-    body: "After a signal-3 or stronger typhoon, check that all locks still engage smoothly, all panels still close flush, and there's no debris lodged in tracks or hinges. Report anything that doesn't feel right — most post-storm checks turn up nothing, but it's the right time to spot small issues before they become big ones.",
+    body: "After a signal-3 or stronger typhoon, check that all locks still engage smoothly, all panels still close flush, and there's no debris lodged in tracks or hinges. Report anything that doesn't feel right. Most post-storm checks turn up nothing, but it's the right time to spot small issues before they become big ones.",
   },
 ];
 
 const avoid = [
   "Abrasive scrubbers, steel wool, or scouring pads.",
-  "Solvents — paint thinner, acetone, methylated spirits, lacquer cleaners.",
-  "Bleach or chlorine-based cleaners — they can yellow uPVC over time.",
-  "Pressure washers at high settings — can force water past weatherseals.",
+  "Solvents: paint thinner, acetone, methylated spirits, lacquer cleaners.",
+  "Bleach or chlorine-based cleaners. They can yellow uPVC over time.",
+  "Pressure washers at high settings. Can force water past weatherseals.",
   "DIY mechanical adjustments to hardware (call us, the warranty covers it).",
 ];
 
@@ -52,7 +52,7 @@ const Care = () => (
       eyebrow="Care guide"
       title="Designed to outlast you. With a little help."
       breadcrumbLabel="Care"
-      subtitle="FourlinQ uPVC systems need almost no maintenance — no painting, no rust-proofing, no annual sanding. But a small routine extends the life of the seals and hardware. Here's what we recommend."
+      subtitle="FourlinQ uPVC systems need almost no maintenance. No painting, no rust-proofing, no annual sanding. But a small routine extends the life of the seals and hardware. Here's what we recommend."
     />
 
     {/* The routine */}
@@ -116,7 +116,7 @@ const Care = () => (
           Following this routine isn't required to keep your warranty valid.
         </p>
         <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-relaxed">
-          The 10-year warranty on profiles and 5-year warranty on hardware cover normal use and weather exposure. The routine above is about <em>maximizing</em> the life of the seals and rollers beyond the warranty period — not preserving the warranty itself. If anything goes wrong before then, we cover it.
+          The 10-year warranty on profiles and 5-year warranty on hardware cover normal use and weather exposure. The routine above is about <em>maximizing</em> the life of the seals and rollers beyond the warranty period. Not preserving the warranty itself. If anything goes wrong before then, we cover it.
         </p>
       </div>
     </Section>

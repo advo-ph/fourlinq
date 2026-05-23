@@ -11,13 +11,10 @@ interface FooterLink {
 
 const columns: Record<string, FooterLink[]> = {
   Systems: [
-    { label: "All Systems", to: "/products" },
     { label: "Windows", to: "/products/windows" },
     { label: "Doors", to: "/products/doors" },
     { label: "Specialist", to: "/products/specialist" },
     { label: "Finishes", to: "/finishes" },
-    { label: "Design Tool", to: "/design-tool" },
-    { label: "Help me choose", to: "/help-me-choose" },
   ],
   Resources: [
     { label: "Why uPVC", to: "/why-upvc" },
@@ -25,7 +22,6 @@ const columns: Record<string, FooterLink[]> = {
     { label: "For Architects", to: "/for-architects" },
     { label: "FAQ", to: "/faq" },
     { label: "Care guide", to: "/care" },
-    { label: "Certifications", to: "/brand#certifications" },
   ],
   Visit: [
     { label: "Visit a Showroom", to: "/brand#showrooms" },
