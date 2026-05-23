@@ -119,19 +119,17 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     // it's currently attached to the React tree via primitive).
     sceneClone.updateMatrixWorld(true);
 
-    // Measure bbox using each visible mesh's geometry.boundingBox transformed
-    // by its world matrix. This avoids setFromObject's recursive walk pulling
-    // in hidden descendants, and avoids quirks with skinned/armature meshes.
+    // Use setFromObject (with precise=true for skinned meshes) on each
+    // visible mesh. Walking the visible meshes one at a time means we don't
+    // pull in hidden siblings — only the descendants of the visible mesh.
     const bbox = new THREE.Box3();
     let foundAny = false;
     sceneClone.traverse((child) => {
       if (child.type !== "Mesh") return;
       const mesh = child as THREE.Mesh;
-      if (!mesh.visible || !mesh.geometry) return;
-      if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
-      if (!mesh.geometry.boundingBox) return;
-      const meshBox = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld);
-      if (!meshBox.isEmpty()) {
+      if (!mesh.visible) return;
+      const meshBox = new THREE.Box3().setFromObject(mesh, true);
+      if (!meshBox.isEmpty() && isFinite(meshBox.min.x) && isFinite(meshBox.max.x)) {
         bbox.union(meshBox);
         foundAny = true;
       }
