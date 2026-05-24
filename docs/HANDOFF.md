@@ -1,10 +1,71 @@
-# Session Handoff — redesign-marvin2 branch
+# Session Handoff — cms_final branch (live)
 
-Last updated: **2026-05-24 ~4:40 PM GMT+8**
+Last updated: **2026-05-24 ~11 PM GMT+8** (Tita demo prep session)
 
 ---
 
-## Branch state
+## Branch state (current)
+
+`supafinal` is the **current deploy branch** (Prince merged our `cms_final` into his `redesign-marvin2` and pushed as `origin/supafinal` at HEAD `17510f0`). Our session work (`3d86347`) is preserved as an ancestor — no force, no lost commits.
+
+Branch chain:
+- `cms_final` `3d86347` ← night-session push (ours)
+- `supafinal` `17510f0` ← Prince's merge commit on top of `3d86347`
+
+Tell collaborators: `git fetch && git checkout supafinal` to sync.
+
+---
+
+## What was done this session (May 24, ~9 PM → 11 PM)
+
+Theme: **strip "AI generated" surface tells**, simplify under deadline pressure for Tita's bedtime demo. Tita's relationship is at-risk; the brief was *"ship over discuss."*
+
+### 1. RESTRAINT.md — external design rulebook ([RESTRAINT.md](../RESTRAINT.md))
+- Net-new doc at the repo root. Negative-space companion to `DESIGN.md`: lists the things forbidden because they read as AI-generated (stacked gradients, italic display words inside serif headlines, scroll cues, Ken-Burns hero zoom, numbered eyebrows, hairline-flanked centered text, "by the numbers" stat strips, `border-2`, custom `@keyframes` in page files, ScrollReveal on every block). 10-question pre-ship self-check. Reference brands: marvin.com, apple.com/mac.
+
+### 2. /why-upvc full rewrite — [src/pages/WhyUpvc.tsx](../src/pages/WhyUpvc.tsx)
+- Cut 10 sections → 6. White canvas + one dark CTA. Two layout patterns total (hero+feature, 3×2 photo grid) — repetition IS the design.
+- Removed: dual-gradient hero, italic "uPVC", slow-zoom keyframes, scroll cue, dark stat strip, hairline-flanked quote, all `01 · / 02 ·` numbered eyebrows, the "Default" badge with `border-2` accent on the materials card.
+- Materials table iterated heavily on user direction. Final state: 4-col hairline table; **uPVC column = white canvas bg, ink-primary hairline left/right borders, larger serif header, bold ink-primary body text. Header reads `uPV` + red `C`.** Aluminum + Timber columns flat secondary ink, regular weight.
+
+### 3. /finishes simplified to display-only — [src/pages/Finishes.tsx](../src/pages/Finishes.tsx)
+- Per user: *"can u just show the finishes there but no more changing of stuff there."*
+- Removed the interactive scene preview, filter tabs, "Tap a finish" headline. Now: 12 swatches in a 6×2 grid, captioned, no interactivity. Provenance + CTA sections preserved.
+
+### 4. /brand warranty band — [src/pages/Brand.tsx](../src/pages/Brand.tsx)
+- Replaced the top story-grid's duplicate "10-Year Warranty / Covering corrosion resistance…" card with a Showrooms card ("Manila and Cebu."). The warranty story now lives exclusively in the dark band below.
+- Dark band rebuilt as a thin `size="sm"` editorial moment: serif "10" up to 9rem inline with red "YEAR WARRANTY." caption beside it on the same baseline. Promise prose sits quietly in white/65. Below: full-bleed marquee scroll band of warranty-scope items (Corrosion resistance · Long-lasting performance · Weather resistance · Sound insulation), separated by red `·` dots, list duplicated in markup for a seamless loop.
+- Marquee keyframe added to [src/index.css](../src/index.css) as `.animate-marquee` (28s linear infinite). Honors `prefers-reduced-motion`.
+- Copy overridden locally (not via `BRAND.promise`): *"Built to last in Philippine conditions. Backed by FourlinQ in writing."* Replaces brochure-verified `"A Lifetime of Satisfaction and Peace of Mind."` which contradicts the 10-year warranty next to it.
+
+### 5. Nav CTA: "Visit a Showroom" → "Book a Consultation" — [src/components/layout/QuietNavbar.tsx](../src/components/layout/QuietNavbar.tsx)
+- Desktop + mobile drawer. Points at `/brand#contact` (ConsultationForm). Lead capture beats a drive-to-showroom ask as the primary CTA.
+- Showroom link stays in footer as secondary.
+
+### 6. ConsultationForm notes textarea → boxed input — [src/components/shared/ConsultationForm.tsx](../src/components/shared/ConsultationForm.tsx)
+- The underline-only style worked for inputs but the textarea read as floating prose. Now 1px hairline border + `canvas-soft` background + white-on-focus.
+
+### 7. Merge + push
+- Committed local DesignTool + CMS/chat WIP in two snapshot commits before merging `origin/cms_final` (Prince's `redesign-marvin2` work). One merge conflict on `Index.tsx` (Prince's FinishExplorer-in-place-of-DesignToolPreview ordering vs local) — resolved keeping the local ordering: SystemsTiles → ProjectReels → DesignToolPreview → InspirationStrip.
+- Fast-forward push to `cms_final`: `9b69459` → `3d86347`. Vercel rebuild triggered.
+
+---
+
+## What is NOT done / needs attention
+
+1. **DesignTool 500 on `/api/analytics` POST** in local dev — non-blocking telemetry. Page renders fine. Production has the real backend so it won't 500 there.
+2. **`RESTRAINT.md` not cross-linked from `DESIGN.md` / `CLAUDE.md`** — future sessions need to be told about it manually until that link exists.
+3. **`EyebrowHeading` primitive still adds `before:content-['']` hairline prefix** to left-aligned eyebrows — violates RESTRAINT.md but used across many pages. Ripple fix is a separate batch.
+4. **`BRAND.promise = "A Lifetime of Satisfaction and Peace of Mind."`** in `src/data/fourlinq-data.ts` is brochure-verified and still rendered by any page that uses it. Only the /brand warranty band overrides locally. A sitewide rewrite needs client sign-off.
+5. **Vercel preview verification of the marquee** — confirmed in localhost screenshots but not on the deployed URL yet. Give Vercel 1–3 min after the push then check.
+
+---
+
+## Previous session — 2026-05-24 ~4:40 PM (Prince's `redesign-marvin2` initial push)
+
+> Branch state below describes Prince's pre-merge state. Everything below has since been committed and merged into `cms_final` along with the night-session work above.
+
+### Prior branch state
 
 Branch `redesign-marvin2` is based on a merge of `upstream/redesign-marvin` into a local fork. There are **uncommitted changes** across ~15 source files and 3 video files. Nothing has been pushed yet.
 

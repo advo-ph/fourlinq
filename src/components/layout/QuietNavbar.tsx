@@ -147,8 +147,20 @@ const QuietNavbar = () => {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-[72px] animate-fade-in">
-          <div className="container-editorial py-v600">
+        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-[72px] animate-fade-in flex flex-col">
+          {/* Top: primary CTA — red box, prominent, at top so it's the first thing
+              the visitor sees when they open the menu. */}
+          <div className="container-editorial pt-6 pb-2">
+            <Link
+              to="/brand#contact"
+              className="block w-full text-center bg-[color:var(--accent)] hover:bg-[color:var(--accent-hover)] text-white text-body font-medium tracking-wide py-4 transition-colors duration-300 ease-marvin"
+            >
+              Book a Consultation
+            </Link>
+          </div>
+
+          {/* Nav list */}
+          <nav className="container-editorial flex-1 pt-4">
             <ul className="flex flex-col">
               {navLinks.map((link) => {
                 const active = location.pathname === link.to ||
@@ -158,19 +170,19 @@ const QuietNavbar = () => {
                     <Link
                       to={link.to}
                       className={cn(
-                        "block py-5 text-h4 font-serif",
+                        "block py-4 text-[1.5rem] font-serif tracking-tight",
                         active ? "text-[color:var(--accent)]" : "text-[color:var(--ink-primary)]"
                       )}
                     >
                       {link.label}
                     </Link>
                     {link.children && (
-                      <ul className="pb-4 pl-3 -mt-2">
+                      <ul className="pb-4 -mt-2 space-y-1">
                         {link.children.map((c) => (
                           <li key={c.to}>
                             <Link
                               to={c.to}
-                              className="block py-2 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+                              className="block py-1.5 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
                             >
                               {c.label}
                             </Link>
@@ -182,11 +194,19 @@ const QuietNavbar = () => {
                 );
               })}
             </ul>
-            <div className="mt-v700">
-              <EditorialButton to="/brand#contact" size="lg" variant="primary" fullWidth>
-                Book a Consultation
-              </EditorialButton>
-            </div>
+          </nav>
+
+          {/* Footer detail — secondary showroom link + contact */}
+          <div className="container-editorial pb-8 pt-6 border-t border-[color:var(--rule-soft)] mt-6">
+            <Link
+              to="/brand#showrooms"
+              className="block text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin py-2"
+            >
+              Visit a Showroom →
+            </Link>
+            <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-muted)]">
+              Manila · Cebu
+            </p>
           </div>
         </div>
       )}
