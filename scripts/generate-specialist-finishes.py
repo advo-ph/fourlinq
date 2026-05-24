@@ -138,7 +138,27 @@ def create_frame_mask(original: Image.Image, oaklight: Image.Image) -> Image.Ima
     return mask_img
 
 
-def apply_wood_texture(original: Image.Image, mask: Image.Image, texture_path: Path) -> Image.Image:
+def compute_lighting(original: Image.Image, mask: Image.Image) -> np.ndarray:
+    """Extract 3D depth/lighting from original frame — normalized to a subtle range."""
+    orig_arr = np.array(original.convert("L")).astype(np.float32)
+    mask_arr = np.array(mask)
+    frame_px = mask_arr > 128
+
+    if not np.any(frame_px):
+        return np.ones_like(orig_arr)
+
+    vals = orig_arr[frame_px]
+    lo, hi = np.percentile(vals, [1, 99])
+
+    if hi <= lo:
+        return np.ones_like(orig_arr)
+
+    normed = (orig_arr - lo) / (hi - lo)
+    lighting = 0.78 + normed * 0.22
+    return np.clip(lighting, 0.78, 1.0)
+
+
+def apply_wood_texture(original: Image.Image, mask: Image.Image, texture_path: Path, lighting: np.ndarray) -> Image.Image:
     texture = Image.open(texture_path).convert("RGB")
     result = original.copy().convert("RGB")
     w, h = result.size
@@ -149,18 +169,27 @@ def apply_wood_texture(original: Image.Image, mask: Image.Image, texture_path: P
         for x in range(0, w, tw):
             tiled.paste(texture, (x, y))
 
+    tiled_arr = np.array(tiled).astype(np.float32)
+    for c in range(3):
+        tiled_arr[:, :, c] *= lighting
+    tiled_lit = Image.fromarray(np.clip(tiled_arr, 0, 255).astype(np.uint8))
+
     mask_blur = mask.filter(ImageFilter.GaussianBlur(1.5))
-    result.paste(tiled, mask=mask_blur)
+    result.paste(tiled_lit, mask=mask_blur)
     return result
 
 
-def apply_solid_color(original: Image.Image, mask: Image.Image, color: tuple) -> Image.Image:
+def apply_solid_color(original: Image.Image, mask: Image.Image, color: tuple, lighting: np.ndarray) -> Image.Image:
     result = original.copy().convert("RGB")
     w, h = result.size
-    solid = Image.new("RGB", (w, h), color)
+
+    solid_arr = np.full((h, w, 3), color, dtype=np.float32)
+    for c in range(3):
+        solid_arr[:, :, c] *= lighting
+    solid_img = Image.fromarray(np.clip(solid_arr, 0, 255).astype(np.uint8))
 
     mask_blur = mask.filter(ImageFilter.GaussianBlur(1.5))
-    result.paste(solid, mask=mask_blur)
+    result.paste(solid_img, mask=mask_blur)
     return result
 
 
@@ -170,6 +199,7 @@ def generate_all_finishes(product_id: str, original_path: Path, oaklight_path: P
 
     print(f"  Creating frame mask...")
     mask = create_frame_mask(original, oaklight)
+    lighting = compute_lighting(original, mask)
 
     for finish_id, texture_file in WOOD_FINISHES.items():
         out_path = OUTPUT / f"{product_id}-{finish_id}.jpeg"
@@ -178,7 +208,7 @@ def generate_all_finishes(product_id: str, original_path: Path, oaklight_path: P
             continue
 
         texture_path = TEXTURES / texture_file
-        result = apply_wood_texture(original, mask, texture_path)
+        result = apply_wood_texture(original, mask, texture_path, lighting)
         result.save(out_path, "JPEG", quality=92)
         print(f"  OK {out_path.name} ({out_path.stat().st_size / 1024:.0f} KB)")
 
@@ -188,7 +218,7 @@ def generate_all_finishes(product_id: str, original_path: Path, oaklight_path: P
             print(f"  SKIP {out_path.name} (exists)")
             continue
 
-        result = apply_solid_color(original, mask, color)
+        result = apply_solid_color(original, mask, color, lighting)
         result.save(out_path, "JPEG", quality=92)
         print(f"  OK {out_path.name} ({out_path.stat().st_size / 1024:.0f} KB)")
 
