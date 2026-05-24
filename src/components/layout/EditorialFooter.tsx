@@ -11,9 +11,9 @@ interface FooterLink {
 
 const columns: Record<string, FooterLink[]> = {
   Systems: [
-    { label: "Windows", to: "/products/windows" },
-    { label: "Doors", to: "/products/doors" },
-    { label: "Specialist", to: "/products/specialist" },
+    { label: "Windows", to: "/products?filter=windows" },
+    { label: "Doors", to: "/products?filter=doors" },
+    { label: "Specialist", to: "/products?filter=specialist" },
     { label: "Finishes", to: "/finishes" },
   ],
   Resources: [

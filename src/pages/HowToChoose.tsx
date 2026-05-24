@@ -30,21 +30,21 @@ const SYSTEMS: Record<SystemId, SystemSummary> = {
     label: "Casement",
     tagline: "Maximum ventilation. Easy cleaning.",
     why: "Hinged on one side and opens outward. Best when you want the whole window to swing fully open. Best in bedrooms, living rooms, kitchens with countertops below.",
-    link: "/products/windows",
+    link: "/products?filter=windows",
   },
   sliding: {
     id: "sliding",
     label: "Sliding",
     tagline: "Space-saving. Versatile.",
     why: "Slides horizontally along a track. Best where outward clearance is limited: balconies, walkways, narrow corridors, or above kitchen counters.",
-    link: "/products/windows",
+    link: "/products?filter=windows",
   },
   awning: {
     id: "awning",
     label: "Awning",
     tagline: "Ventilation, even in rain.",
     why: "Hinged at the top and opens outward. Lets in air and light during heavy rain without water entering. Often used above fixed glass or as a high transom.",
-    link: "/products/windows",
+    link: "/products?filter=windows",
   },
   "special-shapes": {
     id: "special-shapes",
@@ -58,7 +58,7 @@ const SYSTEMS: Record<SystemId, SystemSummary> = {
     label: "Slide & Fold",
     tagline: "Open the whole wall.",
     why: "Panels slide and fold to one side, creating a seamless indoor-outdoor opening. Best for living areas opening onto patios, garden rooms, lanais, or entertainment spaces.",
-    link: "/products/doors",
+    link: "/products?filter=doors",
   },
 };
 

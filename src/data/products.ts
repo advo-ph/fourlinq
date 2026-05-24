@@ -221,7 +221,7 @@ export const products: Product[] = [
     description:
       "Custom-curved profile work for arched windows and doors. Designed and fabricated to architect-specified geometry. Common in heritage homes and statement entries.",
     shortDescription: "Custom-curved geometry for architectural statements.",
-    image: "/images/wp-export/Arc-Window.jpg",
+    image: "/images/wp-export/archshapes.png",
     specs: [
       "Architect-specified arc geometry",
       "Multi-chamber uPVC profile",
@@ -238,7 +238,7 @@ export const products: Product[] = [
     description:
       "Curtain wall systems — large-format glazed wall assemblies for commercial and high-end residential projects. Engineered for the Philippine climate, with multi-storey applications supported. Consultation required.",
     shortDescription: "Large-format glazed wall assemblies.",
-    image: "/images/wp-export/FourlinQ-Project-7.jpg",
+    image: "/images/wp-export/curtainwall.png",
     specs: [
       "Multi-storey applications",
       "Engineered for tropical climate",
@@ -255,7 +255,7 @@ export const products: Product[] = [
     description:
       "Non-standard panel geometries — triangles, trapezoids, hexagons, and full bespoke shapes. Designed to architect drawings, fabricated in our workshop. The panels that other manufacturers say can't be done.",
     shortDescription: "Bespoke geometry to architect drawings.",
-    image: "/images/wp-export/Special-Shape-Window.jpg",
+    image: "/images/wp-export/customshapes.png",
     specs: [
       "Architect-drawn geometry",
       "Workshop-fabricated",
