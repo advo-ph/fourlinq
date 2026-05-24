@@ -11,7 +11,7 @@ export interface ScrollPhase {
 }
 
 export const TOTAL_FRAMES = 340;
-export const FRAME_PATH_TEMPLATE = "/images/scroll-window/frame_{index}.png";
+export const FRAME_PATH_TEMPLATE = "/images/scroll-window-webp/frame_{index}.webp";
 export const FRAME_PAD_LENGTH = 4;
 
 export const SCROLL_PHASES: ScrollPhase[] = [

@@ -17,7 +17,7 @@ export function useFramePreloader(
   pathTemplate: string,
   options: UseFramePreloaderOptions = {},
 ): UseFramePreloaderReturn {
-  const { enabled = true, batchSize = 6, padLength = 4 } = options;
+  const { enabled = true, batchSize = 50, padLength = 4 } = options;
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const [progress, setProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
