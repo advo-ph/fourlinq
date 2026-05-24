@@ -108,10 +108,10 @@ const Brand = () => (
             The promise
           </p>
           <p className="font-serif font-normal text-white leading-none tracking-tight text-[5rem] lg:text-[7rem] xl:text-[8rem]">
-            10<span className="text-[color:var(--accent)]">.</span>
+            10
           </p>
           <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/50">
-            Year warranty
+            Year warranty<span className="text-[color:var(--accent)]">.</span>
           </p>
         </div>
 
@@ -123,14 +123,14 @@ const Brand = () => (
           <p className="mt-8 text-[11px] uppercase tracking-[0.14em] text-white/40 mb-3">
             Covering
           </p>
-          <ul className="flex flex-wrap text-body-sm text-white">
+          <p className="text-body-sm text-white leading-[1.7]">
             {BRAND.warrantyScope.map((scope, i) => (
-              <li key={scope} className="flex items-center">
+              <span key={scope}>
                 {i > 0 && <span className="mx-3 text-white/25">·</span>}
                 {scope}
-              </li>
+              </span>
             ))}
-          </ul>
+          </p>
         </div>
       </div>
     </Section>
