@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface ProductEntry {
   id: string;
   label: string;
-  category: "windows" | "doors";
+  category: "windows" | "doors" | "specialist";
 }
 
 const PRODUCTS: ProductEntry[] = [
@@ -20,6 +20,9 @@ const PRODUCTS: ProductEntry[] = [
   { id: "large-panel", label: "Large Panel", category: "doors" },
   { id: "lift-and-slide", label: "Lift & Slide", category: "doors" },
   { id: "90-series", label: "90 Series", category: "doors" },
+  { id: "arch-shapes", label: "Arch Shapes", category: "specialist" },
+  { id: "curtain-wall", label: "Curtain Wall", category: "specialist" },
+  { id: "custom-shapes", label: "Custom Shapes", category: "specialist" },
 ];
 
 const FINISH_TO_FILE: Record<string, string> = {
@@ -82,10 +85,13 @@ function CrossfadeImage({ src, alt }: { src: string; alt: string }) {
 
 export default function FinishExplorer() {
   const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[0]);
-  const [selectedFinish, setSelectedFinish] = useState(FRAME_FINISHES[0]);
+  const [selectedFinish, setSelectedFinish] = useState(
+    FRAME_FINISHES.find((f) => f.id === "charcoal-gray") ?? FRAME_FINISHES[0],
+  );
 
   const windows = PRODUCTS.filter((p) => p.category === "windows");
   const doors = PRODUCTS.filter((p) => p.category === "doors");
+  const specialist = PRODUCTS.filter((p) => p.category === "specialist");
 
   return (
     <div className="grid lg:grid-cols-[280px,1fr] gap-8 lg:gap-12">
@@ -114,6 +120,25 @@ export default function FinishExplorer() {
           <p className="eyebrow mb-3">Doors</p>
           <div className="flex flex-col gap-1">
             {doors.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setSelectedProduct(p)}
+                className={cn(
+                  "text-left px-3 py-2 text-sm font-medium transition-colors border",
+                  selectedProduct.id === p.id
+                    ? "border-[color:var(--ink-primary)] bg-[color:var(--ink-primary)] text-white"
+                    : "border-transparent hover:border-[color:var(--rule-soft)] text-[color:var(--ink-secondary)]"
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="eyebrow mb-3">Specialist</p>
+          <div className="flex flex-col gap-1">
+            {specialist.map((p) => (
               <button
                 key={p.id}
                 onClick={() => setSelectedProduct(p)}
