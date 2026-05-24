@@ -213,9 +213,9 @@ const WhyUpvc = () => (
       <div className="overflow-x-auto">
         <div className="min-w-[720px]">
           {/* Header */}
-          <div className="grid grid-cols-[1.5fr_2fr_2fr_2fr] border-t-2 border-[color:var(--ink-primary)]">
+          <div className="grid grid-cols-[1.5fr_2fr_2fr_2fr] border-t-2 border-[color:var(--accent)]">
             <span className="eyebrow text-[color:var(--ink-muted)] py-5 pr-4">Feature</span>
-            <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--rule-strong)] font-serif text-h5 font-normal text-[color:var(--ink-primary)] leading-none">
+            <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--accent)] font-serif text-h5 font-normal text-[color:var(--accent)] leading-none">
               uPVC
             </span>
             <span className="py-5 px-4 font-serif text-h5 font-normal text-[color:var(--ink-secondary)] leading-none">
@@ -235,7 +235,7 @@ const WhyUpvc = () => (
               <span className="text-body-sm font-medium uppercase tracking-[0.06em] text-[color:var(--ink-muted)] py-5 pr-4 self-start">
                 {row.feature}
               </span>
-              <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--rule-strong)] text-body font-bold text-[color:var(--ink-primary)] leading-[1.5]">
+              <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--accent)] text-body font-bold text-[color:var(--accent)] leading-[1.5]">
                 {row.upvc}
               </span>
               <span className="py-5 px-4 text-body-sm text-[color:var(--ink-secondary)] leading-[1.5]">
@@ -250,7 +250,7 @@ const WhyUpvc = () => (
           {/* Bottom edge of uPVC column */}
           <div className="grid grid-cols-[1.5fr_2fr_2fr_2fr]">
             <span />
-            <span className="border-l border-r border-b-2 border-l-[color:var(--rule-strong)] border-r-[color:var(--rule-strong)] border-b-[color:var(--ink-primary)] bg-[color:var(--canvas)]" />
+            <span className="border-l border-r border-b-2 border-[color:var(--accent)] bg-[color:var(--canvas)]" />
             <span />
             <span />
           </div>
