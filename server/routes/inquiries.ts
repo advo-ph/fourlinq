@@ -285,7 +285,7 @@ router.get("/chat-logs/:sessionId", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT id, role, message, created_at FROM chat_messages WHERE session_id = $1 ORDER BY created_at ASC",
+      "SELECT id, role, message, image_url, created_at FROM chat_messages WHERE session_id = $1 ORDER BY created_at ASC",
       [sessionId]
     );
     res.json({ messages: result.rows });

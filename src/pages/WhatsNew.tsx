@@ -1,9 +1,22 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
-import { whatsNew, type WhatsNewCategory, type WhatsNewEntry } from "@/data/whats-new";
+import { whatsNew as fallbackNews, type WhatsNewCategory, type WhatsNewEntry } from "@/data/whats-new";
+import { fetchNews, type CmsNewsPost } from "@/lib/cms-api";
 import { cn } from "@/lib/utils";
+
+function fromCms(p: CmsNewsPost): WhatsNewEntry {
+  return {
+    id: p.slug,
+    date: (p.published_at ?? "").slice(0, 10),
+    category: p.category,
+    title: p.title,
+    excerpt: p.excerpt ?? "",
+    image: p.cover_path ?? "",
+    link: p.internal_link ?? p.external_link ?? undefined,
+  };
+}
 
 const ALL_FILTERS: { label: string; value: "all" | WhatsNewCategory }[] = [
   { label: "All updates", value: "all" },
@@ -13,12 +26,6 @@ const ALL_FILTERS: { label: string; value: "all" | WhatsNewCategory }[] = [
   { label: "Press", value: "press" },
 ];
 
-/** Only surface filter tabs that have at least one entry — empty filters
- *  make the filter look broken. */
-const filters = ALL_FILTERS.filter(
-  (f) => f.value === "all" || whatsNew.some((e) => e.category === f.value)
-);
-
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase();
 
@@ -27,12 +34,26 @@ const categoryLabel = (c: WhatsNewEntry["category"]) =>
 
 const WhatsNew = () => {
   const [active, setActive] = useState<"all" | WhatsNewCategory>("all");
+  const [items, setItems] = useState<WhatsNewEntry[]>(fallbackNews);
+
+  useEffect(() => {
+    fetchNews()
+      .then((rows) => setItems(rows.map(fromCms)))
+      .catch(() => { /* keep fallback */ });
+  }, []);
+
+  /** Only surface filter tabs that have at least one entry — empty filters
+   *  make the filter look broken. */
+  const filters = useMemo(
+    () => ALL_FILTERS.filter((f) => f.value === "all" || items.some((e) => e.category === f.value)),
+    [items]
+  );
 
   const filtered = useMemo(() => {
-    const sorted = [...whatsNew].sort((a, b) => b.date.localeCompare(a.date));
+    const sorted = [...items].sort((a, b) => b.date.localeCompare(a.date));
     if (active === "all") return sorted;
     return sorted.filter((e) => e.category === active);
-  }, [active]);
+  }, [active, items]);
 
   return (
     <Layout>

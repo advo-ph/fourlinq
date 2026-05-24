@@ -1,11 +1,25 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
-import { projects, type ProjectCategory } from "@/data/projects";
+import { projects as fallbackProjects, type ProjectCategory } from "@/data/projects";
+import { fetchProjects, type CmsProject } from "@/lib/cms-api";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | ProjectCategory;
+
+// Normalize API row (DB shape) to the view shape used by this page
+type ViewProject = { id: string; name: string; location: string; image: string; caption?: string; category: string };
+function normalize(p: CmsProject): ViewProject {
+  return {
+    id: p.slug,
+    name: p.title,
+    location: p.location ?? "",
+    image: p.cover_path ?? "",
+    caption: p.caption ?? undefined,
+    category: p.category ?? "interior",
+  };
+}
 
 const filters: { label: string; value: Filter }[] = [
   { label: "All projects", value: "all" },
@@ -19,10 +33,19 @@ const filters: { label: string; value: Filter }[] = [
 
 const Inspiration = () => {
   const [active, setActive] = useState<Filter>("all");
+  const [items, setItems] = useState<ViewProject[]>(() =>
+    fallbackProjects.map((p) => ({ id: p.id, name: p.name, location: p.location, image: p.image, caption: p.caption, category: p.category }))
+  );
+
+  useEffect(() => {
+    fetchProjects()
+      .then((rows) => setItems(rows.map(normalize)))
+      .catch(() => { /* keep fallback */ });
+  }, []);
 
   const filtered = useMemo(
-    () => (active === "all" ? projects : projects.filter((p) => p.category === active)),
-    [active]
+    () => (active === "all" ? items : items.filter((p) => p.category === active)),
+    [active, items]
   );
 
   return (

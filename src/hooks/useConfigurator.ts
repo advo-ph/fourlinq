@@ -35,7 +35,10 @@ const productTypeData: ProductTypeItem[] = staticProductTypes.map((t) => ({
   iconKey: t.icon,
   openingMechanism: t.id,
   category: t.category,
-  categoryName: t.category === "windows" ? "Windows" : "Doors",
+  categoryName:
+    t.category === "windows" ? "Windows" :
+    t.category === "doors" ? "Doors" :
+    "Specialist",
 }));
 
 const finishData: FinishOption[] = staticFinishes.map((f) => ({

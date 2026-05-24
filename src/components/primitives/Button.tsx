@@ -37,7 +37,7 @@ const EditorialButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Editor
         ? "rounded-full bg-[color:var(--accent)] text-white border-2 border-[color:var(--accent)] hover:bg-[color:var(--accent-hover)] hover:border-[color:var(--accent-hover)]"
         : variant === "secondary"
         ? "rounded-none bg-transparent text-[color:var(--ink-primary)] border-2 border-[color:var(--ink-primary)] hover:bg-[color:var(--ink-primary)] hover:text-white"
-        : "bg-transparent text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] underline-offset-4 hover:underline";
+        : "bg-transparent text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] underline underline-offset-[6px] decoration-1 decoration-[color:var(--rule-strong)] hover:decoration-[color:var(--accent)]";
 
     const classes = cn(
       "inline-flex items-center justify-center font-sans font-medium tracking-wide",

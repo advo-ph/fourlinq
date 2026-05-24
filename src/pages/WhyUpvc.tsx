@@ -70,7 +70,7 @@ const WhyUpvc = () => (
       eyebrow="The material"
       title="Why uPVC."
       breadcrumbLabel="Why uPVC"
-      subtitle="A material chosen for what a Philippine home actually goes through. The heat. The humidity. The salt air along the coast. The storms that test what a house is made of."
+      subtitle="A material chosen for Philippine conditions: heat, humidity, coastal salt air, and typhoon-season storms."
     />
 
     {/* Opening editorial — split with hero spec photo */}
@@ -101,7 +101,7 @@ const WhyUpvc = () => (
     {/* The 7 benefits — alternating photo-paragraph rows */}
     <Section tone="soft" size="lg">
       <EyebrowHeading eyebrow="What you get" level={2}>
-        Built for how you actually live.
+        What you get.
       </EyebrowHeading>
 
       <ul className="mt-16 lg:mt-24 space-y-24 lg:space-y-32">
@@ -218,7 +218,7 @@ const WhyUpvc = () => (
             Three forces. One material.
           </EyebrowHeading>
           <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[36rem]">
-            We do not import European spec sheets. The material in our profiles is the same uPVC formulation used across northern Europe. The way we specify it (chamber count, steel reinforcement gauge, gasket compound, glazing thickness) is calibrated for what a Philippine house actually goes through.
+            We do not import European spec sheets. The material in our profiles is the same uPVC formulation used across northern Europe. The way we specify it (chamber count, steel reinforcement gauge, gasket compound, glazing thickness) is calibrated for Philippine conditions.
           </p>
           <ul className="mt-10 space-y-6">
             <li className="border-t border-[color:var(--rule-soft)] pt-5">

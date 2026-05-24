@@ -12,7 +12,8 @@ export function resetChat() {
 }
 
 export async function* streamChat(
-  userMessage: string
+  userMessage: string,
+  imageDataUrl?: string,
 ): AsyncGenerator<string> {
   chatHistory.push({
     role: "user",
@@ -26,6 +27,7 @@ export async function* streamChat(
       message: userMessage,
       history: chatHistory.slice(0, -1),
       sessionId,
+      imageDataUrl,
     }),
   });
 

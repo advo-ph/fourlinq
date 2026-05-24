@@ -1,11 +1,29 @@
 import { useParams, Link, Navigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import ProjectPhotoSwitcher, { type ProjectPhoto } from "@/components/shared/ProjectPhotoSwitcher";
 import EditorialButton from "@/components/primitives/Button";
-import { projects } from "@/data/projects";
+import { projects as fallbackProjects, type Project } from "@/data/projects";
 import { products } from "@/data/products";
+import { fetchProjects, type CmsProject } from "@/lib/cms-api";
+
+function fromCms(p: CmsProject): Project {
+  return {
+    id: p.slug,
+    name: p.title,
+    location: p.location ?? "",
+    image: p.cover_path ?? "",
+    gallery: p.gallery_paths,
+    category: (p.category ?? "interior") as Project["category"],
+    caption: p.caption ?? undefined,
+    description: p.description ?? undefined,
+    architect: p.architect ?? undefined,
+    year: p.project_year ?? undefined,
+    systemsUsed: p.systems_used,
+    quote: p.quote_text ? { text: p.quote_text, attribution: p.quote_attribution ?? "" } : undefined,
+  };
+}
 
 /**
  * /projects/:slug — individual project detail page.
@@ -28,11 +46,19 @@ const categoryLabel: Record<string, string> = {
 
 const ProjectDetail = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [projects, setProjects] = useState<Project[]>(fallbackProjects);
+
+  useEffect(() => {
+    fetchProjects()
+      .then((rows) => setProjects(rows.map(fromCms)))
+      .catch(() => { /* keep fallback */ });
+  }, []);
+
   const project = projects.find((p) => p.id === slug);
 
   const otherProjects = useMemo(
     () => projects.filter((p) => p.id !== slug).slice(0, 3),
-    [slug]
+    [slug, projects]
   );
 
   // Map systemsUsed slugs to product entries for cross-links

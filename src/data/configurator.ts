@@ -7,7 +7,7 @@ export interface ProductType {
   id: string;
   name: string;
   icon: string;
-  category: "windows" | "doors";
+  category: "windows" | "doors" | "specialist";
 }
 
 export interface FinishOption {
@@ -25,8 +25,8 @@ export interface GlassOption {
   tint: string;
 }
 
-// Verified from brochure: Casement, Sliding, Awning, Special Shapes (windows)
-// Doors: Sliding Door, Bifold/Slide & Fold, French Door, Entrance, Lift & Slide
+// Catalog mirrors the brochure-verified FourlinQ product line: 5 windows, 7 doors,
+// 3 specialist geometries. iconKeys reuse a few core icons across related types.
 export const productTypes: ProductType[] = [
   // Windows
   { id: "casement", name: "Casement", icon: "casement", category: "windows" },
@@ -34,12 +34,19 @@ export const productTypes: ProductType[] = [
   { id: "sliding", name: "Sliding", icon: "sliding", category: "windows" },
   { id: "fixed", name: "Fixed", icon: "fixed", category: "windows" },
   { id: "tilt-turn", name: "Tilt & Turn", icon: "tilt-turn", category: "windows" },
-  // Doors
-  { id: "sliding-door", name: "Sliding Door", icon: "sliding-door", category: "doors" },
+  { id: "special-shapes", name: "Special Shapes", icon: "special-shapes", category: "windows" },
+  // Doors — featured order: Slide & Fold → Large Panel → 90 Series → Lift & Slide
   { id: "bifold", name: "Slide & Fold", icon: "bifold", category: "doors" },
+  { id: "large-panel-doors", name: "Large Panel Doors", icon: "large-panel", category: "doors" },
+  { id: "90-series", name: "90 Series", icon: "90-series", category: "doors" },
   { id: "lift-slide", name: "Lift & Slide", icon: "lift-slide", category: "doors" },
+  { id: "sliding-door", name: "Sliding Door", icon: "sliding-door", category: "doors" },
   { id: "french-door", name: "French Door", icon: "french-door", category: "doors" },
   { id: "entrance", name: "Casement Door", icon: "entrance", category: "doors" },
+  // Specialist — custom-fabricated geometries
+  { id: "arch-shapes", name: "Arch Shapes", icon: "arch", category: "specialist" },
+  { id: "curtain-wall", name: "Curtain Wall", icon: "curtain-wall", category: "specialist" },
+  { id: "custom-shapes", name: "Custom Shapes", icon: "custom-shapes", category: "specialist" },
 ];
 
 // 11 verified finishes from physical uPVC profile sample bars

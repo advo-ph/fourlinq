@@ -8,7 +8,8 @@ import chatLiteRouter from "./routes/chat-lite.js";
 import adminChatRouter from "./routes/admin-chat.js";
 import inquiriesRouter from "./routes/inquiries.js";
 import analyticsRouter from "./routes/analytics.js";
-import { loginHandler, logoutHandler, checkAuthHandler, requireAdmin } from "./auth.js";
+import { cmsPublic, cmsAdmin, uploadRouter, usersRouter, auditMiddleware } from "./cms-config.js";
+import { loginHandler, logoutHandler, checkAuthHandler, requireAdmin, requireRole } from "./auth.js";
 
 dotenv.config({ path: ".env.development.local" });
 dotenv.config();
@@ -25,12 +26,15 @@ app.use(cors({
     : ["http://localhost:3000", "http://localhost:5173", "http://localhost:8080"],
   credentials: true,
 }));
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
 // ─── Public routes ───────────────────────────────
 app.use("/api/chat", chatLiteRouter);
 app.use("/api/analytics", analyticsRouter);
+app.use("/api/cms", cmsPublic);
+// Serve uploaded CMS media (must come before SPA fallback)
+app.use("/uploads", express.static(path.resolve(import.meta.dirname, "../uploads"), { maxAge: "30d" }));
 // Public form submissions (router has /contact, /quote-request, /save-configuration)
 app.use("/api", inquiriesRouter);
 
@@ -40,8 +44,19 @@ app.post("/api/admin/logout", logoutHandler);
 app.get("/api/admin/check", checkAuthHandler);
 
 // ─── Protected admin routes ──────────────────────
+// requireAdmin = "any authenticated user". requireRole(["admin"]) for admin-only.
 app.use("/api/admin/chat", requireAdmin, adminChatRouter);
 app.use("/api/admin/analytics", requireAdmin, analyticsRouter);
+
+// CMS — admin + editor can manage all content; media role limited to /media only
+app.use("/api/admin/cms/media",
+  ...requireRole(["admin", "editor", "media"]), auditMiddleware, uploadRouter);
+app.use("/api/admin/cms",
+  ...requireRole(["admin", "editor"]), auditMiddleware, cmsAdmin);
+
+// User management — admin only
+app.use("/api/admin/users", ...requireRole(["admin"]), auditMiddleware, usersRouter);
+
 // Admin inquiries (router has /inquiries GET and /inquiries/:id PATCH)
 app.use("/api/admin", requireAdmin, inquiriesRouter);
 
