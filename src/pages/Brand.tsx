@@ -98,32 +98,27 @@ const Brand = () => (
       </div>
     </Section>
 
-    {/* Warranty — sleek dark moment. Inline 10 + YEAR WARRANTY anchor,
-        marquee scope band below. */}
-    <Section tone="dark" size="md">
-      <p className="text-[11px] uppercase tracking-[0.18em] text-white/40 mb-6">
-        The promise
-      </p>
-
-      <div className="grid lg:grid-cols-12 gap-x-12 gap-y-10 items-center">
+    {/* Warranty — thin dark band. Inline 10 + YEAR WARRANTY is the hero;
+        promise prose is small detail beneath; marquee runs flush. */}
+    <Section tone="dark" size="sm">
+      <div className="grid lg:grid-cols-12 gap-x-12 gap-y-6 items-end">
         <div className="lg:col-span-7 flex items-baseline gap-5 lg:gap-7">
-          <p className="font-serif font-normal text-white leading-none tracking-tight text-[5rem] lg:text-[7rem] xl:text-[8rem]">
+          <p className="font-serif font-normal text-white leading-none tracking-tight text-[5rem] lg:text-[7.5rem] xl:text-[9rem]">
             10
           </p>
-          <p className="text-[15px] lg:text-[17px] uppercase tracking-[0.18em] text-[color:var(--accent)] font-medium">
+          <p className="text-[15px] lg:text-[18px] uppercase tracking-[0.18em] text-[color:var(--accent)] font-medium">
             Year warranty.
           </p>
         </div>
 
-        <p className="lg:col-span-5 text-body lg:text-body-lg text-white/75 leading-[1.6] max-w-[34rem]">
+        <p className="lg:col-span-5 text-body-sm lg:text-body text-white/65 leading-[1.55] max-w-[32rem]">
           {BRAND.promise}
         </p>
       </div>
 
-      {/* Marquee scope band — covers what the warranty includes, scrolling */}
-      <div className="mt-14 lg:mt-20 -mx-5 lg:-mx-12 border-y border-white/10 overflow-hidden">
-        <div className="animate-marquee flex whitespace-nowrap py-5">
-          {/* Duplicate the list so the loop is seamless */}
+      {/* Marquee scope band — flush to bottom of section */}
+      <div className="mt-8 lg:mt-10 -mx-5 lg:-mx-12 border-t border-white/10 overflow-hidden">
+        <div className="animate-marquee flex whitespace-nowrap py-3">
           {[...Array(2)].map((_, dup) => (
             <span key={dup} className="flex shrink-0 items-center text-[11px] lg:text-body-sm uppercase tracking-[0.18em] text-white/70">
               {BRAND.warrantyScope.map((scope) => (
