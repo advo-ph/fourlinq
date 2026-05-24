@@ -235,7 +235,7 @@ const WhyUpvc = () => (
               <span className="text-body-sm font-medium uppercase tracking-[0.06em] text-[color:var(--ink-muted)] py-5 pr-4 self-start">
                 {row.feature}
               </span>
-              <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--accent)] text-body font-bold text-[color:var(--accent)] leading-[1.5]">
+              <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--accent)] text-body font-bold text-[color:var(--ink-primary)] leading-[1.5]">
                 {row.upvc}
               </span>
               <span className="py-5 px-4 text-body-sm text-[color:var(--ink-secondary)] leading-[1.5]">
