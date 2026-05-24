@@ -53,7 +53,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
-    image: "/images/wp-export/sliding.jpeg",
+    image: "/images/wp-export/slidingwindow.png",
     specs: [
       "Multi-chamber uPVC profile",
       "Smooth horizontal track operation",
@@ -101,7 +101,7 @@ export const products: Product[] = [
     category: "doors",
     description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
-    image: "/images/wp-export/sliding.jpeg",
+    image: "/images/wp-export/slidingdoor.jpeg",
     specs: [
       "Multi-chamber uPVC profile",
       "Space-saving horizontal slide",
@@ -117,7 +117,7 @@ export const products: Product[] = [
     category: "doors",
     description: PRODUCT_TYPES.find((p) => p.id === "slide-and-fold")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "slide-and-fold")!.tagline,
-    image: "/images/wp-export/Slide-and-Fold.jpg",
+    image: "/images/wp-export/slideandfold.jpeg",
     specs: [
       "Multi-panel folding system",
       "Full wall opening capability",
@@ -134,7 +134,7 @@ export const products: Product[] = [
     description:
       "Reinforced uPVC casement door combining aesthetic versatility with the security demands of main entry points. Multi-chamber profile with galvanized steel reinforcement.",
     shortDescription: "Secure and elegant single-leaf hinged doors.",
-    image: "/images/wp-export/Door-5.jpg",
+    image: "/images/wp-export/casement-door.jpeg",
     specs: [
       "Multi-chamber reinforced profile",
       "Galvanized steel core",
@@ -169,7 +169,7 @@ export const products: Product[] = [
     description:
       "Large-format panel doors engineered for openings up to 6 metres wide. Built for ground-floor living rooms and lanai-facing walls where the door itself becomes part of the architecture. Custom-specified per project.",
     shortDescription: "Door openings up to 6 metres wide.",
-    image: "/images/wp-export/Door-14.jpg",
+    image: "/images/wp-export/largepanel.png",
     specs: [
       "Spans up to 6 metres wide",
       "Multi-chamber reinforced profile",
@@ -186,7 +186,7 @@ export const products: Product[] = [
     description:
       "Lift-and-slide door system. The panel lifts off its seal to slide effortlessly along the track, then settles back onto the seal when closed for a fully weather-tight finish. Ideal for large openings where smooth daily operation matters.",
     shortDescription: "Effortless operation on large openings.",
-    image: "/images/wp-export/Door-6.jpg",
+    image: "/images/wp-export/liftandslide.jpeg",
     specs: [
       "Lift mechanism for low-effort operation",
       "Weather-tight closed-position seal",
@@ -203,7 +203,7 @@ export const products: Product[] = [
     description:
       "FourlinQ 90 Series door system — engineered for premium residential applications where performance and finish matter. Custom-specified profile family.",
     shortDescription: "Premium residential door system.",
-    image: "/images/wp-export/Door-7.jpg",
+    image: "/images/wp-export/90series.jpeg",
     specs: [
       "90 Series profile family",
       "Multi-chamber reinforced profile",

@@ -1,6 +1,8 @@
 import { lazy, Suspense } from "react";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
+import EyebrowHeading from "@/components/primitives/EyebrowHeading";
+import FinishExplorer from "@/components/home/FinishExplorer";
 
 const ScrollWindow = lazy(() => import("@/components/home/ScrollWindow"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
@@ -10,7 +12,6 @@ import ProjectReels from "@/components/home/ProjectReels";
 import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
 import BrandCTA from "@/components/home/BrandCTA";
-import DesignToolPreview from "@/components/home/DesignToolPreview";
 
 // Captions are intentionally generic until client confirms actual project locations.
 const heroSlides: HeroSlide[] = [
@@ -30,7 +31,7 @@ const Index = () => {
         fallbackSlides={heroSlides}
         caption="For the Philippine climate"
         headline="Built for the houses we share with the weather."
-        lede="Custom-made uPVC windows and doors. Eleven finishes. One promise."
+        lede="Custom-made uPVC windows and doors. Twelve finishes. One promise."
         ctaLabel="Explore Systems"
         ctaTo="/products"
       />
@@ -43,11 +44,17 @@ const Index = () => {
         <SystemsTiles />
       </Section>
 
-      <ProjectReels />
-
       <Section tone="canvas" size="lg">
-        <DesignToolPreview />
+        <EyebrowHeading eyebrow="Our Finishes" level={2}>
+          Twelve finishes. Every product.
+        </EyebrowHeading>
+        <p className="mt-8 lg:mt-10 mb-12 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.6]">
+          Seven wood-grain laminates from Oak Light to Walnut, and five solids including Jet Black, Charcoal Gray, and Matte Quartz. Each laminate is heat-fused directly to the uPVC core, not painted on.
+        </p>
+        <FinishExplorer />
       </Section>
+
+      <ProjectReels />
 
       <InspirationStrip />
 
