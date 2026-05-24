@@ -172,7 +172,7 @@ const DesignTool = () => {
 
   const isLoading = typesLoading || finishesLoading || glassLoading;
 
-  const selectedFinish = finishOptions.find((f) => f.id === config.finish) || { name: "White", color: "#F5F5F0", id: "white" };
+  const selectedFinish = finishOptions.find((f) => f.id === config.finish) || { name: "White", color: "#F5F5F5", id: "white" };
   const selectedGlass = glassOptions.find((g) => g.id === config.glass) || { name: "Clear", id: "clear-float" };
   const selectedType = productTypes.find((t) => t.id === config.type) || { name: "Casement", id: "casement", iconKey: "casement" };
 

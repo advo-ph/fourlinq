@@ -116,7 +116,7 @@ export const ADVANTAGES: Advantage[] = [
     id: "attractive-appearance",
     label: "Attractive Appearance",
     description:
-      "Clean, modern profiles available in 11 finishes — from classic white to rich wood grains — designed to complement any architectural style.",
+      "Clean, modern profiles available in 12 finishes — from classic white to rich wood grains — designed to complement any architectural style.",
     icon: "sparkles",
   },
   {
@@ -329,9 +329,9 @@ export const MATERIALS: MaterialOption[] = [
       "10-Year Warranty",
     ],
     compatibleFinishIds: [
-      "oak-light", "oak-malt", "woodgray", "2-wood-black",
-      "dark-oak", "walnut", "golden-oak",
-      "white", "jet-black", "charcoal-gray", "matte-quartz",
+      "oak-light", "oak-malt", "jet-black", "charcoal-gray",
+      "matte-quartz", "silica-cream", "black-wood", "gray-wood",
+      "dark-oak", "walnut", "golden-oak", "white",
     ],
   },
   {
@@ -345,12 +345,12 @@ export const MATERIALS: MaterialOption[] = [
       "Corrosion-resistant",
     ],
     // ⚠️ Confirm with client — aluminum finish availability not fully detailed in brochure
-    compatibleFinishIds: ["white", "jet-black", "charcoal-gray", "matte-quartz"],
+    compatibleFinishIds: ["oak-light", "silica-cream", "white", "jet-black", "charcoal-gray", "matte-quartz"],
   },
 ];
 
 // ─────────────────────────────────────────────
-// FRAME FINISHES — 11 Confirmed Options
+// FRAME FINISHES — 12 Confirmed Options
 // Source: Physical uPVC profile sample bars
 // ─────────────────────────────────────────────
 
@@ -375,11 +375,11 @@ export const FRAME_FINISHES: FrameFinish[] = [
     id: "oak-light",
     label: "Oak Light",
     category: "wood-grain",
-    swatchHex: "#D6C4A1",
+    swatchHex: "#C9A96E",
     description:
-      "Pale, almost bleached Scandinavian oak. Fine, straight grain with subtle cream and off-white tones. Airy and minimalist — reads nearly white from a distance.",
+      "Pale golden blonde with soft, fine grain. The lightest wood option — airy and natural. Works well in Scandinavian-inspired and minimalist interiors.",
     hasTexture: true,
-    textureImagePath: "/images/textures/finish/oak-light.jpg",
+    textureImagePath: "/images/finishes/textures/oak-light.png",
   },
   {
     id: "oak-malt",
@@ -389,69 +389,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Warm medium-blonde with golden-amber tones and slightly pronounced grain. Natural and unpretentious — like raw, unfinished timber. Pairs well with earth-tone interiors.",
     hasTexture: true,
-    textureImagePath: "/images/textures/finish/oak-malt.jpg",
-  },
-  {
-    id: "woodgray",
-    label: "Woodgray",
-    category: "wood-grain",
-    swatchHex: "#8C8680",
-    description:
-      "Cool gray base with subtle brown-taupe grain lines — like driftwood or weathered timber. A unique crossover finish that is neither fully wood nor fully solid.",
-    hasTexture: true,
-    textureImagePath: "/images/textures/finish/woodgray.jpg",
-  },
-  {
-    id: "2-wood-black",
-    label: "2 Wood Black",
-    category: "wood-grain",
-    swatchHex: "#2E2A27",
-    description:
-      "Deep espresso brown-black where wood grain is still perceptible in raking light. Moody and rich — like ebonized oak or dark wenge. More textural than Jet Black.",
-    hasTexture: true,
-    textureImagePath: "/images/textures/finish/2-wood-black.jpg",
-  },
-  {
-    id: "dark-oak",
-    label: "Dark Oak",
-    category: "wood-grain",
-    swatchHex: "#5C3A1E",
-    description:
-      "Medium-dark reddish-brown with clearly defined, flowing grain lines in deep amber and brown. Classic and warm — reminiscent of mahogany-adjacent hardwoods used in heritage homes.",
-    hasTexture: true,
-    textureImagePath: "/images/textures/finish/dark-oak.jpg",
-  },
-  {
-    id: "walnut",
-    label: "Walnut",
-    category: "wood-grain",
-    swatchHex: "#6B4226",
-    description:
-      "Rich chocolatey brown with prominent, swirling grain. Bold contrast between dark base and lighter streaks. Luxurious and heavy-feeling — the most premium timber look in the lineup.",
-    hasTexture: true,
-    textureImagePath: "/images/textures/finish/walnut.jpg",
-    profilePhotoPath: "/images/wp-export/Walnut-Profile.jpg",
-  },
-  {
-    id: "golden-oak",
-    label: "Golden Oak",
-    category: "wood-grain",
-    swatchHex: "#C8820A",
-    description:
-      "Bright honey-amber with a strong open-grain pattern — almost orange-gold in direct light. The most vivid wood finish. Warm and inviting; suits traditional Filipino and Spanish colonial interiors.",
-    hasTexture: true,
-    textureImagePath: "/images/textures/finish/golden-oak.jpg",
-    profilePhotoPath: "/images/wp-export/Golden-Oak-Profile.jpg",
-  },
-  {
-    id: "white",
-    label: "White",
-    category: "solid",
-    swatchHex: "#F5F5F5",
-    description:
-      "Clean, bright white with a smooth uniform surface. The most versatile option — matches any wall color, reads as modern or classic depending on context.",
-    hasTexture: false,
-    profilePhotoPath: "/images/wp-export/White-Profile.jpg",
+    textureImagePath: "/images/finishes/textures/oak-malt.jpeg",
   },
   {
     id: "jet-black",
@@ -461,7 +399,6 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Deep, near-total black with a smooth matte-to-satin surface. Completely uniform — no grain. High contrast and architectural. The darkest and most dramatic option.",
     hasTexture: false,
-    profilePhotoPath: "/images/wp-export/Black-Profile.jpg",
   },
   {
     id: "charcoal-gray",
@@ -471,7 +408,6 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Mid-dark gray, softer than Jet Black with a slightly cooler tone. Sits between anthracite and concrete in character — industrial but not aggressive. Very popular on contemporary facades.",
     hasTexture: false,
-    profilePhotoPath: "/images/wp-export/Gray-Profile.jpg",
   },
   {
     id: "matte-quartz",
@@ -481,15 +417,73 @@ export const FRAME_FINISHES: FrameFinish[] = [
     description:
       "Flat medium gray with almost no sheen — stone-like and understated. Lighter and warmer than Charcoal. Closest visually to polished concrete or a quartz countertop.",
     hasTexture: false,
-    profilePhotoPath: "/images/wp-export/Matte-Quartz-Profile.jpg",
   },
   {
-    id: "silicia-cream",
-    label: "Silicia Cream",
+    id: "silica-cream",
+    label: "Silica Cream",
     category: "solid",
-    swatchHex: "#E8DEC6",
+    swatchHex: "#d4ccc1",
     description:
-      "Warm off-white with a faint sand cast — softer and less clinical than pure White. Reads as bone or unbleached linen on a facade. Pairs with limewashed walls, travertine, and warm timber.",
+      "Warm off-white with sandy undertones. Softer than pure white — blends naturally with concrete, stone, and tropical-palette walls.",
+    hasTexture: false,
+  },
+  {
+    id: "black-wood",
+    label: "Black Wood",
+    category: "wood-grain",
+    swatchHex: "#2E2A27",
+    description:
+      "Deep espresso brown-black where wood grain is still perceptible in raking light. Moody and rich — like ebonized oak or dark wenge.",
+    hasTexture: true,
+    textureImagePath: "/images/finishes/textures/black-wood.jpeg",
+  },
+  {
+    id: "gray-wood",
+    label: "Gray Wood",
+    category: "wood-grain",
+    swatchHex: "#8C8680",
+    description:
+      "Cool gray base with subtle brown-taupe grain lines — like driftwood or weathered timber. A crossover finish that is neither fully wood nor fully solid.",
+    hasTexture: true,
+    textureImagePath: "/images/finishes/textures/gray-wood.jpeg",
+  },
+  {
+    id: "dark-oak",
+    label: "Dark Oak",
+    category: "wood-grain",
+    swatchHex: "#5C3A1E",
+    description:
+      "Medium-dark reddish-brown with clearly defined, flowing grain lines in deep amber and brown. Classic and warm — reminiscent of mahogany-adjacent hardwoods.",
+    hasTexture: true,
+    textureImagePath: "/images/finishes/textures/dark-oak.jpeg",
+  },
+  {
+    id: "walnut",
+    label: "Walnut",
+    category: "wood-grain",
+    swatchHex: "#6B4226",
+    description:
+      "Rich chocolatey brown with prominent, swirling grain. Bold contrast between dark base and lighter streaks. The most premium timber look in the lineup.",
+    hasTexture: true,
+    textureImagePath: "/images/finishes/textures/walnut.jpeg",
+  },
+  {
+    id: "golden-oak",
+    label: "Golden Oak",
+    category: "wood-grain",
+    swatchHex: "#C8820A",
+    description:
+      "Bright honey-amber with a strong open-grain pattern — almost orange-gold in direct light. The most vivid wood finish. Suits traditional Filipino and Spanish colonial interiors.",
+    hasTexture: true,
+    textureImagePath: "/images/finishes/textures/golden-oak.jpg",
+  },
+  {
+    id: "white",
+    label: "White",
+    category: "solid",
+    swatchHex: "#F5F5F5",
+    description:
+      "Clean, bright white with a smooth uniform surface. The most versatile option — matches any wall color, reads as modern or classic depending on context.",
     hasTexture: false,
   },
 ];

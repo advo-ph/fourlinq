@@ -25,25 +25,27 @@ const FinishSwatch = ({
 }: FinishSwatchProps) => {
   const finish = FRAME_FINISHES.find((f) => f.id === finishId);
   const resolvedType = finishType ?? finish?.category ?? "solid";
-  // Wood-grain finishes use the generated brochure-derived texture.
-  // Solid finishes render as a clean color swatch — the angled brochure profile
-  // photos read as cluttered 3D rendering at this size, not as a finish sample.
-  const photo = finish?.textureImagePath;
-
   const isWoodGrain = resolvedType === "wood-grain";
   const shape = isWoodGrain ? "rounded-lg" : "rounded-full";
   const borderStyle = selected
     ? "border-primary ring-2 ring-primary/30"
     : "border-border";
 
+  const hasRealTexture = finish?.hasTexture && finish.textureImagePath;
+
   return (
     <div
-      className={`${sizeMap[size]} ${shape} border-[3px] ${borderStyle} relative overflow-hidden transition-colors bg-cover bg-center ${className}`}
-      style={{
-        backgroundColor: color,
-        backgroundImage: photo ? `url(${photo})` : undefined,
-      }}
-    />
+      className={`${sizeMap[size]} ${shape} border-[3px] ${borderStyle} relative overflow-hidden transition-colors ${className}`}
+      style={hasRealTexture ? undefined : { backgroundColor: color }}
+    >
+      {hasRealTexture && (
+        <img
+          src={finish.textureImagePath}
+          alt={finish.label}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+    </div>
   );
 };
 

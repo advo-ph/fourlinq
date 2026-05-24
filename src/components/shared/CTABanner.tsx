@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import AnimatedSection from "./AnimatedSection";
 
 interface CTABannerProps {
   headline?: string;
@@ -20,7 +18,7 @@ const CTABanner = ({
   secondaryTo = "/products",
 }: CTABannerProps) => {
   return (
-    <AnimatedSection className="bg-primary py-20">
+    <section className="bg-primary py-20">
       <div className="page-container max-w-4xl text-center">
         <h2 className="text-3xl md:text-4xl font-semibold text-primary-foreground mb-4">
           {headline}
@@ -37,7 +35,7 @@ const CTABanner = ({
           </Link>
         </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 };
 

@@ -37,7 +37,7 @@ export const comparisonData: ComparisonRow[] = [
   { feature: "Sightline thickness", upvc: "Standard profile", aluminium: "Slimmer profile possible", timber: "Variable" },
   { feature: "Sound insulation", upvc: "24-32 dB attenuation typical", aluminium: "Comparable with proper glazing", timber: "Good with mass" },
   { feature: "Fire retardance", upvc: "Self-extinguishing", aluminium: "Non-combustible", timber: "Combustible" },
-  { feature: "Aesthetics", upvc: "11 finishes (solid + wood-grain)", aluminium: "Powder-coat color range", timber: "Natural grain or painted" },
+  { feature: "Aesthetics", upvc: "12 finishes (solid + wood-grain)", aluminium: "Powder-coat color range", timber: "Natural grain or painted" },
 ];
 
 // Re-export all 7 verified advantages for use elsewhere

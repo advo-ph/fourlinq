@@ -1,4 +1,7 @@
 {
+  "git": {
+    "productionBranch": "redesign-marvin2"
+  },
   "buildCommand": "vite build",
   "outputDirectory": "dist",
   "framework": "vite",

@@ -1,103 +1,176 @@
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import { cn } from "@/lib/utils";
+import { useFramePreloader } from "@/hooks/useFramePreloader";
+import EyebrowHeading from "@/components/primitives/EyebrowHeading";
+import FeatureLink from "@/components/primitives/FeatureLink";
+
+const TILE_FRAMES = 53;
 
 interface SystemTile {
   name: string;
   description: string;
-  image: string;
+  framePath: string;
   to: string;
 }
 
 const systems: SystemTile[] = [
   {
     name: "Window Systems",
-    description: "Casement, sliding, awning, and fixed glass. Sized and sealed for the way light moves through a Philippine home.",
-    image: "/images/wp-export/FourlinQ-Project-7.jpg",
+    description:
+      "Casement, sliding, awning, and fixed-panel. Multi-chamber uPVC profiles with galvanized steel reinforcement and EPDM gaskets. Glass from 6 mm to 12 mm. All units fabricated to your architect's measurements.",
+    framePath: "/images/systems/window/frame_{index}.jpg",
     to: "/products/windows",
   },
   {
     name: "Door Systems",
-    description: "Slide & Fold, Large Panel up to six metres, Lift & Slide, 90 Series. The wall that opens when you want it to.",
-    image: "/images/wp-export/FQC-Project-18.jpg",
+    description:
+      "Slide & Fold (up to 6 metres wide), Lift & Slide, Large Panel, and 90 Series sliding. Same steel-reinforced uPVC profile as the windows. Panels fold or slide to fully open a wall between indoor and outdoor spaces.",
+    framePath: "/images/systems/door/frame_{index}.jpg",
     to: "/products/doors",
   },
   {
     name: "Specialist Systems",
-    description: "Arches, curtain walls, and bespoke geometry. For projects that refuse the standard catalog.",
-    image: "/images/brand-story.jpg",
+    description:
+      "Arches, circles, triangles, and other non-standard shapes. Curtain wall configurations for full glass facades. Each unit is built to a specific project drawing.",
+    framePath: "/images/systems/specialist/frame_{index}.jpg",
     to: "/products/specialist",
   },
 ];
 
+function SystemFrameTile({ system }: { system: SystemTile }) {
+  const tileRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const frameRef = useRef(0);
+  const rafRef = useRef(0);
+  const [near, setNear] = useState(false);
+
+  const { images, isLoaded } = useFramePreloader(
+    TILE_FRAMES,
+    system.framePath,
+    { enabled: near, padLength: 4 },
+  );
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setNear(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "200% 0px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const draw = useCallback(
+    (f: number) => {
+      const cvs = canvasRef.current;
+      if (!cvs) return;
+      const ctx = cvs.getContext("2d");
+      if (!ctx) return;
+      const img = images[f];
+      if (!img?.naturalWidth) return;
+      if (cvs.width !== img.naturalWidth || cvs.height !== img.naturalHeight) {
+        cvs.width = img.naturalWidth;
+        cvs.height = img.naturalHeight;
+      }
+      ctx.drawImage(img, 0, 0);
+    },
+    [images],
+  );
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    draw(0);
+  }, [isLoaded, draw]);
+
+  // Scroll-based: map tile's viewport travel to frame index
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const onScroll = () => {
+      const el = tileRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+
+      const progress = Math.max(0, Math.min(1, (vh - rect.top) / (vh / 2 + rect.height / 2)));
+      const target = Math.min(
+        TILE_FRAMES - 1,
+        Math.floor(progress * TILE_FRAMES),
+      );
+
+      if (target !== frameRef.current) {
+        frameRef.current = target;
+        draw(target);
+      }
+    };
+
+    const tick = () => {
+      onScroll();
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [isLoaded, draw]);
+
+  return (
+    <li ref={tileRef}>
+      <Link to={system.to} className="group block">
+        <div className="relative aspect-video overflow-hidden bg-neutral-50 mb-6">
+          <canvas
+            ref={canvasRef}
+            className={cn(
+              "w-full h-full object-cover transition-opacity duration-500",
+              isLoaded ? "opacity-100" : "opacity-0",
+            )}
+          />
+        </div>
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+            {system.name}
+          </h3>
+          <ArrowUpRight
+            size={20}
+            className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
+          />
+        </div>
+        <p className="mt-3 text-body-sm lg:text-body text-[color:var(--ink-secondary)] max-w-[24rem]">
+          {system.description}
+        </p>
+      </Link>
+    </li>
+  );
+}
+
 const SystemsTiles = () => (
   <div>
-    <div className="grid lg:grid-cols-[1fr,1fr] gap-12 lg:gap-16 mb-16 lg:mb-20">
-      <EyebrowHeading eyebrow="Our Systems" level={2}>
-        Three families. Every shape a Philippine home needs.
+    <div className="mb-16 lg:mb-20">
+      <EyebrowHeading eyebrow="Collection" level={2}>
+        Products.
       </EyebrowHeading>
-      <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] lg:self-end leading-[1.65]">
-        From a quiet bedroom casement to a six-metre folding wall that opens the whole house to the garden. Plus the bespoke geometry in between.
+      <p className="mt-8 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.65]">
+        Custom-fabricated uPVC windows and doors from our Manila workshop.
+        Measured to your architect's drawings, finished in any of twelve
+        colors, and installed by our own crew.
       </p>
+      <div className="mt-6">
+        <FeatureLink to="/why-upvc">Why uPVC</FeatureLink>
+      </div>
     </div>
 
     <ul className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-12">
       {systems.map((sys) => (
-        <li key={sys.name}>
-          <Link to={sys.to} className="group block">
-            <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
-              <img
-                src={sys.image}
-                alt={sys.name}
-                loading="lazy"
-                decoding="async"
-                className={cn(
-                  "w-full h-full object-cover",
-                  "transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
-                )}
-              />
-            </div>
-            <div className="mt-6">
-              <div className="flex items-start justify-between gap-4">
-                <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                  {sys.name}
-                </h3>
-                <ArrowUpRight
-                  size={20}
-                  className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
-                />
-              </div>
-              <p className="mt-3 text-body-sm lg:text-body text-[color:var(--ink-secondary)] max-w-[24rem]">
-                {sys.description}
-              </p>
-            </div>
-          </Link>
-        </li>
+        <SystemFrameTile key={sys.name} system={sys} />
       ))}
     </ul>
-
-    {/* Finishes wow-link */}
-    <div className="mt-20 lg:mt-28 border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 grid lg:grid-cols-[1fr,1fr] gap-10 items-center">
-      <div>
-        <p className="eyebrow mb-4">Every system, eleven ways</p>
-        <h3 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] max-w-[18ch]">
-          Pick a finish. Watch it change.
-        </h3>
-      </div>
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[24rem] leading-relaxed">
-          Seven heat-fused wood-grain laminates, four solid colors — engineered to hold their finish through 25 years of tropical sun.
-        </p>
-        <Link
-          to="/finishes"
-          className="group inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
-        >
-          Explore the 11 finishes
-          <ArrowUpRight size={16} strokeWidth={1.5} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300 ease-marvin" />
-        </Link>
-      </div>
-    </div>
   </div>
 );
 

@@ -22,7 +22,7 @@ const navLinks: NavLink[] = [
       { label: "Specialist Systems", to: "/products/specialist", description: "Arch, Curtain Wall, Custom Shapes" },
     ],
   },
-  { label: "Inspiration", to: "/inspiration" },
+  { label: "Our Projects", to: "/inspiration" },
   { label: "What's New", to: "/whats-new" },
   { label: "Why uPVC", to: "/why-upvc" },
   { label: "Brand", to: "/brand" },
@@ -79,33 +79,34 @@ const QuietNavbar = () => {
                     {link.children && (
                       <div
                         className={cn(
-                          "absolute left-1/2 -translate-x-1/2 top-full mt-3 w-[420px]",
-                          "bg-white border border-[color:var(--rule-soft)] shadow-depth-4",
+                          "absolute left-1/2 -translate-x-1/2 top-full w-[420px]",
+                          "pt-3",
                           "opacity-0 invisible translate-y-1 pointer-events-none",
                           "group-hover/nav:opacity-100 group-hover/nav:visible group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto",
-                          "transition-all duration-300 ease-marvin",
-                          "p-6"
+                          "transition-all duration-300 ease-marvin"
                         )}
                       >
-                        <ul className="flex flex-col">
-                          {link.children.map((c) => (
-                            <li key={c.to}>
-                              <Link
-                                to={c.to}
-                                className="block py-3 -mx-3 px-3 hover:bg-[color:var(--canvas-soft)] transition-colors duration-300 ease-marvin"
-                              >
-                                <p className="text-body-sm font-medium text-[color:var(--ink-primary)]">
-                                  {c.label}
-                                </p>
-                                {c.description && (
-                                  <p className="text-[12px] mt-0.5 text-[color:var(--ink-muted)] leading-snug">
-                                    {c.description}
+                        <div className="bg-white border border-[color:var(--rule-soft)] shadow-depth-4 p-6">
+                          <ul className="flex flex-col">
+                            {link.children.map((c) => (
+                              <li key={c.to}>
+                                <Link
+                                  to={c.to}
+                                  className="block py-3 -mx-3 px-3 hover:bg-[color:var(--canvas-soft)] transition-colors duration-300 ease-marvin"
+                                >
+                                  <p className="text-body-sm font-medium text-[color:var(--ink-primary)]">
+                                    {c.label}
                                   </p>
-                                )}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
+                                  {c.description && (
+                                    <p className="text-[12px] mt-0.5 text-[color:var(--ink-muted)] leading-snug">
+                                      {c.description}
+                                    </p>
+                                  )}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     )}
                   </li>

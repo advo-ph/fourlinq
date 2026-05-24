@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
+import { motion, useReducedMotion } from "framer-motion";
 import { HTMLAttributes, ReactNode } from "react";
+import { MOTION } from "@/theme.config";
 
 interface SectionProps extends HTMLAttributes<HTMLElement> {
   children: ReactNode;
@@ -9,16 +11,31 @@ interface SectionProps extends HTMLAttributes<HTMLElement> {
   size?: "sm" | "md" | "lg" | "xl";
   /** Wrap children in a Container with editorial max-width. Default true. */
   contained?: boolean;
+  /** Disable the scroll-triggered fade-in animation. */
+  noAnimation?: boolean;
 }
+
+const fadeVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const fadeTransition = {
+  duration: 0.6,
+  ease: MOTION.ease,
+};
 
 const Section = ({
   children,
   tone = "canvas",
   size = "lg",
   contained = true,
+  noAnimation = false,
   className,
   ...rest
 }: SectionProps) => {
+  const prefersReducedMotion = useReducedMotion();
+
   const toneClass =
     tone === "soft" ? "bg-[color:var(--canvas-soft)]" :
     tone === "dark" ? "bg-[color:var(--canvas-dark)] text-[color:var(--ink-inverse)]" :
@@ -36,10 +53,28 @@ const Section = ({
     children
   );
 
+  const classes = cn(toneClass, padClass, className);
+
+  if (noAnimation || prefersReducedMotion) {
+    return (
+      <section className={classes} {...rest}>
+        {content}
+      </section>
+    );
+  }
+
   return (
-    <section className={cn(toneClass, padClass, className)} {...rest}>
+    <motion.section
+      className={classes}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-80px" }}
+      variants={fadeVariants}
+      transition={fadeTransition}
+      {...rest}
+    >
       {content}
-    </section>
+    </motion.section>
   );
 };
 

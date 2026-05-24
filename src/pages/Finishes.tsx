@@ -5,13 +5,14 @@ import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
-import { ArrowRight } from "lucide-react";
+import { FINISH_SCENES, getFinishVariantSrc } from "@/data/finish-scenes";
+import { ArrowRight, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type FinishFilter = "all" | "wood-grain" | "solid";
 
 const FILTER_TABS: { id: FinishFilter; label: string }[] = [
-  { id: "all", label: "All 11 finishes" },
+  { id: "all", label: "All 12 finishes" },
   { id: "wood-grain", label: "Wood grain" },
   { id: "solid", label: "Solid" },
 ];
@@ -23,20 +24,20 @@ const FILTER_TABS: { id: FinishFilter; label: string }[] = [
  * adds the context that turns a swatch grid into a design conversation.
  */
 const finishPairing: Record<string, string> = {
-  "oak-light":
-    "The finish that quietly disappears. Sits well with a Scandinavian-Filipino register: pale oak floors, white plaster walls, indoor planting. Reads as warm white from across the room. Pairs with concrete and linen.",
+  "silica-cream":
+    "The warm neutral. Softer than pure white, with sandy undertones that sit well against concrete, stone, and tropical-palette walls. Disappears into the facade or reads as a deliberate warm tone depending on context.",
   "oak-malt":
-    "The honest middle. Less rustic than Golden Oak, less austere than Woodgray. Works on a lanai facade where the warm tone catches afternoon light. Pairs with bone-white walls and brushed bronze.",
-  woodgray:
-    "The driftwood register. The most architectural of the wood-grains. Reads as weathered timber on a beachfront install, as soft warm grey in an urban condo. Pairs with white oak, polished concrete, and natural stone.",
-  "2-wood-black":
-    "The moody alternative to Jet Black. When the architect wants drama without a flat industrial read. Reads as wenge in raking light, as deep espresso in direct sun. Pairs with travertine, brass, and high-contrast white.",
-  "dark-oak":
-    "Filipino hardwood register without the hardwood maintenance. Reads as narra or aged kamagong from across a room. Specifies for heritage homes and ancestral-house renovations. Pairs with capiz, terracotta, limewashed walls.",
+    "The honest middle. Less rustic than Golden Oak, less austere than Gray Wood. Works on a lanai facade where the warm tone catches afternoon light. Pairs with bone-white walls and brushed bronze.",
+  "black-wood":
+    "The moody alternative. When the architect wants drama without a flat industrial read. Reads as wenge in raking light, as deep espresso in direct sun. Pairs with travertine, brass, and high-contrast white.",
+  "gray-wood":
+    "The driftwood register. The most architectural of the wood-grains. Reads as weathered timber on a beachfront install, as soft warm grey in an urban condo. Pairs with polished concrete and natural stone.",
   walnut:
     "The richest wood-grain in the catalog. For projects where the window is meant to be noticed: feature walls, statement entries, double-height openings. Reads as solid American walnut up close. Pairs with brass and deep emerald.",
   "golden-oak":
     "The warmest wood-grain. The finish for a sun-drenched lanai or a kitchen window above the sink. Specifies well in tropical-traditional homes: bahay-na-bato influences, capiz screens, rattan furniture. Pairs with terracotta and mango wood.",
+  "dark-oak":
+    "Filipino hardwood register without the hardwood maintenance. Reads as narra or aged kamagong from across a room. Specifies for heritage homes and ancestral-house renovations. Pairs with capiz, terracotta, limewashed walls.",
   white:
     "The default and the discipline. The matte white that lets the architecture lead. The gold standard for modern facades, condominium interiors, white-on-white kitchens. Pairs with everything.",
   "jet-black":
@@ -55,6 +56,7 @@ const finishPairing: Record<string, string> = {
 const Finishes = () => {
   const [selectedId, setSelectedId] = useState(FRAME_FINISHES[0].id);
   const [filter, setFilter] = useState<FinishFilter>("all");
+  const scene = FINISH_SCENES[0]; // single scene for now
 
   const selected = useMemo(
     () => FRAME_FINISHES.find((f) => f.id === selectedId) ?? FRAME_FINISHES[0],
@@ -66,32 +68,62 @@ const Finishes = () => {
     return FRAME_FINISHES.filter((f) => f.category === filter);
   }, [filter]);
 
-  // Big hero swatch: real wood-grain texture for wood finishes, solid color for solids.
-  const heroTexture = selected.textureImagePath;
-
   return (
     <Layout>
       <PageHeader
         eyebrow="The catalog"
-        title="Eleven finishes. One window."
+        title="Twelve finishes. One window."
         breadcrumbLabel="Finishes"
-        subtitle="Each FourlinQ system is available in eleven brochure-verified finishes. Seven wood-grain laminates and four solid colors."
+        subtitle="Each FourlinQ system is available in twelve brochure-verified finishes. Seven wood-grain laminates and five solid colors. Pick one. See it on the frame."
       />
 
-      {/* Hero — big honest swatch (real texture for wood, solid color for solids) + description */}
+      {/* Interactive hero — photo + overlaid frame swatch + description */}
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
-          <div className="grid lg:grid-cols-[6fr,5fr] gap-10 lg:gap-16 items-center">
-            <div
-              className="aspect-square w-full bg-cover bg-center rounded-sm shadow-depth-4 transition-[background-image,background-color] duration-500 ease-marvin"
-              style={{
-                backgroundColor: selected.swatchHex,
-                backgroundImage: heroTexture ? `url(${heroTexture})` : undefined,
-              }}
-              aria-label={`${selected.label} finish preview`}
-            />
+          <div className="grid lg:grid-cols-[7fr,5fr] gap-10 lg:gap-16 items-start">
+            {/* Hero preview — stacked images, cross-fade to selected variant */}
+            <div className={cn("relative bg-[color:var(--canvas-soft)] overflow-hidden", scene.aspect)}>
+              {scene.hasAssets ? (
+                // Real variants — preload all 11, cross-fade to selected
+                FRAME_FINISHES.map((f) => (
+                  <img
+                    key={f.id}
+                    src={getFinishVariantSrc(scene, f)}
+                    alt={`${scene.label} with ${f.label} frame`}
+                    className={cn(
+                      "absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-marvin",
+                      f.id === selected.id ? "opacity-100" : "opacity-0"
+                    )}
+                    loading={f.id === selected.id ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                ))
+              ) : (
+                // No assets yet — show the base scene cleanly, no fake overlay
+                <img
+                  src={scene.fallbackSrc}
+                  alt={scene.label}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                />
+              )}
 
-            <div>
+              {/* Status badge — honest about asset state */}
+              <div className="absolute top-4 left-4 flex items-center gap-2 bg-[color:var(--ink-primary)]/90 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium">
+                {scene.hasAssets ? (
+                  <>Preview · {selected.label}</>
+                ) : (
+                  <>
+                    <Camera size={12} strokeWidth={1.5} />
+                    Photo previews coming soon
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Selected finish description */}
+            <div className="lg:pt-8">
               <p className="eyebrow mb-4 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-[color:var(--rule-strong)]">
                 {selected.category === "wood-grain" ? "Wood grain" : "Solid"}
               </p>
@@ -114,7 +146,7 @@ const Finishes = () => {
                 <EditorialButton to="/products" variant="primary" size="md">
                   See on a system
                 </EditorialButton>
-                <EditorialButton to="/brand#contact" variant="secondary" size="md">
+                <EditorialButton to="/brand#contact" variant="ghost" size="md">
                   Request a sample →
                 </EditorialButton>
               </div>
@@ -157,8 +189,7 @@ const Finishes = () => {
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
           {filtered.map((f) => {
             const isSelected = f.id === selected.id;
-            // Wood-grain → real brochure-derived texture. Solid → clean color swatch.
-            const swatchImage = f.textureImagePath;
+            const hasRealTexture = f.hasTexture && f.textureImagePath;
             return (
               <li key={f.id}>
                 <button
@@ -168,16 +199,23 @@ const Finishes = () => {
                 >
                   <div
                     className={cn(
-                      "aspect-square w-full overflow-hidden transition-all duration-300 ease-marvin bg-cover bg-center",
+                      "aspect-square w-full overflow-hidden transition-all duration-300 ease-marvin",
                       isSelected
                         ? "ring-2 ring-[color:var(--accent)] ring-offset-2 ring-offset-[color:var(--canvas-soft)]"
                         : "ring-1 ring-[color:var(--rule-soft)] hover:ring-[color:var(--ink-primary)]"
                     )}
-                    style={{
-                      backgroundColor: f.swatchHex,
-                      backgroundImage: swatchImage ? `url(${swatchImage})` : undefined,
-                    }}
-                  />
+                    style={hasRealTexture ? undefined : { backgroundColor: f.swatchHex }}
+                  >
+                    {hasRealTexture && (
+                      <img
+                        src={f.textureImagePath}
+                        alt={`${f.label} finish`}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
                   <p className={cn(
                     "mt-3 text-body-sm font-medium transition-colors duration-300 ease-marvin",
                     isSelected ? "text-[color:var(--accent)]" : "text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)]"
@@ -200,15 +238,15 @@ const Finishes = () => {
           <div>
             <p className="eyebrow mb-5">How we chose</p>
             <h2 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1]">
-              Eleven finishes, not eleven hundred.
+              Twelve finishes, not twelve hundred.
             </h2>
           </div>
           <div className="space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.7] max-w-[40rem]">
             <p>
-              Other brands offer hundreds of swatches and call it choice. We chose eleven. The ones that work in Filipino homes, hold up in Filipino sun, and pair cleanly with the architectural materials already common here.
+              Other brands offer hundreds of swatches and call it choice. We chose twelve. The ones that work in Filipino homes, hold up in Filipino sun, and pair cleanly with the architectural materials already common here.
             </p>
             <p>
-              The seven wood-grain laminates are heat-fused (not painted or printed), so they don't peel, chip, or fade. The four solid finishes use UV-stabilized pigments that hold their color through 25 years of tropical sun.
+              The seven wood-grain laminates are heat-fused (not painted or printed), so they don't peel, chip, or fade. The five solid finishes use UV-stabilized pigments that hold their color through 25 years of tropical sun.
             </p>
             <p>
               Every finish is brochure-verified. None are conceptual. If you see it here, you

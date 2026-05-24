@@ -1,15 +1,14 @@
 import { lazy, Suspense } from "react";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
-import CapizDivider from "@/components/primitives/CapizDivider";
+import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 
-const HeroScroll3D = lazy(() => import("@/components/home/HeroScroll3D"));
-const DesignToolPreview = lazy(() => import("@/components/home/DesignToolPreview"));
+const Window3D = lazy(() => import("@/components/3d/Window3D"));
+const ScrollWindow = lazy(() => import("@/components/home/ScrollWindow"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
-import EditorialIntro from "@/components/home/EditorialIntro";
-import AuthorityStrip from "@/components/home/AuthorityStrip";
 import SystemsTiles from "@/components/home/SystemsTiles";
+import ProjectReels from "@/components/home/ProjectReels";
 import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
 import BrandCTA from "@/components/home/BrandCTA";
@@ -37,43 +36,48 @@ const Index = () => {
         ctaTo="/products"
       />
 
-      <Suspense fallback={<div className="h-screen bg-[color:var(--canvas-soft)]" />}>
-        <HeroScroll3D />
+      <Suspense fallback={null}>
+        <ScrollWindow />
       </Suspense>
-
-      <Section tone="canvas" size="lg">
-        <CapizDivider className="mb-section-mobile md:mb-section-tablet lg:mb-section-desktop" />
-        <EditorialIntro />
-      </Section>
-
-      <Section tone="canvas" size="md">
-        <AuthorityStrip />
-      </Section>
 
       <Section tone="soft" size="lg">
         <SystemsTiles />
       </Section>
 
-      {/* Design Tool preview — auto-cycles configs using the configurator's
-          own SVG render engine. Replaces the prior 3D viewer (unreliable
-          rendering across browsers, did not position consistently). */}
+      <ProjectReels />
+
+      {/* Interactive 3D window — procedural, no AI assets needed */}
       <Section tone="canvas" size="lg">
-        <Suspense
-          fallback={<div className="min-h-[400px] bg-[color:var(--canvas-soft)]" />}
-        >
-          <DesignToolPreview />
-        </Suspense>
+        <div className="grid lg:grid-cols-[5fr,6fr] gap-12 lg:gap-16 items-start">
+          <div>
+            <EyebrowHeading eyebrow="Our Finishes" level={2}>
+              Customizable for you.
+            </EyebrowHeading>
+            <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.6]">
+              Seven wood-grain laminates from Oak Light to Walnut, and four solids including Jet Black, Charcoal Gray, and Matte Quartz. Each laminate is heat-fused directly to the uPVC core, not painted on.
+            </p>
+          </div>
+          <div>
+            <Suspense
+              fallback={
+                <div className="w-full aspect-[5/6] lg:aspect-[4/5] bg-[color:var(--canvas-soft)] flex items-center justify-center">
+                  <p className="eyebrow">Loading 3D…</p>
+                </div>
+              }
+            >
+              <Window3D />
+            </Suspense>
+          </div>
+        </div>
       </Section>
 
-      <Section tone="canvas" size="lg">
-        <InspirationStrip />
-      </Section>
+      <InspirationStrip />
 
       <Section tone="canvas" size="lg" className="!pt-0">
         <WhatsNew />
       </Section>
 
-      <Section tone="dark" size="lg">
+      <Section tone="dark" size="lg" noAnimation>
         <BrandCTA />
       </Section>
     </Layout>
