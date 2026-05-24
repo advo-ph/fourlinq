@@ -27,6 +27,42 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+### Branch: `cms_final` (LIVE — Vercel production, 2026-05-24 night session)
+
+Tita demo pass. Merge of `cms-rag-multiuser` (CMS + chat work + design tweaks) into `cms_final` (Prince's `redesign-marvin2` = the branch Vercel is pointed at). Fast-forward push at HEAD `3d86347`. Theme: strip "AI generated" surface flourishes and tighten the warranty story for the live preview Tita reviewed before sleep.
+
+#### Added
+
+- [RESTRAINT.md](../RESTRAINT.md) at the repo root — external anti-pattern rulebook explicitly forbidding the surface tells that read as AI-generated: stacked gradient overlays on hero photos, `font-serif italic` display words inside serif headlines (the most identifiable tell), scroll cues, Ken-Burns hero zoom, 88vh "cinematic" heroes, numbered eyebrows (`01 ·`, `02 ·`), decorative hairlines flanking centered text, "by the numbers" dark stat strips, `border-2` accents, custom `@keyframes` in page files, and `ScrollReveal` on every block. Includes a 10-question pre-ship self-check. Reference brands: marvin.com, apple.com/mac. Per user: *"i dont want any of your ai design shinanigans and i want proper front end sleek minimalist design… why upvc was redesigned using your internal design skull and completely ruined the look / i tlooks ugly / ai generated / not marvin-esuqe / apple-esque"*.
+- New CSS keyframe `marquee` + `.animate-marquee` utility in [src/index.css](../src/index.css). 28s linear infinite, honors `prefers-reduced-motion` via the existing global rule. Currently used only by the warranty band on /brand.
+
+#### Changed
+
+- **/why-upvc page rewritten** against [RESTRAINT.md](../RESTRAINT.md). Cut 10 sections → 6. White canvas throughout plus one dark CTA. Removed: dual-gradient hero stack, italic "uPVC" word inside the headline, slow-zoom keyframes, scroll cue, dark "By the numbers" stat strip, hairline-flanked centered quote, all numbered eyebrows (`01 · Attractive`, etc.), `border-2` "Default" badge on the materials comparison card. Two layout patterns total — hero/feature (photo + caption beside heading) and 3×2 photo-grid for the remaining six advantages. Repetition IS the design. [src/pages/WhyUpvc.tsx](../src/pages/WhyUpvc.tsx).
+- **/why-upvc materials comparison table** iterated through ~10 commits to a final treatment: 4-column hairline table with the uPVC column visually emphasized — white canvas background, hairline left/right borders in ink-primary, larger serif "uPVC" header, **bold** body text in ink-primary. Aluminum and Timber columns stay flat in secondary ink. uPVC header reads `uPV` + red `C` (mirrors the FourlinQ wordmark Q-treatment but on the "C" per user correction). Body cells deliberately black bold, not red — user-tested and rolled back: *"dont make the text inside table red"*. Recommended-material signal is unmistakable without a "Default" badge. [src/pages/WhyUpvc.tsx](../src/pages/WhyUpvc.tsx), [src/data/benefits.ts](../src/data/benefits.ts).
+- **/finishes simplified to display-only**. Per user during Tita-prep crunch: *"can u just show the finishes there but no more changing of stuff there, like pressing wont do anything"*. Removed the interactive scene preview (click swatch → window cross-fades), the All/Wood/Solid filter tabs, the "Tap a finish. Watch the window change." heading. Page now shows the 12 brochure-verified swatches in a 6×2 grid with name + Wood Grain/Solid caption, plus the existing provenance and CTA sections. No clicks change state. [src/pages/Finishes.tsx](../src/pages/Finishes.tsx).
+- **/brand warranty section** rebuilt as a thin dark band. Was: `size="md"` two-column layout with `h2`-scale headline and a 4-column `gap-px bg-white/10` mosaic of warranty scope items (pixel-fake-divider, template-y). Now: `size="sm"` band; "10" as a giant serif numeral (up to 9rem on xl) and "YEAR WARRANTY." inline beside it on the same baseline, the caption fully in FourlinQ red. Promise prose sits as quiet body-sm in white/65 in a right column. Below the anchor, a full-bleed marquee band (`-mx-12`, hairline top/bottom borders) scrolls the warranty-scope items separated by red `·` dots. List is duplicated in markup so the loop is seamless. Single visual anchor + a moving detail band — reads closer to a luxury-watch product page than a marketing tile. [src/pages/Brand.tsx](../src/pages/Brand.tsx), [src/index.css](../src/index.css).
+- **/brand top story-grid card** swapped from a duplicate "10-Year Warranty / Covering corrosion resistance…" card to a Showrooms card ("Manila and Cebu."). The warranty story now lives exclusively in the highlighted black band directly below, no duplication. [src/pages/Brand.tsx](../src/pages/Brand.tsx).
+- **/brand warranty band copy** overridden locally (not via `BRAND.promise`): *"Built to last in Philippine conditions. Backed by FourlinQ in writing."* The data file's `BRAND.promise = "A Lifetime of Satisfaction and Peace of Mind."` reads as title-case marketing voice and contradicts the 10-year warranty sitting next to it, but the value is brochure-verified so it stays in the data file for other consumers. [src/pages/Brand.tsx](../src/pages/Brand.tsx).
+- **Navbar primary CTA**: "Visit a Showroom" → "Book a Consultation" (desktop link + mobile drawer button). Now points at `/brand#contact` (where `ConsultationForm` lives) instead of `/brand#showrooms`. Lead capture beats a drive-to-showroom ask as the primary conversion — most first-time visitors won't get in a car, but they will fill a form. Showroom link stays in the footer as a secondary entry. [src/components/layout/QuietNavbar.tsx](../src/components/layout/QuietNavbar.tsx).
+- **ConsultationForm notes field → boxed input**. The underline-only style worked for single-line inputs but the textarea read as floating prose. Now: 1px hairline border + `canvas-soft` background + focus state goes white with dark border. Other fields keep the underline style — the textarea is the only visually-distinct field, matching its longer-content expectation. [src/components/shared/ConsultationForm.tsx](../src/components/shared/ConsultationForm.tsx).
+
+#### Removed
+
+- DesignToolPreview / FinishExplorer swap on `/` (homepage): a merge conflict from `origin/cms_final` offered Prince's FinishExplorer-in-place-of-DesignToolPreview ordering. Kept the local version (SystemsTiles → ProjectReels → DesignToolPreview → InspirationStrip) — preserves DesignTool surfacing on the homepage. [src/pages/Index.tsx](../src/pages/Index.tsx).
+
+#### Deployed
+
+- `cms-rag-multiuser` fast-forward pushed to `cms_final` at `3d86347`. Push was confirmed fast-forward (Prince's last commit `9b69459` is an ancestor of the new tip) — no force, no Prince commits lost.
+- Prince then merged `cms_final` into his `redesign-marvin2` and pushed as `origin/supafinal` at `17510f0`. **`supafinal` is now the deploy branch.** Our work is preserved in the merge — `3d86347` is an ancestor of `17510f0`.
+
+#### Honest open-items
+
+- DesignTool 500 on `/api/analytics` POST in local dev — non-blocking telemetry endpoint, page renders fine. Production has the real backend so it won't 500 there, but the dev-only failure is noise during demos.
+- `RESTRAINT.md` is not yet linked from `DESIGN.md` or `CLAUDE.md` / project orientation. Cross-link if you want future sessions to discover it without being told.
+- The `EyebrowHeading` primitive still adds a `before:content-['']` hairline prefix on left-aligned eyebrows — that violates RESTRAINT.md's "no decorative hairline prefixes on eyebrows" rule but the primitive is used across many pages. Rippling the fix is a separate batch.
+- `BRAND.promise = "A Lifetime of Satisfaction and Peace of Mind."` in `src/data/fourlinq-data.ts` is still the value any other page would render. Only the warranty band on /brand overrides it locally. If we want a sitewide rewrite, do that as a separate copy pass with client sign-off (the line is brochure-verified).
+
 ### Branch: `redesign-marvin` (NOT YET MERGED — under client review)
 
 The Marvin-direction redesign is shipping on a feature branch separate from `main`. Vercel auto-deploys it to a preview URL that's distinct from production. All entries in this sub-block live only on that branch until Tita signs off and we merge. Detailed phase-by-phase log lives in [REDESIGN_ROADMAP.md §14 Implementation log](./REDESIGN_ROADMAP.md) — this is the user-visible-impact summary.
