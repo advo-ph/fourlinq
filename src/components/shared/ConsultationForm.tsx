@@ -221,8 +221,9 @@ const ConsultationForm = () => {
                 <label className={labelClass}>Anything specific to share?</label>
                 <textarea value={form.notes}
                           onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-                          rows={4} className={cn(inputClass, "resize-none")}
-                          placeholder="Floor plan reference, expected window count, key dates…" />
+                          rows={5}
+                          placeholder="Floor plan reference, expected window count, key dates…"
+                          className="w-full bg-[color:var(--canvas-soft)] border border-[color:var(--rule-soft)] focus:border-[color:var(--ink-primary)] focus:bg-[color:var(--canvas)] px-4 py-3 text-body text-[color:var(--ink-primary)] outline-none placeholder:text-[color:var(--ink-faint)] transition-colors duration-300 ease-marvin resize-none" />
               </div>
             </div>
           </Step>
