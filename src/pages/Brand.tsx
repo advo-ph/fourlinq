@@ -112,7 +112,7 @@ const Brand = () => (
         </div>
 
         <p className="lg:col-span-5 text-body-sm lg:text-body text-white/65 leading-[1.55] max-w-[32rem]">
-          {BRAND.promise}
+          Built to last in Philippine conditions. Backed by FourlinQ in writing.
         </p>
       </div>
 
