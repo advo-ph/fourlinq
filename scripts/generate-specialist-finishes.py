@@ -139,7 +139,6 @@ def create_frame_mask(original: Image.Image, oaklight: Image.Image) -> Image.Ima
 
 
 def apply_wood_texture(original: Image.Image, mask: Image.Image, texture_path: Path) -> Image.Image:
-    """Tile wood texture across frame area defined by mask."""
     texture = Image.open(texture_path).convert("RGB")
     result = original.copy().convert("RGB")
     w, h = result.size
@@ -150,63 +149,24 @@ def apply_wood_texture(original: Image.Image, mask: Image.Image, texture_path: P
         for x in range(0, w, tw):
             tiled.paste(texture, (x, y))
 
-    orig_gray = original.convert("L")
-    orig_arr = np.array(orig_gray).astype(np.float32)
-    p2, p98 = np.percentile(orig_arr[np.array(mask) > 128], [2, 98]) if np.any(np.array(mask) > 128) else (0, 255)
-
-    if p98 > p2:
-        shading = (orig_arr - p2) / (p98 - p2)
-        shading = np.clip(shading, 0.3, 1.0)
-    else:
-        shading = np.ones_like(orig_arr)
-
-    tiled_arr = np.array(tiled).astype(np.float32)
-    for c in range(3):
-        tiled_arr[:, :, c] *= shading
-
-    tiled_shaded = Image.fromarray(np.clip(tiled_arr, 0, 255).astype(np.uint8))
-
     mask_blur = mask.filter(ImageFilter.GaussianBlur(1.5))
-    result.paste(tiled_shaded, mask=mask_blur)
+    result.paste(tiled, mask=mask_blur)
     return result
 
 
 def apply_solid_color(original: Image.Image, mask: Image.Image, color: tuple) -> Image.Image:
-    """Fill frame area with solid color, preserving shading for depth."""
     result = original.copy().convert("RGB")
     w, h = result.size
-
-    orig_gray = original.convert("L")
-    orig_arr = np.array(orig_gray).astype(np.float32)
-    mask_arr = np.array(mask)
-
-    frame_pixels = mask_arr > 128
-    if np.any(frame_pixels):
-        p2, p98 = np.percentile(orig_arr[frame_pixels], [2, 98])
-    else:
-        p2, p98 = 0, 255
-
-    if p98 > p2:
-        shading = (orig_arr - p2) / (p98 - p2)
-        shading = np.clip(shading, 0.4, 1.0)
-    else:
-        shading = np.ones_like(orig_arr)
-
-    solid = np.full((h, w, 3), color, dtype=np.float32)
-    for c in range(3):
-        solid[:, :, c] *= shading
-
-    solid_img = Image.fromarray(np.clip(solid, 0, 255).astype(np.uint8))
+    solid = Image.new("RGB", (w, h), color)
 
     mask_blur = mask.filter(ImageFilter.GaussianBlur(1.5))
-    result.paste(solid_img, mask=mask_blur)
+    result.paste(solid, mask=mask_blur)
     return result
 
 
 def generate_all_finishes(product_id: str, original_path: Path, oaklight_path: Path):
-    """Generate all finish variants for one product using masking."""
     original = Image.open(original_path).convert("RGB")
-    oaklight = Image.open(oaklight_path).convert("RGB")
+    oaklight = Image.open(oaklight_path).convert("RGB").resize(original.size, Image.LANCZOS)
 
     print(f"  Creating frame mask...")
     mask = create_frame_mask(original, oaklight)
