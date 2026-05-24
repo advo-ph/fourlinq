@@ -17,6 +17,7 @@ interface FollowUp {
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
+  imageDataUrl?: string;
   isStreaming?: boolean;
   followUps?: FollowUp[];
   onFollowUp?: (message: string) => void;
@@ -59,7 +60,7 @@ function extractActions(text: string): ActionItem[] {
 const ACTION_ICONS = { phone: Phone, email: Mail, address: MapPin };
 const ACTION_LABELS = { phone: "Call", email: "Email", address: "Directions" };
 
-const ChatMessage = memo(({ role, content, isStreaming, followUps, onFollowUp }: ChatMessageProps) => {
+const ChatMessage = memo(({ role, content, imageDataUrl, isStreaming, followUps, onFollowUp }: ChatMessageProps) => {
   const isUser = role === "user";
   const actions = useMemo(() => (isUser ? [] : extractActions(content)), [content, isUser]);
   const showActions = !isStreaming && actions.length > 0;
@@ -74,6 +75,13 @@ const ChatMessage = memo(({ role, content, isStreaming, followUps, onFollowUp }:
             : "bg-white text-[color:var(--ink-primary)] border border-[color:var(--rule-soft)] rounded-bl-sm shadow-depth-2"
         }`}
       >
+        {imageDataUrl && (
+          <img
+            src={imageDataUrl}
+            alt="Uploaded by user"
+            className="mb-2 max-h-40 rounded-lg object-cover"
+          />
+        )}
         {content ? (
           <div className="chat-markdown">
             <ReactMarkdown
@@ -144,7 +152,7 @@ const ChatMessage = memo(({ role, content, isStreaming, followUps, onFollowUp }:
             <button
               key={i}
               onClick={() => onFollowUp?.(f.message)}
-              className="px-3 py-1.5 text-[11px] bg-white border border-[color:var(--rule-soft)] text-[color:var(--ink-secondary)] hover:border-[color:var(--ink-primary)] hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin rounded-full"
+              className="px-3 py-1.5 text-[11px] bg-white border border-[color:var(--rule-strong)] text-[color:var(--ink-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin rounded-full"
             >
               {f.label}
             </button>

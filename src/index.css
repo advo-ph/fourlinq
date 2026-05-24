@@ -80,6 +80,17 @@
     --charcoal: 0 0% 14%;
     --charcoal-light: 0 0% 16%;
     --surface: 0 0% 100%;
+
+    /* ── Re-assert FourlinQ design tokens AFTER the shadcn block. ──
+       The shadcn compat layer above redefines --accent as a space-separated
+       HSL triple (for hsl(var(--accent)) consumption by shadcn). That makes
+       plain var(--accent) — used by everything in this codebase via
+       bg-[color:var(--accent)] etc. — resolve to invalid CSS and fall back
+       to white/transparent. Re-declaring the hex forms here puts them last
+       in the cascade so the FourlinQ tokens win. */
+    --accent:       #C8102E;
+    --accent-hover: #A00D26;
+    --accent-quiet: rgba(200, 16, 46, 0.08);
   }
 }
 
@@ -114,11 +125,19 @@
     color: var(--ink-primary);
   }
 
-  /* Focus visible — clean ring */
+  /* Focus visible — quiet 1px dark ring for keyboard nav on buttons / links.
+     Text inputs and option-grid buttons are excluded because they already
+     show focus through their own visual state (wrapper border, selected ring). */
   :focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
+    outline: 1px solid var(--ink-primary);
+    outline-offset: 2px;
     border-radius: 2px;
+  }
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [aria-pressed]:focus-visible {
+    outline: none;
   }
 }
 

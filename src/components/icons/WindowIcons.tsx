@@ -423,6 +423,95 @@ export const EntranceIcon = ({
   </svg>
 );
 
+export const LargePanelIcon = ({
+  className,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+}: IconProps) => (
+  <svg viewBox="0 0 80 80" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
+    <rect x={FRAME.x} y={FRAME.y} width={FRAME.w} height={FRAME.h} rx="1.5" />
+    {/* One huge glass panel — the defining feature of large panel doors */}
+    <rect x="13" y="13" width="54" height="54" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
+    {/* Subtle handle on the leading edge */}
+    <rect x="60" y="37" width="2" height="6" rx="0.5" fill="currentColor" stroke="none" />
+    {/* Width arrows along the bottom to imply the "up to 6m" span */}
+    <line x1="13" y1="73" x2="67" y2="73" strokeWidth={strokeWidth * 0.4} opacity={0.5} />
+    <path d="M 13 73 L 16 71 M 13 73 L 16 75" strokeWidth={strokeWidth * 0.4} opacity={0.5} />
+    <path d="M 67 73 L 64 71 M 67 73 L 64 75" strokeWidth={strokeWidth * 0.4} opacity={0.5} />
+  </svg>
+);
+
+export const NinetySeriesIcon = ({
+  className,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+}: IconProps) => (
+  // aria-hidden so the embedded "90" glyph doesn't get spliced into the
+  // button's accessible name (was rendering as "9090 Series" in textContent).
+  <svg viewBox="0 0 80 80" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className} aria-hidden="true">
+    <rect x={FRAME.x} y={FRAME.y} width={FRAME.w} height={FRAME.h} rx="1.5" />
+    {/* Two overlapping panels — sliding-door style with a heavier interlock at the meeting rail to signal the 90mm profile depth. */}
+    <rect x="13" y="13" width="28" height="54" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
+    <rect x="39" y="13" width="28" height="54" rx="0.5" strokeWidth={strokeWidth * INNER_SCALE} />
+    {/* Thicker interlock mullion */}
+    <rect x="38" y="14" width="3" height="52" fill="currentColor" stroke="none" opacity={0.5} />
+    {/* Handle */}
+    <rect x="60" y="37" width="2" height="6" rx="0.5" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const ArchIcon = ({
+  className,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+}: IconProps) => (
+  <svg viewBox="0 0 80 80" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
+    {/* Full-arch window — no rectangular frame, just the arched opening */}
+    <path d="M 16 70 L 16 38 A 24 24 0 0 1 64 38 L 64 70 Z" strokeWidth={strokeWidth} />
+    <path d="M 20 70 L 20 38 A 20 20 0 0 1 60 38 L 60 70 Z" strokeWidth={strokeWidth * INNER_SCALE} opacity={0.8} />
+    {/* Springline + radial muntins */}
+    <line x1="20" y1="38" x2="60" y2="38" strokeWidth={strokeWidth * 0.4} opacity={0.5} />
+    <line x1="40" y1="38" x2="40" y2="18" strokeWidth={strokeWidth * 0.4} opacity={0.5} />
+  </svg>
+);
+
+export const CurtainWallIcon = ({
+  className,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+}: IconProps) => (
+  <svg viewBox="0 0 80 80" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
+    <rect x={FRAME.x} y={FRAME.y} width={FRAME.w} height={FRAME.h} rx="1.5" />
+    {/* 3×3 glass grid suggesting a curtain wall system */}
+    {[0, 1, 2].map((c) =>
+      [0, 1, 2].map((r) => (
+        <rect
+          key={`${c}-${r}`}
+          x={13 + c * 18}
+          y={13 + r * 18}
+          width={16}
+          height={16}
+          rx={0.4}
+          strokeWidth={strokeWidth * 0.5}
+          opacity={0.7}
+        />
+      ))
+    )}
+  </svg>
+);
+
+export const CustomShapesIcon = ({
+  className,
+  size = defaultProps.size,
+  strokeWidth = defaultProps.strokeWidth,
+}: IconProps) => (
+  <svg viewBox="0 0 80 80" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
+    {/* Trapezoid / angled shape — represents non-rectangular custom geometry */}
+    <path d="M 16 70 L 16 30 L 40 12 L 64 30 L 64 70 Z" strokeWidth={strokeWidth} />
+    <path d="M 20 66 L 20 33 L 40 18 L 60 33 L 60 66 Z" strokeWidth={strokeWidth * 0.6} opacity={0.7} />
+  </svg>
+);
+
 export const SpecialShapesIcon = ({
   className,
   size = defaultProps.size,

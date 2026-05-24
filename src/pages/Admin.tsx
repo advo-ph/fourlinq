@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Phone, Mail, Calendar, Tag, RefreshCw, MessageSquare, Send, X, Loader2, ChevronRight, Lock, LogOut, MessagesSquare, ArrowLeft, HelpCircle } from "lucide-react";
+import { Phone, Mail, Calendar, Tag, RefreshCw, MessageSquare, Send, X, Loader2, ChevronRight, Lock, LogOut, MessagesSquare, ArrowLeft, HelpCircle, FolderKanban, Users } from "lucide-react";
+import { ContentManager, MediaLibrary, CmsRagApi } from "../../packages/cms-rag/client/index";
+import UsersPanel from "./admin/UsersPanel";
+
+const cmsApi = new CmsRagApi("/api/admin/cms");
+
+interface CurrentUser { profile_id: number; email: string; first_name: string; last_name: string; role: string; role_label: string }
 import Logo from "@/components/shared/Logo";
 import { Link } from "react-router-dom";
 
@@ -188,6 +194,7 @@ interface ChatLogMessage {
   id: number;
   role: "user" | "model";
   message: string;
+  image_url?: string | null;
   created_at: string;
 }
 
@@ -266,7 +273,18 @@ const ChatLogs = () => {
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-foreground"
                   }`}>
-                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.message}</p>
+                    {msg.image_url && (
+                      <a href={msg.image_url} target="_blank" rel="noopener noreferrer" className="block mb-2">
+                        <img
+                          src={msg.image_url}
+                          alt="Attached"
+                          className="rounded-md max-h-64 max-w-full object-contain border border-border/40"
+                        />
+                      </a>
+                    )}
+                    {msg.message && (
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.message}</p>
+                    )}
                     <p className={`text-[10px] mt-1.5 ${msg.role === "user" ? "text-primary-foreground/50" : "text-muted-foreground"}`}>
                       {new Date(msg.created_at).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })}
                     </p>
@@ -358,14 +376,16 @@ const ChatLogs = () => {
 
 // ─── Main Admin Page ─────────────────────────────
 
-const Admin = ({ onLogout }: { onLogout: () => void }) => {
+const Admin = ({ onLogout, currentUser }: { onLogout: () => void; currentUser: CurrentUser | null }) => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [counts, setCounts] = useState<CountRow[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Inquiry | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
-  const [tab, setTab] = useState<"leads" | "chats">("leads");
+  const [tab, setTab] = useState<"leads" | "chats" | "content" | "team">("leads");
+  const isAdmin = currentUser?.role === "admin";
+  const isMediaOnly = currentUser?.role === "media";
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -411,6 +431,18 @@ const Admin = ({ onLogout }: { onLogout: () => void }) => {
             <Link to="/"><Logo variant="light" className="h-8" /></Link>
             <div className="h-6 w-px bg-white/10" />
             <span className="text-sm font-medium text-white/70">Admin</span>
+            {currentUser && (
+              <>
+                <div className="h-6 w-px bg-white/10" />
+                <div className="flex items-center gap-2 text-xs text-white/60">
+                  <div className="h-6 w-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-medium uppercase">
+                    {currentUser.first_name[0]}{currentUser.last_name[0]}
+                  </div>
+                  <span>{currentUser.first_name}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-white/30">{currentUser.role}</span>
+                </div>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-4">
             <button onClick={fetchData} className="flex items-center gap-1.5 text-[11px] text-white/50 hover:text-white uppercase tracking-wider transition-colors">
@@ -448,28 +480,62 @@ const Admin = ({ onLogout }: { onLogout: () => void }) => {
           ))}
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex gap-2 mb-6 border-b border-border pb-4">
+        {/* Tab Switcher — role-aware */}
+        <div className="flex gap-2 mb-6 border-b border-border pb-4 flex-wrap">
+          {!isMediaOnly && (
+            <button
+              onClick={() => setTab("leads")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                tab === "leads" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
+              }`}
+            >
+              <Tag size={14} /> Leads & Inquiries
+            </button>
+          )}
+          {!isMediaOnly && (
+            <button
+              onClick={() => setTab("chats")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                tab === "chats" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
+              }`}
+            >
+              <MessagesSquare size={14} /> Chat Logs
+            </button>
+          )}
           <button
-            onClick={() => setTab("leads")}
+            onClick={() => setTab("content")}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              tab === "leads" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
+              tab === "content" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
             }`}
           >
-            <Tag size={14} /> Leads & Inquiries
+            <FolderKanban size={14} /> Content
           </button>
-          <button
-            onClick={() => setTab("chats")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              tab === "chats" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
-            }`}
-          >
-            <MessagesSquare size={14} /> Chat Logs
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setTab("team")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                tab === "team" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
+              }`}
+            >
+              <Users size={14} /> Team
+            </button>
+          )}
         </div>
 
+        {/* Content Tab */}
+        {tab === "content" && (
+          <ContentManager
+            api={cmsApi}
+            hideKinds={["media"]}
+            customPanels={[{ kind: "media", labelPlural: "Media", render: () => <MediaLibrary api={cmsApi} /> }]}
+          />
+        )}
+
+        {/* Team Tab — admin only */}
+        {tab === "team" && isAdmin && <UsersPanel />}
+
         {/* Chat Logs Tab */}
-        {tab === "chats" && <ChatLogs />}
+        {tab === "chats" && !isMediaOnly && <ChatLogs />}
 
         {/* Leads Tab */}
         {tab === "leads" && <>
@@ -660,6 +726,7 @@ const Admin = ({ onLogout }: { onLogout: () => void }) => {
 // ─── Login Gate ──────────────────────────────────
 
 const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -673,12 +740,13 @@ const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       });
       if (res.ok) {
         onLogin();
       } else {
-        setError("Invalid password");
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Invalid email or password");
         setPassword("");
       }
     } catch {
@@ -694,20 +762,30 @@ const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
         <div className="text-center mb-8">
           <Logo variant="light" className="h-12 mx-auto mb-6" />
           <div className="flex items-center justify-center gap-2 text-white/40 text-xs uppercase tracking-wider">
-            <Lock size={12} /> Admin Access
+            <Lock size={12} /> Sign in
           </div>
         </div>
         <form onSubmit={handleSubmit} className="bg-card rounded-lg border border-border p-6 space-y-4">
           <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Email</label>
+            <input
+              type="email"
+              autoFocus
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              placeholder="you@fourlinq.ph"
+            />
+          </div>
+          <div>
             <label className="block text-sm font-medium text-foreground mb-1">Password</label>
             <input
               type="password"
-              autoFocus
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
-              placeholder="Enter admin password"
             />
           </div>
           {error && <p className="text-xs text-accent">{error}</p>}
@@ -719,7 +797,7 @@ const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
             {loading ? <Loader2 size={16} className="animate-spin" /> : "Sign In"}
           </button>
         </form>
-        <p className="text-center text-[10px] text-white/20 mt-6">FourlinQ Internal System</p>
+        <p className="text-center text-[10px] text-white/20 mt-6">FourlinQ Internal · contact admin for access</p>
       </div>
     </div>
   );
@@ -729,13 +807,18 @@ const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
 
 const AdminWithAuth = () => {
   const [authed, setAuthed] = useState<boolean | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
-  useEffect(() => {
+  const refresh = () => {
     fetch("/api/admin/check", { credentials: "include" })
       .then((r) => r.json())
-      .then((d) => setAuthed(d.authenticated))
-      .catch(() => setAuthed(false));
-  }, []);
+      .then((d) => {
+        setAuthed(!!d.authenticated);
+        setCurrentUser(d.user ?? null);
+      })
+      .catch(() => { setAuthed(false); setCurrentUser(null); });
+  };
+  useEffect(() => { refresh(); }, []);
 
   if (authed === null) {
     return (
@@ -746,10 +829,10 @@ const AdminWithAuth = () => {
   }
 
   if (!authed) {
-    return <LoginScreen onLogin={() => setAuthed(true)} />;
+    return <LoginScreen onLogin={refresh} />;
   }
 
-  return <Admin onLogout={() => setAuthed(false)} />;
+  return <Admin onLogout={() => { setAuthed(false); setCurrentUser(null); }} currentUser={currentUser} />;
 };
 
 export default AdminWithAuth;

@@ -95,22 +95,7 @@ export const products: Product[] = [
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Frosted Privacy", "Laminated Safety", "Tinted Bronze"],
   },
-  {
-    id: "sliding-door",
-    name: "Sliding Door",
-    category: "doors",
-    description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
-    shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
-    image: "/images/wp-export/Sliding-Door.jpg",
-    specs: [
-      "Multi-chamber uPVC profile",
-      "Space-saving horizontal slide",
-      "6mm–12mm glass options",
-      "Galvanized steel reinforcement",
-    ],
-    finishes: productFinishes,
-    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
-  },
+  // ─── Featured door systems (Tita's emphasis: lead with these four) ───
   {
     id: "slide-and-fold",
     name: "Slide & Fold",
@@ -126,6 +111,74 @@ export const products: Product[] = [
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Low-E Coated", "Tinted Bronze", "Laminated Safety"],
+  },
+  {
+    id: "large-panel-doors",
+    name: "Large Panel Doors",
+    category: "doors",
+    description:
+      "Large-format panel doors engineered for openings up to 6 metres wide. Built for ground-floor living rooms and lanai-facing walls where the door itself becomes part of the architecture. Custom-specified per project.",
+    shortDescription: "Door openings up to 6 metres wide.",
+    image: "/images/wp-export/Door-14.jpg",
+    specs: [
+      "Spans up to 6 metres wide",
+      "Multi-chamber reinforced profile",
+      "Custom specification per project",
+      "Consultation required for sizing and hardware",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Bronze", "Laminated Safety"],
+  },
+  {
+    id: "90-series",
+    name: "90 Series",
+    category: "doors",
+    description:
+      "FourlinQ 90 Series door system — engineered for premium residential applications where performance and finish matter. Custom-specified profile family.",
+    shortDescription: "Premium residential door system.",
+    image: "/images/wp-export/Door-7.jpg",
+    specs: [
+      "90 Series profile family",
+      "Multi-chamber reinforced profile",
+      "Galvanized steel reinforcement",
+      "Consultation required for specifications",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Low-E Coated", "Laminated Safety"],
+  },
+  {
+    id: "lift-and-slide",
+    name: "Lift & Slide",
+    category: "doors",
+    description:
+      "Lift-and-slide door system. The panel lifts off its seal to slide effortlessly along the track, then settles back onto the seal when closed for a fully weather-tight finish. Ideal for large openings where smooth daily operation matters.",
+    shortDescription: "Effortless operation on large openings.",
+    image: "/images/wp-export/Door-6.jpg",
+    specs: [
+      "Lift mechanism for low-effort operation",
+      "Weather-tight closed-position seal",
+      "Multi-chamber uPVC profile",
+      "Consultation required for sizing",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Bronze", "Laminated Safety"],
+  },
+  // ─── Standard door configurations ───
+  {
+    id: "sliding-door",
+    name: "Sliding Door",
+    category: "doors",
+    description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
+    shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
+    image: "/images/wp-export/Sliding-Door.jpg",
+    specs: [
+      "Multi-chamber uPVC profile",
+      "Space-saving horizontal slide",
+      "6mm–12mm glass options",
+      "Galvanized steel reinforcement",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
   },
   {
     id: "entrance-door",
@@ -160,58 +213,6 @@ export const products: Product[] = [
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Frosted Privacy", "Laminated Safety"],
-  },
-  // ─── Tita-requested Door Systems (consultation-only — no fabricated specs) ───
-  {
-    id: "large-panel-doors",
-    name: "Large Panel Doors",
-    category: "doors",
-    description:
-      "Large-format panel doors engineered for openings up to 6 metres wide. Built for ground-floor living rooms and lanai-facing walls where the door itself becomes part of the architecture. Custom-specified per project.",
-    shortDescription: "Door openings up to 6 metres wide.",
-    image: "/images/wp-export/Door-14.jpg",
-    specs: [
-      "Spans up to 6 metres wide",
-      "Multi-chamber reinforced profile",
-      "Custom specification per project",
-      "Consultation required for sizing and hardware",
-    ],
-    finishes: productFinishes,
-    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Bronze", "Laminated Safety"],
-  },
-  {
-    id: "lift-and-slide",
-    name: "Lift & Slide",
-    category: "doors",
-    description:
-      "Lift-and-slide door system. The panel lifts off its seal to slide effortlessly along the track, then settles back onto the seal when closed for a fully weather-tight finish. Ideal for large openings where smooth daily operation matters.",
-    shortDescription: "Effortless operation on large openings.",
-    image: "/images/wp-export/Door-6.jpg",
-    specs: [
-      "Lift mechanism for low-effort operation",
-      "Weather-tight closed-position seal",
-      "Multi-chamber uPVC profile",
-      "Consultation required for sizing",
-    ],
-    finishes: productFinishes,
-    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Bronze", "Laminated Safety"],
-  },
-  {
-    id: "90-series",
-    name: "90 Series",
-    category: "doors",
-    description:
-      "FourlinQ 90 Series door system — engineered for premium residential applications where performance and finish matter. Custom-specified profile family.",
-    shortDescription: "Premium residential door system.",
-    image: "/images/wp-export/Door-7.jpg",
-    specs: [
-      "90 Series profile family",
-      "Multi-chamber reinforced profile",
-      "Galvanized steel reinforcement",
-      "Consultation required for specifications",
-    ],
-    finishes: productFinishes,
-    glassOptions: ["Clear Float", "Low-E Coated", "Laminated Safety"],
   },
   // ─── Tita-requested Specialist Systems ───
   {

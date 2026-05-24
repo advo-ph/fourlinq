@@ -1,16 +1,18 @@
 import { Router } from "express";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import crypto from "crypto";
 import dotenv from "dotenv";
 import pool from "../db.js";
+import { LLMRouter, providersFromEnv, AllProvidersFailedError } from "../llm/index.js";
+import type { ChatMessage, ContentPart } from "../llm/index.js";
 
 dotenv.config();
 
 const router = Router();
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-if (!GEMINI_API_KEY) {
-  console.warn("GEMINI_API_KEY not set — chat will be disabled");
+const providers = providersFromEnv();
+const llm = providers.length > 0 ? new LLMRouter({ providers }) : null;
+if (!llm) {
+  console.warn("No LLM provider keys configured — chat will be disabled");
 }
 
 // ─────────────────────────────────────────────
@@ -79,100 +81,114 @@ Awning: 400–1500mm wide × 300–900mm tall
 Slide & Fold: 1800–6000mm wide × 2000–2800mm tall
 `;
 
-const SYSTEM_PROMPT = `You are LinQ, the AI assistant for FourlinQ Windows & Doors — a premium uPVC windows and doors company in the Philippines.
+const SYSTEM_PROMPT = `You are LinQ, the AI assistant for FourlinQ Windows & Doors — a premium uPVC and aluminum windows and doors company in the Philippines.
 
 PERSONALITY:
-- Professional yet warm and approachable — like a knowledgeable showroom consultant
-- Proud of FourlinQ products without being pushy
-- Use Filipino-English (Taglish) sparingly when it feels natural, but default to English
-- Be concise — keep responses under 150 words unless the user asks for details
-- Use bullet points and line breaks for readability
+- Professional and direct, like a knowledgeable showroom consultant.
+- Concise. Default under 120 words. Lead with the answer.
+- Bullet points for lists. No fluff openers ("Great question!", "Certainly!").
 
 KNOWLEDGE:
 ${KNOWLEDGE_BASE}
 
 RULES:
-1. ONLY state facts present in your KNOWLEDGE section above. Never invent specifications, prices, performance numbers, or features.
-2. If you don't know something (e.g. pricing, lead times, specific technical specs not listed), say "I'd recommend contacting our sales team for that detail" and provide the contact info.
-3. For pricing questions: FourlinQ provides custom quotes based on specifications. Direct them to call 0925-848-8888 or email sales@fourlinq.com.
-4. If asked about competitors, focus on FourlinQ strengths rather than criticizing competitors.
-5. Proactively suggest the Design Tool (/design-tool) when users discuss configurations or finishes.
-6. Suggest booking a consultation when the conversation reaches a buying stage.
-7. Contact: Sales 0925-848-8888, Assistance 0925-896-5978, Landline (02)8563-5363, Email sales@fourlinq.com
-8. Format responses in clean, readable text with bullet points where appropriate. When listing frame finishes — for either uPVC or Aluminum — ALWAYS render them as a bulleted list, never as inline prose. For Aluminum specifically, format the four solid finishes as four separate bullets (White, Jet Black, Charcoal Gray, Matte Quartz), not as a single comma-separated sentence.
-9. When asked about warranty, it is a 10-Year Warranty covering: corrosion resistance, long lasting performance, weather resistance, and sound insulation.`;
+1. ONLY state facts present in your KNOWLEDGE section. Never invent specifications, prices, or features.
+2. For pricing or specs not listed: "Contact our sales team — 0925-848-8888 or sales@fourlinq.com."
+3. Custom quotes only. No prices in chat.
+4. Do not criticize competitors.
+5. Suggest the Design Tool (/design-tool) when users discuss configurations or finishes.
+6. Suggest a consultation when the user reaches a buying stage.
+7. Contact: Sales 0925-848-8888, Assistance 0925-896-5978, Landline (02)8563-5363, Email sales@fourlinq.com.
+8. Finish lists must be bulleted, never inline prose. Aluminum supports four solid finishes: White, Jet Black, Charcoal Gray, Matte Quartz — one bullet each.
+9. Warranty is 10-Year, covering corrosion resistance, long lasting performance, weather resistance, and sound insulation.
+10. IMAGE MODE: if the user sends a photo, treat it as a wall/room/facade they want windows for. Identify the architectural context briefly (e.g. "looks like a modern facade with a wide horizontal opening"), then recommend ONE primary system type from our 5 with one-sentence reasoning, and ONE finish from our 11 that suits the surrounding palette. Close by inviting them to open the Design Tool (/design-tool) or contact sales. Stay under 130 words.`;
+
+interface GeminiHistoryTurn {
+  role?: "user" | "model";
+  parts?: Array<{ text?: string }>;
+}
+
+function normalizeHistory(raw: unknown): ChatMessage[] {
+  if (!Array.isArray(raw)) return [];
+  const out: ChatMessage[] = [];
+  for (const turn of raw as GeminiHistoryTurn[]) {
+    const role: ChatMessage["role"] = turn?.role === "model" ? "assistant" : "user";
+    const text = (turn?.parts ?? []).map((p) => p?.text ?? "").join("").trim();
+    if (text) out.push({ role, content: text });
+  }
+  return out;
+}
 
 /**
  * POST /api/chat/stream
  * Body: { message: string, history: Array<{ role: "user"|"model", parts: [{text}] }> }
- * Returns: SSE stream
+ * Returns: SSE stream — same envelope as before. The router itself is
+ * non-streaming; we emit the final response as a single chunk so the
+ * existing client keeps working without changes.
  */
 router.post("/stream", async (req, res) => {
-  if (!GEMINI_API_KEY) {
+  if (!llm) {
     return res.status(503).json({ error: "Chat service not configured" });
   }
 
-  const { message, history, sessionId } = req.body;
-
+  const { message, history, sessionId, imageDataUrl } = req.body;
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "message is required" });
   }
 
-  // Generate or reuse session ID for grouping conversations
   const sid = sessionId || crypto.randomUUID();
+  const hasImage = typeof imageDataUrl === "string" && imageDataUrl.startsWith("data:image/");
+  const userContent: string | ContentPart[] = hasImage
+    ? [
+        { type: "text", text: message },
+        { type: "image_url", image_url: { url: imageDataUrl } },
+      ]
+    : message;
+
+  const messages: ChatMessage[] = [
+    ...normalizeHistory(history),
+    { role: "user", content: userContent },
+  ];
+
+  pool.query(
+    "INSERT INTO chat_messages (session_id, role, message, image_url) VALUES ($1, $2, $3, $4)",
+    [sid, "user", message, hasImage ? imageDataUrl : null]
+  ).catch((e) => console.error("Chat log (user) error:", e));
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.write(`data: ${JSON.stringify({ sessionId: sid })}\n\n`);
 
   try {
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      systemInstruction: SYSTEM_PROMPT,
+    const reply = await llm.chat({
+      systemPrompt: SYSTEM_PROMPT,
+      messages,
+      maxTokens: 600,
+      temperature: 0.6,
+      needsVision: hasImage,
     });
 
-    const chatHistory = Array.isArray(history) ? history : [];
-    const chat = model.startChat({ history: chatHistory });
-    const result = await chat.sendMessageStream(message);
+    res.write(`data: ${JSON.stringify({ chunk: reply.text })}\n\n`);
 
-    // Log the user message (fire-and-forget)
     pool.query(
       "INSERT INTO chat_messages (session_id, role, message) VALUES ($1, $2, $3)",
-      [sid, "user", message]
-    ).catch((e) => console.error("Chat log (user) error:", e));
+      [sid, "model", reply.text]
+    ).catch((e) => console.error("Chat log (model) error:", e));
 
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
-    // Send session ID so client can reuse it
-    res.write(`data: ${JSON.stringify({ sessionId: sid })}\n\n`);
-
-    let fullResponse = "";
-    for await (const chunk of result.stream) {
-      const text = chunk.text();
-      if (text) {
-        fullResponse += text;
-        res.write(`data: ${JSON.stringify({ chunk: text })}\n\n`);
-      }
-    }
-
-    // Log the bot response (fire-and-forget)
-    if (fullResponse) {
-      pool.query(
-        "INSERT INTO chat_messages (session_id, role, message) VALUES ($1, $2, $3)",
-        [sid, "model", fullResponse]
-      ).catch((e) => console.error("Chat log (model) error:", e));
-    }
-
-    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    res.write(`data: ${JSON.stringify({ done: true, provider: reply.provider, model: reply.model })}\n\n`);
     res.end();
   } catch (err) {
-    console.error("Chat stream error:", err);
-    if (!res.headersSent) {
-      res.status(500).json({ error: "Chat service unavailable" });
-    } else {
-      res.write(`data: ${JSON.stringify({ error: "An error occurred" })}\n\n`);
-      res.end();
-    }
+    const detail = err instanceof AllProvidersFailedError ? err.message : err instanceof Error ? err.message : String(err);
+    console.error("Chat stream error:", detail);
+    res.write(`data: ${JSON.stringify({ error: "Chat service unavailable" })}\n\n`);
+    res.end();
   }
+});
+
+router.get("/providers", (_req, res) => {
+  if (!llm) return res.json({ providers: [] });
+  res.json({ providers: llm.listProviders() });
 });
 
 export default router;

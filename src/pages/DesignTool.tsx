@@ -12,7 +12,8 @@ import { trackConfigChange } from "@/hooks/useAnalytics";
 import {
   CasementIcon, SlidingIcon, FixedIcon, BifoldIcon, AwningIcon,
   LiftAndSlideIcon, FrenchDoorIcon, TiltAndTurnIcon, SlidingDoorIcon, EntranceIcon,
-  SpecialShapesIcon,
+  SpecialShapesIcon, LargePanelIcon, NinetySeriesIcon,
+  ArchIcon, CurtainWallIcon, CustomShapesIcon,
 } from "@/components/icons/WindowIcons";
 
 const iconMap: Record<string, React.FC<{ className?: string; size?: number; strokeWidth?: number }>> = {
@@ -27,6 +28,11 @@ const iconMap: Record<string, React.FC<{ className?: string; size?: number; stro
   "french-door": FrenchDoorIcon,
   "sliding-door": SlidingDoorIcon,
   entrance: EntranceIcon,
+  "large-panel": LargePanelIcon,
+  "90-series": NinetySeriesIcon,
+  arch: ArchIcon,
+  "curtain-wall": CurtainWallIcon,
+  "custom-shapes": CustomShapesIcon,
 };
 
 // Glass visual representations for the preview
@@ -237,8 +243,22 @@ const DesignTool = () => {
                     })}
                   </div>
                   <h3 className="eyebrow mb-3">Doors</h3>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-3 mb-6">
                     {productTypes.filter((t) => t.category === "doors").map((type) => {
+                      const Icon = iconMap[type.iconKey];
+                      return (
+                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
+                          <div className="flex justify-center mb-2">
+                            {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-[color:var(--ink-muted)]"} strokeWidth={1} />}
+                          </div>
+                          <span className="text-xs font-medium text-primary">{type.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <h3 className="eyebrow mb-3">Specialist</h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    {productTypes.filter((t) => t.category === "specialist").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
                         <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>

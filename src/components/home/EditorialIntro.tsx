@@ -5,7 +5,7 @@ const EditorialIntro = () => (
   <div className="grid lg:grid-cols-[5fr,6fr] gap-12 lg:gap-20 items-center">
     <div>
       <EyebrowHeading eyebrow="The FourlinQ approach" level={2}>
-        For the homes you actually live in.
+        Built for Philippine homes.
       </EyebrowHeading>
       <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.65]">
         Every FourlinQ system is engineered for the Philippines. The heat. The humidity. The salt air along the coast. The storms that test what a house is made of.

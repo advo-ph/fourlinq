@@ -378,7 +378,8 @@ export const FRAME_FINISHES: FrameFinish[] = [
     swatchHex: "#D6C4A1",
     description:
       "Pale, almost bleached Scandinavian oak. Fine, straight grain with subtle cream and off-white tones. Airy and minimalist — reads nearly white from a distance.",
-    hasTexture: false,
+    hasTexture: true,
+    textureImagePath: "/images/textures/finish/oak-light.jpg",
   },
   {
     id: "oak-malt",
@@ -387,7 +388,8 @@ export const FRAME_FINISHES: FrameFinish[] = [
     swatchHex: "#B89A6A",
     description:
       "Warm medium-blonde with golden-amber tones and slightly pronounced grain. Natural and unpretentious — like raw, unfinished timber. Pairs well with earth-tone interiors.",
-    hasTexture: false,
+    hasTexture: true,
+    textureImagePath: "/images/textures/finish/oak-malt.jpg",
   },
   {
     id: "woodgray",
@@ -396,7 +398,8 @@ export const FRAME_FINISHES: FrameFinish[] = [
     swatchHex: "#8C8680",
     description:
       "Cool gray base with subtle brown-taupe grain lines — like driftwood or weathered timber. A unique crossover finish that is neither fully wood nor fully solid.",
-    hasTexture: false,
+    hasTexture: true,
+    textureImagePath: "/images/textures/finish/woodgray.jpg",
   },
   {
     id: "2-wood-black",
@@ -405,7 +408,8 @@ export const FRAME_FINISHES: FrameFinish[] = [
     swatchHex: "#2E2A27",
     description:
       "Deep espresso brown-black where wood grain is still perceptible in raking light. Moody and rich — like ebonized oak or dark wenge. More textural than Jet Black.",
-    hasTexture: false,
+    hasTexture: true,
+    textureImagePath: "/images/textures/finish/2-wood-black.jpg",
   },
   {
     id: "dark-oak",
@@ -414,7 +418,8 @@ export const FRAME_FINISHES: FrameFinish[] = [
     swatchHex: "#5C3A1E",
     description:
       "Medium-dark reddish-brown with clearly defined, flowing grain lines in deep amber and brown. Classic and warm — reminiscent of mahogany-adjacent hardwoods used in heritage homes.",
-    hasTexture: false,
+    hasTexture: true,
+    textureImagePath: "/images/textures/finish/dark-oak.jpg",
   },
   {
     id: "walnut",
@@ -423,7 +428,8 @@ export const FRAME_FINISHES: FrameFinish[] = [
     swatchHex: "#6B4226",
     description:
       "Rich chocolatey brown with prominent, swirling grain. Bold contrast between dark base and lighter streaks. Luxurious and heavy-feeling — the most premium timber look in the lineup.",
-    hasTexture: false,
+    hasTexture: true,
+    textureImagePath: "/images/textures/finish/walnut.jpg",
     profilePhotoPath: "/images/wp-export/Walnut-Profile.jpg",
   },
   {
@@ -433,7 +439,8 @@ export const FRAME_FINISHES: FrameFinish[] = [
     swatchHex: "#C8820A",
     description:
       "Bright honey-amber with a strong open-grain pattern — almost orange-gold in direct light. The most vivid wood finish. Warm and inviting; suits traditional Filipino and Spanish colonial interiors.",
-    hasTexture: false,
+    hasTexture: true,
+    textureImagePath: "/images/textures/finish/golden-oak.jpg",
     profilePhotoPath: "/images/wp-export/Golden-Oak-Profile.jpg",
   },
   {
@@ -475,6 +482,15 @@ export const FRAME_FINISHES: FrameFinish[] = [
       "Flat medium gray with almost no sheen — stone-like and understated. Lighter and warmer than Charcoal. Closest visually to polished concrete or a quartz countertop.",
     hasTexture: false,
     profilePhotoPath: "/images/wp-export/Matte-Quartz-Profile.jpg",
+  },
+  {
+    id: "silicia-cream",
+    label: "Silicia Cream",
+    category: "solid",
+    swatchHex: "#E8DEC6",
+    description:
+      "Warm off-white with a faint sand cast — softer and less clinical than pure White. Reads as bone or unbleached linen on a facade. Pairs with limewashed walls, travertine, and warm timber.",
+    hasTexture: false,
   },
 ];
 

@@ -36,7 +36,7 @@ const FeatureLink = ({
       sizeClass,
       inkClass,
       "hover:text-[color:var(--accent)]",
-      "border-b border-transparent hover:border-current pb-0.5",
+      "border-b border-[color:var(--rule-strong)] hover:border-current pb-0.5",
       className
     )}>
       <span>{children}</span>

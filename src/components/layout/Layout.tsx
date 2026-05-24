@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import QuietNavbar from "./QuietNavbar";
 import EditorialFooter from "./EditorialFooter";
+import ChatBubble from "@/components/chat/ChatBubble";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 const Layout = ({ children }: { children: ReactNode }) => {
@@ -11,6 +12,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <QuietNavbar />
       <main id="main-content" className="flex-1">{children}</main>
       <EditorialFooter />
+      <ChatBubble />
     </div>
   );
 };

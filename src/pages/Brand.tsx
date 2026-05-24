@@ -11,7 +11,7 @@ const Brand = () => (
   <Layout>
     <PageHeader
       eyebrow="Our brand"
-      title="Custom-made for the homes you actually live in."
+      title="Custom-made for Philippine homes."
       breadcrumbLabel="Brand"
       subtitle={BRAND.promise}
     />

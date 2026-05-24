@@ -5,8 +5,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
-import { FINISH_SCENES, getFinishVariantSrc } from "@/data/finish-scenes";
-import { ArrowRight, Camera } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type FinishFilter = "all" | "wood-grain" | "solid";
@@ -56,7 +55,6 @@ const finishPairing: Record<string, string> = {
 const Finishes = () => {
   const [selectedId, setSelectedId] = useState(FRAME_FINISHES[0].id);
   const [filter, setFilter] = useState<FinishFilter>("all");
-  const scene = FINISH_SCENES[0]; // single scene for now
 
   const selected = useMemo(
     () => FRAME_FINISHES.find((f) => f.id === selectedId) ?? FRAME_FINISHES[0],
@@ -68,62 +66,32 @@ const Finishes = () => {
     return FRAME_FINISHES.filter((f) => f.category === filter);
   }, [filter]);
 
+  // Big hero swatch: real wood-grain texture for wood finishes, solid color for solids.
+  const heroTexture = selected.textureImagePath;
+
   return (
     <Layout>
       <PageHeader
         eyebrow="The catalog"
         title="Eleven finishes. One window."
         breadcrumbLabel="Finishes"
-        subtitle="Each FourlinQ system is available in eleven brochure-verified finishes. Seven wood-grain laminates and four solid colors. Pick one. See it on the frame."
+        subtitle="Each FourlinQ system is available in eleven brochure-verified finishes. Seven wood-grain laminates and four solid colors."
       />
 
-      {/* Interactive hero — photo + overlaid frame swatch + description */}
+      {/* Hero — big honest swatch (real texture for wood, solid color for solids) + description */}
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
-          <div className="grid lg:grid-cols-[7fr,5fr] gap-10 lg:gap-16 items-start">
-            {/* Hero preview — stacked images, cross-fade to selected variant */}
-            <div className={cn("relative bg-[color:var(--canvas-soft)] overflow-hidden", scene.aspect)}>
-              {scene.hasAssets ? (
-                // Real variants — preload all 11, cross-fade to selected
-                FRAME_FINISHES.map((f) => (
-                  <img
-                    key={f.id}
-                    src={getFinishVariantSrc(scene, f)}
-                    alt={`${scene.label} with ${f.label} frame`}
-                    className={cn(
-                      "absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-marvin",
-                      f.id === selected.id ? "opacity-100" : "opacity-0"
-                    )}
-                    loading={f.id === selected.id ? "eager" : "lazy"}
-                    decoding="async"
-                  />
-                ))
-              ) : (
-                // No assets yet — show the base scene cleanly, no fake overlay
-                <img
-                  src={scene.fallbackSrc}
-                  alt={scene.label}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="eager"
-                  decoding="async"
-                />
-              )}
+          <div className="grid lg:grid-cols-[6fr,5fr] gap-10 lg:gap-16 items-center">
+            <div
+              className="aspect-square w-full bg-cover bg-center rounded-sm shadow-depth-4 transition-[background-image,background-color] duration-500 ease-marvin"
+              style={{
+                backgroundColor: selected.swatchHex,
+                backgroundImage: heroTexture ? `url(${heroTexture})` : undefined,
+              }}
+              aria-label={`${selected.label} finish preview`}
+            />
 
-              {/* Status badge — honest about asset state */}
-              <div className="absolute top-4 left-4 flex items-center gap-2 bg-[color:var(--ink-primary)]/90 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium">
-                {scene.hasAssets ? (
-                  <>Preview · {selected.label}</>
-                ) : (
-                  <>
-                    <Camera size={12} strokeWidth={1.5} />
-                    Photo previews coming soon
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Selected finish description */}
-            <div className="lg:pt-8">
+            <div>
               <p className="eyebrow mb-4 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-[color:var(--rule-strong)]">
                 {selected.category === "wood-grain" ? "Wood grain" : "Solid"}
               </p>
@@ -146,7 +114,7 @@ const Finishes = () => {
                 <EditorialButton to="/products" variant="primary" size="md">
                   See on a system
                 </EditorialButton>
-                <EditorialButton to="/brand#contact" variant="ghost" size="md">
+                <EditorialButton to="/brand#contact" variant="secondary" size="md">
                   Request a sample →
                 </EditorialButton>
               </div>
@@ -189,9 +157,8 @@ const Finishes = () => {
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
           {filtered.map((f) => {
             const isSelected = f.id === selected.id;
-            const fakeGrain = f.category === "wood-grain"
-              ? `repeating-linear-gradient(90deg, rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 1px, transparent 1px, transparent 4px)`
-              : "none";
+            // Wood-grain → real brochure-derived texture. Solid → clean color swatch.
+            const swatchImage = f.textureImagePath;
             return (
               <li key={f.id}>
                 <button
@@ -201,31 +168,16 @@ const Finishes = () => {
                 >
                   <div
                     className={cn(
-                      "aspect-square w-full overflow-hidden transition-all duration-300 ease-marvin",
+                      "aspect-square w-full overflow-hidden transition-all duration-300 ease-marvin bg-cover bg-center",
                       isSelected
                         ? "ring-2 ring-[color:var(--accent)] ring-offset-2 ring-offset-[color:var(--canvas-soft)]"
                         : "ring-1 ring-[color:var(--rule-soft)] hover:ring-[color:var(--ink-primary)]"
                     )}
-                    style={
-                      f.profilePhotoPath
-                        ? undefined
-                        : {
-                            backgroundColor: f.swatchHex,
-                            backgroundImage: fakeGrain !== "none" ? fakeGrain : undefined,
-                            backgroundBlendMode: fakeGrain !== "none" ? "multiply" : undefined,
-                          }
-                    }
-                  >
-                    {f.profilePhotoPath && (
-                      <img
-                        src={f.profilePhotoPath}
-                        alt={`${f.label} finish on FourlinQ profile`}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
+                    style={{
+                      backgroundColor: f.swatchHex,
+                      backgroundImage: swatchImage ? `url(${swatchImage})` : undefined,
+                    }}
+                  />
                   <p className={cn(
                     "mt-3 text-body-sm font-medium transition-colors duration-300 ease-marvin",
                     isSelected ? "text-[color:var(--accent)]" : "text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)]"

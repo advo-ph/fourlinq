@@ -1,12 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2 } from "lucide-react";
+import { X, Send, Loader2, ImagePlus } from "lucide-react";
 import ChatMessage from "./ChatMessage";
 import { streamChat, resetChat } from "@/lib/gemini-chat";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+  imageDataUrl?: string;
 }
+
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB cap (base64 inflates ~33%)
 
 interface FollowUp {
   label: string;
@@ -82,8 +85,11 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
   useEffect(() => { if (isOpen && inputRef.current) inputRef.current.focus(); }, [isOpen]);
@@ -99,20 +105,47 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
   const handleClose = () => {
     resetChat();
     setMessages([]);
+    setPendingImage(null);
+    setImageError(null);
     onClose();
   };
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim() || isStreaming) return;
-    const userMessage: Message = { role: "user", content: text.trim() };
+  const handleFilePick = (file: File | null) => {
+    setImageError(null);
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setImageError("Please pick an image file.");
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setImageError("Image must be under 4 MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") setPendingImage(reader.result);
+    };
+    reader.onerror = () => setImageError("Could not read image.");
+    reader.readAsDataURL(file);
+  };
+
+  const sendMessage = async (text: string, imageOverride?: string | null) => {
+    const image = imageOverride !== undefined ? imageOverride : pendingImage;
+    const trimmed = text.trim();
+    // Allow image-only sends with a default prompt so the model has something to answer.
+    const effective = trimmed || (image ? "What window system and finish would you recommend for this?" : "");
+    if (!effective || isStreaming) return;
+
+    const userMessage: Message = { role: "user", content: effective, imageDataUrl: image ?? undefined };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+    setPendingImage(null);
     setIsStreaming(true);
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
     try {
       let accumulatedText = "";
-      for await (const chunk of streamChat(text.trim())) {
+      for await (const chunk of streamChat(effective, image ?? undefined)) {
         accumulatedText += chunk;
         setMessages((prev) => {
           const updated = [...prev];
@@ -139,6 +172,8 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
     e.preventDefault();
     sendMessage(input);
   };
+
+  const canSend = (input.trim().length > 0 || pendingImage !== null) && !isStreaming;
 
   if (!isOpen) return null;
 
@@ -185,7 +220,7 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
                 <button
                   key={s}
                   onClick={() => sendMessage(s)}
-                  className="text-[12px] px-3 py-1.5 bg-white border border-[color:var(--rule-soft)] text-[color:var(--ink-secondary)] hover:border-[color:var(--ink-primary)] hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin rounded-full"
+                  className="text-[12px] px-3 py-1.5 bg-white border border-[color:var(--rule-strong)] text-[color:var(--ink-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin rounded-full"
                 >
                   {s}
                 </button>
@@ -202,9 +237,10 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
               key={i}
               role={msg.role}
               content={msg.content}
+              imageDataUrl={msg.imageDataUrl}
               isStreaming={isStreaming && i === messages.length - 1 && msg.role === "assistant"}
               followUps={followUps}
-              onFollowUp={sendMessage}
+              onFollowUp={(m) => sendMessage(m)}
             />
           );
         })}
@@ -214,19 +250,61 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
 
       {/* Input */}
       <form onSubmit={handleSubmit} className="px-3 py-3 shrink-0 border-t border-[color:var(--rule-soft)] bg-white">
-        <div className="flex items-center gap-2 bg-[color:var(--canvas-soft)] border border-[color:var(--rule-soft)] focus-within:border-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin pl-3.5 pr-1.5 py-1 rounded-full">
+        {pendingImage && (
+          <div className="mb-2 flex items-center gap-2">
+            <div className="relative">
+              <img
+                src={pendingImage}
+                alt="Preview"
+                className="h-14 w-14 rounded-md object-cover border border-[color:var(--rule-soft)]"
+              />
+              <button
+                type="button"
+                onClick={() => setPendingImage(null)}
+                aria-label="Remove image"
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[color:var(--ink-primary)] text-white flex items-center justify-center shadow"
+              >
+                <X size={11} />
+              </button>
+            </div>
+            <p className="text-[11px] text-[color:var(--ink-muted)] leading-tight">
+              Photo attached. LinQ will suggest a window type + finish.
+            </p>
+          </div>
+        )}
+        {imageError && (
+          <p className="mb-2 text-[11px] text-red-600">{imageError}</p>
+        )}
+        <div className="flex items-center gap-2 bg-[color:var(--canvas-soft)] border border-[color:var(--rule-soft)] focus-within:border-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin pl-1.5 pr-1.5 py-1 rounded-full">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => { handleFilePick(e.target.files?.[0] ?? null); e.target.value = ""; }}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isStreaming || pendingImage !== null}
+            className="w-8 h-8 rounded-full text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)] flex items-center justify-center transition-colors duration-300 ease-marvin disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+            aria-label="Attach photo"
+            title="Attach a photo of your wall or room"
+          >
+            <ImagePlus size={16} />
+          </button>
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about our systems..."
+            placeholder={pendingImage ? "Add a note (optional)…" : "Ask about our systems…"}
             disabled={isStreaming}
             className="flex-1 bg-transparent text-[13px] text-[color:var(--ink-primary)] outline-none placeholder:text-[color:var(--ink-faint)] disabled:opacity-50 py-1.5"
           />
           <button
             type="submit"
-            disabled={!input.trim() || isStreaming}
+            disabled={!canSend}
             className="w-8 h-8 rounded-full bg-[color:var(--accent)] text-white flex items-center justify-center hover:bg-[color:var(--accent-hover)] transition-colors duration-300 ease-marvin disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
             aria-label="Send"
           >

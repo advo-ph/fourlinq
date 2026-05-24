@@ -20,25 +20,38 @@ async function seedEmbeddings() {
   console.log(`📝 Found ${chunks.length} chunks to embed`);
 
   let success = 0;
+  let i = 0;
   for (const chunk of chunks) {
-    try {
-      const textToEmbed = `${chunk.title}\n\n${chunk.content}`;
-      const embedding = await embedText(textToEmbed);
-
-      const embeddingStr = `[${embedding.join(",")}]`;
-      await pool.query(
-        `UPDATE knowledge_chunk SET embedding = $1::vector WHERE knowledge_chunk_id = $2`,
-        [embeddingStr, chunk.knowledge_chunk_id]
-      );
-
-      success++;
-      console.log(`  ✓ [${success}/${chunks.length}] ${chunk.title}`);
-
-      // Rate limit: 100ms between requests
-      await new Promise((r) => setTimeout(r, 100));
-    } catch (err) {
-      console.error(`  ✗ Failed: ${chunk.title}`, err);
+    i++;
+    const textToEmbed = `${chunk.title}\n\n${chunk.content}`;
+    let attempt = 0;
+    let lastErr: unknown = null;
+    while (attempt < 5) {
+      try {
+        const embedding = await embedText(textToEmbed);
+        const embeddingStr = `[${embedding.join(",")}]`;
+        await pool.query(
+          `UPDATE knowledge_chunk SET embedding = $1::vector WHERE knowledge_chunk_id = $2`,
+          [embeddingStr, chunk.knowledge_chunk_id]
+        );
+        success++;
+        console.log(`  ✓ [${i}/${chunks.length}] ${chunk.title}`);
+        lastErr = null;
+        break;
+      } catch (err: any) {
+        lastErr = err;
+        const msg = String(err?.message ?? err);
+        // Backoff on 429 / 503 / network
+        const transient = /429|503|rate|quota|timeout|fetch failed/i.test(msg);
+        if (!transient) break;
+        const delay = Math.min(2000 * Math.pow(2, attempt), 30000);
+        console.warn(`  ↻ retry ${attempt + 1} in ${delay}ms: ${msg.slice(0, 80)}`);
+        await new Promise((r) => setTimeout(r, delay));
+        attempt++;
+      }
     }
+    if (lastErr) console.error(`  ✗ [${i}/${chunks.length}] ${chunk.title}: ${String(lastErr).slice(0, 120)}`);
+    await new Promise((r) => setTimeout(r, 250)); // base throttle
   }
 
   console.log(`\n✅ Embedded ${success}/${chunks.length} chunks`);

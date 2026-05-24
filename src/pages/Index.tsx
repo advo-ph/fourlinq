@@ -2,9 +2,9 @@ import { lazy, Suspense } from "react";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
 import CapizDivider from "@/components/primitives/CapizDivider";
-import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 
-const Window3D = lazy(() => import("@/components/3d/Window3D"));
+const HeroScroll3D = lazy(() => import("@/components/home/HeroScroll3D"));
+const DesignToolPreview = lazy(() => import("@/components/home/DesignToolPreview"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
 import EditorialIntro from "@/components/home/EditorialIntro";
@@ -37,6 +37,10 @@ const Index = () => {
         ctaTo="/products"
       />
 
+      <Suspense fallback={<div className="h-screen bg-[color:var(--canvas-soft)]" />}>
+        <HeroScroll3D />
+      </Suspense>
+
       <Section tone="canvas" size="lg">
         <CapizDivider className="mb-section-mobile md:mb-section-tablet lg:mb-section-desktop" />
         <EditorialIntro />
@@ -50,29 +54,15 @@ const Index = () => {
         <SystemsTiles />
       </Section>
 
-      {/* Interactive 3D window — procedural, no AI assets needed */}
+      {/* Design Tool preview — auto-cycles configs using the configurator's
+          own SVG render engine. Replaces the prior 3D viewer (unreliable
+          rendering across browsers, did not position consistently). */}
       <Section tone="canvas" size="lg">
-        <div className="grid lg:grid-cols-[5fr,6fr] gap-12 lg:gap-16 items-start">
-          <div>
-            <EyebrowHeading eyebrow="Try the systems" level={2}>
-              Rotate. Open. Refinish.
-            </EyebrowHeading>
-            <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.6]">
-              Drag to rotate. Click to open. Swap any of the eleven finishes.
-            </p>
-          </div>
-          <div>
-            <Suspense
-              fallback={
-                <div className="w-full aspect-[5/6] lg:aspect-[4/5] bg-[color:var(--canvas-soft)] flex items-center justify-center">
-                  <p className="eyebrow">Loading 3D…</p>
-                </div>
-              }
-            >
-              <Window3D />
-            </Suspense>
-          </div>
-        </div>
+        <Suspense
+          fallback={<div className="min-h-[400px] bg-[color:var(--canvas-soft)]" />}
+        >
+          <DesignToolPreview />
+        </Suspense>
       </Section>
 
       <Section tone="canvas" size="lg">
