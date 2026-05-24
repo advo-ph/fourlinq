@@ -230,7 +230,7 @@ const ConsultationForm = () => {
       </div>
 
       {/* Navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-[color:var(--rule-soft)]">
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 lg:pt-8 border-t border-[color:var(--rule-soft)]">
         <button
           type="button"
           onClick={() => setStep((s) => Math.max(0, s - 1))}

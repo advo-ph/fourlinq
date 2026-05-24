@@ -198,55 +198,63 @@ const WhyUpvc = () => (
       </div>
     </Section>
 
-    {/* ── Material comparison ── 3 prose blocks, no spreadsheet ── */}
+    {/* ── Material comparison ── table with uPVC column highlighted ── */}
     <Section tone="soft" size="lg">
-      <div className="grid lg:grid-cols-12 gap-x-12 mb-16">
+      <div className="grid lg:grid-cols-12 gap-x-12 mb-14">
         <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
           uPVC. Aluminum. Timber.
         </h2>
         <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
-          We carry uPVC and aluminum. Most houses end up with uPVC; bigger openings or thinner sightlines go to aluminum. Timber sits in the comparison for reference — we don't sell it.
+          We carry uPVC and aluminum. Most houses end up with uPVC; bigger openings or thinner sightlines go to aluminum. Timber sits in the third column for comparison — we don't sell it.
         </p>
       </div>
 
-      <div className="border-t border-[color:var(--rule-strong)]">
-        {[
-          {
-            name: "uPVC",
-            stance: "What we recommend for most homes",
-            body: "No painting or recoating, inherently inert against salt air, multi-chamber profile that traps air for thermal performance, 24–32 dB of sound attenuation, self-extinguishing in a fire. Twelve heat-fused finishes, solid and wood-grain. Standard sash up to about 2.4 m.",
-            emphasis: true,
-          },
-          {
-            name: "Aluminum",
-            stance: "What we move you to for larger openings",
-            body: "Stronger than uPVC, so spans can be wider and sightlines slimmer. Needs a powder-coat refresh every eight to ten years and a thermal-break insert if heat transfer matters. Non-combustible. Color range is powder-coat, not wood-grain.",
-            emphasis: false,
-          },
-          {
-            name: "Timber",
-            stance: "Shown here for reference — we don't supply it",
-            body: "Naturally insulating and beautiful in the right house, but it needs regular painting and sealing, is vulnerable in salt air without ongoing care, and is combustible. If hardwood is what you want, buy hardwood — not a wood-grain laminate pretending to be it.",
-            emphasis: false,
-          },
-        ].map((m) => (
-          <article
-            key={m.name}
-            className="grid lg:grid-cols-12 gap-x-12 gap-y-4 border-b border-[color:var(--rule-soft)] py-10 lg:py-14"
-          >
-            <div className="lg:col-span-4">
-              <h3 className={`font-serif font-normal tracking-tight text-h4 leading-[1.1] ${m.emphasis ? "text-[color:var(--ink-primary)]" : "text-[color:var(--ink-secondary)]"}`}>
-                {m.name}
-              </h3>
-              <p className="mt-3 text-body-sm text-[color:var(--ink-muted)] leading-[1.5] max-w-[20rem]">
-                {m.stance}
-              </p>
+      {/* Table — uPVC column gets a tinted background + bold text */}
+      <div className="overflow-x-auto">
+        <div className="min-w-[720px]">
+          {/* Header */}
+          <div className="grid grid-cols-[1.5fr_2fr_2fr_2fr] border-t-2 border-[color:var(--ink-primary)]">
+            <span className="eyebrow text-[color:var(--ink-muted)] py-5 pr-4">Feature</span>
+            <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--rule-strong)] font-serif text-h5 font-normal text-[color:var(--ink-primary)] leading-none">
+              uPVC
+            </span>
+            <span className="py-5 px-4 font-serif text-h5 font-normal text-[color:var(--ink-secondary)] leading-none">
+              Aluminum
+            </span>
+            <span className="py-5 px-4 font-serif text-h5 font-normal text-[color:var(--ink-secondary)] leading-none">
+              Timber
+            </span>
+          </div>
+
+          {/* Rows */}
+          {comparisonData.map((row, i) => (
+            <div
+              key={row.feature}
+              className={`grid grid-cols-[1.5fr_2fr_2fr_2fr] border-b border-[color:var(--rule-soft)] ${i === 0 ? "border-t border-[color:var(--rule-soft)]" : ""}`}
+            >
+              <span className="text-body-sm font-medium uppercase tracking-[0.06em] text-[color:var(--ink-muted)] py-5 pr-4 self-start">
+                {row.feature}
+              </span>
+              <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--rule-strong)] text-body font-bold text-[color:var(--ink-primary)] leading-[1.5]">
+                {row.upvc}
+              </span>
+              <span className="py-5 px-4 text-body-sm text-[color:var(--ink-secondary)] leading-[1.5]">
+                {row.aluminium}
+              </span>
+              <span className="py-5 px-4 text-body-sm text-[color:var(--ink-secondary)] leading-[1.5]">
+                {row.timber}
+              </span>
             </div>
-            <p className="lg:col-span-7 lg:col-start-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[42rem]">
-              {m.body}
-            </p>
-          </article>
-        ))}
+          ))}
+
+          {/* Bottom edge of uPVC column */}
+          <div className="grid grid-cols-[1.5fr_2fr_2fr_2fr]">
+            <span />
+            <span className="border-l border-r border-b-2 border-l-[color:var(--rule-strong)] border-r-[color:var(--rule-strong)] border-b-[color:var(--ink-primary)] bg-[color:var(--canvas)]" />
+            <span />
+            <span />
+          </div>
+        </div>
       </div>
     </Section>
 

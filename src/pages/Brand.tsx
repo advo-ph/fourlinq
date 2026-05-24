@@ -1,5 +1,6 @@
+import { Link } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
@@ -9,43 +10,91 @@ import { Phone, Mail, ArrowUpRight } from "lucide-react";
 
 const Brand = () => (
   <Layout>
-    <PageHeader
-      eyebrow="Our brand"
-      title="Custom-made for Philippine homes."
-      breadcrumbLabel="Brand"
-      subtitle={BRAND.promise}
-    />
+    {/* ── Full-viewport house hero ── image fills the screen, title overlays. ── */}
+    <header className="relative h-[calc(100vh-72px)] overflow-hidden">
+      <img
+        src="/images/wp-export/Our_Brand.jpg"
+        alt="A modern Philippine residence outfitted with FourlinQ systems"
+        loading="eager"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      {/* Dark gradient overlay so the text reads clearly over the photo. */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" aria-hidden="true" />
 
-    {/* Brand hero — full-bleed editorial image right after the PageHeader */}
-    <Section tone="canvas" size="md" className="!pb-0">
-      <div className="aspect-[21/9] lg:aspect-[21/9] overflow-hidden bg-[color:var(--canvas-soft)]">
-        <img
-          src="/images/wp-export/Our_Brand.jpg"
-          alt="A modern Philippine residence outfitted with FourlinQ systems"
-          loading="eager"
-          decoding="async"
-          className="w-full h-full object-cover"
-        />
+      <div className="relative h-full container-editorial flex flex-col">
+        <nav aria-label="Breadcrumb" className="pt-8 lg:pt-12">
+          <ol className="flex items-center gap-2 text-[12px] tracking-[0.08em] uppercase text-white/70">
+            <li>
+              <Link to="/" className="hover:text-white transition-colors duration-300 ease-marvin">
+                FourlinQ
+              </Link>
+            </li>
+            <li aria-hidden="true"><ChevronRight size={12} strokeWidth={1.5} /></li>
+            <li className="text-white font-medium">Brand</li>
+          </ol>
+        </nav>
+
+        <div className="mt-auto pb-16 lg:pb-24 max-w-[58rem]">
+          <p className="eyebrow !text-white/70 mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-white/50">
+            Our brand
+          </p>
+          <h1 className="font-serif font-normal tracking-tight text-white text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02]">
+            Custom-made for Philippine homes.
+          </h1>
+          <p className="mt-7 lg:mt-9 text-body-lg lg:text-lead text-white/80 max-w-[40rem] leading-[1.55]">
+            {BRAND.promise}
+          </p>
+        </div>
       </div>
-    </Section>
+    </header>
 
-    {/* Story */}
+    {/* Story — asymmetric bento grid of hairline cards. One featured card
+        anchors the section; three smaller cards orbit around it. No numbers,
+        no shadows, just thin rules and typography. */}
     <Section tone="canvas" size="lg">
-      <div className="grid lg:grid-cols-[5fr,6fr] gap-12 lg:gap-20 items-center">
-        <div>
-          <EyebrowHeading eyebrow="Our story" level={2}>
-            {BRAND.heroQuote}
-          </EyebrowHeading>
-          <div className="mt-8 lg:mt-10 space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.65]">
-            <p>{BRAND.promiseSupport}</p>
-            <p>
-              Eleven finishes from classic white to rich wood grains. Backed by a {BRAND.warranty} covering corrosion resistance, weather resistance, and long-lasting performance.
+      <div className="mb-12 lg:mb-16 flex items-end justify-between gap-8 flex-wrap">
+        <p className="eyebrow inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-[color:var(--rule-strong)]">
+          Our story
+        </p>
+        <span className="eyebrow text-[color:var(--ink-muted)]">FourlinQ / 2026</span>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-2 gap-px bg-[color:var(--rule-soft)] border border-[color:var(--rule-soft)]">
+        {/* Featured card — spans 2 rows on lg */}
+        <article className="lg:col-span-7 lg:row-span-2 bg-[color:var(--canvas)] p-8 lg:p-14 flex flex-col justify-between min-h-[28rem]">
+          <p className="eyebrow text-[color:var(--ink-muted)]">The promise</p>
+          <div>
+            <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[2rem] sm:text-[2.5rem] lg:text-[3.25rem] xl:text-[3.75rem] leading-[1.02] max-w-[18ch]">
+              {BRAND.heroQuote}
+            </h3>
+            <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] max-w-[34rem]">
+              {BRAND.promiseSupport} Every system is fabricated to the architect's specifications. No standard sizes off the shelf.
             </p>
           </div>
-        </div>
-        <div className="relative aspect-[4/5] lg:aspect-[5/6] overflow-hidden bg-[color:var(--canvas-soft)]">
-          <img src="/images/wp-export/FQC-Brand.jpg" alt="A FourlinQ-equipped home in the Philippines" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-        </div>
+        </article>
+
+        {/* Top-right card */}
+        <article className="lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col">
+          <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Finishes</p>
+          <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1]">
+            Twelve total.
+          </h3>
+          <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
+            Six solid colors and six wood-grain laminates, heat-fused into the profile.
+          </p>
+        </article>
+
+        {/* Bottom-right card */}
+        <article className="lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col">
+          <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Warranty</p>
+          <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1]">
+            {BRAND.warranty}.
+          </h3>
+          <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
+            Covering corrosion resistance, weather resistance, and long-lasting performance.
+          </p>
+        </article>
       </div>
     </Section>
 
