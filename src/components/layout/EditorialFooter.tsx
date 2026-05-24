@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CONTACT } from "@/data/fourlinq-data";
+import { CONTACT, BRAND } from "@/data/fourlinq-data";
 import Logo from "@/components/shared/Logo";
 import { ArrowUpRight } from "lucide-react";
 
@@ -59,7 +59,7 @@ const EditorialFooter = () => {
           </div>
           <div className="flex flex-col gap-3 lg:gap-4 lg:items-end">
             <p className="font-serif text-[1.5rem] lg:text-h2 leading-[1.2] tracking-tight max-w-[28rem] lg:text-right">
-              Built for the houses we share with the weather.
+              {BRAND.heroQuote}
             </p>
             <a
               href={gmail}
