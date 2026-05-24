@@ -5,11 +5,13 @@ import CapizDivider from "@/components/primitives/CapizDivider";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 
 const Window3D = lazy(() => import("@/components/3d/Window3D"));
+const ScrollWindow = lazy(() => import("@/components/home/ScrollWindow"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
 import EditorialIntro from "@/components/home/EditorialIntro";
 import AuthorityStrip from "@/components/home/AuthorityStrip";
 import SystemsTiles from "@/components/home/SystemsTiles";
+import ProjectReels from "@/components/home/ProjectReels";
 import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
 import BrandCTA from "@/components/home/BrandCTA";
@@ -49,6 +51,12 @@ const Index = () => {
       <Section tone="soft" size="lg">
         <SystemsTiles />
       </Section>
+
+      <ProjectReels />
+
+      <Suspense fallback={null}>
+        <ScrollWindow />
+      </Suspense>
 
       {/* Interactive 3D window — procedural, no AI assets needed */}
       <Section tone="canvas" size="lg">
