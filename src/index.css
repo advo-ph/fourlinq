@@ -216,6 +216,16 @@
   border-radius: 1px;
 }
 
+/* ─── Marquee — used on dark warranty band, brand page ─── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+
 /* ─── Honor user motion preferences ─── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

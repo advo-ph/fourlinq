@@ -98,39 +98,42 @@ const Brand = () => (
       </div>
     </Section>
 
-    {/* Warranty — sleek dark moment. Numeral as the visual anchor, the rest
-        sits quietly around it. No display-scale shouting. */}
+    {/* Warranty — sleek dark moment. Inline 10 + YEAR WARRANTY anchor,
+        marquee scope band below. */}
     <Section tone="dark" size="md">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-white/40 mb-6">
+        The promise
+      </p>
+
       <div className="grid lg:grid-cols-12 gap-x-12 gap-y-10 items-center">
-        {/* Left: tiny eyebrow + giant restrained serif numeral */}
-        <div className="lg:col-span-5">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-white/40 mb-6">
-            The promise
-          </p>
+        <div className="lg:col-span-7 flex items-baseline gap-5 lg:gap-7">
           <p className="font-serif font-normal text-white leading-none tracking-tight text-[5rem] lg:text-[7rem] xl:text-[8rem]">
             10
           </p>
-          <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-[color:var(--accent)]">
+          <p className="text-[15px] lg:text-[17px] uppercase tracking-[0.18em] text-[color:var(--accent)] font-medium">
             Year warranty.
           </p>
         </div>
 
-        {/* Right: prose + scope as inline divided list, kept compact */}
-        <div className="lg:col-span-6 lg:col-start-7">
-          <p className="text-body lg:text-body-lg text-white/75 leading-[1.6] max-w-[34rem]">
-            {BRAND.promise}
-          </p>
-          <p className="mt-8 text-[11px] uppercase tracking-[0.14em] text-white/40 mb-3">
-            Covering
-          </p>
-          <p className="text-body-sm text-white leading-[1.7]">
-            {BRAND.warrantyScope.map((scope, i) => (
-              <span key={scope}>
-                {i > 0 && <span className="mx-3 text-white/25">·</span>}
-                {scope}
-              </span>
-            ))}
-          </p>
+        <p className="lg:col-span-5 text-body lg:text-body-lg text-white/75 leading-[1.6] max-w-[34rem]">
+          {BRAND.promise}
+        </p>
+      </div>
+
+      {/* Marquee scope band — covers what the warranty includes, scrolling */}
+      <div className="mt-14 lg:mt-20 -mx-5 lg:-mx-12 border-y border-white/10 overflow-hidden">
+        <div className="animate-marquee flex whitespace-nowrap py-5">
+          {/* Duplicate the list so the loop is seamless */}
+          {[...Array(2)].map((_, dup) => (
+            <span key={dup} className="flex shrink-0 items-center text-[11px] lg:text-body-sm uppercase tracking-[0.18em] text-white/70">
+              {BRAND.warrantyScope.map((scope) => (
+                <span key={`${dup}-${scope}`} className="flex items-center">
+                  <span className="px-6 lg:px-10">{scope}</span>
+                  <span className="text-[color:var(--accent)]">·</span>
+                </span>
+              ))}
+            </span>
+          ))}
         </div>
       </div>
     </Section>
