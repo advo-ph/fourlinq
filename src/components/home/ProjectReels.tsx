@@ -58,7 +58,7 @@ function ReelCard({ reel }: { reel: (typeof PROJECT_REELS)[number] }) {
 
 const ProjectReels = () => {
   return (
-    <Section tone="dark" size="lg" contained={false} className="!bg-black">
+    <Section tone="dark" size="lg" contained={false} className="!bg-black" noAnimation>
       <div className="px-4 md:px-6 lg:px-8">
         <div className="container-editorial mb-12 lg:mb-16">
           <EyebrowHeading eyebrow="Our projects" level={2} toneInverse>
