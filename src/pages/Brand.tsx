@@ -87,12 +87,12 @@ const Brand = () => (
 
         {/* Bottom-right card */}
         <article className="lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col">
-          <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Warranty</p>
+          <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Showrooms</p>
           <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1]">
-            {BRAND.warranty}.
+            Manila and Cebu.
           </h3>
           <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
-            Covering corrosion resistance, weather resistance, and long-lasting performance.
+            Walk through full-scale systems with our consultants. Frames you can open, finishes you can touch, hardware that's already in your wall.
           </p>
         </article>
       </div>
