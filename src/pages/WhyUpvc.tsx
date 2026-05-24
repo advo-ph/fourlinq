@@ -215,7 +215,7 @@ const WhyUpvc = () => (
           {/* Header */}
           <div className="grid grid-cols-[1.5fr_2fr_2fr_2fr] border-t-2 border-[color:var(--ink-primary)]">
             <span className="eyebrow text-[color:var(--ink-muted)] py-5 pr-4">Feature</span>
-            <span className="py-5 px-5 bg-[color:var(--ink-primary)] font-serif text-h5 font-normal text-white leading-none">
+            <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--ink-primary)] font-serif text-h5 font-normal text-[color:var(--ink-primary)] leading-none">
 uPV<span className="text-[color:var(--accent)]">C</span>
             </span>
             <span className="py-5 px-4 font-serif text-h5 font-normal text-[color:var(--ink-secondary)] leading-none">
@@ -235,7 +235,7 @@ uPV<span className="text-[color:var(--accent)]">C</span>
               <span className="text-body-sm font-medium uppercase tracking-[0.06em] text-[color:var(--ink-muted)] py-5 pr-4 self-start">
                 {row.feature}
               </span>
-              <span className="py-5 px-5 bg-[color:var(--ink-primary)] text-body font-bold text-white leading-[1.5]">
+              <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--ink-primary)] text-body font-bold text-[color:var(--ink-primary)] leading-[1.5]">
                 {row.upvc}
               </span>
               <span className="py-5 px-4 text-body-sm text-[color:var(--ink-secondary)] leading-[1.5]">
@@ -250,7 +250,7 @@ uPV<span className="text-[color:var(--accent)]">C</span>
           {/* Bottom edge of uPVC column */}
           <div className="grid grid-cols-[1.5fr_2fr_2fr_2fr]">
             <span />
-            <span className="bg-[color:var(--ink-primary)] h-4" />
+            <span className="border-l border-r border-b-2 border-[color:var(--ink-primary)] bg-[color:var(--canvas)]" />
             <span />
             <span />
           </div>
