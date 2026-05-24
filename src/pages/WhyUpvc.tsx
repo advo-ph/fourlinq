@@ -216,7 +216,7 @@ const WhyUpvc = () => (
           <div className="grid grid-cols-[1.5fr_2fr_2fr_2fr] border-t-2 border-[color:var(--ink-primary)]">
             <span className="eyebrow text-[color:var(--ink-muted)] py-5 pr-4">Feature</span>
             <span className="py-5 px-5 bg-[color:var(--canvas)] border-l border-r border-[color:var(--ink-primary)] font-serif text-h5 font-normal text-[color:var(--ink-primary)] leading-none">
-              u<span className="text-[color:var(--accent)]">P</span>VC
+uPV<span className="text-[color:var(--accent)]">C</span>
             </span>
             <span className="py-5 px-4 font-serif text-h5 font-normal text-[color:var(--ink-secondary)] leading-none">
               Aluminum
