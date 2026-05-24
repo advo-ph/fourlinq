@@ -25,7 +25,7 @@ const advantages: Advantage[] = [
   {
     number: "02",
     title: "Salt-air resistant",
-    body: "uPVC profiles never rust or corrode. Stays dimensionally stable along Coastal Batangas, Cebu, and Tagaytay installs where aluminum begins to pit within a decade.",
+    body: "uPVC profiles never rust or corrode. The material is inherently inert, so it stays dimensionally stable in coastal salt air without needing protective coatings.",
   },
   {
     number: "03",

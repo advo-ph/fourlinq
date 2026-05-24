@@ -25,15 +25,19 @@ export interface ComparisonRow {
   timber: string;
 }
 
+// Comparison framing: we sell BOTH uPVC and aluminum at FourlinQ. The table
+// describes where each material genuinely fits rather than ranking them. Most
+// rows show real differences without calling any material "bad" — the
+// architect/owner chooses based on the project's actual constraints.
 export const comparisonData: ComparisonRow[] = [
-  { feature: "Maintenance", upvc: "None required", aluminium: "Periodic re-coating", timber: "Regular painting/sealing" },
-  { feature: "Corrosion Resistance", upvc: "Excellent — never rusts", aluminium: "Good (risk in salt air)", timber: "Poor (rot/warp risk)" },
-  { feature: "Thermal Performance", upvc: "Excellent — multi-chamber", aluminium: "Poor (conducts heat)", timber: "Good" },
-  { feature: "Weather Resistance", upvc: "Excellent — EPDM sealed", aluminium: "Good", timber: "Poor" },
-  { feature: "Sound Insulation", upvc: "Excellent — 6–12mm glass", aluminium: "Moderate", timber: "Good" },
-  { feature: "Fire Retardance", upvc: "Inherently fire retardant", aluminium: "Non-combustible", timber: "Combustible" },
-  { feature: "Aesthetics", upvc: "11 finishes (solid + wood-grain)", aluminium: "Powder-coat options", timber: "Natural/painted" },
-  { feature: "Warranty", upvc: "10-Year Warranty", aluminium: "Varies", timber: "Varies" },
+  { feature: "Maintenance", upvc: "No painting or recoating", aluminium: "Powder-coat refresh every 8-10 years", timber: "Regular painting and sealing" },
+  { feature: "Corrosion in salt air", upvc: "Inherently inert", aluminium: "Anodized or powder-coated for protection", timber: "Vulnerable without sealing" },
+  { feature: "Thermal performance", upvc: "Multi-chamber profile traps air", aluminium: "Thermal break inserts available", timber: "Naturally insulating" },
+  { feature: "Maximum span", upvc: "Up to ~2.4 m sash (standard)", aluminium: "Larger spans + slim sightlines", timber: "Depends on hardwood spec" },
+  { feature: "Sightline thickness", upvc: "Standard profile", aluminium: "Slimmer profile possible", timber: "Variable" },
+  { feature: "Sound insulation", upvc: "24-32 dB attenuation typical", aluminium: "Comparable with proper glazing", timber: "Good with mass" },
+  { feature: "Fire retardance", upvc: "Self-extinguishing", aluminium: "Non-combustible", timber: "Combustible" },
+  { feature: "Aesthetics", upvc: "11 finishes (solid + wood-grain)", aluminium: "Powder-coat color range", timber: "Natural grain or painted" },
 ];
 
 // Re-export all 7 verified advantages for use elsewhere
