@@ -53,15 +53,18 @@ const PhaseText = ({ phase, isActive, progress }: PhaseTextProps) => {
         transform: `translateY(${translateY}px)`,
         willChange: "opacity, transform",
       }}
-      className={cn("absolute inset-0 flex items-center", opacity === 0 && "pointer-events-none")}
+      className={cn(
+        "absolute inset-0 flex items-end pb-10 lg:items-center lg:pb-0",
+        opacity === 0 && "pointer-events-none"
+      )}
     >
       <div className="w-full px-6 md:px-12 lg:px-20">
-        <div className="max-w-[26rem]">
-          <p className="eyebrow !text-[color:var(--ink-muted)] mb-4">{phase.text.eyebrow}</p>
-          <h3 className="font-serif text-h4 md:text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] mb-5">
+        <div className="max-w-[26rem] mx-auto lg:mx-0 text-center lg:text-left">
+          <p className="eyebrow !text-[color:var(--ink-muted)] mb-3 lg:mb-4">{phase.text.eyebrow}</p>
+          <h3 className="font-serif text-[1.5rem] md:text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.15] mb-3 lg:mb-5">
             {phase.text.headline}
           </h3>
-          <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
+          <p className="text-body-sm lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.55]">
             {phase.text.body}
           </p>
         </div>
@@ -161,7 +164,9 @@ const ScrollWindow = () => {
         )}
 
         {/* Instant poster — first frame painted by the browser before the
-            JS preloader has a chance to start. Eliminates the blank hero. */}
+            JS preloader has a chance to start. Eliminates the blank hero.
+            Mobile: top half (~55vh, object-contain so the full frame shows
+            above the text). Desktop: full-bleed cover behind centered text. */}
         <img
           src={FRAME_PATH_TEMPLATE.replace("{index}", "0001")}
           alt=""
@@ -169,16 +174,20 @@ const ScrollWindow = () => {
           decoding="async"
           aria-hidden="true"
           className={cn(
-            "absolute inset-0 w-full h-full object-cover transition-opacity duration-300",
+            "absolute left-0 right-0 top-0 h-[55vh] w-full object-contain",
+            "lg:inset-0 lg:h-full lg:object-cover",
+            "transition-opacity duration-300",
             isLoaded ? "opacity-0" : "opacity-100",
           )}
         />
 
-        {/* Canvas for frame rendering — full screen width */}
+        {/* Canvas for frame rendering. Same responsive sizing as the poster. */}
         <canvas
           ref={canvasRef}
           className={cn(
-            "absolute inset-0 w-full h-full object-cover transition-opacity duration-300",
+            "absolute left-0 right-0 top-0 h-[55vh] w-full object-contain",
+            "lg:inset-0 lg:h-full lg:object-cover",
+            "transition-opacity duration-300",
             isLoaded ? "opacity-100" : "opacity-0",
           )}
         />

@@ -46,42 +46,42 @@ const EditorialFooter = () => {
 
   return (
     <footer className="bg-[color:var(--canvas-dark)] text-white">
-      <div className="container-editorial py-16 md:py-20 lg:py-section-tablet">
+      <div className="container-editorial py-10 md:py-16 lg:py-section-tablet">
         {/* Top — wordmark + standout contact line */}
-        <div className="grid lg:grid-cols-[1fr,2fr] gap-12 lg:gap-20 pb-12 lg:pb-16 border-b border-white/10">
+        <div className="grid lg:grid-cols-[1fr,2fr] gap-8 lg:gap-20 pb-8 lg:pb-16 border-b border-white/10">
           <div>
             <Link to="/" className="inline-block">
-              <Logo variant="light" className="h-12" />
+              <Logo variant="light" className="h-10 lg:h-12" />
             </Link>
-            <p className="mt-4 text-[11px] uppercase tracking-[0.12em] text-white/50 font-medium">
+            <p className="mt-3 text-[10px] lg:text-[11px] uppercase tracking-[0.12em] text-white/50 font-medium">
               Custom-made in the Philippines
             </p>
           </div>
-          <div className="flex flex-col gap-4 lg:items-end">
-            <p className="font-serif text-h3 lg:text-h2 leading-[1.15] tracking-tight max-w-[28rem] lg:text-right">
+          <div className="flex flex-col gap-3 lg:gap-4 lg:items-end">
+            <p className="font-serif text-[1.5rem] lg:text-h2 leading-[1.2] tracking-tight max-w-[28rem] lg:text-right">
               Built for the houses we share with the weather.
             </p>
             <a
               href={gmail}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 mt-4 lg:mt-2 text-body-lg font-sans border-b border-white/40 pb-1 hover:border-white transition-colors duration-300 ease-marvin"
+              className="group inline-flex items-center gap-2 mt-2 text-body lg:text-body-lg font-sans border-b border-white/40 pb-1 hover:border-white transition-colors duration-300 ease-marvin break-all"
             >
               {CONTACT.email}
-              <ArrowUpRight size={16} className="transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <ArrowUpRight size={14} className="shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
-            <a href={tel} className="text-body text-white/70 hover:text-white transition-colors duration-300 ease-marvin">
+            <a href={tel} className="text-body-sm lg:text-body text-white/70 hover:text-white transition-colors duration-300 ease-marvin">
               {CONTACT.mobileSales}
             </a>
           </div>
         </div>
 
         {/* Link columns */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 py-12 lg:py-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8 lg:gap-12 py-8 lg:py-16">
           {Object.entries(columns).map(([category, links]) => (
             <nav key={category} aria-label={category}>
-              <h4 className="eyebrow text-white/50 mb-6">{category}</h4>
-              <ul className="space-y-3">
+              <h4 className="eyebrow text-white/50 mb-4 lg:mb-6">{category}</h4>
+              <ul className="space-y-2.5 lg:space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -98,11 +98,11 @@ const EditorialFooter = () => {
         </div>
 
         {/* Bottom strip */}
-        <div className="pt-8 border-t border-white/10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p className="text-body-sm text-white/50">
+        <div className="pt-6 lg:pt-8 border-t border-white/10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p className="text-[12px] lg:text-body-sm text-white/50">
             © {new Date().getFullYear()} FourlinQ Windows &amp; Doors. All rights reserved.
           </p>
-          <div className="flex gap-6">
+          <div className="flex gap-5 lg:gap-6">
             {socials.map((s) => (
               <a
                 key={s.label}
