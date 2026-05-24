@@ -1,11 +1,16 @@
 /**
  * FAQ content for the public FAQ page.
  *
- * Source: cross-referenced from src/data/fourlinq-data.ts (brochure-verified),
- * the LinQ knowledge base in server/migrations/004_knowledge_seed.sql, and
- * docs/CHANGELOG.md client-comment-driven decisions. Pricing-specific
- * questions are intentionally omitted until Tita confirms a price-context
- * stance — see REDESIGN_ROADMAP.md §14 "Open items".
+ * Brochure-verified only. Anything that was previously cross-referenced from
+ * the old migration 004 KB seed (lead times, "5-year hardware + 2-year glass"
+ * warranty, "marine-grade stainless hardware", "25-year UV stabilizers",
+ * "signal-5 typhoon thresholds", "national shipping") has been removed or
+ * replaced with a contact-sales call to action, per the brochure-only memory.
+ *
+ * To add a new claim: confirm it's in the brochure or get Tita's explicit
+ * sign-off. Update src/data/faq.ts, then run on the VPS:
+ *   cd /opt/fourlinq && npx tsx server/scripts/seed-site-knowledge.ts
+ *   npx tsx server/scripts/seed-embeddings.ts
  */
 
 export type FAQCategory = "products" | "material" | "ordering" | "install" | "warranty" | "care";
@@ -30,7 +35,7 @@ export const FAQ: FAQEntry[] = [
   {
     category: "products",
     q: "What systems do you offer?",
-    a: "Five system types, each custom-made to your specifications: Casement, Sliding, Awning, Special Shapes, and Slide & Fold. All are available in uPVC, with Aluminum as an alternate material for certain frames. Detailed specs live on the Systems page.",
+    a: "Five system types, each custom-made to your specifications: Casement, Sliding, Awning, Special Shapes, and Slide & Fold. All are available in uPVC, with Aluminum as an alternate material for certain frames. Detailed specs live on the Products page (/products).",
   },
   {
     category: "products",
@@ -40,96 +45,91 @@ export const FAQ: FAQEntry[] = [
   {
     category: "products",
     q: "Can you do custom shapes — arches, trapezoids?",
-    a: "Yes. Our Special Shapes system supports fully custom geometry, including arch-tops, circles, trapezoids, and triangles. Often combined with other system types to create a dramatic feature wall of glass. Send us your architectural drawings and we'll quote against them.",
+    a: "Yes. Our Special Shapes system supports fully custom geometry, including arch-tops, circles, trapezoids, and triangles. Often combined with other system types to create a dramatic feature wall of glass. Send us your architectural drawings via 0925-848-8888 or sales@fourlinq.com and we'll quote against them.",
   },
   {
     category: "products",
     q: "How many finishes are available?",
-    a: "12 finishes total. Solid colors include classic White, Anthracite, and metallic options. Wood-grain laminates include Walnut, Oak, and other realistic timber finishes — applied via heat-fused foil that won't peel or fade. You can browse the full swatch set on the Brand page or in the Design Tool.",
+    a: "12 finishes total — 7 wood-grain (Oak Light, Oak Malt, Black Wood, Gray Wood, Dark Oak, Walnut, Golden Oak) and 5 solid colors (White, Jet Black, Charcoal Gray, Matte Quartz, Silica Cream). Browse the full set on /finishes or in the Design Tool (/design-tool).",
   },
 
   // ── uPVC & Materials ──────────────────────────────
   {
     category: "material",
     q: "What is uPVC and why is it better for the Philippines?",
-    a: "uPVC is unplasticized polyvinyl chloride — a rigid polymer profile that won't rust, rot, warp, or corrode. For the Philippines, that means it handles the heat, humidity, salt air along the coast, and storm conditions far better than steel, aluminum, or timber. It's also a thermal insulator (multi-chamber profile design traps air), so interiors stay cooler with less aircon.",
+    a: "uPVC is unplasticized polyvinyl chloride — a rigid polymer profile that won't rust, rot, warp, or corrode. Our profiles are fire retardant, thermally efficient (multi-chamber design), corrosion resistant, and sound insulating — well-suited to the Philippine climate.",
   },
   {
     category: "material",
-    q: "Will uPVC yellow or fade in the tropical sun?",
-    a: "No — our profiles include UV stabilizers engineered for 25+ years of tropical-sun exposure. The warranty covers color stability for 10 years. Independent accelerated-weathering tests show color difference below the human-perceptible threshold even at the 25-year-equivalent mark.",
+    q: "Will uPVC fade in the tropical sun?",
+    a: "Our uPVC profiles are engineered for tropical use and are corrosion resistant. The 10-Year Warranty covers long lasting performance and weather resistance. For specific color-stability questions about a particular finish, contact our sales team — 0925-848-8888 or sales@fourlinq.com.",
   },
   {
     category: "material",
-    q: "Can uPVC handle typhoons?",
-    a: "Yes. Our profiles are internally reinforced with galvanized steel where structural strength is needed, and we use multi-point locking with marine-grade stainless hardware and double or triple weatherseals. The multi-chamber design also flexes-and-recovers under wind load rather than deforming permanently like aluminum.",
+    q: "How does FourlinQ handle storm conditions?",
+    a: "Our profiles use galvanized steel reinforcement where structural strength is needed, EPDM gaskets for air and water tightness, and drainage holes for proper drainage. Weather resistance is one of the four areas covered by our 10-Year Warranty.",
   },
   {
     category: "material",
     q: "uPVC vs Aluminum — which should I choose?",
-    a: "Both are corrosion-free, but they trade off differently. uPVC is the better thermal insulator (cooler interiors, lower energy bills) and quieter against rain. Aluminum has thinner sight-lines if you want a more minimal architectural look, and handles very large spans like wide sliders better. We offer both; the choice is usually driven by sight-line preference and panel size.",
+    a: "We offer both. uPVC is the better thermal insulator (cooler interiors), sound insulator, and is fire retardant. Aluminum has slimmer sightlines for a more minimal look and suits very large spans. Use the Design Tool (/design-tool) to compare configurations, or visit any of our four showrooms for a hands-on look.",
   },
 
   // ── Ordering ──────────────────────────────────────
   {
     category: "ordering",
     q: "How do I get a quote?",
-    a: "Three ways. (1) Use the Design Tool to configure a system and submit your spec — we reply with a tailored quote. (2) Request a Quote from any system's detail page and tell us about your project. (3) Visit a showroom and we'll measure and quote on site. For larger projects (new builds, full-home renovations), the showroom route is usually fastest.",
+    a: "Three ways. (1) Use the Design Tool (/design-tool) to configure a system — we reply with a tailored quote. (2) Request a Quote from any system's detail page. (3) Visit a showroom (Manila, Pasig, Alabang, or Cebu) and we'll measure and quote on site. You can also reach sales directly at 0925-848-8888 or sales@fourlinq.com.",
   },
   {
     category: "ordering",
     q: "How much do FourlinQ systems cost?",
-    a: "Pricing depends on the system, dimensions, finish, glass type, and install complexity. We don't publish list prices because every order is custom-made — but a free quote is fast, and the Design Tool gives you a saved configuration we can reference. Visit a showroom or request a quote and we'll have a number to you within a few days.",
+    a: "Pricing is custom per project — every order is made to your specifications. We don't publish list prices. Request a free quote and we'll get back to you with a number. Contact sales: 0925-848-8888 or sales@fourlinq.com.",
   },
   {
     category: "ordering",
-    q: "What's the lead time?",
-    a: "Standard configurations are 4–6 weeks from confirmed order. Custom sizes or special shapes take 6–8 weeks. We'll confirm the exact timeline as part of your quote.",
+    q: "Where can I see your products in person?",
+    a: "We have four showrooms: Main Office (Sta. Ana, Manila), Ortigas (CW Home Depot, Pasig), Alabang (CW Home Depot, Westgate Alabang), and Cebu (Centro Fortuna Building, Banilad, Mandaue). Call the assistance line at 0925-896-5978 to schedule a visit.",
   },
   {
     category: "ordering",
-    q: "Do you accept international orders / projects outside Metro Manila?",
-    a: "We're based in the Philippines and serve the local market. Our showrooms cover Metro Manila and Cebu, and we ship-and-install nationally. For projects outside our standard install regions we coordinate with local certified contractors.",
+    q: "Can you do projects outside Metro Manila and Cebu?",
+    a: "Our showrooms are in Metro Manila and Cebu. For projects outside those regions, contact sales to confirm coverage: 0925-848-8888 or sales@fourlinq.com.",
   },
 
   // ── Installation ───────────────────────────────────
   {
     category: "install",
     q: "Do you handle installation?",
-    a: "Yes. Our certified installers handle the full job — measurement, removal of any existing windows, fitting, sealing, and post-install QA. We don't subcontract out without our supervision; the warranty depends on it.",
+    a: "Yes. Installation is part of the FourlinQ service. Contact sales at 0925-848-8888 or sales@fourlinq.com to scope the work for your project.",
   },
   {
     category: "install",
     q: "What's the install process?",
-    a: "Five steps: (1) Site visit and measurement, free. (2) Detailed quote within a few business days. (3) Fabrication of your custom units, 4–8 weeks. (4) Install on site, typically 1–2 days for a residential project. (5) Final walk-through with you to confirm finish and operation.",
-  },
-  {
-    category: "install",
-    q: "Will install be messy or disruptive?",
-    a: "Some dust and noise is unavoidable during removal of the old units, but our crews clean up daily and protect floors and furniture. A typical residential install is 1–2 days for a few rooms, less for single replacements. We coordinate around your schedule.",
+    a: "Typically: site visit and measurement → detailed quote → fabrication of your custom units → on-site installation → final walk-through. Timelines depend on the system, quantity, and any custom shapes; we confirm specifics as part of your quote.",
   },
 
   // ── Warranty ───────────────────────────────────────
   {
     category: "warranty",
     q: "What does the warranty cover?",
-    a: "10-year warranty on the uPVC profile itself: structural integrity, corrosion resistance, weather resistance, and color stability. Hardware (hinges, locks, rollers) is covered for 5 years. Glass sealed units are covered against seal failure. The warranty assumes professional install — DIY or third-party installs void coverage.",
+    a: "FourlinQ provides a 10-Year Warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation. The full warranty document goes out with every order — read it before signing.",
   },
   {
     category: "warranty",
     q: "What's not covered?",
-    a: "Cosmetic damage from impact, deliberate misuse, or improper cleaning chemicals. Acts of nature beyond the rated wind-load (above signal-5 typhoon thresholds) require a separate claim assessment. The full warranty document goes out with every order — read it before signing.",
+    a: "Cosmetic damage from impact, deliberate misuse, or improper cleaning chemicals are not covered. Acts of nature beyond rated wind-load require a separate claim assessment. For specific exclusions, refer to the warranty document or contact sales: 0925-848-8888.",
   },
 
   // ── Care & Maintenance ─────────────────────────────
   {
     category: "care",
     q: "How do I clean uPVC frames?",
-    a: "Warm soapy water and a soft cloth, every few months. Avoid abrasive scrubbers, solvents, bleach, or anything labeled 'paint thinner' — those can damage the surface finish. The wood-grain finishes wipe down the same way and don't need oiling or refinishing.",
+    a: "Warm soapy water and a soft cloth, every few months. Avoid abrasive scrubbers, solvents, bleach, or paint thinner — those can damage the surface finish. Wood-grain finishes wipe down the same way and don't need oiling or refinishing.",
   },
   {
     category: "care",
     q: "How do I maintain the hardware?",
-    a: "A drop of light machine oil on hinge pins and lock cylinders every 6 months keeps them smooth. Rollers on sliding systems benefit from the same treatment plus occasional brushing-out of any dust in the track. The Care Guide page has the full routine.",
+    a: "A drop of light machine oil on hinge pins and lock cylinders every 6 months keeps them smooth. Rollers on sliding systems benefit from the same treatment plus occasional brushing-out of any dust in the track. See /care for the full routine.",
   },
 ];
