@@ -98,33 +98,40 @@ const Brand = () => (
       </div>
     </Section>
 
-    {/* Warranty — dark editorial moment ── commanding type, generous breathing,
-        hairline grid (no pixel-fake-divider). The promise lives here. */}
-    <Section tone="dark" size="xl">
-      <p className="eyebrow !text-white/50 mb-8">The promise</p>
+    {/* Warranty — sleek dark moment. Numeral as the visual anchor, the rest
+        sits quietly around it. No display-scale shouting. */}
+    <Section tone="dark" size="md">
+      <div className="grid lg:grid-cols-12 gap-x-12 gap-y-10 items-center">
+        {/* Left: tiny eyebrow + giant restrained serif numeral */}
+        <div className="lg:col-span-5">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-white/40 mb-6">
+            The promise
+          </p>
+          <p className="font-serif font-normal text-white leading-none tracking-tight text-[5rem] lg:text-[7rem] xl:text-[8rem]">
+            10<span className="text-[color:var(--accent)]">.</span>
+          </p>
+          <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/50">
+            Year warranty
+          </p>
+        </div>
 
-      <h2 className="font-serif font-normal text-white tracking-tight text-[2.75rem] sm:text-[3.5rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02] max-w-[16ch]">
-        {BRAND.warranty}.
-      </h2>
-
-      <div className="mt-16 lg:mt-24 grid lg:grid-cols-12 gap-x-12 gap-y-10 items-start">
-        <p className="lg:col-span-5 text-body-lg lg:text-lead text-white/75 leading-[1.55] max-w-[34rem]">
-          {BRAND.promise}
-        </p>
-
-        <ul className="lg:col-span-6 lg:col-start-7 border-t border-white/15">
-          {BRAND.warrantyScope.map((scope) => (
-            <li
-              key={scope}
-              className="border-b border-white/15 py-5 flex items-baseline gap-6"
-            >
-              <span className="text-[11px] uppercase tracking-[0.14em] text-white/40 w-12 shrink-0 tabular-nums">
-                {String(BRAND.warrantyScope.indexOf(scope) + 1).padStart(2, "0")}
-              </span>
-              <span className="text-body-lg text-white font-medium">{scope}</span>
-            </li>
-          ))}
-        </ul>
+        {/* Right: prose + scope as inline divided list, kept compact */}
+        <div className="lg:col-span-6 lg:col-start-7">
+          <p className="text-body lg:text-body-lg text-white/75 leading-[1.6] max-w-[34rem]">
+            {BRAND.promise}
+          </p>
+          <p className="mt-8 text-[11px] uppercase tracking-[0.14em] text-white/40 mb-3">
+            Covering
+          </p>
+          <ul className="flex flex-wrap text-body-sm text-white">
+            {BRAND.warrantyScope.map((scope, i) => (
+              <li key={scope} className="flex items-center">
+                {i > 0 && <span className="mx-3 text-white/25">·</span>}
+                {scope}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </Section>
 
