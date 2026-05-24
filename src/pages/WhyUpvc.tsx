@@ -4,7 +4,6 @@ import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import { benefits, comparisonData } from "@/data/benefits";
-import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -54,15 +53,15 @@ const benefitElaboration: Record<string, string> = {
   "fire-retardant":
     "uPVC is self-extinguishing. The material does not propagate flame and stops burning when the heat source is removed. This is engineered into the polymer, not added as a coating. Electrical fires in older condominium stock and provincial residences are a real category of risk. The difference between a frame that contributes to a fire and one that resists it is the difference between losing a window and losing a wing of the house.",
   "thermal-efficiency":
-    "A multi-chamber uPVC profile is not a hollow tube. It is a series of air pockets engineered to break the path of heat. Each chamber adds a small thermal break that compounds across the depth of the profile. A west-facing wall hit by direct afternoon sun transfers measurably less heat through a multi-chamber uPVC frame than through a single-chamber aluminum one. Lower interior surface temperature on the frame means less radiant heat into the room, which means the airconditioner runs less often, which means a quieter, cheaper home.",
+    "A multi-chamber uPVC profile is not a hollow tube. It is a series of air pockets engineered to break the path of heat. Each chamber adds a small thermal break that compounds across the depth of the profile. A west-facing wall hit by direct afternoon sun stays cooler on the interior surface than one with a less-insulated frame. Lower surface temperature means less radiant heat into the room, which means the airconditioner runs less often, which means a quieter, cheaper home.",
   "corrosion-resistant":
-    "Aluminum oxidizes. Steel rusts. uPVC does neither. In salt-air conditions on the coast, or on a high-floor unit exposed to amihan, this is the difference between a window frame that needs servicing inside a decade and one that does not. There is no sacrificial coating to fail. The material itself is the protection. A FourlinQ profile installed within a kilometer of the sea will look the same in ten years as it does the day the install crew leaves.",
+    "uPVC is inherently inert. It does not rust, does not oxidize, does not require sacrificial coatings to stay protected. In salt-air conditions on the coast, or on a high-floor unit exposed to amihan, that nature is doing the protecting. There is no coating to fail. A FourlinQ uPVC profile installed within a kilometer of the sea will look the same in ten years as it does the day the install crew leaves.",
   "long-lasting-performance":
     "The 10-year FourlinQ system warranty covers structural performance, the weather seal, and the finish. Not just the profile. This warranty term matches what we have observed in our installs over more than two decades. uPVC does not warp in tropical humidity, does not rot when a typhoon drives water against it for six hours, and does not require sanding, repainting, or resealing on the maintenance schedule a timber frame demands.",
   "weather-resistance":
     "Two engineering details do most of the work. EPDM gaskets compress under sash pressure to form an airtight seal. Drainage holes machined into the frame let any water that does penetrate run back out rather than pool inside the chamber. During a Habagat-driven afternoon storm where rain is wind-driven horizontally at 60 km/h, a properly installed FourlinQ system stays dry inside.",
   "sound-insulation":
-    "Multi-chamber profiles plus glazing thicknesses from 6 mm to 12 mm produce 24–32 dB of acoustic attenuation in standard residential installations. A bedroom on a busy street feels noticeably quieter than a single-glazed aluminum room next door. The reduction is largest at the frequency band of road traffic, which is exactly where homeowners feel the difference between a restful bedroom and one that needs a white-noise machine.",
+    "Multi-chamber profiles plus glazing thicknesses from 6 mm to 12 mm produce 24–32 dB of acoustic attenuation in standard residential installations. A bedroom on a busy street feels noticeably quieter than a single-glazed room next door. The reduction is largest at the frequency band of road traffic, which is exactly where homeowners feel the difference between a restful bedroom and one that needs a white-noise machine.",
 };
 
 const WhyUpvc = () => (
@@ -79,7 +78,7 @@ const WhyUpvc = () => (
       <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 items-center">
         <div className="lg:col-span-6">
           <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
-            uPVC is the material that quietly out-engineers every alternative in tropical residential construction. It does not rust like steel, warp like timber, oxidize like aluminum, or fade like painted finishes.
+            uPVC is the material chosen for most FourlinQ residential installations. It is inherently inert, dimensionally stable in tropical humidity, and engineered to hold its finish for decades without painting or recoating.
           </p>
           <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[36rem]">
             It is the material we chose because it is the material that survives twenty Philippine summers without asking for help.
@@ -160,16 +159,18 @@ const WhyUpvc = () => (
       </ul>
     </Section>
 
-    {/* Comparison — visual check/X table */}
+    {/* Materials comparison — three columns, equal weight. FourlinQ sells
+        uPVC AND aluminum; we describe each material's character honestly
+        rather than declaring a winner. */}
     <Section tone="canvas" size="lg">
       <div className="grid lg:grid-cols-12 gap-x-8 mb-12 lg:mb-16">
         <div className="lg:col-span-5">
-          <EyebrowHeading eyebrow="Material comparison" level={2}>
-            How uPVC stacks up.
+          <EyebrowHeading eyebrow="Material at a glance" level={2}>
+            How the three materials compare.
           </EyebrowHeading>
         </div>
         <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
-          The differences read as a feature list. They show up in homes as different sounds, different surface temperatures, and different maintenance calendars.
+          FourlinQ specifies uPVC for most residential applications and aluminum where the project asks for very large spans or slimmer sightlines. The table below describes each material's character, not a winner.
         </p>
       </div>
 
@@ -178,43 +179,35 @@ const WhyUpvc = () => (
           <thead>
             <tr className="border-t-2 border-b border-[color:var(--ink-primary)]">
               <th className="py-5 pr-6 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Feature</th>
-              <th className="py-5 px-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]">
-                <span className="block">uPVC</span>
-                <span className="block text-[10px] tracking-[0.12em] normal-case text-[color:var(--accent)] mt-1 font-medium">FourlinQ</span>
-              </th>
-              <th className="py-5 px-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Aluminium</th>
-              <th className="py-5 pl-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-muted)]">Timber</th>
+              <th className="py-5 px-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-primary)]">uPVC</th>
+              <th className="py-5 px-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-primary)]">Aluminium</th>
+              <th className="py-5 pl-4 text-[11px] tracking-[0.14em] uppercase font-medium text-[color:var(--ink-primary)]">Timber</th>
             </tr>
           </thead>
           <tbody>
             {comparisonData.map((row) => (
               <tr key={row.feature} className="border-b border-[color:var(--rule-soft)]">
-                <td className="py-5 pr-6 text-body-sm font-medium text-[color:var(--ink-primary)] align-top">
+                <td className="py-5 pr-6 text-body-sm font-medium text-[color:var(--ink-muted)] align-top">
                   {row.feature}
                 </td>
-                <td className="py-5 px-4 text-body-sm text-[color:var(--ink-primary)] font-medium align-top bg-[color:var(--canvas-soft)]">
-                  <div className="flex items-start gap-2">
-                    <Check size={16} strokeWidth={2} className="text-[color:var(--accent)] shrink-0 mt-0.5" />
-                    <span>{row.upvc}</span>
-                  </div>
+                <td className="py-5 px-4 text-body-sm text-[color:var(--ink-primary)] align-top">
+                  {row.upvc}
                 </td>
-                <td className="py-5 px-4 text-body-sm text-[color:var(--ink-muted)] align-top">
-                  <div className="flex items-start gap-2">
-                    <X size={16} strokeWidth={1.5} className="text-[color:var(--ink-faint)] shrink-0 mt-0.5" />
-                    <span>{row.aluminium}</span>
-                  </div>
+                <td className="py-5 px-4 text-body-sm text-[color:var(--ink-primary)] align-top">
+                  {row.aluminium}
                 </td>
-                <td className="py-5 pl-4 text-body-sm text-[color:var(--ink-muted)] align-top">
-                  <div className="flex items-start gap-2">
-                    <X size={16} strokeWidth={1.5} className="text-[color:var(--ink-faint)] shrink-0 mt-0.5" />
-                    <span>{row.timber}</span>
-                  </div>
+                <td className="py-5 pl-4 text-body-sm text-[color:var(--ink-primary)] align-top">
+                  {row.timber}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <p className="mt-8 text-body-sm text-[color:var(--ink-muted)] italic max-w-[44rem]">
+        FourlinQ offers both uPVC and aluminum systems. Your consultation will recommend whichever material fits the geometry, sightline preference, and climate exposure of your specific project.
+      </p>
     </Section>
 
     {/* Climate context — photo-paragraph instead of icon cards */}
@@ -273,13 +266,13 @@ const WhyUpvc = () => (
         </div>
         <div className="lg:col-span-7 lg:col-start-6 space-y-5 text-body text-[color:var(--ink-secondary)] leading-[1.65]">
           <p>
-            uPVC is the right answer for residential windows and doors in the Philippines for almost every common application. It is not always the right answer for very large unbroken spans. Past a certain pane size, glass weight and wind load math push the spec toward aluminum-reinforced systems. We will say so during your consultation rather than over-specify.
+            uPVC is the right answer for most Philippine residential windows and doors. It is not the right answer when the project calls for very large unbroken spans or for the slimmest possible sightlines — that is when we specify FourlinQ aluminum instead. Aluminum gives you the span and the sightline; uPVC gives you the thermal break and the maintenance-free finish.
           </p>
           <p>
             uPVC also does not pretend to be timber. If you want the look of solid hardwood, we offer wood-grain laminated finishes that do an honest job. If hardwood is the texture you want under your hand, we will tell you that and recommend a hardwood door from a specialist.
           </p>
           <p>
-            Premium is not the same thing as universal. The right question is not <em>"is uPVC the best material"</em>; it is <em>"is uPVC the right material for this specific opening, in this specific climate, with this specific budget and design intent."</em> The answer is usually yes. When it is no, we will say so.
+            Premium is not the same thing as universal. The right question is not <em>"which material is best"</em>; it is <em>"which material fits this opening, in this climate, with this design intent."</em> FourlinQ stocks both uPVC and aluminum so the consultation can recommend either honestly.
           </p>
         </div>
       </div>
