@@ -114,22 +114,26 @@ def generate_oaklight_base(client, product_id: str, product_info: dict, oaklight
 def create_frame_mask(original: Image.Image, oaklight: Image.Image) -> Image.Image:
     """
     Compare original (dark frame) vs AI oaklight (light frame) to find frame pixels.
-    Frame pixels are dark in original but became light in the oaklight version.
+    Uses brightness difference between original and oaklight to catch the full
+    frame range including mid-gray 3D shading, not just the darkest pixels.
     """
-    orig_resized = original.convert("L")
-    oak_resized = oaklight.resize(original.size, Image.LANCZOS).convert("L")
+    orig_gray = original.convert("L")
+    oak_gray = oaklight.resize(original.size, Image.LANCZOS).convert("L")
 
-    orig_arr = np.array(orig_resized)
-    oak_arr = np.array(oak_resized)
+    orig_arr = np.array(orig_gray).astype(np.float32)
+    oak_arr = np.array(oak_gray).astype(np.float32)
 
-    dark_in_original = orig_arr < 100
-    light_in_oaklight = oak_arr > 70
-    bright_background = orig_arr > 200
+    diff = oak_arr - orig_arr
+    bright_background = orig_arr > 210
 
-    frame_mask = dark_in_original & light_in_oaklight & ~bright_background
+    frame_mask = (diff > 20) & ~bright_background
+    not_dark_but_frame = (orig_arr < 170) & (oak_arr > 100) & ~bright_background
+    frame_mask = frame_mask | not_dark_but_frame
 
     mask_img = Image.fromarray((frame_mask * 255).astype(np.uint8))
-    mask_img = mask_img.filter(ImageFilter.MedianFilter(3))
+    mask_img = mask_img.filter(ImageFilter.MaxFilter(3))
+    mask_img = mask_img.filter(ImageFilter.MinFilter(3))
+    mask_img = mask_img.filter(ImageFilter.MedianFilter(5))
 
     return mask_img
 
