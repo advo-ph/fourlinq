@@ -326,6 +326,244 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
           </g>
         );
       }
+      case "special-shapes": {
+        // Arch-topped window: half-circle top + rectangular sash below.
+        const archH = Math.min(gw * 0.5, gh * 0.45);
+        const archBottomY = gy + archH;
+        const sashY = archBottomY + 3;
+        const sashH = gh - archH - 3;
+        const cx = gx + gw / 2;
+        const r = gw / 2;
+        return (
+          <g>
+            {/* Arch — glass + dark outline */}
+            <path d={`M ${gx} ${archBottomY} A ${r} ${archH} 0 0 1 ${gx + gw} ${archBottomY} L ${gx + gw} ${archBottomY} Z`} fill="#D0D8E0" />
+            <path d={`M ${gx} ${archBottomY} A ${r} ${archH} 0 0 1 ${gx + gw} ${archBottomY} L ${gx + gw} ${archBottomY} Z`} fill={glassTint} />
+            <path d={`M ${gx} ${archBottomY} A ${r} ${archH} 0 0 1 ${gx + gw} ${archBottomY} L ${gx + gw} ${archBottomY} Z`} fill={glassColor} />
+            <path d={`M ${gx} ${archBottomY} A ${r} ${archH} 0 0 1 ${gx + gw} ${archBottomY}`} fill="none" stroke={dark} strokeWidth="1.2" />
+            {/* Radial mullions to suggest fan glazing */}
+            {[0.25, 0.5, 0.75].map((t, i) => {
+              const angle = Math.PI * t;
+              const ex = cx - r * Math.cos(angle);
+              const ey = archBottomY - archH * Math.sin(angle);
+              return <line key={i} x1={cx} y1={archBottomY} x2={ex} y2={ey} stroke={frameColor} strokeWidth="2" />;
+            })}
+            {/* Rectangular sash below */}
+            {sashH > 4 && sash(gx, sashY, gw, sashH)}
+          </g>
+        );
+      }
+      case "arch-shapes": {
+        // Round-top (Palladian) window. Uses the full preview area: arch on
+        // top, rectangular body below. The OUTER frame contour follows this
+        // silhouette — drawn as a path with even-odd fill so the dark frame
+        // is a visible band between the outer arch and an inset inner arch.
+        const fwL = fw;  // match the rectangular outer-frame thickness                              // frame thickness in svg px
+        const ox = pad, oy = pad;                   // outer position
+        const ow = svgW - pad * 2;
+        const oh = svgH - pad * 2;
+        // Keep the arch as a smaller rounded crown (matches the picker icon):
+        // ~25% of height, naturally proportioned to width.
+        const archHOuter = Math.min(ow * 0.28, oh * 0.25);
+        const bodyTopOuter = oy + archHOuter;
+        const rOuter = ow / 2;
+        const cx = ox + ow / 2;
+
+        // Inner contour, inset by frame thickness on all sides
+        const ix = ox + fwL;
+        const iy = oy + fwL;
+        const iw = ow - fwL * 2;
+        const ih = oh - fwL * 2;
+        const archHInner = Math.max(2, archHOuter - fwL);
+        const bodyTopInner = iy + archHInner;
+        const rInner = iw / 2;
+
+        // Outer outline path — start at bottom-left, up the left wall, over the
+        // arch, down the right wall, across the bottom, close.
+        const outerD =
+          `M ${ox} ${oy + oh} ` +
+          `L ${ox} ${bodyTopOuter} ` +
+          `A ${rOuter} ${archHOuter} 0 0 1 ${ox + ow} ${bodyTopOuter} ` +
+          `L ${ox + ow} ${oy + oh} Z`;
+        const innerD =
+          `M ${ix} ${iy + ih} ` +
+          `L ${ix} ${bodyTopInner} ` +
+          `A ${rInner} ${archHInner} 0 0 1 ${ix + iw} ${bodyTopInner} ` +
+          `L ${ix + iw} ${iy + ih} Z`;
+
+        // Glass area = inner shape
+        const glassArea = innerD;
+
+        // Body / arch split points for mullions (inside inner shape)
+        const bodyH = ih - archHInner;
+        const bodyTop = bodyTopInner;
+
+        return (
+          <g>
+            {/* Drop shadow under the whole silhouette */}
+            <path d={outerD} transform="translate(2,3)" fill="black" opacity="0.08" />
+            {/* Dark frame outline (the band) */}
+            <path d={outerD} fill={dark} />
+            {/* Frame fill (texture/color) — band between outer and inner */}
+            <path d={`${outerD} ${innerD}`} fill={frameFill} fillRule="evenodd" />
+            {/* Glass — fills the inner shape */}
+            <path d={glassArea} fill="#D0D8E0" />
+            <path d={glassArea} fill={glassTint} />
+            <path d={glassArea} fill={glassColor} />
+            <path d={glassArea} fill="white" opacity="0.06" />
+
+            {/* Mullions — clipped to glass shape via a clipPath would be ideal,
+                but at this scale we just draw lines inside the inner contour. */}
+            {/* King mullion (vertical through both arch and body) */}
+            <rect x={cx - 1.5} y={iy} width={3} height={ih} fill={frameFill} />
+            <line x1={cx - 1.5} y1={iy} x2={cx - 1.5} y2={iy + ih} stroke={dark} strokeWidth="0.4" opacity="0.5" />
+            <line x1={cx + 1.5} y1={iy} x2={cx + 1.5} y2={iy + ih} stroke={dark} strokeWidth="0.4" opacity="0.5" />
+            {/* Fan muntins — symmetric pair across the arch */}
+            {[0.32, 0.68].map((t, i) => {
+              const angle = Math.PI * t;
+              const ex = cx - rInner * Math.cos(angle);
+              const ey = bodyTop - archHInner * Math.sin(angle);
+              return (
+                <line
+                  key={i}
+                  x1={cx} y1={bodyTop}
+                  x2={ex} y2={ey}
+                  stroke={frameColor}
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                />
+              );
+            })}
+            {/* Horizontal mullion at body midpoint */}
+            {bodyH > 12 && (
+              <rect x={ix} y={bodyTop + bodyH / 2 - 1.5} width={iw} height={3} fill={frameFill} />
+            )}
+            {/* Spring-line where arch meets body */}
+            <line x1={ix} y1={bodyTop} x2={ix + iw} y2={bodyTop} stroke={dark} strokeWidth="0.8" opacity="0.55" />
+
+            {/* Final crisp outline */}
+            <path d={outerD} fill="none" stroke={dark} strokeWidth="0.6" opacity="0.85" />
+          </g>
+        );
+      }
+      case "curtain-wall": {
+        // Grid of glass panels — typical 3-wide × N-tall curtain wall.
+        const cols = 3;
+        const rows = Math.max(2, Math.round(gh / (gw / cols)));
+        const cw = gw / cols;
+        const rh = gh / rows;
+        const cells: React.ReactElement[] = [];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const x = gx + c * cw;
+            const y = gy + r * rh;
+            cells.push(<g key={`${r}-${c}`}>{glass(x + 0.5, y + 0.5, cw - 1, rh - 1)}</g>);
+          }
+        }
+        return (
+          <g>
+            {cells}
+            {/* Mullions */}
+            {Array.from({ length: cols + 1 }).map((_, i) => (
+              <rect key={`v${i}`} x={gx + i * cw - 1} y={gy} width={2} height={gh} fill={frameFill} />
+            ))}
+            {Array.from({ length: rows + 1 }).map((_, i) => (
+              <rect key={`h${i}`} x={gx} y={gy + i * rh - 1} width={gw} height={2} fill={frameFill} />
+            ))}
+          </g>
+        );
+      }
+      case "custom-shapes": {
+        // Gable (pentagonal) window — outer frame contour follows the gable
+        // silhouette, with an inset inner contour creating the visible frame
+        // band. Communicates "any custom geometry".
+        const fwL = fw;  // match the rectangular outer-frame thickness
+        const ox = pad, oy = pad;
+        const ow = svgW - pad * 2;
+        const oh = svgH - pad * 2;
+        const peakY = oy;
+        const eaveYOuter = oy + Math.min(ow * 0.32, oh * 0.38);
+        const baseYOuter = oy + oh;
+        const cx = ox + ow / 2;
+
+        // Inset by frame thickness — for the angled top, inset along the
+        // slope normal (approx by raising inner peak proportionally).
+        const slopeRise = eaveYOuter - peakY;
+        const slopeRun = ow / 2;
+        const slopeLen = Math.hypot(slopeRise, slopeRun);
+        // Peak inset: move down by a bit more than fwL to keep the slope band even
+        const peakInsetY = peakY + fwL * (slopeLen / slopeRun);
+        const eaveYInner = eaveYOuter + fwL * (slopeRise / slopeLen);
+        const leftXInner = ox + fwL;
+        const rightXInner = ox + ow - fwL;
+        const baseYInner = baseYOuter - fwL;
+
+        const outerD =
+          `M ${cx} ${peakY} ` +
+          `L ${ox + ow} ${eaveYOuter} ` +
+          `L ${ox + ow} ${baseYOuter} ` +
+          `L ${ox} ${baseYOuter} ` +
+          `L ${ox} ${eaveYOuter} Z`;
+        const innerD =
+          `M ${cx} ${peakInsetY} ` +
+          `L ${rightXInner} ${eaveYInner} ` +
+          `L ${rightXInner} ${baseYInner} ` +
+          `L ${leftXInner} ${baseYInner} ` +
+          `L ${leftXInner} ${eaveYInner} Z`;
+
+        return (
+          <g>
+            {/* Drop shadow under the silhouette */}
+            <path d={outerD} transform="translate(2,3)" fill="black" opacity="0.08" />
+            {/* Dark frame outline (under-band) */}
+            <path d={outerD} fill={dark} />
+            {/* Frame fill — band between outer and inner using even-odd */}
+            <path d={`${outerD} ${innerD}`} fill={frameFill} fillRule="evenodd" />
+            {/* Glass — fills the inner pentagon */}
+            <path d={innerD} fill="#D0D8E0" />
+            <path d={innerD} fill={glassTint} />
+            <path d={innerD} fill={glassColor} />
+            <path d={innerD} fill="white" opacity="0.06" />
+
+            {/* Mullions inside the inner contour:
+                - center post from peak inset to base
+                - horizontal cross at the eave line */}
+            <line x1={cx} y1={peakInsetY} x2={cx} y2={baseYInner}
+                  stroke={frameColor} strokeWidth="2.4" strokeLinecap="round" />
+            <line x1={leftXInner} y1={eaveYInner} x2={rightXInner} y2={eaveYInner}
+                  stroke={frameColor} strokeWidth="2.4" strokeLinecap="round" />
+
+            {/* Final crisp silhouette outline */}
+            <path d={outerD} fill="none" stroke={dark} strokeWidth="0.6" opacity="0.85" />
+          </g>
+        );
+      }
+      case "large-panel-doors": {
+        // Single oversized panel door — full-height glass with one slim handle.
+        return (
+          <g>
+            <rect x={gx} y={gy} width={gw} height={gh} fill={dark} rx="1" />
+            <rect x={gx + 1.5} y={gy + 1.5} width={gw - 3} height={gh - 3} fill={frameFill} rx="1" />
+            {glass(gx + 5, gy + 5, gw - 10, gh - 10)}
+            <rect x={gx + 5} y={gy + 5} width={gw - 10} height={gh - 10} fill="none" stroke={dark} strokeWidth="0.5" opacity="0.3" />
+            <rect x={gx + gw - 9} y={gy + gh / 2 - 18} width={3} height={36} rx="1.5" fill={handleClr} opacity="0.85" />
+            <rect x={gx} y={gy + gh - 2} width={gw} height={2} fill={dark} opacity="0.15" />
+          </g>
+        );
+      }
+      case "90-series": {
+        // 3-panel slider in the 90mm series — wider rails, three glass panels.
+        const pw = gw / 3;
+        return (
+          <g>
+            {sash(gx, gy, pw + 2, gh)}
+            {sash(gx + pw - 1, gy, pw + 2, gh)}
+            {sash(gx + 2 * pw - 2, gy, pw + 2, gh)}
+            {handle(gx + 2 * pw - 8, gy + gh / 2)}
+            <rect x={gx} y={gy + gh - 3} width={gw} height={3} fill={dark} opacity="0.15" />
+          </g>
+        );
+      }
       case "entrance": {
         const transomH = gh * 0.2;
         const divider = 3;
@@ -360,7 +598,9 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
     <div className="flex flex-col items-center">
       <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full max-w-[320px]">
         {renderDefs()}
-        {outerFrame()}
+        {/* Skip the rectangular outer frame for shaped windows — each shaped
+            case draws its own frame contour. */}
+        {type !== "arch-shapes" && type !== "custom-shapes" && outerFrame()}
         {renderContent()}
       </svg>
       <p className="text-sm text-muted-foreground mt-4">{width} mm &times; {height} mm</p>

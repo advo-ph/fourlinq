@@ -47,7 +47,7 @@ chunks.push({
   sourceUrl: "site://contact",
 });
 
-// --- Branches ---
+// --- Branches (individual + aggregate) ---
 for (const b of BRANCHES) {
   chunks.push({
     title: `Branch — ${b.label}`,
@@ -57,8 +57,15 @@ for (const b of BRANCHES) {
     sourceUrl: `site://branch/${b.id}`,
   });
 }
+chunks.push({
+  title: `All ${BRANCHES.length} FourlinQ Branches (overview)`,
+  content: `FourlinQ has ${BRANCHES.length} branches in the Philippines:\n${BRANCHES.map((b, i) => `${i + 1}. ${b.label} — ${b.address}, ${b.city}, ${b.region}`).join("\n")}`,
+  type: "branch_overview",
+  tags: ["branch", "overview", "all", "showroom", "location"],
+  sourceUrl: "site://branches",
+});
 
-// --- Advantages (7) ---
+// --- Advantages (7 individual + 1 aggregate) ---
 for (const a of ADVANTAGES) {
   chunks.push({
     title: `FourlinQ Advantage — ${a.label}`,
@@ -68,6 +75,14 @@ for (const a of ADVANTAGES) {
     sourceUrl: `site://advantage/${a.id}`,
   });
 }
+// Aggregate chunk so "list all advantages" queries retrieve the full set.
+chunks.push({
+  title: "All 7 FourlinQ Advantages (overview)",
+  content: `The 7 FourlinQ advantages are:\n${ADVANTAGES.map((a, i) => `${i + 1}. ${a.label} — ${a.description}`).join("\n")}`,
+  type: "advantage_overview",
+  tags: ["advantage", "overview", "all", "seven"],
+  sourceUrl: "site://advantages",
+});
 
 // --- uPVC profile cut features (7) ---
 for (const f of UPVC_PROFILE_FEATURES) {
@@ -80,7 +95,7 @@ for (const f of UPVC_PROFILE_FEATURES) {
   });
 }
 
-// --- Product types (5) ---
+// --- Product types (5 individual + 1 aggregate) ---
 for (const p of PRODUCT_TYPES) {
   const dim = DIMENSION_CONSTRAINTS[p.id];
   chunks.push({
@@ -91,6 +106,13 @@ for (const p of PRODUCT_TYPES) {
     sourceUrl: `site://product-type/${p.id}`,
   });
 }
+chunks.push({
+  title: "All 5 FourlinQ Product Types (overview)",
+  content: `FourlinQ offers 5 product types:\n${PRODUCT_TYPES.map((p, i) => `${i + 1}. ${p.label} (${p.category}) — ${p.tagline} ${p.primaryBenefit}.`).join("\n")}`,
+  type: "product_overview",
+  tags: ["product", "overview", "all", "five"],
+  sourceUrl: "site://products",
+});
 
 // --- Catalog products (cards on /products page) ---
 for (const p of PRODUCTS) {
@@ -114,7 +136,7 @@ for (const m of MATERIALS) {
   });
 }
 
-// --- Finishes (12) ---
+// --- Finishes (individual + aggregate) ---
 for (const f of FRAME_FINISHES) {
   chunks.push({
     title: `Finish — ${f.label}`,
@@ -124,6 +146,13 @@ for (const f of FRAME_FINISHES) {
     sourceUrl: `site://finish/${f.id}`,
   });
 }
+chunks.push({
+  title: `All ${FRAME_FINISHES.length} FourlinQ Frame Finishes (overview)`,
+  content: `FourlinQ offers ${FRAME_FINISHES.length} brochure-verified frame finishes.\nWood-grain finishes: ${FRAME_FINISHES.filter(f => f.category === "wood-grain").map(f => f.label).join(", ")}.\nSolid finishes: ${FRAME_FINISHES.filter(f => f.category === "solid").map(f => f.label).join(", ")}.`,
+  type: "finish_overview",
+  tags: ["finish", "overview", "all", "twelve", "swatches"],
+  sourceUrl: "site://finishes",
+});
 
 // --- FAQ ---
 const faqCat = Object.fromEntries(FAQ_CATEGORIES.map((c) => [c.id, c.label]));

@@ -1,17 +1,45 @@
 import { memo, useMemo } from "react";
+import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import { Phone, Mail, MapPin, ArrowUpRight } from "lucide-react";
+import { Phone, Mail, MapPin, ArrowUpRight, ExternalLink } from "lucide-react";
 
 interface ActionItem {
-  type: "phone" | "email" | "address";
+  type: "phone" | "email" | "address" | "page";
   label: string;
   value: string;
   href: string;
+  /** Page actions get a friendly title. */
+  pageTitle?: string;
 }
+
+// Known internal routes — used both for label-friendliness and to allow link
+// extraction even when the model writes "the Design Tool" without the path.
+const PAGE_TITLES: Record<string, string> = {
+  "/": "Home",
+  "/products": "Products",
+  "/window-systems": "Window Systems",
+  "/door-systems": "Door Systems",
+  "/specialist-systems": "Specialist Systems",
+  "/why-upvc": "Why uPVC",
+  "/finishes": "Finishes",
+  "/how-to-choose": "How to Choose",
+  "/faq": "FAQ",
+  "/for-architects": "For Architects",
+  "/whats-new": "What's New",
+  "/brand": "Brand",
+  "/inspiration": "Inspiration",
+  "/care": "Care & Maintenance",
+  "/warranty": "Warranty",
+  "/design-tool": "Design Tool",
+};
+
+// Match either bare paths (/finishes, /projects/foo) or markdown links to them
+const INTERNAL_PATH_RE = /(?:^|[\s(])(\/(?:design-tool|finishes|products|whats-new|inspiration|projects\/[a-z0-9-]+|window-systems|door-systems|specialist-systems|why-upvc|how-to-choose|faq|for-architects|brand|care|warranty)(?![a-zA-Z0-9_/-]))/g;
 
 interface FollowUp {
   label: string;
   message: string;
+  href?: string;
 }
 
 interface ChatMessageProps {
@@ -53,12 +81,27 @@ function extractActions(text: string): ActionItem[] {
       href: `https://maps.google.com/?q=${encodeURIComponent(trimmed)}`,
     });
   }
+  // Internal pages — turn any `/path` reference into a "Visit page" chip.
+  for (const match of text.matchAll(INTERNAL_PATH_RE)) {
+    const path = match[1];
+    if (!path || seen.has(path)) continue;
+    seen.add(path);
+    const title = PAGE_TITLES[path] ?? path.replace(/^\//, "").split("/")[0]
+      .split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    actions.push({
+      type: "page",
+      label: title,
+      value: path,
+      href: path,
+      pageTitle: title,
+    });
+  }
 
-  return actions.slice(0, 4);
+  return actions.slice(0, 5);
 }
 
-const ACTION_ICONS = { phone: Phone, email: Mail, address: MapPin };
-const ACTION_LABELS = { phone: "Call", email: "Email", address: "Directions" };
+const ACTION_ICONS = { phone: Phone, email: Mail, address: MapPin, page: ExternalLink };
+const ACTION_LABELS = { phone: "Call", email: "Email", address: "Directions", page: "Visit page" };
 
 const ChatMessage = memo(({ role, content, imageDataUrl, isStreaming, followUps, onFollowUp }: ChatMessageProps) => {
   const isUser = role === "user";
@@ -122,14 +165,8 @@ const ChatMessage = memo(({ role, content, imageDataUrl, isStreaming, followUps,
           <div className="mt-3 pt-3 border-t border-[color:var(--rule-soft)] flex flex-col gap-1.5">
             {actions.map((a, i) => {
               const Icon = ACTION_ICONS[a.type];
-              return (
-                <a
-                  key={i}
-                  href={a.href}
-                  target={a.type === "address" ? "_blank" : undefined}
-                  rel={a.type === "address" ? "noopener noreferrer" : undefined}
-                  className="group flex items-center gap-2.5 px-2.5 py-2 border border-[color:var(--rule-soft)] bg-[color:var(--canvas-soft)] hover:border-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin rounded-lg"
-                >
+              const chipBody = (
+                <>
                   <Icon size={13} className="shrink-0 text-[color:var(--ink-muted)]" />
                   <div className="min-w-0 flex-1">
                     <span className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--ink-muted)] block leading-none mb-0.5">
@@ -138,6 +175,25 @@ const ChatMessage = memo(({ role, content, imageDataUrl, isStreaming, followUps,
                     <span className="text-[12px] truncate block text-[color:var(--ink-primary)]">{a.label}</span>
                   </div>
                   <ArrowUpRight size={12} className="shrink-0 text-[color:var(--ink-muted)] group-hover:text-[color:var(--ink-primary)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 ease-marvin" />
+                </>
+              );
+              const chipCls = "group flex items-center gap-2.5 px-2.5 py-2 border border-[color:var(--rule-soft)] bg-[color:var(--canvas-soft)] hover:border-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin rounded-lg";
+              if (a.type === "page") {
+                return (
+                  <Link key={i} to={a.href} className={chipCls}>
+                    {chipBody}
+                  </Link>
+                );
+              }
+              return (
+                <a
+                  key={i}
+                  href={a.href}
+                  target={a.type === "address" ? "_blank" : undefined}
+                  rel={a.type === "address" ? "noopener noreferrer" : undefined}
+                  className={chipCls}
+                >
+                  {chipBody}
                 </a>
               );
             })}
@@ -148,15 +204,21 @@ const ChatMessage = memo(({ role, content, imageDataUrl, isStreaming, followUps,
       {/* Follow-up Buttons */}
       {showFollowUps && (
         <div className="flex flex-wrap gap-1.5 mt-2 max-w-[85%]">
-          {followUps!.map((f, i) => (
-            <button
-              key={i}
-              onClick={() => onFollowUp?.(f.message)}
-              className="px-3 py-1.5 text-[11px] bg-white border border-[color:var(--rule-strong)] text-[color:var(--ink-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin rounded-full"
-            >
-              {f.label}
-            </button>
-          ))}
+          {followUps!.map((f, i) => {
+            const cls = "px-3 py-1.5 text-[11px] bg-white border border-[color:var(--rule-strong)] text-[color:var(--ink-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin rounded-full";
+            if (f.href) {
+              return (
+                <Link key={i} to={f.href} className={cls}>
+                  {f.label}
+                </Link>
+              );
+            }
+            return (
+              <button key={i} onClick={() => onFollowUp?.(f.message)} className={cls}>
+                {f.label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

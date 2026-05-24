@@ -14,6 +14,7 @@ const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB cap (base64 inflates ~33%)
 interface FollowUp {
   label: string;
   message: string;
+  href?: string;
 }
 
 interface ChatPanelProps {
@@ -34,13 +35,13 @@ function getFollowUps(text: string, allMessages: Message[]): FollowUp[] {
   const messageCount = allMessages.filter((m) => m.role === "user").length;
 
   if (t.includes("casement") || t.includes("sliding") || t.includes("awning") || t.includes("slide & fold") || t.includes("special shape")) {
-    followUps.push({ label: "Try the Design Tool", message: "How do I use the Design Tool?" });
+    followUps.push({ label: "Open the Design Tool →", message: "", href: "/design-tool" });
     if (!t.includes("finish")) followUps.push({ label: "What finishes are available?", message: "What finishes are available?" });
     followUps.push({ label: "Request a quote", message: "How can I request a quote?" });
   }
   if (t.includes("finish") || t.includes("laminate") || t.includes("wood grain") || t.includes("oak") || t.includes("walnut")) {
     if (!followUps.some((f) => f.label.includes("Design Tool")))
-      followUps.push({ label: "Try the Design Tool", message: "How do I use the Design Tool?" });
+      followUps.push({ label: "Open the Design Tool →", message: "", href: "/design-tool" });
     followUps.push({ label: "Which finishes for aluminum?", message: "Which finishes are available for aluminum frames?" });
   }
   if (t.includes("price") || t.includes("cost") || t.includes("quote") || t.includes("budget")) {
@@ -81,8 +82,21 @@ function getFollowUps(text: string, allMessages: Message[]): FollowUp[] {
   }).slice(0, 3);
 }
 
+const STORAGE_KEY = "flq.chat.messages.v1";
+
+function loadPersistedMessages(): Message[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as Message[];
+  } catch { /* ignore */ }
+  return [];
+}
+
 const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(loadPersistedMessages);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
@@ -92,6 +106,11 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => {
+    // Persist chat history across page navigations (survives the unmount/remount
+    // cycle when users browse to another route with the panel closed).
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages)); } catch { /* quota */ }
+  }, [messages]);
   useEffect(() => { if (isOpen && inputRef.current) inputRef.current.focus(); }, [isOpen]);
   // Escape to close
   useEffect(() => {
@@ -103,11 +122,19 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
   }, [isOpen]);
 
   const handleClose = () => {
-    resetChat();
-    setMessages([]);
+    // Closing the panel no longer wipes history — user can scroll back when
+    // they reopen. Use the explicit "Reset" button to clear.
     setPendingImage(null);
     setImageError(null);
     onClose();
+  };
+
+  const handleReset = () => {
+    resetChat();
+    setMessages([]);
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+    setPendingImage(null);
+    setImageError(null);
   };
 
   const handleFilePick = (file: File | null) => {
@@ -193,13 +220,25 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
             <p className="text-[10px] tracking-[0.08em] uppercase text-[color:var(--ink-muted)] mt-0.5">FourlinQ Assistant</p>
           </div>
         </div>
-        <button
-          onClick={handleClose}
-          className="text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin p-1 -mr-1"
-          aria-label="Close chat"
-        >
-          <X size={18} />
-        </button>
+        <div className="flex items-center gap-1">
+          {messages.length > 0 && (
+            <button
+              onClick={handleReset}
+              className="text-[10px] uppercase tracking-wider text-[color:var(--ink-muted)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin px-2 py-1"
+              aria-label="Reset chat"
+              title="Start a new conversation"
+            >
+              Reset
+            </button>
+          )}
+          <button
+            onClick={handleClose}
+            className="text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin p-1 -mr-1"
+            aria-label="Close chat"
+          >
+            <X size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Messages area */}

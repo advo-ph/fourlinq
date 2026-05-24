@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import pool from "../db.js";
 import { LLMRouter, providersFromEnv, AllProvidersFailedError } from "../llm/index.js";
 import type { ChatMessage, ContentPart } from "../llm/index.js";
+import { retrieveContext } from "../lib/rag.js";
 
 dotenv.config();
 
@@ -15,72 +16,9 @@ if (!llm) {
   console.warn("No LLM provider keys configured — chat will be disabled");
 }
 
-// ─────────────────────────────────────────────
-// KNOWLEDGE BASE — 100% verified from official FourlinQ brochures
-// Source: src/data/fourlinq-data.ts
-// ⚠️ Do NOT add claims not present in the brochure
-// ─────────────────────────────────────────────
-
-const KNOWLEDGE_BASE = `
-[BRAND]
-Company: FourlinQ Windows & Doors
-Promise: "A Lifetime of Satisfaction and Peace of Mind."
-Core offer: Custom-made Windows & Doors to suit customers' specifications.
-Warranty: 10-Year Warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation.
-
-[CONTACT — VERIFIED]
-Sales: 0925-848-8888
-Assistance: 0925-896-5978
-Landline: (02)8563-5363
-Email: sales@fourlinq.com
-
-[BRANCHES — 4 LOCATIONS]
-1. Main Office — #2635 Lamayan St., Sta. Ana, Manila (NCR)
-2. Ortigas — CW Home Depot, Unit 41 Doña Julia Vargas Ave., cor. Meralco Avenue, Brgy. Ugong, Pasig City (NCR)
-3. Alabang — CW Home Depot, Alabang Zapote Road cor. Filinvest Ave., Westgate Alabang, Muntinlupa (NCR)
-4. Cebu Branch — Door 9 Centro Fortuna Building, A.S. Fortuna Street, Banilad, Mandaue City, Cebu
-
-[PRODUCT TYPES — 5 CONFIRMED]
-1. Casement (Window) — "Smooth operation. Reliable performance." Hinged on one side, opens outward for maximum ventilation and a clean facade. Benefit: Maximum ventilation and easy cleaning.
-2. Sliding (Window & Door) — "Elegant. Versatile. Thoroughly reliable." Slides horizontally along a track — ideal where outward clearance is limited. Benefit: Space-saving, ideal for balconies and wide openings.
-3. Special Shapes (Window) — "Make a statement with glass." Can be combined with other window types to create a dramatic feature wall of glass. Supports fully custom geometry.
-4. Awning (Window) — "Light and security, beautifully combined." Hinged at the top and opens outward. Provides light and architectural interest where security matters.
-5. Slide & Fold (Window & Door) — "Open up your space completely." Panels slide and fold to one side, creating a fully open wall. Ideal for living areas, patios, and entertainment spaces.
-
-[MATERIALS]
-1. uPVC — Fire retardant, thermally efficient (multi-chamber design), never rusts or corrodes, no painting or maintenance required, galvanized steel reinforced for security, EPDM gaskets (fully weatherproof), 6mm–12mm glass options, sound insulating. 10-Year Warranty. Compatible with all 11 finishes.
-2. Aluminum (New) — Slim sightlines for a modern minimal look, high strength-to-weight ratio, suitable for large-span openings, corrosion-resistant. Compatible with 4 solid finishes only (White, Jet Black, Charcoal Gray, Matte Quartz).
-
-[7 FOURLINQ ADVANTAGES — VERIFIED CLAIMS ONLY]
-1. Attractive Appearance — 11 finishes from classic white to rich wood grains, designed to complement any architectural style.
-2. Fire Retardant — uPVC is inherently fire retardant, slowing the spread of flames.
-3. Thermal Efficiency — Multi-chamber profile traps air to reduce heat transfer, keeping interiors cooler.
-4. Corrosion Resistant — Unlike steel, uPVC never rusts — ideal for Philippine humidity, salt air, and heavy rainfall.
-5. Long Lasting Performance — 10-year warranty. uPVC does not warp, rot, or require repainting.
-6. Weather Resistance — EPDM gaskets and drainage holes ensure a tight seal against rain, wind, and storms.
-7. Sound Insulation — Multi-chamber profiles and thick glass (6mm–12mm) significantly reduce outside noise.
-
-[uPVC PROFILE ENGINEERING — 7 FEATURES]
-1. Thick Glass — 6mm–12mm for insulation, soundproofing, and impact resistance.
-2. Smooth Homogenous Profile — Easy cleaning, no grooves where dirt accumulates.
-3. Galvanized Steel Reinforcement — Structural rigidity that resists forced entry and heavy wind loads.
-4. Multi-Chamber Profile — Trapped air chambers act as thermal barriers — cooler rooms, lower electricity bills.
-5. Internal Glazing Beads — Glass secured from inside — cannot be removed from outside.
-6. EPDM Gaskets — Weatherproof seal against rain, wind, dust, and insects.
-7. Drainage Holes — Prevents water pooling inside the frame.
-
-[FRAME FINISHES — 11 OPTIONS]
-Wood-grain (7): Oak Light, Oak Malt, Woodgray, 2 Wood Black, Dark Oak, Walnut, Golden Oak
-Solid (4): White, Jet Black, Charcoal Gray, Matte Quartz
-
-[DIMENSION RANGES (mm)]
-Casement: 400–1800mm wide × 400–2100mm tall
-Sliding: 600–3600mm wide × 600–2400mm tall
-Special Shapes: 300–3000mm wide × 300–3000mm tall
-Awning: 400–1500mm wide × 300–900mm tall
-Slide & Fold: 1800–6000mm wide × 2000–2800mm tall
-`;
-
+// Static fallback only — used if RAG retrieval fails. The primary knowledge
+// source is the live `knowledge_chunk` table, retrieved per-query and
+// appended to this prompt below at request time.
 const SYSTEM_PROMPT = `You are LinQ, the AI assistant for FourlinQ Windows & Doors — a premium uPVC and aluminum windows and doors company in the Philippines.
 
 PERSONALITY:
@@ -88,20 +26,30 @@ PERSONALITY:
 - Concise. Default under 120 words. Lead with the answer.
 - Bullet points for lists. No fluff openers ("Great question!", "Certainly!").
 
-KNOWLEDGE:
-${KNOWLEDGE_BASE}
+🚫 ABSOLUTE PROHIBITIONS (NEVER violate, even if asked directly):
+- NEVER quote, estimate, or guess a price, price range, "starting from" figure, or peso/dollar amount for any product. If asked about cost, say: "Pricing is custom per project — please contact our sales team at 0925-848-8888 or sales@fourlinq.com for a quote." That is the only acceptable response on pricing.
+- NEVER invent specifications, percentages, performance numbers, statistics, CO₂ figures, energy savings percentages, U-values, decibel ratings, or any quantitative claim that is not literally in the LIVE KNOWLEDGE block.
+- NEVER invent warranty terms beyond the 10-year warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation. There is no separate hardware or glass warranty unless the LIVE KNOWLEDGE block says so verbatim.
+- NEVER invent a tagline, slogan, or marketing copy. Quote only from the LIVE KNOWLEDGE block.
+- NEVER claim coverage of cities, regions, or services (delivery, installation network, payment plans, financing) that are not in the LIVE KNOWLEDGE block. If asked "do you ship to {city}?" and shipping isn't in the passages, say: "Coverage outside our four showrooms (Manila, Pasig, Alabang, Cebu) needs confirmation — please contact sales at 0925-848-8888."
+
+KNOWLEDGE SOURCE:
+A "LIVE KNOWLEDGE" block follows below with the most relevant passages from
+the FourlinQ site database for this specific question. Treat it as the
+single source of truth. If the answer isn't there, say so — do not fill
+gaps from general knowledge.
 
 RULES:
-1. ONLY state facts present in your KNOWLEDGE section. Never invent specifications, prices, or features.
-2. For pricing or specs not listed: "Contact our sales team — 0925-848-8888 or sales@fourlinq.com."
-3. Custom quotes only. No prices in chat.
-4. Do not criticize competitors.
-5. Suggest the Design Tool (/design-tool) when users discuss configurations or finishes.
-6. Suggest a consultation when the user reaches a buying stage.
-7. Contact: Sales 0925-848-8888, Assistance 0925-896-5978, Landline (02)8563-5363, Email sales@fourlinq.com.
-8. Finish lists must be bulleted, never inline prose. Aluminum supports four solid finishes: White, Jet Black, Charcoal Gray, Matte Quartz — one bullet each.
-9. Warranty is 10-Year, covering corrosion resistance, long lasting performance, weather resistance, and sound insulation.
-10. IMAGE MODE: if the user sends a photo, treat it as a wall/room/facade they want windows for. Identify the architectural context briefly (e.g. "looks like a modern facade with a wide horizontal opening"), then recommend ONE primary system type from our 5 with one-sentence reasoning, and ONE finish from our 11 that suits the surrounding palette. Close by inviting them to open the Design Tool (/design-tool) or contact sales. Stay under 130 words.`;
+1. If the answer is not literally in the LIVE KNOWLEDGE passages, respond with: "I don't have that detail yet — please contact our sales team at 0925-848-8888 or sales@fourlinq.com." Do not paraphrase. Do not guess.
+2. Do not criticize competitors.
+3. Suggest the Design Tool (/design-tool) when users discuss configurations or finishes.
+4. Suggest a consultation when the user reaches a buying stage.
+5. Contact: Sales 0925-848-8888, Assistance 0925-896-5978, Landline (02)8563-5363, Email sales@fourlinq.com.
+6. Finish lists must be bulleted, never inline prose.
+7. IMAGE MODE: if the user sends a photo, identify the architectural context briefly, recommend ONE primary system type with one-sentence reasoning, and ONE finish that suits the surrounding palette. Close by inviting them to open the Design Tool (/design-tool) or contact sales. Stay under 130 words.
+
+GROUNDING CHECKLIST (silent — do not output):
+Before sending a reply, scan it for: prices, percentages, year-counts other than 10, decibel/U-value numbers, city names not in passages, warranty types other than the 10-year, taglines, claims about installer networks or nationwide shipping. If any of these appear and ARE NOT verbatim in the LIVE KNOWLEDGE block, rewrite to remove them or replace with the contact line.`;
 
 interface GeminiHistoryTurn {
   role?: "user" | "model";
@@ -160,12 +108,30 @@ router.post("/stream", async (req, res) => {
   res.setHeader("Connection", "keep-alive");
   res.write(`data: ${JSON.stringify({ sessionId: sid })}\n\n`);
 
+  // Retrieve top-K relevant chunks from the live knowledge_chunk table so
+  // edits in the admin Content Manager immediately influence answers.
+  // Falls back to the hardcoded SYSTEM_PROMPT if retrieval fails.
+  let systemPrompt = SYSTEM_PROMPT;
+  try {
+    const chunks = await retrieveContext(message, 15);
+    if (chunks.length > 0) {
+      const contextBlock = chunks
+        .map((c, i) => `[${i + 1}] ${c.title}\n${c.content}`)
+        .join("\n\n");
+      systemPrompt = `${SYSTEM_PROMPT}\n\n[LIVE KNOWLEDGE — top ${chunks.length} matches from the site database]\n${contextBlock}`;
+    }
+  } catch (e) {
+    console.warn("RAG retrieval failed, using static prompt:", (e as Error).message);
+  }
+
   try {
     const reply = await llm.chat({
-      systemPrompt: SYSTEM_PROMPT,
+      systemPrompt,
       messages,
-      maxTokens: 600,
-      temperature: 0.6,
+      maxTokens: 1500,
+      // Low temperature keeps the model conservative — it sticks to what's
+      // in LIVE KNOWLEDGE instead of confidently embellishing.
+      temperature: 0.2,
       needsVision: hasImage,
     });
 

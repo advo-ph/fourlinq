@@ -4,7 +4,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useProductTypes, useFinishes, useGlassTypes } from "@/hooks/useConfigurator";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Loader2, CheckCircle, X } from "lucide-react";
 import WindowPreview from "@/components/configurator/WindowPreview";
 import FinishSwatch from "@/components/shared/FinishSwatch";
@@ -151,6 +151,8 @@ const SaveModal = ({ isOpen, onClose, config, selectedType, selectedFinish, sele
 };
 
 const DesignTool = () => {
+  const [searchParams] = useSearchParams();
+  const isEmbed = searchParams.get("embed") === "1";
   const [step, setStep] = useState(0);
   const [saveOpen, setSaveOpen] = useState(false);
   const [config, setConfig] = useState({
@@ -181,31 +183,36 @@ const DesignTool = () => {
   const canContinue = step < 3;
   const canBack = step > 0;
 
+  const Chrome = ({ children }: { children: React.ReactNode }) =>
+    isEmbed ? <>{children}</> : <Layout>{children}</Layout>;
+
   if (isLoading) {
     return (
-      <Layout>
-        <PageHeader title="Design Tool" breadcrumbLabel="Design Tool" subtitle="Loading configurator..." />
-        <div className="pb-20">
+      <Chrome>
+        {!isEmbed && <PageHeader title="Design Tool" breadcrumbLabel="Design Tool" subtitle="Loading configurator..." />}
+        <div className={isEmbed ? "py-6" : "pb-20"}>
           <div className="page-container max-w-6xl">
             <div className="flex items-center justify-center py-20">
               <div className="text-[color:var(--ink-muted)] text-sm">Loading design tool…</div>
             </div>
           </div>
         </div>
-      </Layout>
+      </Chrome>
     );
   }
 
   return (
-    <Layout>
-      <PageHeader
-        eyebrow="Configurator"
-        title="Build your window. Save it. Share it."
-        breadcrumbLabel="Design Tool"
-        subtitle="Choose a type, pick a finish, set the size — then save your spec or send it to our team for a tailored quote."
-      />
+    <Chrome>
+      {!isEmbed && (
+        <PageHeader
+          eyebrow="Configurator"
+          title="Build your window. Save it. Share it."
+          breadcrumbLabel="Design Tool"
+          subtitle="Choose a type, pick a finish, set the size — then save your spec or send it to our team for a tailored quote."
+        />
+      )}
 
-      <div className="pb-20">
+      <div className={isEmbed ? "py-6" : "pb-20"}>
         <div className="page-container max-w-6xl">
           {/* Step Progress */}
           <div className="flex items-center justify-center gap-2 mb-12">
@@ -365,7 +372,7 @@ const DesignTool = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </Chrome>
   );
 };
 

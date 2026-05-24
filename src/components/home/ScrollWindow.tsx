@@ -90,7 +90,7 @@ const ScrollWindow = () => {
           observer.disconnect();
         }
       },
-      { rootMargin: "200% 0px" },
+      { rootMargin: "0px" },
     );
 
     observer.observe(container);
@@ -117,7 +117,17 @@ const ScrollWindow = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const img = images[displayedFrame];
+    // Prefer the requested frame; fall back to nearest buffered frame so the
+    // canvas stays painted even while later frames are still streaming in.
+    let img = images[displayedFrame];
+    if (!img || !img.naturalWidth) {
+      for (let offset = 1; offset < images.length; offset++) {
+        const before = images[displayedFrame - offset];
+        if (before?.naturalWidth) { img = before; break; }
+        const after = images[displayedFrame + offset];
+        if (after?.naturalWidth) { img = after; break; }
+      }
+    }
     if (!img || !img.naturalWidth) return;
 
     if (canvas.width !== img.naturalWidth || canvas.height !== img.naturalHeight) {
@@ -149,6 +159,20 @@ const ScrollWindow = () => {
             </div>
           </div>
         )}
+
+        {/* Instant poster — first frame painted by the browser before the
+            JS preloader has a chance to start. Eliminates the blank hero. */}
+        <img
+          src={FRAME_PATH_TEMPLATE.replace("{index}", "0001")}
+          alt=""
+          fetchPriority="high"
+          decoding="async"
+          aria-hidden="true"
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover transition-opacity duration-300",
+            isLoaded ? "opacity-0" : "opacity-100",
+          )}
+        />
 
         {/* Canvas for frame rendering — full screen width */}
         <canvas
