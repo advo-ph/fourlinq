@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 type FinishFilter = "all" | "wood-grain" | "solid";
 
 const FILTER_TABS: { id: FinishFilter; label: string }[] = [
-  { id: "all", label: "All 11 finishes" },
+  { id: "all", label: "All 12 finishes" },
   { id: "wood-grain", label: "Wood grain" },
   { id: "solid", label: "Solid" },
 ];
@@ -24,20 +24,20 @@ const FILTER_TABS: { id: FinishFilter; label: string }[] = [
  * adds the context that turns a swatch grid into a design conversation.
  */
 const finishPairing: Record<string, string> = {
-  "oak-light":
-    "The finish that quietly disappears. Sits well with a Scandinavian-Filipino register: pale oak floors, white plaster walls, indoor planting. Reads as warm white from across the room. Pairs with concrete and linen.",
+  "silica-cream":
+    "The warm neutral. Softer than pure white, with sandy undertones that sit well against concrete, stone, and tropical-palette walls. Disappears into the facade or reads as a deliberate warm tone depending on context.",
   "oak-malt":
-    "The honest middle. Less rustic than Golden Oak, less austere than Woodgray. Works on a lanai facade where the warm tone catches afternoon light. Pairs with bone-white walls and brushed bronze.",
-  woodgray:
-    "The driftwood register. The most architectural of the wood-grains. Reads as weathered timber on a beachfront install, as soft warm grey in an urban condo. Pairs with white oak, polished concrete, and natural stone.",
-  "2-wood-black":
-    "The moody alternative to Jet Black. When the architect wants drama without a flat industrial read. Reads as wenge in raking light, as deep espresso in direct sun. Pairs with travertine, brass, and high-contrast white.",
-  "dark-oak":
-    "Filipino hardwood register without the hardwood maintenance. Reads as narra or aged kamagong from across a room. Specifies for heritage homes and ancestral-house renovations. Pairs with capiz, terracotta, limewashed walls.",
+    "The honest middle. Less rustic than Golden Oak, less austere than Gray Wood. Works on a lanai facade where the warm tone catches afternoon light. Pairs with bone-white walls and brushed bronze.",
+  "black-wood":
+    "The moody alternative. When the architect wants drama without a flat industrial read. Reads as wenge in raking light, as deep espresso in direct sun. Pairs with travertine, brass, and high-contrast white.",
+  "gray-wood":
+    "The driftwood register. The most architectural of the wood-grains. Reads as weathered timber on a beachfront install, as soft warm grey in an urban condo. Pairs with polished concrete and natural stone.",
   walnut:
     "The richest wood-grain in the catalog. For projects where the window is meant to be noticed: feature walls, statement entries, double-height openings. Reads as solid American walnut up close. Pairs with brass and deep emerald.",
   "golden-oak":
     "The warmest wood-grain. The finish for a sun-drenched lanai or a kitchen window above the sink. Specifies well in tropical-traditional homes: bahay-na-bato influences, capiz screens, rattan furniture. Pairs with terracotta and mango wood.",
+  "dark-oak":
+    "Filipino hardwood register without the hardwood maintenance. Reads as narra or aged kamagong from across a room. Specifies for heritage homes and ancestral-house renovations. Pairs with capiz, terracotta, limewashed walls.",
   white:
     "The default and the discipline. The matte white that lets the architecture lead. The gold standard for modern facades, condominium interiors, white-on-white kitchens. Pairs with everything.",
   "jet-black":
@@ -72,9 +72,9 @@ const Finishes = () => {
     <Layout>
       <PageHeader
         eyebrow="The catalog"
-        title="Eleven finishes. One window."
+        title="Twelve finishes. One window."
         breadcrumbLabel="Finishes"
-        subtitle="Each FourlinQ system is available in eleven brochure-verified finishes. Seven wood-grain laminates and four solid colors. Pick one. See it on the frame."
+        subtitle="Each FourlinQ system is available in twelve brochure-verified finishes. Seven wood-grain laminates and five solid colors. Pick one. See it on the frame."
       />
 
       {/* Interactive hero — photo + overlaid frame swatch + description */}
@@ -189,9 +189,7 @@ const Finishes = () => {
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
           {filtered.map((f) => {
             const isSelected = f.id === selected.id;
-            const fakeGrain = f.category === "wood-grain"
-              ? `repeating-linear-gradient(90deg, rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 1px, transparent 1px, transparent 4px)`
-              : "none";
+            const hasRealTexture = f.hasTexture && f.textureImagePath;
             return (
               <li key={f.id}>
                 <button
@@ -206,20 +204,12 @@ const Finishes = () => {
                         ? "ring-2 ring-[color:var(--accent)] ring-offset-2 ring-offset-[color:var(--canvas-soft)]"
                         : "ring-1 ring-[color:var(--rule-soft)] hover:ring-[color:var(--ink-primary)]"
                     )}
-                    style={
-                      f.profilePhotoPath
-                        ? undefined
-                        : {
-                            backgroundColor: f.swatchHex,
-                            backgroundImage: fakeGrain !== "none" ? fakeGrain : undefined,
-                            backgroundBlendMode: fakeGrain !== "none" ? "multiply" : undefined,
-                          }
-                    }
+                    style={hasRealTexture ? undefined : { backgroundColor: f.swatchHex }}
                   >
-                    {f.profilePhotoPath && (
+                    {hasRealTexture && (
                       <img
-                        src={f.profilePhotoPath}
-                        alt={`${f.label} finish on FourlinQ profile`}
+                        src={f.textureImagePath}
+                        alt={`${f.label} finish`}
                         loading="lazy"
                         decoding="async"
                         className="w-full h-full object-cover"
@@ -248,15 +238,15 @@ const Finishes = () => {
           <div>
             <p className="eyebrow mb-5">How we chose</p>
             <h2 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1]">
-              Eleven finishes, not eleven hundred.
+              Twelve finishes, not twelve hundred.
             </h2>
           </div>
           <div className="space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.7] max-w-[40rem]">
             <p>
-              Other brands offer hundreds of swatches and call it choice. We chose eleven. The ones that work in Filipino homes, hold up in Filipino sun, and pair cleanly with the architectural materials already common here.
+              Other brands offer hundreds of swatches and call it choice. We chose twelve. The ones that work in Filipino homes, hold up in Filipino sun, and pair cleanly with the architectural materials already common here.
             </p>
             <p>
-              The seven wood-grain laminates are heat-fused (not painted or printed), so they don't peel, chip, or fade. The four solid finishes use UV-stabilized pigments that hold their color through 25 years of tropical sun.
+              The seven wood-grain laminates are heat-fused (not painted or printed), so they don't peel, chip, or fade. The five solid finishes use UV-stabilized pigments that hold their color through 25 years of tropical sun.
             </p>
             <p>
               Every finish is brochure-verified. None are conceptual. If you see it here, you

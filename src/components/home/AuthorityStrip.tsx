@@ -41,7 +41,7 @@ const AuthorityStrip = () => (
           Engineered for Philippine homes — not imported into them.
         </h2>
         <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[34rem]">
-          Every FourlinQ system is custom-fabricated in our Manila workshop. Measured to your architect's drawings. Finished in any of eleven colors. Installed by our own team.
+          Every FourlinQ system is custom-fabricated in our Manila workshop. Measured to your architect's drawings. Finished in any of twelve colors. Installed by our own team.
         </p>
         <Link
           to="/why-upvc"

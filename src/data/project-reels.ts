@@ -13,7 +13,7 @@ export const PROJECT_REELS: ProjectReel[] = [
   },
   {
     id: "reel-2",
-    location: "Binan",
+    location: "Private residence",
     videoSrc: "/videos/reels/reel-2.mp4",
   },
   {

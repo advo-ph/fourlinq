@@ -45,7 +45,7 @@ export const FAQ: FAQEntry[] = [
   {
     category: "products",
     q: "How many finishes are available?",
-    a: "11 finishes total. Solid colors include classic White, Anthracite, and metallic options. Wood-grain laminates include Walnut, Oak, and other realistic timber finishes — applied via heat-fused foil that won't peel or fade. You can browse the full swatch set on the Brand page or in the Design Tool.",
+    a: "12 finishes total. Solid colors include classic White, Anthracite, and metallic options. Wood-grain laminates include Walnut, Oak, and other realistic timber finishes — applied via heat-fused foil that won't peel or fade. You can browse the full swatch set on the Brand page or in the Design Tool.",
   },
 
   // ── uPVC & Materials ──────────────────────────────

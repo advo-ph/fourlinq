@@ -70,7 +70,7 @@ const technicalResources: Resource[] = [
   {
     title: "Finish Color Palette",
     type: "PDF",
-    description: "All eleven brochure-verified finishes with hex values, swatches, and recommended pairings for residential and commercial use.",
+    description: "All twelve brochure-verified finishes with hex values, swatches, and recommended pairings for residential and commercial use.",
     status: "available",
     href: "/finishes",
   },

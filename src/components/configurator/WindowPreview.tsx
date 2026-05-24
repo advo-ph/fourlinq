@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { FRAME_FINISHES } from "@/data/fourlinq-data";
 
 interface PreviewProps {
   type: string;
@@ -35,10 +36,10 @@ const woodGrainConfig: Record<string, {
   density: "fine" | "medium" | "bold";
 }> = {
   "oak-light": {
-    grainColor: "#8B7355",
-    grainOpacity: 0.18,
-    highlightColor: "#FFFFFF",
-    highlightOpacity: 0.12,
+    grainColor: "#8A6E3E",
+    grainOpacity: 0.2,
+    highlightColor: "#EDE0C0",
+    highlightOpacity: 0.18,
     density: "fine",
   },
   "oak-malt": {
@@ -47,6 +48,27 @@ const woodGrainConfig: Record<string, {
     highlightColor: "#E8D5A8",
     highlightOpacity: 0.15,
     density: "medium",
+  },
+  "black-wood": {
+    grainColor: "#000000",
+    grainOpacity: 0.25,
+    highlightColor: "#4A3A30",
+    highlightOpacity: 0.1,
+    density: "medium",
+  },
+  "gray-wood": {
+    grainColor: "#3A3530",
+    grainOpacity: 0.2,
+    highlightColor: "#A09890",
+    highlightOpacity: 0.12,
+    density: "medium",
+  },
+  "walnut": {
+    grainColor: "#1A0F08",
+    grainOpacity: 0.35,
+    highlightColor: "#8B6B50",
+    highlightOpacity: 0.12,
+    density: "bold",
   },
   "golden-oak": {
     grainColor: "#6B4400",
@@ -62,27 +84,6 @@ const woodGrainConfig: Record<string, {
     highlightOpacity: 0.15,
     density: "bold",
   },
-  "walnut": {
-    grainColor: "#1A0F08",
-    grainOpacity: 0.35,
-    highlightColor: "#8B6B50",
-    highlightOpacity: 0.12,
-    density: "bold",
-  },
-  "2-wood-black": {
-    grainColor: "#000000",
-    grainOpacity: 0.25,
-    highlightColor: "#4A3A30",
-    highlightOpacity: 0.1,
-    density: "medium",
-  },
-  "woodgray": {
-    grainColor: "#3A3530",
-    grainOpacity: 0.2,
-    highlightColor: "#A09890",
-    highlightOpacity: 0.12,
-    density: "medium",
-  },
 };
 
 const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacity, width, height }: PreviewProps) => {
@@ -96,6 +97,8 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
   const brightness = ((num >> 16) + ((num >> 8) & 0xff) + (num & 0xff)) / 3;
   const handleClr = brightness > 160 ? "#888888" : lighten(frameColor, 60);
 
+  const finishData = FRAME_FINISHES.find((f) => f.id === finishId);
+  const hasRealTexture = finishData?.hasTexture && finishData.textureImagePath;
   const isWoodGrain = finishId in woodGrainConfig;
   const grainCfg = woodGrainConfig[finishId];
 
@@ -105,13 +108,20 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
   const gx = fx + fw, gy = fy + fw, gw = fWidth - fw * 2, gh = fHeight - fw * 2;
   const glassColor = `rgba(200,220,240,${0.12 + glassOpacity * 0.4})`;
 
-  // --- Wood grain pattern definitions ---
   const renderDefs = () => {
+    if (hasRealTexture) {
+      return (
+        <defs>
+          <pattern id="grain-fill" patternUnits="objectBoundingBox" width="1" height="1">
+            <image href={finishData.textureImagePath} width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+        </defs>
+      );
+    }
+
     if (!isWoodGrain || !grainCfg) return null;
 
     const { grainColor, grainOpacity, highlightColor, highlightOpacity, density } = grainCfg;
-
-    // Generate grain lines based on density
     const spacing = density === "fine" ? 3 : density === "medium" ? 4.5 : 6;
     const lineWidth = density === "fine" ? 0.6 : density === "medium" ? 0.9 : 1.2;
     const lines: { y: number; dx: number; w: number; o: number }[] = [];
@@ -126,62 +136,6 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
 
     return (
       <defs>
-        {/* Horizontal grain pattern (for top/bottom frame) */}
-        <pattern id="grain-h" patternUnits="userSpaceOnUse" width="80" height="40">
-          <rect width="80" height="40" fill={frameColor} />
-          {lines.map((l, i) => (
-            <path
-              key={i}
-              d={`M 0 ${l.y} Q 20 ${l.y + l.dx} 40 ${l.y - l.dx * 0.5} Q 60 ${l.y + l.dx * 0.7} 80 ${l.y}`}
-              stroke={grainColor}
-              strokeWidth={l.w}
-              fill="none"
-              opacity={l.o}
-            />
-          ))}
-          {/* Highlight streaks */}
-          {lines.filter((_, i) => i % 3 === 0).map((l, i) => (
-            <path
-              key={`h${i}`}
-              d={`M 0 ${l.y + 1} Q 30 ${l.y + 1 + l.dx * 0.5} 80 ${l.y + 1}`}
-              stroke={highlightColor}
-              strokeWidth={l.w * 0.6}
-              fill="none"
-              opacity={highlightOpacity}
-            />
-          ))}
-          {/* Knot detail */}
-          <ellipse cx="55" cy="20" rx="3" ry="5" fill="none" stroke={grainColor} strokeWidth="0.5" opacity={grainOpacity * 0.4} />
-        </pattern>
-
-        {/* Vertical grain pattern (for left/right frame + sashes) */}
-        <pattern id="grain-v" patternUnits="userSpaceOnUse" width="40" height="80" patternTransform="rotate(90)">
-          <rect width="40" height="80" fill={frameColor} />
-          {lines.map((l, i) => (
-            <path
-              key={i}
-              d={`M 0 ${l.y} Q 20 ${l.y + l.dx} 40 ${l.y - l.dx * 0.5} Q 60 ${l.y + l.dx * 0.7} 80 ${l.y}`}
-              stroke={grainColor}
-              strokeWidth={l.w}
-              fill="none"
-              opacity={l.o}
-              transform={`scale(1, ${80 / 40})`}
-            />
-          ))}
-          {lines.filter((_, i) => i % 3 === 0).map((l, i) => (
-            <path
-              key={`h${i}`}
-              d={`M 0 ${l.y + 1} Q 30 ${l.y + 1 + l.dx * 0.5} 80 ${l.y + 1}`}
-              stroke={highlightColor}
-              strokeWidth={l.w * 0.6}
-              fill="none"
-              opacity={highlightOpacity}
-              transform={`scale(1, ${80 / 40})`}
-            />
-          ))}
-        </pattern>
-
-        {/* Combined pattern that tiles for general frame fill */}
         <pattern id="grain-fill" patternUnits="userSpaceOnUse" width="80" height="40">
           <rect width="80" height="40" fill={frameColor} />
           {lines.map((l, i) => (
@@ -209,8 +163,7 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
     );
   };
 
-  // Fill color — pattern for wood, solid for others
-  const frameFill = isWoodGrain ? "url(#grain-fill)" : frameColor;
+  const frameFill = (hasRealTexture || isWoodGrain) ? "url(#grain-fill)" : frameColor;
 
   // --- Primitives ---
 

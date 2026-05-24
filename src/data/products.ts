@@ -37,7 +37,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "casement")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "casement")!.tagline,
-    image: "/images/wp-export/Casement-Window.jpg",
+    image: "/images/wp-export/casement.jpeg",
     specs: [
       "Multi-chamber uPVC profile",
       "6mm–12mm glass options",
@@ -53,7 +53,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
-    image: "/images/wp-export/Sliding-Window.jpg",
+    image: "/images/wp-export/sliding.jpeg",
     specs: [
       "Multi-chamber uPVC profile",
       "Smooth horizontal track operation",
@@ -69,7 +69,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "special-shapes")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "special-shapes")!.tagline,
-    image: "/images/wp-export/Special-Shape-Window-1.jpg",
+    image: "/images/wp-export/specialshapes.jpeg",
     specs: [
       "Custom geometry — arches, circles, triangles",
       "Combinable with other window types",
@@ -85,7 +85,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "awning")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "awning")!.tagline,
-    image: "/images/wp-export/Awning-Window.jpg",
+    image: "/images/wp-export/awning.jpeg",
     specs: [
       "Top-hinged, opens outward",
       "Ventilation even during rain",
@@ -101,7 +101,7 @@ export const products: Product[] = [
     category: "doors",
     description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
-    image: "/images/wp-export/Sliding-Door.jpg",
+    image: "/images/wp-export/sliding.jpeg",
     specs: [
       "Multi-chamber uPVC profile",
       "Space-saving horizontal slide",
@@ -151,7 +151,7 @@ export const products: Product[] = [
     description:
       "Double-leaf door system with multi-point locking. Multi-chamber uPVC profile with galvanized steel reinforcement for security and weather resistance.",
     shortDescription: "Classic double-leaf doors with multi-point locking.",
-    image: "/images/wp-export/Door-1.jpg",
+    image: "/images/wp-export/frenchdoor.jpeg",
     specs: [
       "Double-leaf configuration",
       "Multi-point locking system",

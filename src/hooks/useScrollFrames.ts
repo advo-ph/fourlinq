@@ -41,6 +41,7 @@ export function useScrollFrames({
 
   const getPhaseForScroll = useCallback(
     (progress: number) => {
+      if (!isFinite(progress)) return 0;
       const thresholds = phaseThresholds.current;
       for (let i = thresholds.length - 1; i >= 0; i--) {
         if (progress >= thresholds[i]) return i;
@@ -55,11 +56,13 @@ export function useScrollFrames({
       const thresholds = phaseThresholds.current;
       const phaseIdx = getPhaseForScroll(progress);
       const phase = phases[phaseIdx];
+      if (!phase) return 0;
 
       if (phase.mode === "scroll-mapped") {
         const phaseStart = thresholds[phaseIdx];
         const phaseEnd = thresholds[phaseIdx + 1] ?? 1;
         const phaseLen = phaseEnd - phaseStart;
+        if (phaseLen <= 0) return phase.startFrame;
         const progressInPhase = Math.max(0, Math.min(1, (progress - phaseStart) / phaseLen));
         return Math.round(
           phase.startFrame + progressInPhase * (phase.endFrame - phase.startFrame),
@@ -81,6 +84,17 @@ export function useScrollFrames({
     const scrolled = -rect.top + earlyStart;
     return Math.max(0, Math.min(1, scrolled / scrollableDistance));
   }, [containerRef]);
+
+  // Find which phase a given frame belongs to
+  const getPhaseForFrame = useCallback(
+    (frame: number): number => {
+      for (let i = phases.length - 1; i >= 0; i--) {
+        if (frame >= phases[i].startFrame) return i;
+      }
+      return 0;
+    },
+    [phases],
+  );
 
   useEffect(() => {
     if (!enabled) return;
@@ -105,18 +119,32 @@ export function useScrollFrames({
 
       const phaseIdx = getPhaseForScroll(progress);
       const phase = phases[phaseIdx];
+      if (!phase) {
+        rafRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       let current = displayedFrameRef.current;
 
       if (current !== target) {
         const delta = target - current;
         const direction = Math.sign(delta);
+        const absDelta = Math.abs(delta);
 
         if (phase.mode === "scroll-mapped") {
-          const step = Math.min(Math.abs(delta), SPINNING_MAX_STEP);
+          const step = Math.min(absDelta, SPINNING_MAX_STEP);
           current += direction * step;
         } else {
           if (timestamp - lastAutoStepTimeRef.current >= AUTO_PLAY_INTERVAL) {
-            current += direction;
+            // Speed up only when the displayed frame is in a different
+            // phase than the target — i.e. the user scrolled ahead by
+            // one or more full phases.
+            const displayedPhaseIdx = getPhaseForFrame(current);
+            const phaseDiff = Math.abs(phaseIdx - displayedPhaseIdx);
+            const step = phaseDiff >= 1
+              ? Math.min(absDelta, 1 + phaseDiff * 2)
+              : 1;
+            current += direction * step;
             lastAutoStepTimeRef.current = timestamp;
           }
         }
@@ -126,19 +154,20 @@ export function useScrollFrames({
         setDisplayedFrame(current);
       }
 
-      // Text is scroll-driven: compute phase and progress from scroll position
       const scrollPhaseIdx = getPhaseForScroll(progress);
       const scrollPhase = phases[scrollPhaseIdx];
-      const t = phaseThresholds.current;
-      const scrollPhaseStart = t[scrollPhaseIdx];
-      const scrollPhaseEnd = t[scrollPhaseIdx + 1] ?? 1;
-      const scrollPhaseLen = scrollPhaseEnd - scrollPhaseStart;
-      const scrollProg = scrollPhaseLen > 0
-        ? Math.max(0, Math.min(1, (progress - scrollPhaseStart) / scrollPhaseLen))
-        : 0;
+      if (scrollPhase) {
+        const t = phaseThresholds.current;
+        const scrollPhaseStart = t[scrollPhaseIdx];
+        const scrollPhaseEnd = t[scrollPhaseIdx + 1] ?? 1;
+        const scrollPhaseLen = scrollPhaseEnd - scrollPhaseStart;
+        const scrollProg = scrollPhaseLen > 0
+          ? Math.max(0, Math.min(1, (progress - scrollPhaseStart) / scrollPhaseLen))
+          : 0;
 
-      setScrollPhaseId(scrollPhase.id);
-      setScrollPhaseProgress(scrollProg);
+        setScrollPhaseId(scrollPhase.id);
+        setScrollPhaseProgress(scrollProg);
+      }
       setScrollProgress(progress);
 
       rafRef.current = requestAnimationFrame(animate);
@@ -146,16 +175,16 @@ export function useScrollFrames({
 
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [enabled, totalFrames, phases, getTargetFrame, getPhaseForScroll]);
+  }, [enabled, totalFrames, phases, getTargetFrame, getPhaseForScroll, getPhaseForFrame]);
 
-  // Handle initial scroll position on mount
   useEffect(() => {
     if (!enabled) return;
     const progress = getScrollProgress();
     const target = getTargetFrame(progress);
-    displayedFrameRef.current = target;
-    setDisplayedFrame(target);
-  }, [enabled, getScrollProgress, getTargetFrame]);
+    const clamped = Math.max(0, Math.min(totalFrames - 1, target));
+    displayedFrameRef.current = clamped;
+    setDisplayedFrame(clamped);
+  }, [enabled, getScrollProgress, getTargetFrame, totalFrames]);
 
   return { displayedFrame, scrollPhaseId, scrollPhaseProgress, scrollProgress };
 }

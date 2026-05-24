@@ -148,22 +148,36 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     }
   }, [sceneClone, systemType]);
 
-  // Finish swap — recolor frame1/frame2 materials on visible meshes.
   useEffect(() => {
     const target = new THREE.Color(finish.swatchHex);
-    sceneClone.traverse((child) => {
-      if (child.type !== "Mesh") return;
-      const mesh = child as THREE.Mesh;
-      if (!mesh.visible || !mesh.material) return;
-      const mat = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as THREE.MeshStandardMaterial;
-      const name = mat.name || "";
-      if (name === "frame1" || name === "frame2") {
-        mat.color = target;
-        mat.roughness = 0.65;
-        mat.metalness = 0;
-        mat.needsUpdate = true;
-      }
-    });
+    const hasTexture = finish.hasTexture && finish.textureImagePath;
+
+    const applyTexture = (texture: THREE.Texture | null) => {
+      sceneClone.traverse((child) => {
+        if (child.type !== "Mesh") return;
+        const mesh = child as THREE.Mesh;
+        if (!mesh.visible || !mesh.material) return;
+        const mat = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as THREE.MeshStandardMaterial;
+        const name = mat.name || "";
+        if (name === "frame1" || name === "frame2") {
+          mat.color = texture ? new THREE.Color("#ffffff") : target;
+          mat.map = texture;
+          mat.roughness = 0.65;
+          mat.metalness = 0;
+          mat.needsUpdate = true;
+        }
+      });
+    };
+
+    if (hasTexture) {
+      new THREE.TextureLoader().load(finish.textureImagePath!, (tex) => {
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(2, 2);
+        applyTexture(tex);
+      });
+    } else {
+      applyTexture(null);
+    }
   }, [finish, sceneClone]);
 
   // Animation control — the source clip is 4 seconds (0-2s open, 2-4s close-back),
@@ -333,27 +347,25 @@ const Window3D = ({
         <ul className="flex flex-wrap gap-2">
           {FRAME_FINISHES.map((f) => {
             const isSelected = f.id === selected.id;
-            const fakeGrain = f.category === "wood-grain"
-              ? `repeating-linear-gradient(90deg, rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 1px, transparent 1px, transparent 4px)`
-              : "none";
+            const hasRealTexture = f.hasTexture && f.textureImagePath;
             return (
               <li key={f.id}>
                 <button
                   onClick={() => setSelectedId(f.id)}
                   aria-pressed={isSelected}
                   className={cn(
-                    "w-9 h-9 transition-all duration-300 ease-marvin",
+                    "w-9 h-9 overflow-hidden transition-all duration-300 ease-marvin",
                     isSelected
                       ? "ring-2 ring-[color:var(--accent)] ring-offset-2 ring-offset-white"
                       : "ring-1 ring-[color:var(--rule-soft)] hover:ring-[color:var(--ink-primary)]"
                   )}
-                  style={{
-                    backgroundColor: f.swatchHex,
-                    backgroundImage: fakeGrain !== "none" ? fakeGrain : undefined,
-                    backgroundBlendMode: fakeGrain !== "none" ? "multiply" : undefined,
-                  }}
+                  style={hasRealTexture ? undefined : { backgroundColor: f.swatchHex }}
                   title={f.label}
-                />
+                >
+                  {hasRealTexture && (
+                    <img src={f.textureImagePath} alt={f.label} className="w-full h-full object-cover" />
+                  )}
+                </button>
               </li>
             );
           })}

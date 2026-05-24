@@ -1,15 +1,12 @@
 import { lazy, Suspense } from "react";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
-import CapizDivider from "@/components/primitives/CapizDivider";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 
 const Window3D = lazy(() => import("@/components/3d/Window3D"));
 const ScrollWindow = lazy(() => import("@/components/home/ScrollWindow"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
-import EditorialIntro from "@/components/home/EditorialIntro";
-import AuthorityStrip from "@/components/home/AuthorityStrip";
 import SystemsTiles from "@/components/home/SystemsTiles";
 import ProjectReels from "@/components/home/ProjectReels";
 import InspirationStrip from "@/components/home/InspirationStrip";
@@ -39,14 +36,9 @@ const Index = () => {
         ctaTo="/products"
       />
 
-      <Section tone="canvas" size="lg">
-        <CapizDivider className="mb-section-mobile md:mb-section-tablet lg:mb-section-desktop" />
-        <EditorialIntro />
-      </Section>
-
-      <Section tone="canvas" size="md">
-        <AuthorityStrip />
-      </Section>
+      <Suspense fallback={null}>
+        <ScrollWindow />
+      </Suspense>
 
       <Section tone="soft" size="lg">
         <SystemsTiles />
@@ -54,19 +46,15 @@ const Index = () => {
 
       <ProjectReels />
 
-      <Suspense fallback={null}>
-        <ScrollWindow />
-      </Suspense>
-
       {/* Interactive 3D window — procedural, no AI assets needed */}
       <Section tone="canvas" size="lg">
         <div className="grid lg:grid-cols-[5fr,6fr] gap-12 lg:gap-16 items-start">
           <div>
-            <EyebrowHeading eyebrow="Try the systems" level={2}>
-              Rotate. Open. Refinish.
+            <EyebrowHeading eyebrow="Our Finishes" level={2}>
+              Customizable for you.
             </EyebrowHeading>
             <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.6]">
-              Drag to rotate. Click to open. Swap any of the eleven finishes.
+              Seven wood-grain laminates from Oak Light to Walnut, and four solids including Jet Black, Charcoal Gray, and Matte Quartz. Each laminate is heat-fused directly to the uPVC core, not painted on.
             </p>
           </div>
           <div>
@@ -83,15 +71,13 @@ const Index = () => {
         </div>
       </Section>
 
-      <Section tone="canvas" size="lg">
-        <InspirationStrip />
-      </Section>
+      <InspirationStrip />
 
       <Section tone="canvas" size="lg" className="!pt-0">
         <WhatsNew />
       </Section>
 
-      <Section tone="dark" size="lg">
+      <Section tone="dark" size="lg" noAnimation>
         <BrandCTA />
       </Section>
     </Layout>

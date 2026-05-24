@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import QuoteModal from "@/components/shared/QuoteModal";
-import ProjectPhotoSwitcher, { type ProjectPhoto } from "@/components/shared/ProjectPhotoSwitcher";
+
 import UPVCAdvantageStrip from "@/components/shared/UPVCAdvantageStrip";
 import EditorialButton from "@/components/primitives/Button";
 import { useProducts, Product } from "@/hooks/useProducts";
@@ -30,11 +30,6 @@ export interface BucketCopy {
   subSystemList: string;
   /** Which products.ts category to filter by */
   filterCategory: "windows" | "doors" | "specialist";
-  /**
-   * Project photos for the cursor-switching gallery (Tita §2.1.3).
-   * 4-6 photos recommended; the switcher zones the hero width by photo count.
-   */
-  projectPhotos: ProjectPhoto[];
   breadcrumbLabel: string;
 }
 
@@ -73,14 +68,6 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
             </div>
           </div>
 
-          {/* Cursor-switching project gallery — Tita §2.1.3 */}
-          <div className="mb-16 lg:mb-24">
-            <ProjectPhotoSwitcher
-              eyebrow="From recent projects"
-              photos={copy.projectPhotos}
-            />
-          </div>
-
           {/* Product grid */}
           <div className="border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16">
             <div className="flex items-end justify-between gap-x-8 gap-y-4 mb-12 lg:mb-16">
@@ -112,7 +99,7 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
                     onClick={() => { setSelected(product); trackProductView(product.name); }}
                     className="group block text-left"
                   >
-                    <div className="aspect-[4/5] bg-[color:var(--canvas-soft)] overflow-hidden">
+                    <div className="aspect-video bg-[color:var(--canvas-soft)] overflow-hidden">
                       <img
                         src={product.image}
                         alt={product.name}
@@ -217,7 +204,7 @@ const ProductPeek = ({ product, onClose }: { product: Product; onClose: () => vo
         </div>
 
         <div className="px-6 lg:px-10 py-8">
-          <div className="aspect-[4/3] bg-[color:var(--canvas-soft)] mb-8 overflow-hidden">
+          <div className="aspect-video bg-[color:var(--canvas-soft)] mb-8 overflow-hidden">
             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
           </div>
           <p className="text-body text-[color:var(--ink-secondary)] leading-[1.7] mb-10">
