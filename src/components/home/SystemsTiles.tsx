@@ -62,7 +62,7 @@ function SystemFrameTile({ system }: { system: SystemTile }) {
           obs.disconnect();
         }
       },
-      { rootMargin: "200% 0px" },
+      { rootMargin: "50% 0px" },
     );
     obs.observe(el);
     return () => obs.disconnect();

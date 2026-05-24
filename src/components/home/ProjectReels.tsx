@@ -43,7 +43,7 @@ function ReelCard({ reel }: { reel: (typeof PROJECT_REELS)[number] }) {
         muted
         loop
         playsInline
-        preload="auto"
+        preload="none"
         className="w-full h-full object-cover"
       />
       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
