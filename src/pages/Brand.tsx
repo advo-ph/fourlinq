@@ -110,8 +110,8 @@ const Brand = () => (
           <p className="font-serif font-normal text-white leading-none tracking-tight text-[5rem] lg:text-[7rem] xl:text-[8rem]">
             10
           </p>
-          <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/50">
-            Year warranty<span className="text-[color:var(--accent)]">.</span>
+          <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-[color:var(--accent)]">
+            Year warranty.
           </p>
         </div>
 
