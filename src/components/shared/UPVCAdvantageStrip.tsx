@@ -19,7 +19,8 @@ interface Advantage {
 const advantages: Advantage[] = [
   {
     number: "01",
-    title: "Built for Philippine typhoons",
+    // TODO: client copy — advantage title needs brochure-verified replacement
+    title: "Typhoon and monsoon ready",
     body: "Multi-chamber profiles with galvanized steel reinforcement, engineered to withstand sustained design-load wind pressure. Standard hardware tested against monsoon-driven rain ingress.",
   },
   {
@@ -54,8 +55,9 @@ const UPVCAdvantageStrip = () => (
     <div className="grid lg:grid-cols-12 gap-x-8 gap-y-8 mb-12 lg:mb-16">
       <div className="lg:col-span-5">
         <p className="eyebrow mb-4">Why FourlinQ</p>
+        {/* TODO: client copy — section h2 needs brochure-verified replacement */}
         <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
-          Six advantages, each engineered for the Philippine climate.
+          Six advantages of the FourlinQ system.
         </h2>
       </div>
       <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">

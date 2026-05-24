@@ -25,12 +25,13 @@ const heroSlides: HeroSlide[] = [
 const Index = () => {
   return (
     <Layout>
+      {/* Hero copy is brochure-verified from BRAND. Do not invent marketing lines here. */}
       <VideoHero
         videoSrc="/videos/hero-loop.mp4"
         fallbackSlides={heroSlides}
-        caption="For the Philippine climate"
-        headline="Built for the houses we share with the weather."
-        lede="Custom-made uPVC windows and doors. Twelve finishes. One promise."
+        caption="FourlinQ Windows & Doors"
+        headline="A Lifetime of Satisfaction and Peace of Mind."
+        lede="Custom-made to your specifications. Backed by a 10-year warranty."
         ctaLabel="Explore Systems"
         ctaTo="/products"
       />

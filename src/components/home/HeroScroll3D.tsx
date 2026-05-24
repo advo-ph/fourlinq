@@ -25,8 +25,9 @@ interface Scene {
 
 const SCENES: Scene[] = [
   {
+    // TODO: client copy — first scene headline + body need brochure-verified replacements
     eyebrow: "FourlinQ",
-    headline: "Built for Philippine homes.",
+    headline: "Custom-made, to your specifications.",
     body: "Custom uPVC and aluminum windows, sized to your architect's drawings, fabricated in our Manila workshop.",
     imageSrc: "/images/projects-fb/mbArIDA5.jpg",
     imageAlt: "Completed FourlinQ install at the Nuvali residence",

@@ -176,7 +176,8 @@ const Products = () => {
     <Layout>
       <PageHeader
         eyebrow="The catalog"
-        title="Systems engineered for the Philippine climate."
+        // TODO: client copy — replace with brochure-verified page intro
+        title="Window, door, and specialist systems."
         breadcrumbLabel="Systems"
         subtitle="Custom-made uPVC windows and doors — quiet, thermally efficient, corrosion-resistant. Each profile tested for the heat, humidity, salt air, and storms that test what a home is made of."
       />
