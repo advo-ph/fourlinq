@@ -112,10 +112,14 @@ export const projects: Project[] = [
     id: "san-lorenzo-makati-aluminum",
     name: "San Lorenzo, Makati",
     location: "San Lorenzo, Makati",
-    image: `${FB}/P7DLic-T.jpg`,
+    // Hero swapped to the finished-interior shot. The original hero
+    // (P7DLic-T.jpg) was a construction-deck-with-scaffolding photo that
+    // read as raw; the finished room with the awning-window grid is
+    // editorial.
+    image: `${FB}/yDrxH9L-.jpg`,
     gallery: [
+      `${FB}/P7DLic-T.jpg`,
       `${FB}/P8m34kD5.jpg`,
-      `${FB}/yDrxH9L-.jpg`,
       `${FB}/z8K5dOzz.jpg`,
       `${FB}/2vzBfKBe.jpg`,
     ],
@@ -127,40 +131,40 @@ export const projects: Project[] = [
   {
     id: "cebu-s-residences",
     name: "Cebu — S. Residences",
-    location: "Cebu",
+    location: "Alta Vista Subdivision, Pardo, Cebu City",
     image: `${FB}/SISsEiUz.jpg`,
     gallery: [`${FB}/roGKW8A5.jpg`],
     category: "doors",
     caption: "Sliding door installation at the S. Residences project.",
-    description: "Cebu Project: S. Residences. Sliding doors and modern window installations.",
+    description: "S. Residences in Alta Vista Subdivision, Pardo, Cebu City. Sliding doors and modern window installations.",
   },
   {
     id: "cebu-g-residences",
     name: "Cebu — G. Residences",
-    location: "Cebu",
+    location: "Vista Grande Subdivision, Talisay City",
     image: `${FB}/bmZ6fgTu.jpg`,
     gallery: [`${FB}/GNCqPBUr.jpg`],
     category: "doors",
     caption: "Modern window and door installation at the G. Residences project.",
-    description: "Cebu Project: G. Residences. Premium windows and doors tailored to the home's design.",
+    description: "G. Residences in Vista Grande Subdivision, Talisay City. Premium windows and doors tailored to the home's design.",
   },
   {
     id: "cebu-r-residences",
     name: "Cebu — R. Residences",
-    location: "Cebu",
+    location: "Monterrazas de Cebu, Guadalupe, Cebu City",
     image: `${FB}/1BZGuW8L.jpg`,
     category: "interior",
     caption: "Window and door installation at the R. Residences project.",
-    description: "Cebu Project: R. Residences. Window and door installation in a modern Cebu home.",
+    description: "R. Residences in Monterrazas de Cebu, Guadalupe, Cebu City. Window and door installation in a hillside residence.",
   },
   {
     id: "cebu-a-residences",
     name: "Cebu — A. Residences",
-    location: "Cebu",
+    location: "Oslob, Cebu",
     image: `${FB}/hRCCxHm4.jpg`,
-    category: "interior",
-    caption: "Window and door installation at the A. Residences project.",
-    description: "Cebu Project: A. Residences.",
+    category: "exterior",
+    caption: "Modernist hillside residence in Oslob, Cebu.",
+    description: "A. Residences in Oslob, Cebu. Modernist hillside home with white-frame elevator tower.",
   },
   {
     id: "batangas-c-residences",
@@ -203,13 +207,8 @@ export const projects: Project[] = [
     caption: "Window and door installation at the G. Residence in Taguig City.",
     description: "G. Residence Project Site: Taguig City. Upgrade your view. Elevate your living.",
   },
-  {
-    id: "bataan-residence",
-    name: "Bataan residence",
-    location: "Bataan",
-    image: `${FB}/I5J0-ATK.jpg`,
-    category: "exterior",
-    caption: "Ongoing project in Bataan featuring high-quality uPVC windows and doors.",
-    description: "Rainy days are here. We're proud to share our ongoing project in Bataan featuring high-quality uPVC windows and doors. Built to withstand all types of Philippine weather.",
-  },
+  // NOTE: Bataan project was dropped on 2026-05-24 — its only photo
+  // (I5J0-ATK.jpg, 14 KB) was a pure black frame with just the FourlinQ
+  // watermark. Unusable as a hero. When Tita supplies a real Bataan
+  // install photo, restore the entry.
 ];
