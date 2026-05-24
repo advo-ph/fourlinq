@@ -17,9 +17,9 @@ const navLinks: NavLink[] = [
     label: "Systems",
     to: "/products",
     children: [
-      { label: "Window Systems", to: "/products/windows", description: "Casement, Sliding, Awning, Special Shapes" },
-      { label: "Door Systems", to: "/products/doors", description: "Slide & Fold, Large Panel, Lift & Slide, 90 Series" },
-      { label: "Specialist Systems", to: "/products/specialist", description: "Arch, Curtain Wall, Custom Shapes" },
+      { label: "Window Systems", to: "/products?filter=windows", description: "Casement, Sliding, Awning, Special Shapes" },
+      { label: "Door Systems", to: "/products?filter=doors", description: "Slide & Fold, Large Panel, Lift & Slide, 90 Series" },
+      { label: "Specialist Systems", to: "/products?filter=specialist", description: "Arch, Curtain Wall, Custom Shapes" },
     ],
   },
   { label: "Our Projects", to: "/inspiration" },

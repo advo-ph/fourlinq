@@ -21,21 +21,21 @@ const systems: SystemTile[] = [
     description:
       "Casement, sliding, awning, and fixed-panel. Multi-chamber uPVC profiles with galvanized steel reinforcement and EPDM gaskets. Glass from 6 mm to 12 mm. All units fabricated to your architect's measurements.",
     framePath: "/images/systems/window/frame_{index}.jpg",
-    to: "/products/windows",
+    to: "/products?filter=windows",
   },
   {
     name: "Door Systems",
     description:
       "Slide & Fold (up to 6 metres wide), Lift & Slide, Large Panel, and 90 Series sliding. Same steel-reinforced uPVC profile as the windows. Panels fold or slide to fully open a wall between indoor and outdoor spaces.",
     framePath: "/images/systems/door/frame_{index}.jpg",
-    to: "/products/doors",
+    to: "/products?filter=doors",
   },
   {
     name: "Specialist Systems",
     description:
       "Arches, circles, triangles, and other non-standard shapes. Curtain wall configurations for full glass facades. Each unit is built to a specific project drawing.",
     framePath: "/images/systems/specialist/frame_{index}.jpg",
-    to: "/products/specialist",
+    to: "/products?filter=specialist",
   },
 ];
 

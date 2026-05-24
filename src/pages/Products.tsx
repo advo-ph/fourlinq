@@ -160,10 +160,23 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
 };
 
 const Products = () => {
-  const [searchParams] = useSearchParams();
-  const initialFilter = (searchParams.get("filter") as Filter) || "all";
-  const [activeFilter, setActiveFilter] = useState<Filter>(initialFilter);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramFilter = (searchParams.get("filter") as Filter) || "all";
+  const [activeFilter, setActiveFilterState] = useState<Filter>(paramFilter);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    setActiveFilterState(paramFilter);
+  }, [paramFilter]);
+
+  const setActiveFilter = (f: Filter) => {
+    setActiveFilterState(f);
+    if (f === "all") {
+      setSearchParams({});
+    } else {
+      setSearchParams({ filter: f });
+    }
+  };
 
   const { data: products = [], isLoading } = useProducts();
 
@@ -217,7 +230,7 @@ const Products = () => {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i}>
-                  <div className="aspect-[4/5] bg-[color:var(--canvas-soft)]" />
+                  <div className="aspect-video bg-[color:var(--canvas-soft)]" />
                   <div className="mt-6 space-y-3">
                     <div className="h-2.5 bg-[color:var(--rule-soft)] w-16" />
                     <div className="h-5 bg-[color:var(--rule-soft)] w-40" />
@@ -239,13 +252,13 @@ const Products = () => {
                     onClick={() => { setSelectedProduct(product); trackProductView(product.name); }}
                     className="group block text-left"
                   >
-                    <div className="aspect-[4/5] bg-[color:var(--canvas-soft)] overflow-hidden">
+                    <div className="bg-[color:var(--canvas-soft)] overflow-hidden">
                       <img
                         src={product.image}
                         alt={product.name}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-contain p-6 transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
+                        className="w-full h-auto object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                       />
                     </div>
                     <div className="mt-6">
