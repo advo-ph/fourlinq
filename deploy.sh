@@ -2,7 +2,7 @@
 # FourlinQ — single-process deploy to advo VPS (mirrors kent pattern).
 # Usage: ./deploy.sh
 #
-# Builds frontend locally, rsyncs dist/ + server/ + api/_llm/ + manifest files
+# Builds frontend locally, rsyncs dist/ + server/ + packages/ + manifest files
 # to /opt/fourlinq, runs `npm ci`, and restarts the pm2 process. The first
 # run also expects you to scp a .env file (kept off-rsync via --exclude).
 
@@ -43,7 +43,6 @@ rsync -az --delete \
   --exclude='.env.development.local' \
   --exclude='.env.local' \
   --exclude='.git' \
-  --exclude='.vercel' \
   --exclude='.tmp' \
   --exclude='docs' \
   --exclude='scripts' \
@@ -64,11 +63,6 @@ rsync -az --delete \
 
 # src/data is imported by server scripts at runtime (tsx) for KB seeding.
 rsync -az --delete src/data/ "${VPS_SSH}:${REMOTE_DIR}/src/data/"
-
-rsync -az --delete \
-  --exclude='node_modules' \
-  api/ \
-  "${VPS_SSH}:${REMOTE_DIR}/api/"
 
 rsync -az \
   package.json package-lock.json tsconfig.json ecosystem.config.cjs \
