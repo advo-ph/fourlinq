@@ -25,13 +25,16 @@ const heroSlides: HeroSlide[] = [
 const Index = () => {
   return (
     <Layout>
-      {/* Hero copy is brochure-verified from BRAND. Do not invent marketing lines here. */}
+      {/* Hero headline approved by Tita 2026-05-25. Lede acknowledges both
+          FourlinQ product lines (uPVC + aluminium). No warranty mention —
+          per Tita, some customers opt out of the 10-yr warranty so it's
+          not a universal homepage anchor. */}
       <VideoHero
         videoSrc="/videos/hero-loop.mp4"
         fallbackSlides={heroSlides}
         caption="FourlinQ Windows & Doors"
-        headline="A Lifetime of Satisfaction and Peace of Mind."
-        lede="Custom-made to your specifications. Backed by a 10-year warranty."
+        headline="Built to Last. Designed to Inspire."
+        lede="Custom-made uPVC and aluminium systems, fabricated to your specifications."
         ctaLabel="Explore Systems"
         ctaTo="/products"
       />
