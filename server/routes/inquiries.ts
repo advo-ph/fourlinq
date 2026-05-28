@@ -1,7 +1,35 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import pool from "../db.js";
+import { sendInquiryNotification } from "../lib/mailer.js";
 
 const router = Router();
+
+// Rate limiters — protect public POST endpoints from spam without blocking
+// legitimate use. Limits per IP, window resets rolling.
+const contactLimiter = rateLimit({
+  windowMs: 60 * 1000,           // 1 minute
+  max: 3,                         // 3 requests per IP per minute
+  message: { error: "Too many requests. Please wait a moment and try again." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const quoteLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,      // 1 hour
+  max: 10,                        // 10 quote requests per IP per hour
+  message: { error: "Too many quote requests. Please wait before submitting another." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const configurationLimiter = rateLimit({
+  windowMs: 60 * 1000,           // 1 minute
+  max: 20,                        // 20 saves per IP per minute (tool is interactive)
+  message: { error: "Too many configuration saves. Please wait a moment." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // ─── Helpers ────────────────────────────────────
 
@@ -25,7 +53,7 @@ function clampInt(val: string | undefined, fallback: number, max: number): numbe
  * POST /api/contact
  * Body: { name, email, phone?, subject?, message }
  */
-router.post("/contact", async (req, res) => {
+router.post("/contact", contactLimiter, async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
 
   if (!name || !email || !message) {
@@ -43,6 +71,12 @@ router.post("/contact", async (req, res) => {
       ["contact", refId, name, email, phone || null, subject || null, message]
     );
     console.log("New contact:", refId, name, email);
+    // Fire-and-forget notification — never let mail failure break the response.
+    void sendInquiryNotification({
+      type: "contact",
+      refId, name, email, phone, subject, message,
+      source: req.get("referer") || req.originalUrl,
+    });
     res.json({ success: true, refId, message: "Thank you! We'll get back to you within 24 hours." });
   } catch (err) {
     console.error("Contact save error:", err);
@@ -54,7 +88,7 @@ router.post("/contact", async (req, res) => {
  * POST /api/quote-request
  * Body: { name, email, phone?, productId?, productName?, notes?, finish?, dimensions?, quantity?, budget?, timeline? }
  */
-router.post("/quote-request", async (req, res) => {
+router.post("/quote-request", quoteLimiter, async (req, res) => {
   const { name, email, phone, productId, productName, notes, finish, dimensions, quantity, budget, timeline } = req.body;
 
   if (!name || !email) {
@@ -73,6 +107,12 @@ router.post("/quote-request", async (req, res) => {
       ["quote", refId, name, email, phone || null, productId || null, productName || null, JSON.stringify(config), notes || null]
     );
     console.log("New quote:", refId, name, productName);
+    void sendInquiryNotification({
+      type: "quote-request",
+      refId, name, email, phone, message: notes,
+      extra: { product: productName, finish, dimensions, quantity, budget, timeline },
+      source: req.get("referer") || req.originalUrl,
+    });
     res.json({ success: true, refId, message: `Quote request ${refId} received! We'll send you a detailed quotation within 48 hours.` });
   } catch (err) {
     console.error("Quote save error:", err);
@@ -84,7 +124,7 @@ router.post("/quote-request", async (req, res) => {
  * POST /api/save-configuration
  * Body: { name?, email?, phone?, config: { type, finish, glass, width, height } }
  */
-router.post("/save-configuration", async (req, res) => {
+router.post("/save-configuration", configurationLimiter, async (req, res) => {
   const { name, email, phone, config } = req.body;
 
   if (!config) {
@@ -102,6 +142,16 @@ router.post("/save-configuration", async (req, res) => {
       ["configuration", refId, name || null, email || null, phone || null, JSON.stringify(config)]
     );
     console.log("Config saved:", refId, name || "(anonymous)");
+    // Only notify when an inquirer left contact details — anonymous saves are
+    // self-reference bookmarks, not leads.
+    if (name && email) {
+      void sendInquiryNotification({
+        type: "save-configuration",
+        refId, name, email, phone,
+        extra: config as Record<string, unknown>,
+        source: req.get("referer") || req.originalUrl,
+      });
+    }
     res.json({ success: true, refId, message: `Configuration ${refId} saved!` });
   } catch (err) {
     console.error("Config save error:", err);

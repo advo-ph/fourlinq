@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-05-27** (post-Tita-demo, deployed via VPS, not Vercel)
+**Last updated: 2026-05-29** (post-Tita revision pass + Phase 2 scaffolding — aluminium subsection, hero copy, curtain-wall, Slide & Fold video, mailer + rate limiting shipped)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -25,13 +25,31 @@ These came in after the redesign demo. Status reflects current state.
 |---|---|---|---|
 | 1 | Hero headline = "Built to Last. Designed to Inspire." | Shipped 2026-05-25 | n/a |
 | 2 | Drop "10-year warranty" from front-page hero (some customers opt out) | Shipped 2026-05-25 | n/a |
-| 3 | Acknowledge both uPVC AND aluminium product lines | Partial (in hero lede only) | Phase 6 |
+| 3 | Acknowledge both uPVC AND aluminium product lines | Shipped 2026-05-29 (dedicated `/aluminium` page + Systems nav dropdown link). Spec sheets per sub-product still pending — see Phase 6. | Phase 6 |
 | 4 | Auto-email new inquiries to sales@fourlinq.com | Pending (needs SMTP creds) | Phase 2 |
 | 5 | CMS lets Tita upload photos directly via /admin | Pending | Phase 7 |
 | 6 | Photo cleanup on project sites (manual edit) | Waiting on Tita to send specific photos + objects to remove | Manual, no code |
 | 7 | "Installed across the Philippines" reads too local | Shipped 2026-05-25 (now "Custom-fabricated to architect specifications") | n/a |
 | 8 | "Twelve finishes" product card misplaced in projects feed | Shipped 2026-05-25 (filtered off homepage) | n/a |
 | 9 | Public site sign-in confusion | n/a (no wall exists; clarified to Tita the sign-in is only `/admin`) | n/a |
+
+---
+
+## Open client requests (from Imie/Tita 2026-05-28 chat round 2)
+
+Second round of feedback after the demo. Mostly visual/photo work — deferred until Imie supplies the specific assets.
+
+| # | Request | Status | Notes |
+|---|---|---|---|
+| 10 | Sliding door photo looks like a 2-panel fixed | Blocked on Imie | Current `slidingdoor.jpeg` and `Sliding-Door.jpg` both show static panels with no sliding cue. Needs a proper product render or photo with track / offset / arrows. |
+| 11 | French sliding door — wants this as a category | Blocked on Imie | Currently we have separate "French Door" + "Sliding Door". Unclear if she wants a combined "French Sliding Door" product (sliding instead of swinging) or just a rename. |
+| 12 | "Special designs" visual unclear | Blocked on Imie | She marked a photo 🖼 with that label but didn't say what's wrong. |
+| 13 | Curtain wall display "tall and wide" | Shipped 2026-05-29 (card spans 2 grid columns on /products) | n/a |
+| 14 | 3D interactive open/close on window/door designs | Planned (large effort — Three.js or animated SVG) | Apply to /products. Schedule as its own phase. |
+| 15 | Slide & Fold reference video — https://youtu.be/-8XwIKAtAAc | Shipped 2026-05-29 | YouTube embed renders in the Slide & Fold product detail panel on /products. Schema now supports `youtubeId` on any product. |
+| 16 | "International feel despite being a local fabricator" | Shipped 2026-05-29 (Brand hero + AuthorityStrip + Warranty + Finishes provenance copy). | Remaining copy uses "European-spec" / "European fenestration standards" framing. |
+| 17 | Design names — "Mali yung design niyo, check internet for meaning of each" | Blocked on Imie | She didn't enumerate which products. The brochure-verified names should stay until she points at specific ones. One certain bug fixed: `id="entrance-door"` → `casement-door` (matched the `name` field and FinishExplorer reference). |
+| 18 | AI photo cleanup (remove objects on project sites) | Blocked on Imie | Needs her to flag specific photos + objects. |
 
 ---
 
@@ -85,8 +103,8 @@ These came in after the redesign demo. Status reflects current state.
 
 ## Phase 2 — Email notifications + rate limiting
 
-**Status:** Planned (NOW the top priority — Tita explicitly asked 2026-05-25)
-**Effort estimate:** Half a day
+**Status:** Scaffolding shipped 2026-05-29. Mailer is wired into all three POST endpoints; rate limiters are live. Notifications will start sending the moment SMTP credentials land in env vars — no further code work needed.
+**Effort estimate (remaining):** 0 dev hours. ~15 min to drop credentials into `.env` on the VPS.
 **Blocker:** Need either a Gmail app password for `sales@fourlinq.com` OR a Resend API key (free tier). Waiting on Tita's pick.
 
 ### Scope
@@ -164,17 +182,19 @@ Copy changes are infrequent today. Premature migration adds maintenance cost wit
 
 ## Phase 6 — Aluminium systems subsection
 
-**Status:** Planned (Tita ask 2026-05-25)
-**Effort estimate:** Half a day to a full day, depending on photo + spec availability.
+**Status:** Partial — landing page + nav shipped 2026-05-29, sub-product spec sheets still pending.
+**Effort estimate (remaining):** Half a day once Imie supplies brochure photos + specs.
 **Trigger:** Tita's note: *"there are two types of windows that we carry: 1. uPVC system, 2. aluminium system (thermal break, non-thermal break, alu slim). these have been mentioned to you when you visited the showrooms."*
 
 ### Scope
 
-- Dedicated Aluminium Systems landing area (likely a new tab under `/products` filter or a `/products/aluminium` sub-route, parallel to `/products/windows`, `/products/doors`, `/products/specialist`).
-- Three sub-products: thermal break, non-thermal break, alu slim. Each with a hero image, spec sheet, finishes, glass options.
-- Nav update: surface "Aluminium" as a sibling filter to "Windows" / "Doors" / "Specialist" rather than burying it inside Why uPVC.
-- Material comparison table on `/why-upvc` already mentions aluminium honestly. Reinforce there with a "See Aluminium systems →" deep link.
-- Hero lede on `/` already acknowledges both lines as of 2026-05-25.
+- ✅ Dedicated landing area at `/aluminium` (own page, parallel to `/products/windows` filter).
+- ✅ Nav update: "Aluminium Line" entry in the Systems dropdown.
+- ✅ Three sub-products written as cards on the landing page (thermal break, non-thermal break, alu slim) with summary + "best for" guidance.
+- ❌ Hero image per sub-product. Currently text-only cards.
+- ❌ Spec sheet per sub-product (dimensions, max spans, finishes, glass options).
+- ❌ Material comparison table on `/why-upvc` → "See Aluminium systems →" deep link.
+- ✅ Hero lede on `/` acknowledges both lines (since 2026-05-25).
 
 ### Out of scope
 
@@ -183,7 +203,7 @@ Copy changes are infrequent today. Premature migration adds maintenance cost wit
 
 ### Blockers
 
-- Need brochure-verified product names, dimensions, max spans, and at least one hero photo per sub-product.
+- Brochure-verified product names, dimensions, max spans, and at least one hero photo per sub-product (still needed to complete the page).
 
 ---
 

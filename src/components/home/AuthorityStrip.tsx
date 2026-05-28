@@ -38,10 +38,10 @@ const AuthorityStrip = () => (
       <div>
         <p className="eyebrow mb-5">Made for the climate</p>
         <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
-          Engineered for Philippine homes — not imported into them.
+          European engineering, fabricated for tropical climate.
         </h2>
         <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[34rem]">
-          Every FourlinQ system is custom-fabricated in our Manila workshop. Measured to your architect's drawings. Finished in any of twelve colors. Installed by our own team.
+          Multi-chamber uPVC profiles built to European fenestration standards, then custom-fabricated in our Manila workshop to your architect's drawings. Twelve finishes. Installed by our own team.
         </p>
         <Link
           to="/why-upvc"

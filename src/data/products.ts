@@ -20,6 +20,8 @@ export interface Product {
   specs: string[];
   finishes: ProductFinish[];
   glassOptions: string[];
+  /** Optional YouTube video ID — renders an embed in the product detail panel. */
+  youtubeId?: string;
 }
 
 // Derive finishes from verified FRAME_FINISHES
@@ -118,6 +120,8 @@ export const products: Product[] = [
     description: PRODUCT_TYPES.find((p) => p.id === "slide-and-fold")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "slide-and-fold")!.tagline,
     image: "/images/wp-export/slideandfold.jpeg",
+    // Tita reference video (2026-05-28 chat): shows the system in motion.
+    youtubeId: "-8XwIKAtAAc",
     specs: [
       "Multi-panel folding system",
       "Full wall opening capability",

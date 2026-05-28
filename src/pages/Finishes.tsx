@@ -65,7 +65,7 @@ const Finishes = () => (
         </div>
         <div className="space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.7] max-w-[40rem]">
           <p>
-            Other brands offer hundreds of swatches and call it choice. We chose twelve. The ones that work in Filipino homes, hold up in Filipino sun, and pair cleanly with the architectural materials already common here.
+            Other brands offer hundreds of swatches and call it choice. We chose twelve, selected against European fenestration standards for colorfastness and grain quality, then validated against tropical sun and salt-air conditions.
           </p>
           <p>
             The seven wood-grain laminates are heat-fused (not painted or printed), so they don't peel, chip, or fade. The five solid finishes use UV-stabilized pigments that hold their color through 25 years of tropical sun.
