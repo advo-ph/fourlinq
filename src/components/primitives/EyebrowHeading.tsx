@@ -33,7 +33,7 @@ const EyebrowHeading = ({
   className,
   toneInverse = false,
 }: EyebrowHeadingProps) => {
-  const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
+  const HeadingTag = `h${level}` as "h1" | "h2" | "h3" | "h4";
   const alignClass = align === "center" ? "text-center mx-auto" : "";
   const inkClass = toneInverse ? "text-[color:var(--ink-inverse)]" : "text-[color:var(--ink-primary)]";
   const ledeInkClass = toneInverse ? "text-white/70" : "text-[color:var(--ink-secondary)]";

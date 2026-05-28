@@ -31,6 +31,7 @@ router.get("/", async (req, res) => {
         p.short_description AS "shortDescription",
         p.thumbnail_url AS image,
         p.is_featured AS "isFeatured",
+        p.youtube_id AS "youtubeId",
         p.sort_order,
         pt.name AS "typeName",
         pt.icon_key AS "iconKey",
@@ -84,6 +85,7 @@ router.get("/", async (req, res) => {
           iconKey: product.iconKey,
           typeSlug: product.typeSlug,
           isFeatured: product.isFeatured,
+          youtubeId: product.youtubeId || undefined,
         };
       })
     );
@@ -113,6 +115,7 @@ router.get("/:slug", async (req, res) => {
         p.description,
         p.short_description AS "shortDescription",
         p.thumbnail_url AS image,
+        p.youtube_id AS "youtubeId",
         pt.name AS "typeName",
         pt.icon_key AS "iconKey"
       FROM product p
@@ -164,6 +167,7 @@ router.get("/:slug", async (req, res) => {
       glassOptions: glassResult.rows.map((r) => r.name),
       typeName: product.typeName,
       iconKey: product.iconKey,
+      youtubeId: product.youtubeId || undefined,
     });
   } catch (err) {
     console.error("GET /api/products/:slug error:", err);

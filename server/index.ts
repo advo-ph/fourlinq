@@ -8,6 +8,7 @@ import chatLiteRouter from "./routes/chat-lite.js";
 import adminChatRouter from "./routes/admin-chat.js";
 import inquiriesRouter from "./routes/inquiries.js";
 import analyticsRouter from "./routes/analytics.js";
+import productsRouter from "./routes/products.js";
 import { cmsPublic, cmsAdmin, uploadRouter, usersRouter, auditMiddleware } from "./cms-config.js";
 import { loginHandler, logoutHandler, checkAuthHandler, requireAdmin, requireRole } from "./auth.js";
 
@@ -37,6 +38,8 @@ app.use("/api/cms", cmsPublic);
 app.use("/uploads", express.static(path.resolve(import.meta.dirname, "../uploads"), { maxAge: "30d" }));
 // Public form submissions (router has /contact, /quote-request, /save-configuration)
 app.use("/api", inquiriesRouter);
+// Public product catalog (Phase 1 — DB-backed, hook falls back to static if 5xx)
+app.use("/api/products", productsRouter);
 
 // ─── Admin auth (open) ──────────────────────────
 app.post("/api/admin/login", loginHandler);

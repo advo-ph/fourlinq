@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-05-29** (post-Tita revision pass + Phase 2 scaffolding — aluminium subsection, hero copy, curtain-wall, Slide & Fold video, mailer + rate limiting shipped)
+**Last updated: 2026-05-29** (unblocked-items sweep — Phase 1 pipes wired, Phase 3 shipped, Phase 7 confirmed shipped, plus aluminium subsection, hero copy, curtain-wall, Slide & Fold video, mailer scaffolding)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -75,18 +75,18 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 
 ## Phase 1 — Move product catalog to DB
 
-**Status:** Planned
-**Effort estimate:** 2–3 days
-**Why first:** Unlocks non-developer content updates, sets the pattern for moving other content to the DB later, and the schema is already partially built.
+**Status:** Partial — pipes wired 2026-05-29. Admin CRUD + seed cutover still pending.
+**Effort estimate (remaining):** ~1 day for admin CRUD, ~2 hours for the seed cutover migration.
 
 ### Scope
 
-- Add tables: `product`, `product_finish`, `product_glass_option`, `product_image` (1:M relationship to `product`).
-- Migration script that seeds the new tables from the current static data in [src/data/fourlinq-data.ts](../src/data/fourlinq-data.ts) so nothing breaks on cutover.
-- Wire up [server/routes/products.ts](../server/routes/products.ts) (already stubbed): `GET /api/products`, `GET /api/products/:id`.
-- Replace the `useProducts` hook in [src/hooks/useProducts.ts](../src/hooks/useProducts.ts) to fetch via React Query instead of returning the static array.
-- Build a minimal admin CRUD UI under [src/pages/Admin.tsx](../src/pages/Admin.tsx) — list, edit form, image upload.
-- Keep brand, contact, and branch info static in TypeScript for now. Those rarely change and are not blocking.
+- ✅ Schema: `product`, `product_finish`, `product_glass`, `product_feature`, `finish`, `glass_type`, `product_type`, `product_category` (all present since migration 001).
+- ✅ `GET /api/products` and `GET /api/products/:slug` routes (joined query for specs/finishes/glass).
+- ✅ Route mounted at `app.use("/api/products", productsRouter)` in `server/index.ts`.
+- ✅ `useProducts` hook converted to React Query (`@tanstack/react-query`) with the static catalog as `placeholderData` + on-error fallback. Page stays renderable when API is down.
+- ✅ Migration 008 adds `youtube_id` column. Backfills the Slide & Fold reference video.
+- ❌ Seed cutover: the existing migration-002 seed has different product names ("Casement 70 Series" etc.) than the current static catalog. Need a follow-up migration that aligns DB seed with `src/data/products.ts` so flipping the hook to API-first doesn't change what users see.
+- ❌ Admin CRUD UI for products. The CMS package's `ContentManager` could host this once `product` is registered as a CMS kind, or a bespoke admin panel.
 
 ### Out of scope
 
@@ -96,8 +96,8 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 
 ### Risks
 
-- Image upload requires a storage decision (Vercel Blob, S3, or local-with-CDN). Decide before starting.
-- React Query caching needs revalidation strategy on admin edits.
+- Seed cutover changes what `/products` renders. Do it in one tested migration with a screenshot diff before merging.
+- React Query caching needs revalidation strategy on admin edits (add `queryClient.invalidateQueries(["products"])` after mutations).
 
 ---
 
@@ -126,7 +126,16 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 
 ## Phase 3 — Tighten TypeScript + add CI
 
-**Status:** Planned
+**Status:** Shipped 2026-05-29.
+
+### What landed
+
+- New `typecheck` script in `package.json` runs `tsc --build`, which walks project references (`tsconfig.app.json`, `tsconfig.node.json`). Previously the project's bare `tsc --noEmit` did zero work because the root tsconfig has `files: []`. Three real bugs surfaced and fixed: `useRef<HTMLDivElement>` on `<li>` (SystemsTiles), JSX intrinsic narrowing on `HeadingTag` (EyebrowHeading), framer-motion drag-event type collision (Section).
+- New `.github/workflows/ci.yml` runs lint + typecheck + test + build on push/PR to main, cms-rag-multiuser, supafinal.
+
+### Deferred
+
+- Flipping `strict: true` and `strictNullChecks: true` on the app tsconfig. The current codebase surfaces zero additional errors at those flags (verified), but the change should ship as its own PR with a `[ci]` label to confirm CI catches regressions cleanly.
 **Effort estimate:** 1 day for strict mode, half-day for CI
 **Why before bigger changes:** Safety net for everything that follows. Cheap to do, expensive to skip.
 
@@ -209,26 +218,23 @@ Copy changes are infrequent today. Premature migration adds maintenance cost wit
 
 ## Phase 7 — CMS photo upload via admin
 
-**Status:** Planned (Tita ask 2026-05-25 — *"is it possible for us to add photos in the future? or does it need to go through your admin?"*)
-**Effort estimate:** Half a day
-**Why next:** Removes us from the loop on routine content updates. Tita can refresh project galleries and What's New entries without our involvement.
+**Status:** Shipped (verified 2026-05-29 — was already built via the `cms-rag` package, just undocumented here).
 
-### Scope
+### What landed
 
-- Admin photo-upload endpoint: `POST /api/admin/media` (multer-backed, accepts JPEG/PNG/WEBP up to 8MB, stores to `/opt/fourlinq/uploads/` on the VPS, returns the public URL).
-- Static-serve the `uploads/` directory via Express + nginx so the URLs work in production.
-- Admin UI: drag-drop uploader + a media library list (filename, thumbnail, copy URL button, delete).
-- Wire into existing admin content sections (Projects, What's New) so an entry's `image` field has an "Upload new" affordance instead of requiring a hand-typed path.
-- Image optimization: server-side resize to max 1600px wide on upload + generate a 480px thumbnail. Use `sharp`.
+- ✅ `POST /api/admin/cms/media/upload` (multer-backed via `packages/cms-rag/server/routes-upload.ts`), accepts JPEG/PNG/WebP/GIF/AVIF/SVG up to 15MB, stores to `/opt/fourlinq/uploads/cms/` on the VPS, writes a `cms_media_asset` row, returns the public path.
+- ✅ Static-serve at `app.use("/uploads", express.static(...))` in `server/index.ts`.
+- ✅ Admin UI — `MediaLibrary` component (`packages/cms-rag/client/MediaLibrary.tsx`) lives in the Content tab as a sub-panel. Drag-drop, paste-from-clipboard, batch upload, alt-text/tags edit, soft-delete.
+- ✅ `MediaPicker` exists to attach existing library images to other CMS entities.
+
+### Deferred follow-up
+
+- `sharp` server-side resize to 1600px wide + 480px thumbnail. Touches the shared `cms-rag` package; ship as its own change with thumbnail-storage strategy decided.
 
 ### Out of scope
 
 - CDN integration (Cloudflare Images / Bunny). The VPS can serve the volumes Tita generates.
 - Bulk import from Facebook scrape. The existing scrape pipeline still works for those.
-
-### Blockers
-
-- None. Can start any time.
 
 ---
 
