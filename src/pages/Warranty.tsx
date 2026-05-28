@@ -169,7 +169,7 @@ const Warranty = () => (
             <div className="lg:col-span-7">
               <p className="eyebrow mb-3">Why we can stand behind it</p>
               <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
-                Engineered for Philippine homes — not imported into them.
+                European-spec systems, fabricated for Philippine conditions.
               </h2>
               <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-xl">
                 The warranty isn't a marketing decision. It's the number that matches what we've seen across FourlinQ installations in Metro Manila, Cebu, Tagaytay, and the coast. Profiles that look the same after a decade of sun. Hardware that still operates smoothly after a thousand monsoons.

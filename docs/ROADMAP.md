@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-05-29** (post-Tita revision pass — aluminium subsection + Brand hero copy + curtain-wall fix shipped)
+**Last updated: 2026-05-29** (post-Tita revision pass + Phase 2 scaffolding — aluminium subsection, hero copy, curtain-wall, Slide & Fold video, mailer + rate limiting shipped)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -46,8 +46,8 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 | 12 | "Special designs" visual unclear | Blocked on Imie | She marked a photo 🖼 with that label but didn't say what's wrong. |
 | 13 | Curtain wall display "tall and wide" | Shipped 2026-05-29 (card spans 2 grid columns on /products) | n/a |
 | 14 | 3D interactive open/close on window/door designs | Planned (large effort — Three.js or animated SVG) | Apply to /products. Schedule as its own phase. |
-| 15 | Slide & Fold reference video — https://youtu.be/-8XwIKAtAAc | Planned (small) | Embed or use as style reference for our own asset. |
-| 16 | "International feel despite being a local fabricator" | Partial — Brand hero shipped 2026-05-29 ("European engineering. Philippine projects."). Other pages still read locally. | Sweep remaining hero/section copy on a separate pass. |
+| 15 | Slide & Fold reference video — https://youtu.be/-8XwIKAtAAc | Shipped 2026-05-29 | YouTube embed renders in the Slide & Fold product detail panel on /products. Schema now supports `youtubeId` on any product. |
+| 16 | "International feel despite being a local fabricator" | Shipped 2026-05-29 (Brand hero + AuthorityStrip + Warranty + Finishes provenance copy). | Remaining copy uses "European-spec" / "European fenestration standards" framing. |
 | 17 | Design names — "Mali yung design niyo, check internet for meaning of each" | Blocked on Imie | She didn't enumerate which products. The brochure-verified names should stay until she points at specific ones. One certain bug fixed: `id="entrance-door"` → `casement-door` (matched the `name` field and FinishExplorer reference). |
 | 18 | AI photo cleanup (remove objects on project sites) | Blocked on Imie | Needs her to flag specific photos + objects. |
 
@@ -103,8 +103,8 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 
 ## Phase 2 — Email notifications + rate limiting
 
-**Status:** Planned (NOW the top priority — Tita explicitly asked 2026-05-25)
-**Effort estimate:** Half a day
+**Status:** Scaffolding shipped 2026-05-29. Mailer is wired into all three POST endpoints; rate limiters are live. Notifications will start sending the moment SMTP credentials land in env vars — no further code work needed.
+**Effort estimate (remaining):** 0 dev hours. ~15 min to drop credentials into `.env` on the VPS.
 **Blocker:** Need either a Gmail app password for `sales@fourlinq.com` OR a Resend API key (free tier). Waiting on Tita's pick.
 
 ### Scope

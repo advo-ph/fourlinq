@@ -79,6 +79,19 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
             <img src={product.image} alt={product.name} className="w-full h-full object-contain p-6" />
           </div>
 
+          {product.youtubeId && (
+            <div className="aspect-video bg-black mb-8 overflow-hidden">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${product.youtubeId}?rel=0`}
+                title={`${product.name} demonstration video`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+                className="w-full h-full border-0"
+              />
+            </div>
+          )}
+
           <p className="text-body text-[color:var(--ink-secondary)] leading-[1.7] mb-10">
             {product.description}
           </p>
