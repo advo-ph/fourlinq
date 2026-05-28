@@ -40,7 +40,7 @@ const systems: SystemTile[] = [
 ];
 
 function SystemFrameTile({ system }: { system: SystemTile }) {
-  const tileRef = useRef<HTMLDivElement>(null);
+  const tileRef = useRef<HTMLLIElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
   const rafRef = useRef(0);

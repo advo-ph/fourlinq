@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, HTMLMotionProps } from "framer-motion";
 import { HTMLAttributes, ReactNode } from "react";
 import { MOTION } from "@/theme.config";
 
-interface SectionProps extends HTMLAttributes<HTMLElement> {
+interface SectionProps extends Omit<HTMLAttributes<HTMLElement>, "onDrag" | "onDragStart" | "onDragEnd" | "onAnimationStart" | "onAnimationEnd" | "onAnimationIteration"> {
   children: ReactNode;
   /** Background mode. Marvin alternates between light + dark sections per page. */
   tone?: "canvas" | "soft" | "dark";
@@ -71,7 +71,7 @@ const Section = ({
       viewport={{ once: true, margin: "-80px" }}
       variants={fadeVariants}
       transition={fadeTransition}
-      {...rest}
+      {...(rest as HTMLMotionProps<"section">)}
     >
       {content}
     </motion.section>

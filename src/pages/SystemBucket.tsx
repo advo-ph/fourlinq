@@ -221,7 +221,7 @@ const ProductPeek = ({ product, onClose }: { product: Product; onClose: () => vo
           </EditorialButton>
         </div>
       </motion.aside>
-      <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} productName={product.name} />
+      <QuoteModal isOpen={quoteOpen} onClose={() => setQuoteOpen(false)} productName={product.name} />
     </>
   );
 };
