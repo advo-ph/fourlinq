@@ -250,7 +250,7 @@ const Products = () => {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.3, ease: [0.68, 0, 0.33, 1] }}
                     onClick={() => { setSelectedProduct(product); trackProductView(product.name); }}
-                    className="group block text-left"
+                    className={`group block text-left ${product.id === "curtain-wall" ? "sm:col-span-2" : ""}`}
                   >
                     <div className="bg-[color:var(--canvas-soft)] overflow-hidden">
                       <img

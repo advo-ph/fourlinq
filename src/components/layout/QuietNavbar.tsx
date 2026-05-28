@@ -20,6 +20,7 @@ const navLinks: NavLink[] = [
       { label: "Window Systems", to: "/products?filter=windows", description: "Casement, Sliding, Awning, Special Shapes" },
       { label: "Door Systems", to: "/products?filter=doors", description: "Slide & Fold, Large Panel, Lift & Slide, 90 Series" },
       { label: "Specialist Systems", to: "/products?filter=specialist", description: "Arch, Curtain Wall, Custom Shapes" },
+      { label: "Aluminium Line", to: "/aluminium", description: "Thermal Break, Non-Thermal Break, Alu Slim" },
     ],
   },
   { label: "Our Projects", to: "/inspiration" },

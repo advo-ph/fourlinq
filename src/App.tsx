@@ -17,6 +17,7 @@ const ProjectDetail = lazy(() => import("./pages/ProjectDetail"));
 const ForArchitects = lazy(() => import("./pages/ForArchitects"));
 const DesignTool = lazy(() => import("./pages/DesignTool"));
 const WhyUpvc = lazy(() => import("./pages/WhyUpvc"));
+const Aluminium = lazy(() => import("./pages/Aluminium"));
 const Brand = lazy(() => import("./pages/Brand"));
 const Legal = lazy(() => import("./pages/Legal"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/for-architects" element={<ForArchitects />} />
             <Route path="/design-tool" element={<DesignTool />} />
             <Route path="/why-upvc" element={<WhyUpvc />} />
+            <Route path="/aluminium" element={<Aluminium />} />
             <Route path="/brand" element={<Brand />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/care" element={<Care />} />
