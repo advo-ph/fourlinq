@@ -40,7 +40,7 @@ const Brand = () => (
             Our brand
           </p>
           <h1 className="font-serif font-normal tracking-tight text-white text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02]">
-            Custom-made for Philippine homes.
+            European engineering. Philippine projects.
           </h1>
           <p className="mt-7 lg:mt-9 text-body-lg lg:text-lead text-white/80 max-w-[40rem] leading-[1.55]">
             {BRAND.promise}

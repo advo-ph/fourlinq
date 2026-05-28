@@ -128,7 +128,7 @@ export const products: Product[] = [
     glassOptions: ["Clear Float", "Low-E Coated", "Tinted Bronze", "Laminated Safety"],
   },
   {
-    id: "entrance-door",
+    id: "casement-door",
     name: "Casement Door",
     category: "doors",
     description:

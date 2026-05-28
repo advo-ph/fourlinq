@@ -58,7 +58,7 @@ const InspirationStrip = () => {
       <div className="container-editorial">
         <div className="grid lg:grid-cols-[1fr,auto] items-end gap-8 mb-12 lg:mb-16">
           <EyebrowHeading eyebrow="Our Projects" level={2}>
-            Installed across the Philippines.
+            Custom-fabricated to architect specifications.
           </EyebrowHeading>
           <FeatureLink to="/inspiration">View full gallery</FeatureLink>
         </div>

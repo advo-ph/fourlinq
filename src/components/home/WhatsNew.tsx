@@ -2,7 +2,18 @@ import { Link } from "react-router-dom";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import FeatureLink from "@/components/primitives/FeatureLink";
 import ScrollReveal from "@/components/primitives/ScrollReveal";
-import { whatsNew, type WhatsNewEntry } from "@/data/whats-new";
+import { whatsNew as allEntries, type WhatsNewEntry } from "@/data/whats-new";
+
+/**
+ * Homepage WhatsNew shows only event + press categories — projects already
+ * have their own InspirationStrip section directly above this one, and the
+ * "product" entries (e.g. "Twelve finish options across every system") were
+ * reading as misplaced when stacked next to project cards. Full feed lives
+ * on the /whats-new page where the visitor expects to see everything mixed.
+ */
+const whatsNew = allEntries
+  .filter((e) => e.category === "event" || e.category === "press")
+  .slice(0, 3);
 
 const formatDate = (iso: string) => {
   const d = new Date(iso);
