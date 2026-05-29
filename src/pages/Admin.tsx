@@ -526,11 +526,23 @@ const Admin = ({ onLogout, currentUser }: { onLogout: () => void; currentUser: C
 
         {/* Content Tab */}
         {tab === "content" && (
-          <ContentManager
-            api={cmsApi}
-            hideKinds={["media"]}
-            customPanels={[{ kind: "media", labelPlural: "Media", render: () => <MediaLibrary api={cmsApi} /> }]}
-          />
+          <>
+            <div className="mb-6 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground leading-relaxed">
+              <p className="font-medium text-foreground mb-1">What you can edit here</p>
+              <p>
+                Projects, news, page body copy, products (including finishes / glass / specs), aluminium systems, and the media library.
+              </p>
+              <p className="font-medium text-foreground mt-3 mb-1">What's locked to the design team</p>
+              <p>
+                The homepage video hero, the scrolling window animation, the Brand page hero, and the Why-uPVC hero are art-directed pieces tied to timed frame sequences. They live in the codebase, not the CMS — message the dev team if you want changes there.
+              </p>
+            </div>
+            <ContentManager
+              api={cmsApi}
+              hideKinds={["media"]}
+              customPanels={[{ kind: "media", labelPlural: "Media", render: () => <MediaLibrary api={cmsApi} /> }]}
+            />
+          </>
         )}
 
         {/* Team Tab — admin only */}

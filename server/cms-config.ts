@@ -323,6 +323,12 @@ const uploadRouter = createUploadRouter({
   organizationId: ORG_ID,
   uploadDir: path.resolve(import.meta.dirname, "../uploads/cms"),
   publicPrefix: "/uploads/cms",
+  // 8 MB cap (was 15 MB default) — covers any reasonable web-sized image and
+  // keeps a phone-shot 20 MB JPEG from getting uploaded by accident.
+  maxSizeBytes: 8 * 1024 * 1024,
+  // Allow only the formats the rest of the site actually renders. SVG
+  // intentionally excluded — it can carry script payloads.
+  allowedMime: /^image\/(jpe?g|png|webp|avif|gif)$/,
 });
 
 const usersRouter = createUsersRouter({ pool, organizationId: ORG_ID });
