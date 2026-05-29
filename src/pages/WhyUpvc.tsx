@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Layout from "@/components/layout/Layout";
+import PageBody from "@/components/shared/PageBody";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { benefits, comparisonData } from "@/data/benefits";
@@ -274,6 +275,9 @@ uPV<span className="text-[color:var(--accent)]">C</span>
         </div>
       </div>
     </Section>
+
+    {/* Editable CMS body — empty by default */}
+    <PageBody route="/why-upvc" />
 
     {/* ── CTA ── single dark section, two buttons ── */}
     <Section tone="dark" size="md">

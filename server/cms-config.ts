@@ -329,6 +329,14 @@ const uploadRouter = createUploadRouter({
   // Allow only the formats the rest of the site actually renders. SVG
   // intentionally excluded — it can carry script payloads.
   allowedMime: /^image\/(jpe?g|png|webp|avif|gif)$/,
+  // Auto-resize anything wider than 1600px to 1600px + generate a 480px
+  // thumbnail. Tita can upload a 3000px phone photo and the site still
+  // serves a sane-sized image. (Phase 7 follow-up.)
+  resize: { maxWidth: 1600, thumbWidth: 480, quality: 82 },
+  // Reject obviously-wrong aspects. Product cards expect roughly square →
+  // landscape (0.5 = tall portrait, 3.0 = wide banner). Anything outside
+  // that is almost certainly the wrong image for the slot.
+  aspectRatioRange: [0.5, 3.0],
 });
 
 const usersRouter = createUsersRouter({ pool, organizationId: ORG_ID });
