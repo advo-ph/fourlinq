@@ -1,20 +1,141 @@
-# Session Handoff — cms_final branch (live)
+# Session Handoff
 
-Last updated: **2026-05-24 ~11 PM GMT+8** (Tita demo prep session)
+Last updated: **2026-05-29 ~14:30 GMT+8** (backlog-close + deploy-hardening session)
 
 ---
 
 ## Branch state (current)
 
-`supafinal` is the **current deploy branch** (Prince merged our `cms_final` into his `redesign-marvin2` and pushed as `origin/supafinal` at HEAD `17510f0`). Our session work (`3d86347`) is preserved as an ancestor — no force, no lost commits.
+All three working branches in sync at **`1378871`** (deploy hardening + Phase 5 page body + sharp resize):
 
-Branch chain:
-- `cms_final` `3d86347` ← night-session push (ours)
-- `supafinal` `17510f0` ← Prince's merge commit on top of `3d86347`
+- `origin/main` ← FF-merged from supafinal so fresh clones land on the actual codebase (was 150 commits stale)
+- `origin/supafinal` ← deploy branch (what `./deploy.sh` ships)
+- `origin/cms-rag-multiuser` ← working branch (where day-to-day commits land before merging up)
 
-Tell collaborators: `git fetch && git checkout supafinal` to sync.
+**Prod is on `1378871`** at https://fourlinq.ph. Verify with `npm run deploy:status` (SSHes + cats `/opt/fourlinq/deployed-from.txt`).
+
+Tell collaborators: `git fetch && git checkout main` to sync.
 
 ---
+
+## What was done this session (May 29, ~9 AM → 2 PM)
+
+Theme: **close the backlog**. Phase-by-phase work that had been outstanding from the post-Tita-demo punch list. Outcome: roadmap reconciled with code reality, CMS editable surface expanded with safeguards so Tita can edit without breaking visuals, deploy pipeline hardened with branch guard + audit trail + opt-in pull-based fallback.
+
+### 1. Phase 1 — Product catalog → DB (full cutover) — [server/scripts/seed-products.ts](../server/scripts/seed-products.ts), [src/hooks/useProducts.ts](../src/hooks/useProducts.ts)
+
+- Mounted `/api/products` route (was implemented but unmounted).
+- `useProducts` converted to React Query with the static catalog as on-error fallback.
+- Migration 008 adds `youtube_id` column + backfills Slide & Fold with Tita's reference video `-8XwIKAtAAc`.
+- Migration 009 adds 9 missing `product_type` rows + the `specialist` category so all 14 static products map 1:1.
+- `seed-products.ts` cuts the DB seed over to the static catalog — reseeds `finish` from `FRAME_FINISHES` (12 brochure rows), nulls `knowledge_chunk.product_id` FK to allow product DELETE, reseeds 14 products with their finishes / glass / specs joined.
+- `USE_API=true` flipped — `/products` reads from DB on prod. Static catalog is the on-error safety net only.
+- Bugs caught + fixed during cutover: `product_category_id` is `GENERATED ALWAYS` (switched to slug-JOIN), `product_feature` has separate label + value NOT NULL columns, TRUNCATE requires sequence ownership (switched to DELETE).
+
+### 2. Phase 2 — Mailer + rate limiting (scaffolding) — [server/lib/mailer.ts](../server/lib/mailer.ts), [server/routes/inquiries.ts](../server/routes/inquiries.ts)
+
+- New `mailer.ts` with `sendInquiryNotification()`. No-op + `console.warn` when SMTP credentials missing so dev and pre-credential prod don't fail.
+- Plain-HTML email with reply-to set to inquirer so Tita can reply directly. Configurable `MAIL_TO` (default `sales@fourlinq.com`), `MAIL_FROM`, `MAIL_BCC`.
+- Wired into `/contact`, `/quote-request`, `/save-configuration` as fire-and-forget after DB insert. Mail failure never breaks the inquiry flow.
+- `express-rate-limit`: contact 3/min, quote 10/hr, save-configuration 20/min, all per-IP. Returns 429 with explanatory body on hit.
+- **Blocker**: needs `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` in `/opt/fourlinq/.env` (Gmail app password or Resend API key). Goes live the moment they land — no further code work.
+
+### 3. Phase 3 — Typecheck + CI — [package.json](../package.json), [.github/workflows/ci.yml](../.github/workflows/ci.yml)
+
+- New `npm run typecheck` runs `tsc --build` (the previously-used bare `tsc --noEmit` did zero work — root tsconfig has `files: []`).
+- 3 real type bugs surfaced and fixed: `useRef<HTMLDivElement>` on a `<li>` in SystemsTiles, JSX intrinsic narrowing on `HeadingTag` in EyebrowHeading collapsing against drei `<Image>` required props, framer-motion `onDrag` type collision in Section.
+- `.github/workflows/ci.yml` runs `lint + typecheck + test + build` on push/PR to main, supafinal, cms-rag-multiuser.
+- Lint config tightened: excludes vendored shadcn `ui/**` + `packages/cms-rag/**`, allows `require()` in tailwind config, allows explicit `any` in `server/**` (DB row adapters).
+
+### 4. Phase 4 — Confirmed already-shipped (doc cleanup)
+
+- Real admin auth (bcryptjs + JWT in httpOnly cookie + per-user accounts in `auth_user` / `profile` / `role` tables + `server/scripts/create-admin.ts` bootstrap) was already wired via the `cms-rag` package. Roadmap was just stale.
+
+### 5. Phase 5 — Page body to DB (Brand + Why uPVC, MVP) — [src/components/shared/PageBody.tsx](../src/components/shared/PageBody.tsx)
+
+- Migration 012 seeds `cms_page` rows for `/brand` and `/why-upvc` (body empty by default).
+- New `<PageBody route="..." />` fetches `cms_page.body` via React Query, renders markdown into a quietly-styled section between the existing layout and the dark CTA. Empty body = renders nothing = page is visually unchanged.
+- Custom react-markdown overrides map h1-h3 / p / ul / ol / a / strong / hr to Marvin typography. No `@tailwindcss/typography` dep needed.
+- **The homepage hero, scroll-window 340-frame animation, SystemsTiles per-tile sequences, Brand hero photo, and Why uPVC profile-image hero are intentionally NOT editable** — they're art-directed and tied to timed frame sequences. Locked to code by design, documented in the admin banner (see 7 below).
+
+### 6. Phase 6 (partial) — Aluminium subsection + CMS kind — [src/pages/Aluminium.tsx](../src/pages/Aluminium.tsx)
+
+- New `/aluminium` page covering Thermal Break / Non-Thermal Break / Alu Slim. Tita's explicit ask from 2026-05-25: *"there are two types of windows that we carry: 1. uPVC system, 2. aluminium system (thermal break, non-thermal break, alu slim)."*
+- Migration 010 creates `cms_aluminium_system` table; registered as the `aluminium` CMS entity with hero image upload + spec sheet URL + display order + published flag.
+- Page renders from `/api/cms/aluminium` with the same static array as on-error fallback.
+- **Blocker**: per-system spec sheets + hero photos still need Imie's brochure data.
+
+### 7. Phase 7 — Confirmed already-shipped (doc cleanup)
+
+- CMS photo upload (drag-drop, paste, batch, alt-text, soft-delete) was already wired via `MediaLibrary` from `cms-rag`. Roadmap was stale.
+
+### 8. CMS editability gaps (close the rest) — [server/cms-config.ts](../server/cms-config.ts)
+
+- `youtube_id` added to product CMS form. Tita can attach videos to any product.
+- Product `finish_labels` / `glass_labels` / `spec_labels` text[] columns (migration 011, backfilled from joins). Route prefers these when populated; falls back to joins when null. Trade-off: lose referential integrity in exchange for one-screen editing.
+- `aluminium` CMS kind exposes 8 editable fields.
+
+### 9. CMS safeguards — [src/pages/Admin.tsx](../src/pages/Admin.tsx), [server/routes/products.ts](../server/routes/products.ts), [packages/cms-rag/server/routes-upload.ts](../packages/cms-rag/server/routes-upload.ts)
+
+- **Admin banner** in `/admin → Content` spells out what's editable vs design-locked. Reduces "can I change the scroll thing?" questions.
+- **Empty-array fallback** on `/api/products` — Tita blanks a product's finish list → page falls back to original static values for that slug. No empty sections.
+- **Upload size cap** 15 MB → 8 MB.
+- **Mime allowlist** tightened to JPEG / PNG / WebP / AVIF / GIF — SVG removed (script-injection vector).
+- **Sharp post-processing** — resize to 1600px wide if larger, generate 480px-wide thumbnail, EXIF orientation honored, sharp failures non-fatal.
+- **Aspect-ratio guard** — reject uploads outside `[0.5, 3.0]` width/height with 400 + explanatory message.
+
+### 10. Deploy hardening — [deploy.sh](../deploy.sh), [scripts/vps-auto-deploy.sh](../scripts/vps-auto-deploy.sh)
+
+- `deploy.sh` refuses to ship from non-canonical branches (`main` / `supafinal` / `cms-rag-multiuser`) or with a dirty working tree. `FORCE_DEPLOY=1` bypasses both (logged as `forced:1`).
+- Writes `/opt/fourlinq/deployed-from.txt` after each deploy: SHA, branch, subject, author, timestamp, deployer identity.
+- `scripts/vps-auto-deploy.sh` — pull-based deploy for VPS cron (opt-in, not yet enabled). Tracks `origin/main`, rebuilds + restarts pm2 when HEAD moves. Setup steps in the script header.
+- `npm run deploy` / `deploy:status` / `deploy:log` helpers.
+
+### 11. Roadmap reconciliation — [docs/ROADMAP.md](./ROADMAP.md)
+
+- Phase 1 + 3 + 7 + Phase 4 flipped from Planned/Deferred to Shipped (4 was already-shipped, just undocumented).
+- Phase 5 marked Partial — page-body work landed; static-copy-snippets layer + branches table stay deferred.
+- Phase 6 still Partial — page + nav + CMS kind shipped; spec sheets blocked on Imie.
+
+### 12. Tests — [src/test/useProducts.test.ts](../src/test/useProducts.test.ts), [src/test/data-integrity.test.ts](../src/test/data-integrity.test.ts)
+
+- 17 tests pass (was 1). Hook returns full catalog, filters by category, surfaces Slide & Fold youtubeId, returns the fixed casement-door id, errors on unknown slug. Data integrity: ids unique + kebab-case, every product has a known category, image paths under `/images/`, youtube ids match 11-char format, no stale `entrance-door` id, FRAME_FINISHES is 12 (5 solid + 7 wood-grain).
+
+### 13. Misc copy + visual fixes
+
+- Brand hero: *"Custom-made for Philippine homes."* → *"European engineering. Philippine projects."* (Tita: *"made it seem like just a local fabricator... dapat may international feel"*).
+- International-feel copy sweep on AuthorityStrip, Warranty, Finishes.
+- `/products` Curtain Wall card now spans 2 grid columns (Imie: *"curtain wall should be tall and wide"*).
+- `casement-door` id fix — was `entrance-door` with `name: "Casement Door"`.
+- Slide & Fold reference video embed renders in product detail panel.
+- ConsultationForm Back / Continue buttons get breathing room (`pt-2` → `pt-6 lg:pt-8`).
+
+---
+
+## Honest open-items (carry into next session)
+
+- **SMTP credentials for `/opt/fourlinq/.env`** — Tita to supply. Blocks auto-email to `sales@fourlinq.com`.
+- **Pull-based auto-deploy setup** — script is ready but cron + deploy key need provisioning on the VPS.
+- **Server-side test coverage** — 17 unit tests don't exercise: mailer behavior with SMTP set, `/api/contact` `/quote-request` `/save-configuration` endpoint shape, `/api/cms/*` CRUD, upload sharp + aspect rejection, PageBody fallback. CI proves nothing about these.
+- **Round-2 visual asks** — sliding door photo, french sliding door category, "special designs" photo, photo cleanup, design name corrections — all blocked on Imie supplying the assets / clarifying.
+- **Aluminium spec sheets** — Imie's brochure data per system needed.
+- **3D interactive on `/products`** — Tita ask, deferred. Three.js or animated SVG, 1-2 day lift.
+- **Bundle size at build** — `dist/assets/index-*.js` at 634 kB / 203 kB gzip, over Vite's 500 kB warning. `manualChunks` cleanup before adding more features.
+
+---
+
+## Previous sessions
+
+<details>
+<summary>2026-05-24 ~11 PM GMT+8 — Tita demo prep (cms_final branch)</summary>
+
+## Branch state (then-current)
+
+`supafinal` was the deploy branch (Prince merged our `cms_final` into his `redesign-marvin2` and pushed as `origin/supafinal` at HEAD `17510f0`). Our session work (`3d86347`) preserved as an ancestor — no force, no lost commits.
+
+Branch chain at the time:
+- `cms_final` `3d86347` ← night-session push (ours)
+- `supafinal` `17510f0` ← Prince's merge commit on top of `3d86347`
 
 ## What was done this session (May 24, ~9 PM → 11 PM)
 
@@ -149,3 +270,5 @@ Branch `redesign-marvin2` is based on a merge of `upstream/redesign-marvin` into
 - **Do not change copy** without running it through the /writenobs skill or checking with the user.
 - **Scroll-based animations for SystemsTiles** — frames advance with scroll position, fully open at viewport center. Don't change to auto-looping or static images.
 - **Update this file** at the end of every session with what changed and what's pending.
+
+</details>
