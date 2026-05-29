@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-05-29** (unblocked-items sweep — Phase 1 pipes wired, Phase 3 shipped, Phase 7 confirmed shipped, plus aluminium subsection, hero copy, curtain-wall, Slide & Fold video, mailer scaffolding)
+**Last updated: 2026-05-29** (close-the-backlog sweep — sharp resize + thumbnail + aspect-ratio guard on uploads, Phase 5 partial-shipped, Phase 4 confirmed shipped, roadmap doc reconciled with reality)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -26,8 +26,8 @@ These came in after the redesign demo. Status reflects current state.
 | 1 | Hero headline = "Built to Last. Designed to Inspire." | Shipped 2026-05-25 | n/a |
 | 2 | Drop "10-year warranty" from front-page hero (some customers opt out) | Shipped 2026-05-25 | n/a |
 | 3 | Acknowledge both uPVC AND aluminium product lines | Shipped 2026-05-29 (dedicated `/aluminium` page + Systems nav dropdown link). Spec sheets per sub-product still pending — see Phase 6. | Phase 6 |
-| 4 | Auto-email new inquiries to sales@fourlinq.com | Pending (needs SMTP creds) | Phase 2 |
-| 5 | CMS lets Tita upload photos directly via /admin | Pending | Phase 7 |
+| 4 | Auto-email new inquiries to sales@fourlinq.com | Scaffolding shipped 2026-05-29; goes live the moment SMTP creds land in `.env`. See Phase 2. | Phase 2 |
+| 5 | CMS lets Tita upload photos directly via /admin | Shipped (verified 2026-05-29 — `MediaLibrary` in `/admin → Content`, drag-drop + paste + batch + alt-text + soft-delete + size cap). | Phase 7 |
 | 6 | Photo cleanup on project sites (manual edit) | Waiting on Tita to send specific photos + objects to remove | Manual, no code |
 | 7 | "Installed across the Philippines" reads too local | Shipped 2026-05-25 (now "Custom-fabricated to architect specifications") | n/a |
 | 8 | "Twelve finishes" product card misplaced in projects feed | Shipped 2026-05-25 (filtered off homepage) | n/a |
@@ -153,40 +153,46 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 
 ---
 
-## Phase 4 — Real admin auth (conditional)
+## Phase 4 — Real admin auth
 
-**Status:** Deferred
-**Trigger to revisit:** Client adds a second admin user, or a security review requires per-user audit trails.
-**Effort estimate:** 1–2 days
+**Status:** Shipped (verified 2026-05-29 — was already built via the `cms-rag` package's `createAuthKit`, just undocumented here).
 
-### Scope (when triggered)
+### What landed
 
-- Replace the shared password with per-user accounts (bcrypt for password hashing, JWT unchanged).
-- Wire the existing `auth_user`, `role`, and `permission` tables in [server/migrations/001_schema.sql](../server/migrations/001_schema.sql).
-- Login page UI swap (email + password instead of password-only).
-- Admin UI for inviting and disabling users.
+- ✅ Per-user accounts backed by `auth_user` / `profile` / `role` / `permission` tables (migration 001).
+- ✅ bcryptjs password hashing (`packages/cms-rag/server/auth.ts`).
+- ✅ JWT in httpOnly cookie, configurable secret via `ADMIN_JWT_SECRET`.
+- ✅ Role-based access middleware: `requireRole(["admin", "editor", "media"])`. CMS routes already use it.
+- ✅ Bootstrap script: `npx tsx server/scripts/create-admin.ts` with `ADMIN_EMAIL` + `ADMIN_PASSWORD` env vars (idempotent — re-running updates the password).
+- ✅ Admin login UI accepts email + password (`/admin` page).
+- ✅ `UsersPanel` in `/admin → Team` for admin role to manage other users.
 
-### Why deferred
+### Deferred follow-up
 
-The shared password works fine for a one-person ops team. Building this now is YAGNI.
+- Self-service password reset flow.
+- Email-based user invitations (currently users are bootstrapped via the script and added by admin in UsersPanel).
 
 ---
 
-## Phase 5 — Move static copy + branches to DB
+## Phase 5 — Move static copy to DB
 
-**Status:** Deferred
-**Trigger to revisit:** Phase 1 ships and the client demonstrates appetite for self-service content editing, OR copy edit requests start arriving more than once a month.
-**Effort estimate:** 1–2 days
+**Status:** Partial — `/brand` and `/why-upvc` got editable body sections 2026-05-29. Rest deferred.
 
-### Scope (when triggered)
+### What landed
 
-- `site_content` key-value table for hero, about, why-uPVC, and legal copy.
-- `branch` table.
-- Admin UI for editing both.
+- ✅ Migration 012 seeds `cms_page` rows for `/brand` and `/why-upvc` (body empty by default).
+- ✅ New `<PageBody route="..." />` component fetches `cms_page.body` from `/api/cms/pages/:route` and renders markdown into a quietly-styled section between the existing layout and the dark CTA. Empty body = nothing renders, so the page is visually unchanged unless Tita adds prose.
+- ✅ React-Markdown renderer maps headings / paragraphs / lists / links / hr into Marvin-style typography so output stays on-brand even if Tita pastes plain markdown.
+- ✅ Tita edits content via `/admin → Content → Pages` (already wired pageEntity).
 
-### Why deferred
+### Out of scope (intentionally — design-locked)
 
-Copy changes are infrequent today. Premature migration adds maintenance cost without payoff.
+- Homepage video hero, scroll-window 340-frame animation, SystemsTiles per-tile sequences, Brand hero house photo, Why uPVC profile-image hero, FeaturedTextureScroll cross-fade. These are art-directed and must not be CMS-editable.
+
+### Deferred
+
+- Branches list as a CMS-editable table (`branch` rows). Trigger: client opens a new showroom location.
+- `site_content` key-value snippets table (for footer copy, contact phone, etc.). Trigger: those values change more than once per quarter.
 
 ---
 

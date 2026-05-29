@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import PageBody from "@/components/shared/PageBody";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
@@ -212,6 +213,9 @@ const Brand = () => (
         ))}
       </ul>
     </Section>
+
+    {/* Editable CMS body — empty by default, renders nothing if Tita hasn't added content */}
+    <PageBody route="/brand" />
 
     {/* CTA */}
     <Section tone="dark" size="md">
