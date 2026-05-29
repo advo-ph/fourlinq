@@ -1,7 +1,15 @@
 import { Router } from "express";
 import pool from "../db.js";
+import { products as staticProducts } from "../../src/data/products.js";
 
 const router = Router();
+
+/**
+ * Safety net: if Tita blanks a product's finish_labels / glass_labels /
+ * spec_labels in the CMS, fall back to what the static catalog has for that
+ * product so the page doesn't render an empty section. Keyed by slug.
+ */
+const STATIC_BY_SLUG = new Map(staticProducts.map((p) => [p.id, p]));
 
 /**
  * GET /api/products
@@ -63,19 +71,28 @@ router.get("/", async (req, res) => {
         let glassOptions: string[] = [];
 
         if (hasEditableLists) {
-          specs = product.spec_labels ?? [];
-          glassOptions = product.glass_labels ?? [];
+          const fallback = STATIC_BY_SLUG.get(product.id);
+          specs = product.spec_labels?.length ? product.spec_labels : (fallback?.specs ?? []);
+          glassOptions = product.glass_labels?.length ? product.glass_labels : (fallback?.glassOptions ?? []);
+
+          const finishNames =
+            product.finish_labels?.length
+              ? product.finish_labels
+              : (fallback?.finishes.map((f) => f.name) ?? []);
           // Hydrate finish labels with their hex colors from the finish table.
-          if (product.finish_labels?.length) {
+          if (finishNames.length) {
             const { rows: finishRows } = await pool.query(
               `SELECT name, hex_color AS color FROM finish WHERE name = ANY($1::text[])`,
-              [product.finish_labels],
+              [finishNames],
             );
-            // Preserve the admin-ordered list while attaching colors.
             const byName = new Map(finishRows.map((r) => [r.name, r.color]));
-            finishes = product.finish_labels.map((name: string) => ({
+            // Also pull static colors as a second fallback (handles labels
+            // Tita typed that don't match a finish row but DO match the static
+            // catalog — rare but possible).
+            const staticByName = new Map(fallback?.finishes.map((f) => [f.name, f.color]) ?? []);
+            finishes = finishNames.map((name: string) => ({
               name,
-              color: byName.get(name) ?? "#cccccc",
+              color: byName.get(name) ?? staticByName.get(name) ?? "#cccccc",
             }));
           }
         } else {
