@@ -96,7 +96,9 @@ const AdminChat = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                   return updated;
                 });
               }
-            } catch {}
+            } catch {
+              // Stream chunk parse errors are expected during partial JSON; ignore.
+            }
           }
         }
       }
