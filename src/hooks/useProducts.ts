@@ -24,8 +24,10 @@ export interface Product {
   isFeatured?: boolean;
 }
 
-const USE_API = false; // flip to true after the seed-cutover migration aligns
-                       // DB rows with src/data/products.ts. See ROADMAP Phase 1.
+const USE_API = true; // Flipped 2026-05-29 after migration 009 + seed-products.ts
+                      // aligned the DB with src/data/products.ts (14 products,
+                      // 12 finishes, glass + specs joined). Static catalog stays
+                      // as on-error fallback.
 
 async function fetchProducts(): Promise<Product[]> {
   const res = await fetch("/api/products");

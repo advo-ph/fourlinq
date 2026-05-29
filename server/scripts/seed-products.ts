@@ -17,6 +17,7 @@
  */
 import pool from "../db.js";
 import { products as staticProducts } from "../../src/data/products.js";
+import { FRAME_FINISHES } from "../../src/data/fourlinq-data.js";
 
 const ORGANIZATION_ID = 1;
 
@@ -46,14 +47,54 @@ async function findGlassTypeId(label: string): Promise<number | null> {
   return rows[0]?.glass_type_id ?? null;
 }
 
+async function reseedFinishes() {
+  console.log(`[seed-products] Reseeding finish table from FRAME_FINISHES (${FRAME_FINISHES.length} rows)...`);
+  // UPSERT — keep finish_id stable for any existing references.
+  for (const [i, f] of FRAME_FINISHES.entries()) {
+    await pool.query(
+      `INSERT INTO finish (organization_id, name, slug, finish_type, hex_color, texture_url, is_active, sort_order)
+       VALUES ($1, $2, $3, $4, $5, $6, true, $7)
+       ON CONFLICT (organization_id, slug) DO UPDATE SET
+         name = EXCLUDED.name,
+         finish_type = EXCLUDED.finish_type,
+         hex_color = EXCLUDED.hex_color,
+         texture_url = EXCLUDED.texture_url,
+         is_active = true,
+         sort_order = EXCLUDED.sort_order`,
+      [
+        ORGANIZATION_ID,
+        f.label,
+        f.id,
+        f.category, // 'solid' | 'wood-grain'
+        f.swatchHex,
+        f.textureImagePath ?? null,
+        i + 1,
+      ],
+    );
+  }
+}
+
 async function reseed() {
-  console.log(`[seed-products] Truncating product / product_feature / product_finish / product_glass...`);
-  await pool.query(`TRUNCATE product_feature, product_finish, product_glass, product RESTART IDENTITY CASCADE`);
+  await reseedFinishes();
+
+  console.log(`[seed-products] Clearing product / product_feature / product_finish / product_glass...`);
+  // DELETE (not TRUNCATE) so the script can run as the app user without
+  // sequence ownership. IDs keep growing — harmless since the frontend
+  // identifies products by slug, not numeric id.
+  //
+  // First null out the FK from knowledge_chunk; those chunks were seeded for
+  // the old marketing-named products and are stale anyway. They'll get
+  // re-indexed by kb-sync after this seed runs.
+  await pool.query(`UPDATE knowledge_chunk SET product_id = NULL WHERE product_id IS NOT NULL`);
+  await pool.query(`DELETE FROM product_feature`);
+  await pool.query(`DELETE FROM product_finish`);
+  await pool.query(`DELETE FROM product_glass`);
+  await pool.query(`DELETE FROM product`);
 
   let inserted = 0;
   let skippedTypes = 0;
-  let unknownFinishes = new Set<string>();
-  let unknownGlass = new Set<string>();
+  const unknownFinishes = new Set<string>();
+  const unknownGlass = new Set<string>();
 
   for (const [idx, p] of staticProducts.entries()) {
     const productTypeId = await findProductTypeId(p.id);
@@ -79,11 +120,13 @@ async function reseed() {
     );
     const productId = rows[0].product_id;
 
-    // Specs → product_feature
+    // Specs → product_feature. The table separates label (display name) from
+    // value (machine-readable). For free-form spec bullets, both columns hold
+    // the same string.
     for (const [i, spec] of p.specs.entries()) {
       await pool.query(
-        `INSERT INTO product_feature (product_id, feature_type, label, sort_order)
-         VALUES ($1, 'spec', $2, $3)`,
+        `INSERT INTO product_feature (product_id, feature_type, label, value, sort_order)
+         VALUES ($1, 'spec', $2, $2, $3)`,
         [productId, spec, i],
       );
     }

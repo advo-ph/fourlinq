@@ -75,29 +75,30 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 
 ## Phase 1 — Move product catalog to DB
 
-**Status:** Partial — pipes wired 2026-05-29. Admin CRUD + seed cutover still pending.
-**Effort estimate (remaining):** ~1 day for admin CRUD, ~2 hours for the seed cutover migration.
+**Status:** Shipped 2026-05-29 — `/api/products` is now the source of truth on prod. Admin CRUD UI deferred.
+**Effort estimate (remaining):** ~1 day for the admin CRUD UI when needed.
 
-### Scope
+### What landed
 
-- ✅ Schema: `product`, `product_finish`, `product_glass`, `product_feature`, `finish`, `glass_type`, `product_type`, `product_category` (all present since migration 001).
-- ✅ `GET /api/products` and `GET /api/products/:slug` routes (joined query for specs/finishes/glass).
+- ✅ Schema: `product`, `product_finish`, `product_glass`, `product_feature`, `finish`, `glass_type`, `product_type`, `product_category` (all from migration 001).
+- ✅ `GET /api/products` + `GET /api/products/:slug` (joined for specs/finishes/glass).
 - ✅ Route mounted at `app.use("/api/products", productsRouter)` in `server/index.ts`.
-- ✅ `useProducts` hook converted to React Query (`@tanstack/react-query`) with the static catalog as `placeholderData` + on-error fallback. Page stays renderable when API is down.
-- ✅ Migration 008 adds `youtube_id` column. Backfills the Slide & Fold reference video.
-- ❌ Seed cutover: the existing migration-002 seed has different product names ("Casement 70 Series" etc.) than the current static catalog. Need a follow-up migration that aligns DB seed with `src/data/products.ts` so flipping the hook to API-first doesn't change what users see.
-- ❌ Admin CRUD UI for products. The CMS package's `ContentManager` could host this once `product` is registered as a CMS kind, or a bespoke admin panel.
+- ✅ `useProducts` hook uses React Query + `/api/products`, with the static catalog as on-error fallback. The site stays renderable if the API ever goes down.
+- ✅ Migration 008: `ALTER TABLE product ADD COLUMN youtube_id text` + backfill for Slide & Fold.
+- ✅ Migration 009: adds 9 missing `product_type` rows + `specialist` category so all 14 static products map to a real `product_type_id`. Plus GRANT to the app user.
+- ✅ `server/scripts/seed-products.ts`: reseeds the `finish` table from `FRAME_FINISHES` (12 rows, 5 solid + 7 wood-grain), clears stale `product_*` rows, reseeds 14 products from `src/data/products.ts`. Idempotent. Run on prod 2026-05-29 — 14/14 inserted, 12 finishes + 3-4 glass options + 4 specs per product, Slide & Fold has the YouTube ID.
+- ✅ `USE_API=true` in `useProducts.ts` — the hook now reads from `/api/products` first, static catalog only on error.
+
+### Deferred
+
+- Admin CRUD UI for products. The CMS package's `ContentManager` could host this once `product` is registered as a CMS kind, or a bespoke admin panel.
+- React Query revalidation strategy on admin edits (`queryClient.invalidateQueries(["products"])` after mutations).
 
 ### Out of scope
 
 - Multi-tenant catalogs.
 - Product variants beyond the existing finish/glass dimensions.
 - Pricing in the DB (intentional — pricing is custom-quoted).
-
-### Risks
-
-- Seed cutover changes what `/products` renders. Do it in one tested migration with a screenshot diff before merging.
-- React Query caching needs revalidation strategy on admin edits (add `queryClient.invalidateQueries(["products"])` after mutations).
 
 ---
 
