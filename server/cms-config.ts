@@ -136,6 +136,10 @@ const productEntity: EntityConfig = {
     { column: "max_height_mm", label: "Max height (mm)", type: "number" },
     { column: "lead_time_day", label: "Lead time (days)", type: "number" },
     { column: "warranty_year", label: "Warranty (years)", type: "number", default: 10 },
+    { column: "youtube_id", label: "YouTube video ID (e.g. abc123XYZ_-)", type: "text" },
+    { column: "finish_labels", label: "Available finishes (one per line, exact label)", type: "string_array" },
+    { column: "glass_labels", label: "Glass options (one per line)", type: "string_array" },
+    { column: "spec_labels", label: "Specs (one per line, in display order)", type: "string_array" },
     { column: "is_featured", label: "Featured", type: "boolean" },
     { column: "is_active", label: "Active", type: "boolean", default: true },
   ],
@@ -270,7 +274,28 @@ const mediaEntity: EntityConfig = {
   ],
 };
 
-const entities = [projectEntity, newsEntity, pageEntity, productEntity, mediaEntity];
+const aluminiumEntity: EntityConfig = {
+  kind: "aluminium",
+  label: "Aluminium system",
+  labelPlural: "Aluminium",
+  table: "cms_aluminium_system",
+  pk: "cms_aluminium_system_id",
+  slugColumn: "slug",
+  orderBy: "display_order ASC, name ASC",
+  fields: [
+    { column: "slug", label: "Slug", type: "text", required: true },
+    { column: "name", label: "System name", type: "text", required: true },
+    { column: "summary", label: "Summary", type: "textarea" },
+    { column: "best_for", label: "Best for", type: "textarea" },
+    { column: "hero_image_url", label: "Hero image", type: "image" },
+    { column: "spec_sheet_url", label: "Spec sheet (PDF or external link)", type: "text" },
+    { column: "display_order", label: "Display order", type: "number", default: 0 },
+    { column: "is_published", label: "Published", type: "boolean", default: true },
+  ],
+  syncKb: true,
+};
+
+const entities = [projectEntity, newsEntity, pageEntity, productEntity, aluminiumEntity, mediaEntity];
 
 const kb = createKbSync({
   pool,
