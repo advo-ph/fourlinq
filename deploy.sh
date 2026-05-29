@@ -23,6 +23,31 @@ err() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_ROOT"
 
+# ─── Branch guard ─────────────────────────────────────────────────────────
+# Refuse to deploy from anything other than the canonical deploy branches.
+# Bypass with FORCE_DEPLOY=1 for one-off hotfix scenarios — logs a warning.
+ALLOWED_BRANCHES="main supafinal cms-rag-multiuser"
+CURRENT_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null || echo "(detached)")"
+if [ "${FORCE_DEPLOY:-0}" = "1" ]; then
+  log "FORCE_DEPLOY=1 — bypassing branch guard (you are on '${CURRENT_BRANCH}')."
+elif ! echo " ${ALLOWED_BRANCHES} " | grep -q " ${CURRENT_BRANCH} "; then
+  err "Refusing to deploy from '${CURRENT_BRANCH}'. Allowed: ${ALLOWED_BRANCHES}. Use FORCE_DEPLOY=1 to override (only for hotfixes — leaves an audit gap)."
+fi
+
+# Refuse to deploy with uncommitted changes (also bypassable via FORCE_DEPLOY).
+if [ "${FORCE_DEPLOY:-0}" != "1" ] && [ -n "$(git status --porcelain)" ]; then
+  err "Working tree dirty. Commit / stash first, or set FORCE_DEPLOY=1 to ship uncommitted changes."
+fi
+
+# Capture commit SHA + timestamp for the audit trail written below.
+DEPLOY_SHA="$(git rev-parse HEAD)"
+DEPLOY_SHA_SHORT="$(git rev-parse --short HEAD)"
+DEPLOY_SUBJECT="$(git log -1 --pretty=%s)"
+DEPLOY_AUTHOR="$(git log -1 --pretty='%an <%ae>')"
+DEPLOY_TIMESTAMP="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+
+log "Deploying ${DEPLOY_SHA_SHORT} (${CURRENT_BRANCH}): ${DEPLOY_SUBJECT}"
+
 log "Testing SSH connection..."
 ssh -o ConnectTimeout=5 -q "${VPS_SSH}" "echo ok" >/dev/null 2>&1 || err "Cannot connect to VPS"
 
@@ -67,6 +92,19 @@ rsync -az --delete src/data/ "${VPS_SSH}:${REMOTE_DIR}/src/data/"
 rsync -az \
   package.json package-lock.json tsconfig.json ecosystem.config.cjs \
   "${VPS_SSH}:${REMOTE_DIR}/"
+
+log "Writing deploy audit trail to ${REMOTE_DIR}/deployed-from.txt"
+LOCAL_USER="$(whoami)@$(hostname -s)"
+ssh "${VPS_SSH}" "cat > ${REMOTE_DIR}/deployed-from.txt" <<AUDIT
+sha:        ${DEPLOY_SHA}
+short:      ${DEPLOY_SHA_SHORT}
+branch:     ${CURRENT_BRANCH}
+subject:    ${DEPLOY_SUBJECT}
+author:     ${DEPLOY_AUTHOR}
+deployed:   ${DEPLOY_TIMESTAMP}
+deployer:   ${LOCAL_USER}
+forced:     ${FORCE_DEPLOY:-0}
+AUDIT
 
 log "Installing prod dependencies..."
 ssh "${VPS_SSH}" "cd ${REMOTE_DIR} && npm ci --omit=dev --no-audit --no-fund" || err "npm ci failed"
