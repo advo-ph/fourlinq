@@ -265,13 +265,13 @@ const Products = () => {
                     onClick={() => { setSelectedProduct(product); trackProductView(product.name); }}
                     className="group block text-left"
                   >
-                    <div className="bg-[color:var(--canvas-soft)] overflow-hidden">
+                    <div className="aspect-video bg-[color:var(--canvas-soft)] overflow-hidden">
                       <img
                         src={product.image}
                         alt={product.name}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-auto object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                       />
                     </div>
                     <div className="mt-6">
