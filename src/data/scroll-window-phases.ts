@@ -56,3 +56,48 @@ export const SCROLL_PHASES: ScrollPhase[] = [
     },
   },
 ];
+
+// ── Thermal system selector ─────────────────────────────────
+// The thermal phase locks on its end frame; a toggle below the phase text
+// lets the user swap between the uPVC system (the canvas frame as-is) and the
+// Aluminum Thermal Break system (an overlay image cross-faded over the frame).
+// Only interactive once the thermal phase has settled on this frame.
+
+export const THERMAL_PHASE_ID = "thermal";
+
+export type ThermalSystemId = "upvc" | "alu";
+
+export interface ThermalSystem {
+  id: ThermalSystemId;
+  label: string;
+  text: {
+    eyebrow: string;
+    headline: string;
+    body: string;
+  };
+  /** Overlay image cross-faded over the canvas frame. null = keep the frame. */
+  image: string | null;
+}
+
+export const THERMAL_SYSTEMS: ThermalSystem[] = [
+  {
+    id: "upvc",
+    label: "uPVC System",
+    text: {
+      eyebrow: "Thermal Insulation",
+      headline: "Keeps heat on the outside.",
+      body: "The frame has multiple air chambers inside that slow down heat transfer. In a concrete building under direct sun, that means your AC runs less to hold the same temperature.",
+    },
+    image: null,
+  },
+  {
+    id: "alu",
+    label: "Aluminum Thermal Break System",
+    text: {
+      eyebrow: "Thermal Break Technology",
+      headline: "Separates outside heat from the inside frame.",
+      body: "The system uses internal and external aluminum profiles divided by a polyamide thermal break. This barrier reduces direct heat transfer, so the inner side of the frame stays cooler even when the outside surface is exposed to sun.",
+    },
+    image: "/images/thermal-alu-break.webp",
+  },
+];

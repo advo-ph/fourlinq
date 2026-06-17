@@ -242,7 +242,7 @@ export const products: Product[] = [
     description:
       "Curtain wall systems — large-format glazed wall assemblies for commercial and high-end residential projects. Engineered for the Philippine climate, with multi-storey applications supported. Consultation required.",
     shortDescription: "Large-format glazed wall assemblies.",
-    image: "/images/wp-export/curtainwall.png",
+    image: "/images/wp-export/curtainwall2.png",
     specs: [
       "Multi-storey applications",
       "Engineered for tropical climate",
