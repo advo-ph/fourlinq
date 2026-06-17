@@ -95,7 +95,7 @@ export const THERMAL_SYSTEMS: ThermalSystem[] = [
     label: "Aluminum Thermal Break System",
     text: {
       eyebrow: "Thermal Break Technology",
-      headline: "Separates outside heat from the inside frame.",
+      headline: "Keeps heat on the outside.",
       body: "The system uses internal and external aluminum profiles divided by a polyamide thermal break. This barrier reduces direct heat transfer, so the inner side of the frame stays cooler even when the outside surface is exposed to sun.",
     },
     image: "/images/thermal-alu-break.webp",
