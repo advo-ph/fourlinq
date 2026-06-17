@@ -35,8 +35,10 @@ const ThermalSystemToggle = ({
         "relative grid grid-cols-2 w-full max-w-[26rem] mx-auto lg:mx-0 p-1",
         "rounded-full border border-[color:var(--rule-soft)]",
         "bg-[rgba(36,36,36,0.06)] backdrop-blur-sm shadow-depth-2",
+        // Hidden entirely while disabled (scroll still animating / not settled);
+        // fades in only once the thermal frame settles and the toggle is enabled.
         "transition-opacity duration-300 ease-out",
-        disabled ? "opacity-45" : "opacity-100",
+        disabled ? "opacity-0 pointer-events-none" : "opacity-100",
       )}
     >
       {/* Sliding red thumb — width matches one column, shifts by its own width */}
