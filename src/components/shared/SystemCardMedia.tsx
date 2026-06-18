@@ -83,6 +83,13 @@ function AnimatedMedia({
   const rafRef = useRef<number | null>(null);
   const lastTsRef = useRef(0);
   const preloadedRef = useRef(false);
+  // Retained, decoded frame <img> objects. Holding references keeps them in the
+  // browser's in-memory cache for the component's lifetime, so playback never
+  // re-fetches a frame. Without this, the warmed images are GC-eligible and the
+  // HTTP cache gets evicted under memory pressure (e.g. while screen-recording),
+  // causing mid-animation frame requests to fail (net::ERR_INSUFFICIENT_RESOURCES)
+  // and the animation to collapse to just its first and last frame.
+  const framesImgsRef = useRef<(HTMLImageElement | null)[]>([]);
   const openRef = useRef(false); // toggle state for click trigger
   const [revealed, setRevealed] = useState(false); // top layer opacity
 
@@ -96,15 +103,18 @@ function AnimatedMedia({
     const warm = async () => {
       if (cancelled || preloadedRef.current) return;
       preloadedRef.current = true;
-      for (const f of frames) {
+      for (let i = 0; i < frames.length; i++) {
         if (cancelled) return;
         const img = new Image();
         img.decoding = "async";
-        img.src = f;
+        img.src = frames[i];
+        // Retain the element so the decoded frame stays resident — this is what
+        // keeps playback from re-fetching (and failing) under memory pressure.
+        framesImgsRef.current[i] = img;
         try {
           await img.decode();
         } catch {
-          /* decode can reject if interrupted — the HTTP fetch is still cached */
+          /* decode can reject if interrupted — the retained <img> stays cached */
         }
       }
     };
@@ -126,7 +136,10 @@ function AnimatedMedia({
 
   const showFrame = (i: number) => {
     const img = animImgRef.current;
-    if (img) img.src = frames[i];
+    if (!img) return;
+    // Prefer the retained, already-decoded frame's URL so the swap resolves from
+    // the in-memory cache instead of issuing a fresh (evictable, failable) fetch.
+    img.src = framesImgsRef.current[i]?.src ?? frames[i];
   };
 
   const tick = (ts: number) => {
@@ -207,6 +220,9 @@ function AnimatedMedia({
   useEffect(
     () => () => {
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      // Release retained frames so a long-lived list of cards doesn't pin
+      // decoded image memory after the card unmounts.
+      framesImgsRef.current = [];
     },
     [],
   );
