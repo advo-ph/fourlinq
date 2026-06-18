@@ -1,0 +1,101 @@
+name: Deploy
+
+# Auto-deploy to the advo VPS on every push to main. Mirrors deploy.sh:
+# build on the runner, rsync artifacts to /opt/fourlinq, restart pm2.
+# Manual runs are available via the "Run workflow" button (workflow_dispatch).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two deploys at once; cancel an in-flight deploy if a newer
+# commit lands on main.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Quality gate — a broken build must not reach production.
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy to VPS
+        env:
+          VPS: ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}
+          REMOTE_DIR: /opt/fourlinq
+        run: |
+          set -euo pipefail
+          # Absolute key path ($HOME, not ~) so rsync's -e shell expands it.
+          SSH="ssh -i $HOME/.ssh/id_ed25519 -o StrictHostKeyChecking=yes"
+
+          echo "::group::Prepare remote + stop process"
+          $SSH "$VPS" "mkdir -p $REMOTE_DIR/logs && pm2 stop fourlinq 2>/dev/null || true"
+          echo "::endgroup::"
+
+          echo "::group::Sync artifacts (mirrors deploy.sh)"
+          # Frontend build output.
+          rsync -az -e "$SSH" --delete \
+            --exclude='node_modules' --exclude='.env' --exclude='.env.local' \
+            --exclude='.git' --exclude='docs' --exclude='scripts' \
+            dist/ "$VPS:$REMOTE_DIR/dist/"
+          # Server runtime.
+          rsync -az -e "$SSH" --delete --exclude='node_modules' server/ "$VPS:$REMOTE_DIR/server/"
+          # @cms-rag drop-in package used by server/ and Admin.tsx.
+          rsync -az -e "$SSH" --delete --exclude='node_modules' packages/ "$VPS:$REMOTE_DIR/packages/"
+          # src/data imported at runtime (tsx) for KB seeding.
+          rsync -az -e "$SSH" --delete src/data/ "$VPS:$REMOTE_DIR/src/data/"
+          # Manifests needed for the live-side npm ci.
+          rsync -az -e "$SSH" package.json package-lock.json tsconfig.json ecosystem.config.cjs "$VPS:$REMOTE_DIR/"
+          echo "::endgroup::"
+
+          echo "::group::Write deploy audit trail"
+          $SSH "$VPS" "cat > $REMOTE_DIR/deployed-from.txt" <<AUDIT
+          sha:        ${{ github.sha }}
+          short:      $(echo "${{ github.sha }}" | cut -c1-7)
+          branch:     ${{ github.ref_name }}
+          subject:    $(git log -1 --pretty=%s)
+          author:     $(git log -1 --pretty='%an <%ae>')
+          deployed:   $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          deployer:   github-actions (run ${{ github.run_id }})
+          forced:     0
+          AUDIT
+          echo "::endgroup::"
+
+          echo "::group::Install prod deps + restart"
+          $SSH "$VPS" "cd $REMOTE_DIR && npm ci --omit=dev --no-audit --no-fund"
+          # tsx/typescript live in devDependencies but the runtime needs them.
+          $SSH "$VPS" "cd $REMOTE_DIR && npm install --no-save --no-audit --no-fund tsx@4 typescript@5"
+          $SSH "$VPS" "cd $REMOTE_DIR && pm2 startOrRestart ecosystem.config.cjs && pm2 save"
+          echo "::endgroup::"
+
+          echo "::group::Health check"
+          sleep 2
+          $SSH "$VPS" "curl -fsS http://localhost:3001/api/health" && echo
+          echo "::endgroup::"
+
+          echo "Deployed ${{ github.sha }} → https://fourlinq.ph"
