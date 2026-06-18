@@ -44,7 +44,7 @@ export const products: Product[] = [
       "Multi-chamber uPVC profile",
       "6mm–12mm glass options",
       "Galvanized steel reinforcement",
-      "EPDM gaskets — weatherproof seal",
+      "EPDM gaskets, weatherproof seal",
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Low-E Coated", "Frosted Privacy", "Tinted Bronze"],
@@ -73,7 +73,7 @@ export const products: Product[] = [
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "special-shapes")!.tagline,
     image: "/images/wp-export/specialshapes.webp",
     specs: [
-      "Custom geometry — arches, circles, triangles",
+      "Custom geometry, arches, circles, triangles",
       "Combinable with other window types",
       "6mm–12mm glass options",
       "Multi-chamber profile",
@@ -92,7 +92,7 @@ export const products: Product[] = [
       "Top-hinged, opens outward",
       "Ventilation even during rain",
       "Multi-chamber uPVC profile",
-      "EPDM gaskets — weatherproof seal",
+      "EPDM gaskets, weatherproof seal",
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Frosted Privacy", "Laminated Safety", "Tinted Bronze"],
@@ -119,7 +119,7 @@ export const products: Product[] = [
     category: "doors",
     description:
       "Four-panel accordion folding door. Each panel is hinged to the next and runs on a bottom track. When opened, the panels fold and stack to one side, creating a full clear opening with no frame in the way. The lead panel carries the handle and starts the movement. Suited to living areas, patios, and spaces that should open completely to the outside.",
-    shortDescription: "Opens fully — panel by panel, wall to wall.",
+    shortDescription: "Opens fully, panel by panel, wall to wall.",
     image: "/images/wp-export/slideandfold.webp",
     // Tita reference video (2026-05-28 chat): shows the system in motion.
     youtubeId: "-8XwIKAtAAc",
@@ -145,7 +145,7 @@ export const products: Product[] = [
       "Multi-chamber reinforced profile",
       "Galvanized steel core",
       "Multi-point locking",
-      "EPDM gaskets — weatherproof seal",
+      "EPDM gaskets, weatherproof seal",
     ],
     finishes: productFinishes,
     glassOptions: ["Frosted Privacy", "Clear Float", "Laminated Safety"],
@@ -155,7 +155,7 @@ export const products: Product[] = [
     name: "French Sliding Door",
     category: "doors",
     description:
-      "Four-panel sliding door with a traditional French door aesthetic. The two centre panels are active — each handle-fitted — and slide to open, with the outer two panels fixed in place. A decorative grid pattern runs across all four panels. Combines the visual character of a classic double door with the space-saving practicality of a sliding system.",
+      "Four-panel sliding door with a traditional French door aesthetic. The two centre panels are active, each handle-fitted, and slide to open, with the outer two panels fixed in place. A decorative grid pattern runs across all four panels. Combines the visual character of a classic double door with the space-saving practicality of a sliding system.",
     shortDescription: "Classic French door look, sliding operation.",
     image: "/images/wp-export/frenchdoor.webp",
     specs: [
@@ -174,7 +174,7 @@ export const products: Product[] = [
     name: "Large Panel Doors",
     category: "doors",
     description:
-      "Two-panel large-format door system with oversized glass panels and minimal framing. The right panel carries a full-height vertical bar handle. Designed for wide openings — ground-floor living rooms, lanai-facing walls, and anywhere the door should feel like a glass wall rather than a door. Custom-specified per project.",
+      "Two-panel large-format door system with oversized glass panels and minimal framing. The right panel carries a full-height vertical bar handle. Designed for wide openings, ground-floor living rooms, lanai-facing walls, and anywhere the door should feel like a glass wall rather than a door. Custom-specified per project.",
     shortDescription: "Maximum glass, minimal frame.",
     image: "/images/wp-export/largepanel.webp",
     specs: [
@@ -210,7 +210,7 @@ export const products: Product[] = [
     name: "90 Series",
     category: "doors",
     description:
-      "FourlinQ 90 Series — a three-panel door system with large uninterrupted glass panes and minimal framing. The active panel is handle-fitted on the right. Designed for wide residential openings where clean sightlines and a premium finish are the priority. Custom-specified per project.",
+      "FourlinQ 90 Series, a three-panel door system with large uninterrupted glass panes and minimal framing. The active panel is handle-fitted on the right. Designed for wide residential openings where clean sightlines and a premium finish are the priority. Custom-specified per project.",
     shortDescription: "Three-panel premium door system.",
     image: "/images/wp-export/90series.webp",
     specs: [
@@ -246,13 +246,13 @@ export const products: Product[] = [
     name: "Curtain Wall",
     category: "specialist",
     description:
-      "Fixed-glazed facade system arranged in a structural grid of vertical mullions and horizontal transoms. The frame carries the glass weight and transfers wind and gravity loads to the building's primary structure — the wall itself bears no load. Suited to commercial buildings and high-end residential projects where a continuous glazed surface is the design intent. Multi-storey configurations available. Project consultation required.",
-    shortDescription: "Fixed glazed facade — not a wall, a window wall.",
+      "Fixed-glazed facade system arranged in a structural grid of vertical mullions and horizontal transoms. The frame carries the glass weight and transfers wind and gravity loads to the building's primary structure. The wall itself bears no load. Suited to commercial buildings and high-end residential projects where a continuous glazed surface is the design intent. Multi-storey configurations available. Project consultation required.",
+    shortDescription: "Fixed glazed facade. Not a wall, a window wall.",
     image: "/images/wp-export/curtainwall2.png",
     specs: [
       "Fixed (non-operable) glazed assembly",
       "Structural grid: vertical mullions and horizontal transoms",
-      "Non-load-bearing facade — loads transfer to building structure",
+      "Non-load-bearing facade, loads transfer to building structure",
       "Multi-storey capable",
       "Project consultation required",
     ],
@@ -264,7 +264,7 @@ export const products: Product[] = [
     name: "Custom Shapes",
     category: "specialist",
     description:
-      "Non-standard panel geometries — triangles, trapezoids, hexagons, and full bespoke shapes. Designed to architect drawings, fabricated in our workshop. The panels that other manufacturers say can't be done.",
+      "Non-standard panel geometries. Triangles, trapezoids, hexagons, and full bespoke shapes. Designed to architect drawings, fabricated in our workshop. The panels that other manufacturers say can't be done.",
     shortDescription: "Bespoke geometry to architect drawings.",
     image: "/images/wp-export/customshapes.webp",
     specs: [

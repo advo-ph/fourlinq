@@ -263,7 +263,7 @@ export const PRODUCT_TYPES: ProductType[] = [
     category: "both",
     tagline: "Elegant. Versatile. Thoroughly reliable.",
     description:
-      "Elegant, attractive, and versatile while being thoroughly reliable. Slides horizontally along a track — ideal where outward clearance is limited.",
+      "Elegant, attractive, and versatile while being thoroughly reliable. Slides horizontally along a track, ideal where outward clearance is limited.",
     primaryBenefit: "Space-saving, ideal for balconies and wide openings",
     supportsCustomShapes: false,
   },
@@ -294,7 +294,7 @@ export const PRODUCT_TYPES: ProductType[] = [
     tagline: "Open up your space completely.",
     description:
       "Panels that slide and fold to one side, creating a fully open wall between indoor and outdoor spaces. Ideal for living areas, patios, and entertainment spaces.",
-    primaryBenefit: "Full wall opening — seamless indoor-outdoor living",
+    primaryBenefit: "Full wall opening, seamless indoor-outdoor living",
     supportsCustomShapes: false,
   },
 ];
