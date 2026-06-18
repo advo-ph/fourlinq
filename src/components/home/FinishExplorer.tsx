@@ -16,7 +16,7 @@ const PRODUCTS: ProductEntry[] = [
   { id: "sliding-door", label: "Sliding Door", category: "doors" },
   { id: "slide-and-fold", label: "Slide & Fold", category: "doors" },
   { id: "casement-door", label: "Casement Door", category: "doors" },
-  { id: "french-door", label: "French Door", category: "doors" },
+  { id: "french-door", label: "French Sliding Door", category: "doors" },
   { id: "large-panel", label: "Large Panel", category: "doors" },
   { id: "lift-and-slide", label: "Lift & Slide", category: "doors" },
   { id: "90-series", label: "90 Series", category: "doors" },

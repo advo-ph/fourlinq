@@ -5,6 +5,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import QuoteModal from "@/components/shared/QuoteModal";
 import { useProducts, Product } from "@/hooks/useProducts";
 import FinishSwatch from "@/components/shared/FinishSwatch";
+import SystemCardMedia from "@/components/shared/SystemCardMedia";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
 import { trackProductView } from "@/hooks/useAnalytics";
 import { motion, AnimatePresence } from "framer-motion";
@@ -76,7 +77,14 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
         {/* Body */}
         <div className="px-6 lg:px-10 py-8 flex-1">
           <div className="aspect-[4/3] bg-[color:var(--canvas-soft)] mb-8 overflow-hidden">
-            <img src={product.image} alt={product.name} className="w-full h-full object-contain p-6" />
+            <SystemCardMedia
+              productId={product.id}
+              src={product.image}
+              alt={product.name}
+              imgClassName="w-full h-full object-contain p-6"
+              animClassName="w-full h-full object-contain p-6"
+              trigger="click"
+            />
           </div>
 
           {product.youtubeId && (
@@ -266,12 +274,11 @@ const Products = () => {
                     className="group block text-left"
                   >
                     <div className="aspect-video bg-[color:var(--canvas-soft)] overflow-hidden">
-                      <img
+                      <SystemCardMedia
+                        productId={product.id}
                         src={product.image}
                         alt={product.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
+                        imgClassName="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                       />
                     </div>
                     <div className="mt-6">

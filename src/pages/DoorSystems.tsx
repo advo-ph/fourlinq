@@ -10,7 +10,7 @@ const DoorSystems = () => (
       intro:
         "Where a home stops being indoors and starts being outdoors. The lanai door that opens to the garden. The wall that disappears for a party. The threshold that closes against a typhoon and seals back to weather-tight when the wind passes. Custom-fabricated, project-specified, built to operate smoothly for decades.",
       subSystemList:
-        "Slide & Fold, Large Panel Doors (up to 6 metres), Lift & Slide, and the 90 Series. Plus Casement Door, French Door, and Sliding Door configurations.",
+        "Slide & Fold, Large Panel Doors (up to 6 metres), Lift & Slide, and the 90 Series. Plus Casement Door, French Sliding Door, and Sliding Door configurations.",
       filterCategory: "doors",
     }}
   />

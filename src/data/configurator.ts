@@ -41,7 +41,7 @@ export const productTypes: ProductType[] = [
   { id: "90-series", name: "90 Series", icon: "90-series", category: "doors" },
   { id: "lift-slide", name: "Lift & Slide", icon: "lift-slide", category: "doors" },
   { id: "sliding-door", name: "Sliding Door", icon: "sliding-door", category: "doors" },
-  { id: "french-door", name: "French Door", icon: "french-door", category: "doors" },
+  { id: "french-door", name: "French Sliding Door", icon: "french-door", category: "doors" },
   { id: "entrance", name: "Casement Door", icon: "entrance", category: "doors" },
   // Specialist — custom-fabricated geometries
   { id: "arch-shapes", name: "Arch Shapes", icon: "arch", category: "specialist" },

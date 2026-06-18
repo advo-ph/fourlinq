@@ -39,7 +39,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "casement")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "casement")!.tagline,
-    image: "/images/wp-export/casement.jpeg",
+    image: "/images/wp-export/casement.webp",
     specs: [
       "Multi-chamber uPVC profile",
       "6mm–12mm glass options",
@@ -55,7 +55,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
-    image: "/images/wp-export/slidingwindow.png",
+    image: "/images/wp-export/slidingwindow.webp",
     specs: [
       "Multi-chamber uPVC profile",
       "Smooth horizontal track operation",
@@ -71,7 +71,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "special-shapes")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "special-shapes")!.tagline,
-    image: "/images/wp-export/specialshapes.jpeg",
+    image: "/images/wp-export/specialshapes.webp",
     specs: [
       "Custom geometry — arches, circles, triangles",
       "Combinable with other window types",
@@ -87,7 +87,7 @@ export const products: Product[] = [
     category: "windows",
     description: PRODUCT_TYPES.find((p) => p.id === "awning")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "awning")!.tagline,
-    image: "/images/wp-export/awning.jpeg",
+    image: "/images/wp-export/awning.webp",
     specs: [
       "Top-hinged, opens outward",
       "Ventilation even during rain",
@@ -103,7 +103,7 @@ export const products: Product[] = [
     category: "doors",
     description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
-    image: "/images/wp-export/slidingdoor.jpeg",
+    image: "/images/wp-export/slidingdoor.webp",
     specs: [
       "Multi-chamber uPVC profile",
       "Space-saving horizontal slide",
@@ -119,7 +119,7 @@ export const products: Product[] = [
     category: "doors",
     description: PRODUCT_TYPES.find((p) => p.id === "slide-and-fold")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "slide-and-fold")!.tagline,
-    image: "/images/wp-export/slideandfold.jpeg",
+    image: "/images/wp-export/slideandfold.webp",
     // Tita reference video (2026-05-28 chat): shows the system in motion.
     youtubeId: "-8XwIKAtAAc",
     specs: [
@@ -138,7 +138,7 @@ export const products: Product[] = [
     description:
       "Reinforced uPVC casement door combining aesthetic versatility with the security demands of main entry points. Multi-chamber profile with galvanized steel reinforcement.",
     shortDescription: "Secure and elegant single-leaf hinged doors.",
-    image: "/images/wp-export/casement-door.jpeg",
+    image: "/images/wp-export/casement-door.webp",
     specs: [
       "Multi-chamber reinforced profile",
       "Galvanized steel core",
@@ -150,12 +150,12 @@ export const products: Product[] = [
   },
   {
     id: "french-door",
-    name: "French Door",
+    name: "French Sliding Door",
     category: "doors",
     description:
       "Double-leaf door system with multi-point locking. Multi-chamber uPVC profile with galvanized steel reinforcement for security and weather resistance.",
     shortDescription: "Classic double-leaf doors with multi-point locking.",
-    image: "/images/wp-export/frenchdoor.jpeg",
+    image: "/images/wp-export/frenchdoor.webp",
     specs: [
       "Double-leaf configuration",
       "Multi-point locking system",
@@ -173,7 +173,7 @@ export const products: Product[] = [
     description:
       "Large-format panel doors engineered for openings up to 6 metres wide. Built for ground-floor living rooms and lanai-facing walls where the door itself becomes part of the architecture. Custom-specified per project.",
     shortDescription: "Door openings up to 6 metres wide.",
-    image: "/images/wp-export/largepanel.png",
+    image: "/images/wp-export/largepanel.webp",
     specs: [
       "Spans up to 6 metres wide",
       "Multi-chamber reinforced profile",
@@ -190,7 +190,7 @@ export const products: Product[] = [
     description:
       "Lift-and-slide door system. The panel lifts off its seal to slide effortlessly along the track, then settles back onto the seal when closed for a fully weather-tight finish. Ideal for large openings where smooth daily operation matters.",
     shortDescription: "Effortless operation on large openings.",
-    image: "/images/wp-export/liftandslide.jpeg",
+    image: "/images/wp-export/liftandslide.webp",
     specs: [
       "Lift mechanism for low-effort operation",
       "Weather-tight closed-position seal",
@@ -207,7 +207,7 @@ export const products: Product[] = [
     description:
       "FourlinQ 90 Series door system — engineered for premium residential applications where performance and finish matter. Custom-specified profile family.",
     shortDescription: "Premium residential door system.",
-    image: "/images/wp-export/90series.jpeg",
+    image: "/images/wp-export/90series.webp",
     specs: [
       "90 Series profile family",
       "Multi-chamber reinforced profile",
@@ -225,7 +225,7 @@ export const products: Product[] = [
     description:
       "Custom-curved profile work for arched windows and doors. Designed and fabricated to architect-specified geometry. Common in heritage homes and statement entries.",
     shortDescription: "Custom-curved geometry for architectural statements.",
-    image: "/images/wp-export/archshapes.png",
+    image: "/images/wp-export/archshapes.webp",
     specs: [
       "Architect-specified arc geometry",
       "Multi-chamber uPVC profile",
@@ -259,7 +259,7 @@ export const products: Product[] = [
     description:
       "Non-standard panel geometries — triangles, trapezoids, hexagons, and full bespoke shapes. Designed to architect drawings, fabricated in our workshop. The panels that other manufacturers say can't be done.",
     shortDescription: "Bespoke geometry to architect drawings.",
-    image: "/images/wp-export/customshapes.png",
+    image: "/images/wp-export/customshapes.webp",
     specs: [
       "Architect-drawn geometry",
       "Workshop-fabricated",

@@ -15,8 +15,10 @@ interface UseScrollFramesReturn {
   scrollProgress: number;
 }
 
-const AUTO_PLAY_INTERVAL = 33.33; // ~30fps
+const AUTO_PLAY_INTERVAL = 33.33; // ~30fps at 1×
 const SPINNING_MAX_STEP = 3;
+const BASE_SPEED = 1.3;  // default auto-play speed
+const FAST_SPEED = 2.0;  // speed when phase-switching mid-animation
 
 export function useScrollFrames({
   containerRef,
@@ -34,6 +36,9 @@ export function useScrollFrames({
   const lastAutoStepTimeRef = useRef(0);
   const rafRef = useRef(0);
   const scrollProgressRef = useRef(0);
+  const prevPhaseIdxRef = useRef(-1);
+  const isAcceleratedRef = useRef(false);
+  const prevTargetRef = useRef(0);
 
   const phaseThresholds = useRef(
     phases.map((_, i) => i / phases.length),
@@ -85,17 +90,6 @@ export function useScrollFrames({
     return Math.max(0, Math.min(1, scrolled / scrollableDistance));
   }, [containerRef]);
 
-  // Find which phase a given frame belongs to
-  const getPhaseForFrame = useCallback(
-    (frame: number): number => {
-      for (let i = phases.length - 1; i >= 0; i--) {
-        if (frame >= phases[i].startFrame) return i;
-      }
-      return 0;
-    },
-    [phases],
-  );
-
   useEffect(() => {
     if (!enabled) return;
 
@@ -126,6 +120,26 @@ export function useScrollFrames({
 
       let current = displayedFrameRef.current;
 
+      // Detect phase switches for auto-play phases.
+      // Compare current frame against the PREVIOUS phase's target — not the new
+      // one — because target already jumps to the new phase's end frame the
+      // moment the phase changes, so current !== target is always true at entry
+      // regardless of whether the previous animation had settled.
+      if (phase.mode !== "scroll-mapped" && phaseIdx !== prevPhaseIdxRef.current) {
+        if (prevPhaseIdxRef.current !== -1) {
+          const wasMoving = current !== prevTargetRef.current;
+          if (wasMoving) {
+            isAcceleratedRef.current = true;
+          }
+        }
+        prevPhaseIdxRef.current = phaseIdx;
+      }
+
+      // Release acceleration as soon as the frame catches up.
+      if (current === target) {
+        isAcceleratedRef.current = false;
+      }
+
       if (current !== target) {
         const delta = target - current;
         const direction = Math.sign(delta);
@@ -135,16 +149,10 @@ export function useScrollFrames({
           const step = Math.min(absDelta, SPINNING_MAX_STEP);
           current += direction * step;
         } else {
-          if (timestamp - lastAutoStepTimeRef.current >= AUTO_PLAY_INTERVAL) {
-            // Speed up only when the displayed frame is in a different
-            // phase than the target — i.e. the user scrolled ahead by
-            // one or more full phases.
-            const displayedPhaseIdx = getPhaseForFrame(current);
-            const phaseDiff = Math.abs(phaseIdx - displayedPhaseIdx);
-            const step = phaseDiff >= 1
-              ? Math.min(absDelta, 1 + phaseDiff * 2)
-              : 1;
-            current += direction * step;
+          const speed = isAcceleratedRef.current ? FAST_SPEED : BASE_SPEED;
+          const effectiveInterval = AUTO_PLAY_INTERVAL / speed;
+          if (timestamp - lastAutoStepTimeRef.current >= effectiveInterval) {
+            current += direction * 1;
             lastAutoStepTimeRef.current = timestamp;
           }
         }
@@ -153,6 +161,8 @@ export function useScrollFrames({
         displayedFrameRef.current = current;
         setDisplayedFrame(current);
       }
+
+      prevTargetRef.current = target;
 
       const scrollPhaseIdx = getPhaseForScroll(progress);
       const scrollPhase = phases[scrollPhaseIdx];
@@ -175,7 +185,7 @@ export function useScrollFrames({
 
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [enabled, totalFrames, phases, getTargetFrame, getPhaseForScroll, getPhaseForFrame]);
+  }, [enabled, totalFrames, phases, getTargetFrame, getPhaseForScroll]);
 
   useEffect(() => {
     if (!enabled) return;

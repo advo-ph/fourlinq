@@ -10,6 +10,7 @@ import UPVCAdvantageStrip from "@/components/shared/UPVCAdvantageStrip";
 import EditorialButton from "@/components/primitives/Button";
 import { useProducts, Product } from "@/hooks/useProducts";
 import { trackProductView } from "@/hooks/useAnalytics";
+import SystemCardMedia from "@/components/shared/SystemCardMedia";
 
 /**
  * Shared layout for the 3 system buckets (Window / Door / Specialist).
@@ -100,12 +101,11 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
                     className="group block text-left"
                   >
                     <div className="aspect-video bg-[color:var(--canvas-soft)] overflow-hidden">
-                      <img
+                      <SystemCardMedia
+                        productId={product.id}
                         src={product.image}
                         alt={product.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.02]"
+                        imgClassName="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.02]"
                       />
                     </div>
                     <div className="mt-6">
@@ -205,7 +205,14 @@ const ProductPeek = ({ product, onClose }: { product: Product; onClose: () => vo
 
         <div className="px-6 lg:px-10 py-8">
           <div className="aspect-video bg-[color:var(--canvas-soft)] mb-8 overflow-hidden">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            <SystemCardMedia
+              productId={product.id}
+              src={product.image}
+              alt={product.name}
+              imgClassName="w-full h-full object-cover"
+              animClassName="w-full h-full object-cover"
+              trigger="click"
+            />
           </div>
           <p className="text-body text-[color:var(--ink-secondary)] leading-[1.7] mb-10">
             {product.description}
