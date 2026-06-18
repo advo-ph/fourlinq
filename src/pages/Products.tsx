@@ -76,29 +76,16 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
 
         {/* Body */}
         <div className="px-6 lg:px-10 py-8 flex-1">
-          <div className="aspect-[4/3] bg-[color:var(--canvas-soft)] mb-8 overflow-hidden">
+          <div className="aspect-[4/3] bg-white mb-8 overflow-hidden">
             <SystemCardMedia
               productId={product.id}
               src={product.image}
               alt={product.name}
-              imgClassName="w-full h-full object-contain p-6"
-              animClassName="w-full h-full object-contain p-6"
+              imgClassName="w-full h-full object-contain"
+              animClassName="w-full h-full object-contain"
               trigger="click"
             />
           </div>
-
-          {product.youtubeId && (
-            <div className="aspect-video bg-black mb-8 overflow-hidden">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${product.youtubeId}?rel=0`}
-                title={`${product.name} demonstration video`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                loading="lazy"
-                className="w-full h-full border-0"
-              />
-            </div>
-          )}
 
           <p className="text-body text-[color:var(--ink-secondary)] leading-[1.7] mb-10">
             {product.description}

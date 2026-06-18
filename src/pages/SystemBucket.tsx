@@ -204,13 +204,13 @@ const ProductPeek = ({ product, onClose }: { product: Product; onClose: () => vo
         </div>
 
         <div className="px-6 lg:px-10 py-8">
-          <div className="aspect-video bg-[color:var(--canvas-soft)] mb-8 overflow-hidden">
+          <div className="aspect-video bg-white mb-8 overflow-hidden">
             <SystemCardMedia
               productId={product.id}
               src={product.image}
               alt={product.name}
-              imgClassName="w-full h-full object-cover"
-              animClassName="w-full h-full object-cover"
+              imgClassName="w-full h-full object-contain"
+              animClassName="w-full h-full object-contain"
               trigger="click"
             />
           </div>
