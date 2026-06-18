@@ -105,7 +105,7 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
                         productId={product.id}
                         src={product.image}
                         alt={product.name}
-                        imgClassName="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.02]"
+                        imgClassName="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.02]"
                       />
                     </div>
                     <div className="mt-6">

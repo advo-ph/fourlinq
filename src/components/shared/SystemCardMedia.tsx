@@ -227,6 +227,15 @@ function AnimatedMedia({
     [],
   );
 
+  // Only wire the hover animation on devices that actually hover (fine pointer).
+  // On touch screens, "pointer-enter" fires on tap and would play the animation
+  // instead of letting the press fall through to the card's open-drawer click —
+  // which read as a flicker that never opened the drawer. Binding nothing here
+  // lets the tap bubble straight to the button.
+  const canHover =
+    typeof window !== "undefined" &&
+    !!window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
+
   const interaction =
     trigger === "click"
       ? {
@@ -241,7 +250,9 @@ function AnimatedMedia({
           tabIndex: 0,
           "aria-label": `Play ${alt} opening animation`,
         }
-      : { onPointerEnter: handleEnter, onPointerLeave: handleLeave };
+      : canHover
+        ? { onPointerEnter: handleEnter, onPointerLeave: handleLeave }
+        : {};
 
   return (
     <div
