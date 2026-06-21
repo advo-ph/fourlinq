@@ -20,29 +20,29 @@ type EditorialButtonProps = EditorialButtonBaseProps &
   Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof EditorialButtonBaseProps>;
 
 /**
- * Marvin uses two button systems:
- *  - Primary: filled pill (50px radius), brand color
- *  - Secondary: zero-radius outlined, 2px border
- *  - Ghost: plain text, underline on hover
+ * Showroom CTA system:
+ *  - Primary: FourlinQ red, 4px radius, fixed-feeling width
+ *  - Secondary: white fill, graphite text
+ *  - Ghost: quiet tertiary text link
  */
 const EditorialButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, EditorialButtonProps>(
   ({ children, variant = "primary", size = "md", to, href, className, fullWidth, ...rest }, ref) => {
     const sizeClass =
-      size === "sm" ? "px-5 py-2.5 text-body-sm" :
-      size === "lg" ? "px-8 py-4 text-body-lg" :
-                      "px-6 py-3 text-body";
+      size === "sm" ? "px-4 py-2 text-body-sm min-h-9" :
+      size === "lg" ? "px-5 py-3 text-body min-h-10" :
+                      "px-5 py-2.5 text-body min-h-10";
 
     const variantClass =
       variant === "primary"
-        ? "rounded-full bg-[color:var(--accent)] text-white border-2 border-[color:var(--accent)] hover:bg-[color:var(--accent-hover)] hover:border-[color:var(--accent-hover)]"
+        ? "rounded-sm bg-[color:var(--accent)] text-white border-[3px] border-transparent hover:bg-[color:var(--accent-hover)] focus-visible:border-white focus-visible:shadow-[inset_0_0_0_2px_rgba(255,255,255,0.75)]"
         : variant === "secondary"
-        ? "rounded-none bg-transparent text-[color:var(--ink-primary)] border-2 border-[color:var(--ink-primary)] hover:bg-[color:var(--ink-primary)] hover:text-white"
-        : "bg-transparent text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] underline underline-offset-[6px] decoration-1 decoration-[color:var(--rule-strong)] hover:decoration-[color:var(--accent)]";
+        ? "rounded-sm bg-white text-[color:var(--ink-secondary)] border-[3px] border-transparent hover:bg-[color:var(--canvas-soft)] focus-visible:border-[color:var(--ink-primary)]"
+        : "bg-transparent text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)] underline underline-offset-[6px] decoration-1 decoration-[color:var(--rule-strong)] hover:decoration-[color:var(--ink-primary)]";
 
     const classes = cn(
-      "inline-flex items-center justify-center font-sans font-medium tracking-wide",
-      "transition-all duration-300 ease-marvin",
-      "min-h-[44px]", // tap target floor
+      "inline-flex items-center justify-center font-sans font-medium tracking-normal",
+      "transition-[background-color,border-color,color,box-shadow] duration-300 ease-marvin",
+      !fullWidth && variant !== "ghost" && "w-full sm:w-[200px]",
       sizeClass,
       variantClass,
       fullWidth && "w-full",
