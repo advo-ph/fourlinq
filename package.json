@@ -11,6 +11,7 @@
     "typecheck": "tsc --build",
     "test": "vitest run",
     "test:watch": "vitest",
+    "qa:visual": "node scripts/visual-qa.mjs",
     "preview": "vite preview",
     "dev:api": "tsx watch server/index.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",

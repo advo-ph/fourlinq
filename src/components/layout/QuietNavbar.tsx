@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import Logo from "@/components/shared/Logo";
-import EditorialButton from "@/components/primitives/Button";
 import { cn } from "@/lib/utils";
 
 interface NavLink {
@@ -31,10 +30,20 @@ const navLinks: NavLink[] = [
 
 const QuietNavbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const isHome = location.pathname === "/";
+  const transparent = isHome && !scrolled && !mobileOpen;
 
   // Close mobile drawer on route change
   useEffect(() => { setMobileOpen(false); }, [location]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Lock body scroll when mobile drawer open
   useEffect(() => {
@@ -45,20 +54,24 @@ const QuietNavbar = () => {
   return (
     <>
       <nav
+        data-main-nav
         className={cn(
-          "fixed top-0 inset-x-0 z-50 bg-white",
+          "fixed top-0 inset-x-0 z-50",
           "h-[72px]",
-          "border-b border-[color:var(--rule-soft)]"
+          "transition-[background-color,backdrop-filter,color] duration-300 ease-marvin",
+          transparent
+            ? "bg-transparent text-white"
+            : "bg-white/80 text-[color:var(--ink-primary)] backdrop-blur-md"
         )}
       >
         <div className="container-editorial h-full">
           <div className="flex items-center justify-between h-full">
             <Link to="/" className="shrink-0 flex items-center" aria-label="FourlinQ home">
-              <Logo variant="dark" className="h-11" />
+              <Logo variant={transparent ? "light" : "dark"} className="h-11" />
             </Link>
 
-            {/* Desktop nav — mixed-case, plain text, no all-caps. Items with children get an on-hover mega-panel. */}
-            <ul className="hidden lg:flex items-center gap-8 xl:gap-10">
+            {/* Desktop nav — tiny rounded nav buttons with a seamless mega-panel. */}
+            <ul className="hidden lg:flex items-center gap-1 xl:gap-2">
               {navLinks.map((link) => {
                 const active = location.pathname === link.to ||
                                (link.to !== "/" && location.pathname.startsWith(link.to));
@@ -67,11 +80,15 @@ const QuietNavbar = () => {
                     <Link
                       to={link.to}
                       className={cn(
-                        "whitespace-nowrap text-body-sm font-medium transition-colors duration-300 ease-marvin",
-                        "border-b-[1.5px] pb-1 inline-flex items-center gap-1",
+                        "whitespace-nowrap text-body-sm font-medium transition-[background-color,color] duration-300 ease-marvin",
+                        "inline-flex min-h-8 items-center rounded-sm px-4",
                         active
-                          ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
-                          : "text-[color:var(--ink-primary)] border-transparent hover:text-[color:var(--accent)]"
+                          ? transparent
+                            ? "bg-white/15 text-white"
+                            : "bg-[color:var(--canvas-soft)] text-[color:var(--ink-primary)]"
+                          : transparent
+                            ? "text-white hover:bg-white/15"
+                            : "text-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)]"
                       )}
                     >
                       {link.label}
@@ -80,33 +97,35 @@ const QuietNavbar = () => {
                     {link.children && (
                       <div
                         className={cn(
-                          "absolute left-1/2 -translate-x-1/2 top-full w-[420px]",
+                          "fixed left-0 right-0 top-[72px]",
                           "pt-3",
-                          "opacity-0 invisible translate-y-1 pointer-events-none",
-                          "group-hover/nav:opacity-100 group-hover/nav:visible group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto",
-                          "transition-all duration-300 ease-marvin"
+                          "opacity-0 invisible pointer-events-none",
+                          "group-hover/nav:opacity-100 group-hover/nav:visible group-hover/nav:pointer-events-auto",
+                          "transition-[opacity,visibility] duration-300 ease-marvin"
                         )}
                       >
-                        <div className="bg-white border border-[color:var(--rule-soft)] shadow-depth-4 p-6">
-                          <ul className="flex flex-col">
-                            {link.children.map((c) => (
-                              <li key={c.to}>
-                                <Link
-                                  to={c.to}
-                                  className="block py-3 -mx-3 px-3 hover:bg-[color:var(--canvas-soft)] transition-colors duration-300 ease-marvin"
-                                >
-                                  <p className="text-body-sm font-medium text-[color:var(--ink-primary)]">
-                                    {c.label}
-                                  </p>
-                                  {c.description && (
-                                    <p className="text-[12px] mt-0.5 text-[color:var(--ink-muted)] leading-snug">
-                                      {c.description}
+                        <div className="bg-white text-[color:var(--ink-primary)]">
+                          <div className="container-editorial py-9">
+                            <ul className="grid grid-cols-4 gap-4">
+                              {link.children.map((c) => (
+                                <li key={c.to}>
+                                  <Link
+                                    to={c.to}
+                                    className="block rounded-sm px-4 py-5 text-center transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
+                                  >
+                                    <p className="text-[17px] font-medium text-[color:var(--ink-primary)]">
+                                      {c.label}
                                     </p>
-                                  )}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
+                                    {c.description && (
+                                      <p className="mx-auto mt-3 max-w-[14rem] text-body-sm text-[color:var(--ink-muted)] leading-snug">
+                                        {c.description}
+                                      </p>
+                                    )}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -121,13 +140,16 @@ const QuietNavbar = () => {
               <Link
                 to="/brand#contact"
                 className={cn(
-                  "whitespace-nowrap text-body-sm font-medium text-[color:var(--ink-primary)]",
-                  "transition-colors duration-300 ease-marvin hover:text-[color:var(--accent)]",
-                  "inline-flex items-center gap-1.5 group/cta"
+                  "whitespace-nowrap text-body-sm font-medium",
+                  "transition-[background-color,color] duration-300 ease-marvin",
+                  "inline-flex min-h-8 items-center rounded-sm px-4",
+                  transparent
+                    ? "text-white hover:bg-white/15"
+                    : "text-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)]"
                 )}
               >
                 Book a Consultation
-                <span className="inline-block transition-transform duration-300 ease-marvin group-hover/cta:translate-x-0.5">
+                <span className="inline-block pl-1">
                   →
                 </span>
               </Link>
@@ -136,7 +158,7 @@ const QuietNavbar = () => {
             {/* Mobile toggle */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-2 -mr-2 text-[color:var(--ink-primary)]"
+              className={cn("lg:hidden p-2 -mr-2", transparent ? "text-white" : "text-[color:var(--ink-primary)]")}
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -154,7 +176,7 @@ const QuietNavbar = () => {
           <div className="container-editorial pt-6 pb-2">
             <Link
               to="/brand#contact"
-              className="block w-full text-center bg-[color:var(--accent)] hover:bg-[color:var(--accent-hover)] text-white text-body font-medium tracking-wide py-4 transition-colors duration-300 ease-marvin"
+              className="block w-full rounded-sm text-center bg-[color:var(--accent)] hover:bg-[color:var(--accent-hover)] text-white text-body font-medium tracking-normal py-3 transition-colors duration-300 ease-marvin"
             >
               Book a Consultation
             </Link>
@@ -171,7 +193,7 @@ const QuietNavbar = () => {
                     <Link
                       to={link.to}
                       className={cn(
-                        "block py-4 text-[1.5rem] font-serif tracking-tight",
+                        "block py-4 text-[1.5rem] font-sans tracking-normal font-medium",
                         active ? "text-[color:var(--accent)]" : "text-[color:var(--ink-primary)]"
                       )}
                     >
@@ -205,7 +227,7 @@ const QuietNavbar = () => {
             >
               Visit a Showroom →
             </Link>
-            <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-muted)]">
+            <p className="mt-3 text-[12px] tracking-normal text-[color:var(--ink-muted)]">
               Manila · Cebu
             </p>
           </div>

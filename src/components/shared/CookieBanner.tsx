@@ -15,6 +15,10 @@ const CookieBanner = () => {
     }
   }, []);
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("fourlinq:cookie-visibility", { detail: { visible } }));
+  }, [visible]);
+
   const accept = () => {
     localStorage.setItem(COOKIE_KEY, "accepted");
     setVisible(false);
@@ -29,6 +33,7 @@ const CookieBanner = () => {
     <AnimatePresence>
       {visible && (
         <motion.div
+          data-cookie-banner
           initial={{ y: 60, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 60, opacity: 0 }}

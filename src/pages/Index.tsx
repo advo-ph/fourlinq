@@ -32,11 +32,12 @@ const Index = () => {
       <VideoHero
         videoSrc="/videos/hero-loop.mp4"
         fallbackSlides={heroSlides}
-        caption="FourlinQ Windows & Doors"
         headline="Built to Last. Designed to Inspire."
         lede="Custom-made uPVC and aluminium systems, fabricated to your specifications."
         ctaLabel="Explore Systems"
         ctaTo="/products"
+        secondaryLabel="Book Consultation"
+        secondaryTo="/brand#contact"
       />
 
       <Suspense fallback={null}>

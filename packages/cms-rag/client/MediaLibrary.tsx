@@ -6,6 +6,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Upload, X, Save, Trash2 } from "lucide-react";
 import type { CmsRagApi } from "./api.js";
 
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+const ACCEPTED_IMAGE_EXTENSIONS = ".jpg,.jpeg,.png,.webp,.gif,.avif";
+const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+const UPLOAD_HELP_TEXT = "JPEG, PNG, WebP, GIF, AVIF · up to 8 MB each · uploads run sequentially";
+
 interface MediaRow {
   cms_media_asset_id: number;
   file_path: string;
@@ -22,6 +27,7 @@ export function MediaLibrary({ api }: { api: CmsRagApi }) {
   const [editing, setEditing] = useState<MediaRow | null>(null);
   const [uploading, setUploading] = useState<number>(0);
   const [dragOver, setDragOver] = useState(false);
+  const [uploadErrors, setUploadErrors] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -36,12 +42,33 @@ export function MediaLibrary({ api }: { api: CmsRagApi }) {
   const onFiles = useCallback(async (files: FileList | File[]) => {
     const arr = Array.from(files);
     if (arr.length === 0) return;
-    setUploading(arr.length);
+    const errors: string[] = [];
+    const valid = arr.filter((f) => {
+      if (!ACCEPTED_IMAGE_TYPES.includes(f.type)) {
+        errors.push(`${f.name}: unsupported format. Use JPEG, PNG, WebP, GIF, or AVIF.`);
+        return false;
+      }
+      if (f.size > MAX_UPLOAD_BYTES) {
+        errors.push(`${f.name}: ${(f.size / 1024 / 1024).toFixed(1)} MB exceeds the 8 MB limit.`);
+        return false;
+      }
+      return true;
+    });
+
+    setUploadErrors(errors);
+    if (valid.length === 0) return;
+
+    setUploading(valid.length);
     try {
       // Upload sequentially to be polite to the server / DB.
-      for (const f of arr) {
-        try { await api.upload(f); }
-        catch (e) { console.error(`Upload failed: ${f.name}`, e); }
+      for (const f of valid) {
+        try {
+          await api.upload(f);
+        } catch (e) {
+          const message = e instanceof Error ? e.message : String(e);
+          errors.push(`${f.name}: ${message}`);
+          setUploadErrors([...errors]);
+        }
         setUploading((n) => n - 1);
       }
       await load();
@@ -105,7 +132,7 @@ export function MediaLibrary({ api }: { api: CmsRagApi }) {
           <Upload size={18} className="text-muted-foreground" />
           <div className="flex-1">
             <p className="text-sm font-medium">Drop images here, paste from clipboard, or click to browse</p>
-            <p className="text-xs text-muted-foreground">JPEG, PNG, WebP, GIF, AVIF, SVG · up to 15 MB each · uploads run sequentially</p>
+            <p className="text-xs text-muted-foreground">{UPLOAD_HELP_TEXT}</p>
           </div>
           <button
             onClick={() => inputRef.current?.click()}
@@ -117,7 +144,7 @@ export function MediaLibrary({ api }: { api: CmsRagApi }) {
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept={ACCEPTED_IMAGE_EXTENSIONS}
           multiple
           className="hidden"
           onChange={(e) => { if (e.target.files) onFiles(e.target.files); }}
@@ -126,6 +153,13 @@ export function MediaLibrary({ api }: { api: CmsRagApi }) {
           <p className="text-xs text-muted-foreground mt-2 flex items-center gap-2">
             <Loader2 size={12} className="animate-spin" /> Uploading {uploading} file{uploading !== 1 ? "s" : ""}…
           </p>
+        )}
+        {uploadErrors.length > 0 && (
+          <div className="mt-3 space-y-1 rounded-md border border-destructive/30 bg-destructive/5 p-3">
+            {uploadErrors.map((error) => (
+              <p key={error} className="text-xs text-destructive">{error}</p>
+            ))}
+          </div>
         )}
       </div>
 

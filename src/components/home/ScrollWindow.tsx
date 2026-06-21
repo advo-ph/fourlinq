@@ -170,7 +170,6 @@ const ScrollWindow = () => {
         <img
           src={FRAME_PATH_TEMPLATE.replace("{index}", "0001")}
           alt=""
-          fetchPriority="high"
           decoding="async"
           aria-hidden="true"
           className={cn(

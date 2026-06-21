@@ -93,33 +93,33 @@ const VideoHero = (props: VideoHeroProps) => {
         disableRemotePlayback
       />
 
-      {/* Same single bottom-up scrim as photo hero — keeps text legible */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black/55 via-black/18 to-transparent pointer-events-none" />
 
-      <div className="absolute inset-0 flex items-end pb-16 md:pb-20 lg:pb-24">
-        <div className="container-editorial w-full">
-          <div className="max-w-[42rem]" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.35)" }}>
-            {props.caption && (
-              <p className="eyebrow !text-white mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-white/80">
-                {props.caption}
-              </p>
-            )}
-            <h1 className="font-serif font-normal tracking-tight text-white text-display-sm sm:text-[4rem] lg:text-h1 xl:text-display leading-[1.02]">
-              {props.headline}
-            </h1>
-            <p className="mt-6 md:mt-8 text-body lg:text-body-lg text-white/90 max-w-[34rem]">
-              {props.lede}
+      <div className="absolute inset-x-0 bottom-[5.75rem] sm:bottom-[6.5rem] md:bottom-[7rem] lg:bottom-[7.5rem]">
+        <div className="container-editorial">
+          <div className="w-full max-w-[43rem] text-left">
+          {props.caption && (
+            <p className="mb-3 text-body-sm font-medium text-white">
+              {props.caption}
             </p>
-            <div className="mt-8 md:mt-10 flex flex-wrap items-center gap-4">
-              <EditorialButton to={props.ctaTo} variant="primary" size="md">
-                {props.ctaLabel}
+          )}
+          <h1 className="font-serif text-[2.35rem] font-normal leading-[1.04] tracking-tight text-white sm:text-[2.75rem] md:text-[3.15rem] lg:text-[3.75rem] xl:text-h1">
+            {props.headline}
+          </h1>
+          <p className="mt-4 max-w-[34rem] text-body text-white/90 md:text-body-lg">
+            {props.lede}
+          </p>
+          <div className="mt-7 flex w-full max-w-[26rem] flex-col items-start gap-3 md:max-w-none md:flex-row">
+            <EditorialButton to={props.ctaTo} variant="primary" size="md">
+              {props.ctaLabel}
+            </EditorialButton>
+            {props.secondaryLabel && props.secondaryTo && (
+              <EditorialButton to={props.secondaryTo} variant="secondary" size="md">
+                {props.secondaryLabel}
               </EditorialButton>
-              {props.secondaryLabel && props.secondaryTo && (
-                <EditorialButton to={props.secondaryTo} variant="ghost" size="md" className="text-white hover:text-white">
-                  {props.secondaryLabel}
-                </EditorialButton>
-              )}
-            </div>
+            )}
+          </div>
           </div>
         </div>
       </div>

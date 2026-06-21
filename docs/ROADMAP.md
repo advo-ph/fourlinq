@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-05-29** (close-the-backlog sweep — sharp resize + thumbnail + aspect-ratio guard on uploads, Phase 5 partial-shipped, Phase 4 confirmed shipped, roadmap doc reconciled with reality)
+**Last updated: 2026-06-16** (whole-project roadmap refresh on `codex/tesla-marvin-design` — client-comment drift, tablet/mobile QA, CMS/backend parity, blocked-data split)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -72,6 +72,73 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 5. **Document as you go.** Every shipped phase gets a CHANGELOG entry on the day it merges.
 
 ---
+
+## 2026-06-16 Whole-project roadmap refresh
+
+**Scope:** whole project, current dirty working tree on `codex/tesla-marvin-design`.
+**Discovery inputs:** current code, `docs/ROADMAP.md`, `docs/HANDOFF.md`, `docs/FIX_ROADMAP.md`, `docs/REDESIGN_ROADMAP.md`, competitor research under `docs/competitor-*`, three read-only subagent audits, bounded external research for premium window/door sites, and the current local browser feedback loop.
+**Validation rule:** no row below counts as a roadmap item unless it has a falsifiable benchmark in [roadmap-benchmarks/2026-06-16-whole-project.md](./roadmap-benchmarks/2026-06-16-whole-project.md). Rejected or not-yet-decidable items live in [roadmap-rejected.md](./roadmap-rejected.md).
+
+### P0 — Prove current reality before adding new visual work
+
+These are small or foundational. They stop the site from drifting while the design polish continues.
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---|---|---|
+| **Viewport visual QA gate** for home/global chrome at 375, 560, 768, 992, 1100, 1199, and 1440px | Recent feedback around tablet hero layout, footer alignment, chat/social collisions, and centered vs. left/right composition currently depends on eyeballing screenshots | ~0.5-1 day | **B1** | Shipped 2026-06-16 (`npm run qa:visual`) |
+| **Fixed-layer collision policy** for chat, cookie banner, footer socials, and mobile controls | Chat blocked Facebook/Instagram in the footer and can also collide with the cookie banner | ~0.5 day | **B2** | Shipped 2026-06-16 |
+| **Docs reality sync** across ROADMAP, FIX_ROADMAP, REDESIGN_ROADMAP, HANDOFF, BACKEND_SCHEMA, README | Several docs still claim Vercel/no-code/15MB+SVG/old auth/pending UI items after code has moved on | ~0.5 day | **B3** | Planned |
+| **Design-token truth table** for active FourlinQ red/black/white identity, fonts, radius, and button grammar | The branch drifted between Tesla-ish, Marvin-ish, and original FourlinQ identity; docs and code disagree on Inter vs Manrope/Cormorant, pill vs square-ish buttons, and red hexes | ~0.5 day | **B4** | Planned |
+| **Admin media upload truthfulness** | UI still says SVG and 15 MB while server rejects SVG and caps at 8 MB; upload failures are mostly console-only | ~0.5 day | **B5** | Shipped 2026-06-16 |
+
+### P1 — Fix correctness gaps that can mislead Tita or sales
+
+These are real product/backend issues, not just taste.
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---|---|---|
+| **Product detail API parity** (`GET /api/products/:slug` respects editable `finish_labels`, `glass_labels`, `spec_labels`) | List endpoint honors CMS edits, single-product endpoint still reads join tables; product drawer/detail can show stale specs after admin edits | ~0.5 day | **B6** | Planned |
+| **Hardcoded internal route audit** for chat/page-map/knowledge links | Runtime content references `/window-systems`, `/door-systems`, `/specialist-systems`, but the router does not define them | ~0.5 day | **B7** | Planned |
+| **Design Tool save failure state** | The UI can imply a quote request was saved even if `/api/save-configuration` fails | ~0.5 day | **B8** | Planned |
+| **CMS page-field clarity** | Admin Pages expose hero fields that public pages currently ignore, inviting edits that appear to do nothing | ~0.5 day | **B9** | Planned |
+| **Finish-count consistency** | Copy and data drift between 11 and 12 finishes; this is exactly the kind of small product-detail mismatch clients notice | ~0.5 day | **B10** | Planned |
+| **Unverified numeric-claim sweep** on `/why-upvc` and benefit data | Past restraint pass removed unsupported stats, but numeric claims reappear in copy/data without source labels | ~0.5 day | **B11** | Planned |
+
+### P2 — Design polish with measurable acceptance
+
+These are the current design objections translated into pass/fail checks.
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---|---|---|
+| **Hero first-paint and CTA decision** | Current hero has no poster/caption, preloads a large video, and still uses two button CTAs. It can look too centered/tall depending on slide/video and viewport | ~0.5-1 day | **B12** | Planned |
+| **Tablet nav and mega-menu keyboard support** | Desktop nav starts at 992px, a historically weak range; Systems dropdown is hover-driven and not keyboard-complete | ~1 day | **B13** | Planned |
+| **Reduced-motion and data-budget path for frame-heavy home** | Home can load hero video plus scroll/system frame sequences; reduced-motion currently needs a proof path, not hope | ~1 day | **B14** | Planned |
+| **Home Design Tool preview restraint pass** | The preview uses rounded/shadowed card chrome that clashes with the editorial restraint rules | ~0.5 day | **B15** | Planned |
+| **Homepage What's New rule** | Home intentionally filters to event/press, which can omit the latest product/project updates Tita asked for | ~0.5 day | **B16** | Planned |
+
+### P3 — Product/content depth once assets exist
+
+These are genuine but should not block the current visual cleanup.
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---|---|---|
+| **Real systems bucket pages** (`/products/windows`, `/products/doors`, `/products/specialist`) | `SystemBucket` exists but current routes redirect to query-filtered `/products`; the editorial bucket IA from Tita/competitor research is not actually visible | ~1-2 days | **B17** | Planned |
+| **Product-level project galleries and finish visuals** | Competitor research and Tita both point to project photos + finish variation per product, but drawers show mostly one image + swatches | ~2-4 days once assets are selected | **B18** | Planned |
+| **Aluminium spec/photo completion** | `/aluminium` exists, but sub-product specs/photos/spec sheets are still placeholders | ~0.5-1 day after Imie data | **B19** | Blocked on Imie |
+| **Architect resources surface** for spec sheets/CAD/BIM/downloads | Schüco/Milgard/Pella-style pro sites expose technical resources; FourlinQ cannot credibly do this until real documents exist | ~1-2 days after docs | **B20** | Blocked on assets |
+| **3D product open/close** | Tita asked for interactive open/close; this remains a larger signature surface and should not be faked with generic geometry | ~2-4 days once target systems are chosen | **B21** | Deferred |
+
+### P4 — Operational hardening
+
+These reduce production surprises when the CMS/backend is used for real work.
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---|---|---|
+| **Backend integration test layer** for products, inquiries, CMS CRUD, media upload, auth roles | Current tests mostly cover static data/hooks; server surfaces are the real risk now | ~1-2 days | **B22** | Planned |
+| **Deploy migration guard** | Deploy hardens branch/dirty state but does not prove DB migrations are applied before code expects new columns/tables | ~1 day | **B23** | Planned |
+| **Aluminium CMS knowledge sync adapter** | Aluminium CMS declares KB sync tags, but no adapter means updates do not reliably refresh chatbot knowledge | ~0.5-1 day | **B24** | Planned |
+| **CI trigger/doc alignment** | CI docs imply broad PR coverage; actual workflow only runs PRs into `main`/`supafinal`, not `cms-rag-multiuser` | ~0.25 day | **B25** | Planned |
+| **SMTP credential go-live checklist** | Email code is scaffolded, but sales notifications stay no-op until credentials land | ~15 min after credentials | **B26** | Blocked on credentials |
 
 ## Phase 1 — Move product catalog to DB
 
