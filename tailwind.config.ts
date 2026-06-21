@@ -19,12 +19,13 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Inter"', '"Inter Fallback"', "system-ui", "sans-serif"],
+        sans: ['"Manrope"', '"Manrope Fallback"', "system-ui", "sans-serif"],
         serif: ['"Fraunces"', '"Fraunces Fallback"', "Georgia", "serif"],
         display: ['"Fraunces"', '"Fraunces Fallback"', "Georgia", "serif"],
+        promise: ['"Cormorant Garamond"', '"Cormorant Fallback"', "Georgia", "serif"],
       },
       fontSize: {
-        // Editorial scale calibrated to Marvin's hjumbo 88px → body 16px (5.5× ratio)
+        // Editorial scale calibrated to Marvin's hjumbo 88px -> body 16px (5.5x ratio)
         "eyebrow-s": ["0.75rem",  { lineHeight: "1.4", letterSpacing: "0.15em" }],
         "eyebrow":   ["0.8125rem", { lineHeight: "1.4", letterSpacing: "0.12em" }],
         "eyebrow-l": ["0.875rem",  { lineHeight: "1.4", letterSpacing: "0.10em" }],
@@ -35,11 +36,10 @@ export default {
         "h6":        ["1.25rem",  { lineHeight: "1.4", letterSpacing: "-0.005em" }],
         "h5":        ["1.5rem",   { lineHeight: "1.35", letterSpacing: "-0.01em" }],
         "h4":        ["1.875rem", { lineHeight: "1.25", letterSpacing: "-0.01em" }],
-        "h3":        ["2.5rem",   { lineHeight: "1.15", letterSpacing: "-0.015em" }],     // 40 — Marvin h2 desktop
-        "h2":        ["3.5rem",   { lineHeight: "1.1",  letterSpacing: "-0.02em" }],      // 56 — Marvin h1 desktop step
-        "h1":        ["4rem",     { lineHeight: "1.05", letterSpacing: "-0.02em" }],      // 64 — Marvin hjumbo tablet
-        "display":   ["5.5rem",   { lineHeight: "1.0",  letterSpacing: "-0.025em" }],     // 88 — Marvin hjumbo desktop max
-        // Mobile display fallback (use via responsive utilities)
+        "h3":        ["2.5rem",   { lineHeight: "1.15", letterSpacing: "-0.015em" }],
+        "h2":        ["3.5rem",   { lineHeight: "1.1",  letterSpacing: "-0.02em" }],
+        "h1":        ["4rem",     { lineHeight: "1.05", letterSpacing: "-0.02em" }],
+        "display":   ["5.5rem",   { lineHeight: "1.0",  letterSpacing: "-0.025em" }],
         "display-sm": ["3.5rem",  { lineHeight: "1.05", letterSpacing: "-0.02em" }],
       },
       spacing: {
@@ -108,7 +108,7 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
+          DEFAULT: "var(--accent)",
           foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
@@ -135,7 +135,6 @@ export default {
         full: "9999px",
       },
       boxShadow: {
-        // Marvin's depth-1..8 — ultra-subtle 2-layer shadows
         "depth-1": "0 0 1px 0 rgba(36,36,36,0.04), 0 0.5px 1.5px 0 rgba(36,36,36,0.19)",
         "depth-2": "0 0.25px 1px 0 rgba(36,36,36,0.04), 0 0.85px 3px 0 rgba(36,36,36,0.19)",
         "depth-4": "0 0.5px 1.75px 0 rgba(36,36,36,0.04), 0 1.85px 6.25px 0 rgba(36,36,36,0.19)",
@@ -143,8 +142,7 @@ export default {
         "depth-8": "0 0.5px 5px 0 rgba(36,36,36,0.04), 0 3.75px 11px 0 rgba(36,36,36,0.19)",
       },
       transitionTimingFunction: {
-        // Marvin's actual easings (grep'd from production CSS)
-        marvin: "cubic-bezier(.68, 0, .33, 1)",     // signature — slow ease in/out, lingers
+        marvin: "cubic-bezier(.68, 0, .33, 1)",
         "marvin-in": "cubic-bezier(.33, 0, .68, 0)",
         "marvin-out": "cubic-bezier(.33, 1, .68, 1)",
         out: "cubic-bezier(0.215, 0.61, 0.355, 1)",

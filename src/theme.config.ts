@@ -31,7 +31,7 @@ export const INK = {
   primary:   "#242424", // body + display headings — AAA on white
   secondary: "#444444", // sub-body, lede — AA on white
   muted:     "#686868", // captions, eyebrows — AA on white
-  faint:     "#909090", // disabled, placeholder — DECORATIVE ONLY, not for body text (3.0:1 contrast)
+  faint:     "#909090", // disabled, placeholder — decorative only
   inverse:   "#FFFFFF",
 } as const;
 
@@ -61,11 +61,11 @@ export const RULE = {
 /* ─── BUTTON SHAPE (centralized for easy global swap) ─────────────── */
 export const BUTTON = {
   /** "pill" = fully rounded, "square" = zero-radius, "rounded" = small radius. */
-  primaryShape: "pill" as "pill" | "square" | "rounded",
+  primaryShape: "rounded" as "pill" | "square" | "rounded",
   /** Tailwind class to apply to primary buttons. */
-  primaryRadiusClass: "rounded-full",
+  primaryRadiusClass: "rounded-sm",
   /** Outline thickness for buttons + tabs. */
-  borderWidth: "2px",
+  borderWidth: "3px",
 } as const;
 
 /* ─── MOTION ──────────────────────────────────────────────────────── */

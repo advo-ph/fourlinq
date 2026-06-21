@@ -7,15 +7,15 @@
     /* === Marvin-mirrored editorial tokens === */
     --canvas: #FFFFFF;
     --canvas-soft: #F8F8F8;
-    --canvas-cream: #F9F7F1;        /* warm editorial backdrop (Marvin: #E7E5DD) */
+    --canvas-cream: #F9F7F1;
     --canvas-dark: #242424;
 
-    --ease-marvin: cubic-bezier(.68, 0, .33, 1);   /* signature easing */
+    --ease-marvin: cubic-bezier(.68, 0, .33, 1);
 
     --ink-primary:   #242424;
     --ink-secondary: #444444;
-    --ink-muted:     #686868;   /* AA on white: 5.7:1 — safe for body */
-    --ink-faint:     #767676;   /* AA on white: 4.5:1 — decorative/disabled only */
+    --ink-muted:     #686868;
+    --ink-faint:     #767676;
     --ink-inverse:   #FFFFFF;
 
     /* Ink-on-dark scale (for footer, BrandCTA, dark Section) */
@@ -48,7 +48,7 @@
 
     /* === shadcn compatibility — keep so existing components don't break === */
     --background: 0 0% 100%;
-    --foreground: 0 0% 14%;            /* aligned to #242424 */
+    --foreground: 0 0% 14%;
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 14%;
@@ -65,17 +65,17 @@
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 41%;
 
-    --accent: 350 86% 43%;             /* FourlinQ red #C8102E */
+    --accent: 350 86% 43%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 87%;                /* aligned to #DFDFDF */
+    --border: 0 0% 87%;
     --input: 0 0% 87%;
     --ring: 350 86% 43%;
 
-    --radius: 0.125rem;                /* tighter — Marvin uses near-zero */
+    --radius: 0.25rem;
 
     --charcoal: 0 0% 14%;
     --charcoal-light: 0 0% 16%;
@@ -125,7 +125,7 @@
     color: var(--ink-primary);
   }
 
-  /* Focus visible — quiet 1px dark ring for keyboard nav on buttons / links.
+  /* Focus visible — quiet dark ring for keyboard nav on buttons / links.
      Text inputs and option-grid buttons are excluded because they already
      show focus through their own visual state (wrapper border, selected ring). */
   :focus-visible {

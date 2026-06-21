@@ -23,9 +23,8 @@ interface HeroCarouselProps {
 }
 
 /**
- * Marvin-style hero: cross-fading full-bleed photo carousel with a subtle
- * Ken Burns zoom on each slide, gradient scrim at bottom-left, single
- * primary CTA. Autoplay pauses on hover. Manual pagination dots.
+ * Showroom hero: cross-fading full-bleed project carousel with restrained
+ * centered copy and a two-button CTA rhythm.
  */
 const HeroCarousel = ({
   slides,
@@ -71,8 +70,8 @@ const HeroCarousel = ({
                 animate={{ opacity: 1, scale: 1.05 }}
                 exit={{ opacity: 0, scale: 1.08 }}
                 transition={{
-                  opacity: { duration: 1.2, ease: [0.68, 0, 0.33, 1] },
-                  scale:   { duration: 8.0, ease: [0.68, 0, 0.33, 1] },
+                  opacity: { duration: 1.2, ease: [0.5, 0, 0, 0.75] },
+                  scale:   { duration: 8.0, ease: [0.5, 0, 0, 0.75] },
                 }}
               >
                 <img
@@ -80,7 +79,6 @@ const HeroCarousel = ({
                   alt={slide.alt}
                   className="w-full h-full object-cover"
                   loading={i === 0 ? "eager" : "lazy"}
-                  fetchPriority={i === 0 ? "high" : "auto"}
                   decoding="async"
                 />
               </motion.div>
@@ -89,39 +87,38 @@ const HeroCarousel = ({
         </AnimatePresence>
       </div>
 
-      {/* Single bottom-up scrim — softer than double-layer */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black/55 via-black/18 to-transparent pointer-events-none" />
 
-      {/* Hero text block */}
-      <div className="absolute inset-0 flex items-end pb-16 md:pb-20 lg:pb-24">
-        <div className="container-editorial w-full">
-          <div className="max-w-[42rem]" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.35)" }}>
-            {slides[active]?.caption && (
-              <p className="eyebrow !text-white mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-white/80">
-                {slides[active].caption}
-              </p>
-            )}
-            <h1 className="font-serif font-normal tracking-tight text-white text-display-sm sm:text-[4rem] lg:text-h1 xl:text-display leading-[1.02]">
-              {headline}
-            </h1>
-            <p className="mt-6 md:mt-8 text-body lg:text-body-lg text-white/90 max-w-[34rem]">
-              {lede}
+      <div className="absolute inset-x-0 bottom-[5.75rem] sm:bottom-[6.5rem] md:bottom-[7rem] lg:bottom-[7.5rem]">
+        <div className="container-editorial">
+          <div className="w-full max-w-[43rem] text-left">
+          {slides[active]?.caption && (
+            <p className="mb-3 text-body-sm font-medium text-white">
+              {slides[active].caption}
             </p>
-            <div className="mt-8 md:mt-10 flex flex-wrap items-center gap-4">
-              <EditorialButton to={ctaTo} variant="primary" size="md">
-                {ctaLabel}
+          )}
+          <h1 className="font-serif text-[2.35rem] font-normal leading-[1.04] tracking-tight text-white sm:text-[2.75rem] md:text-[3.15rem] lg:text-[3.75rem] xl:text-h1">
+            {headline}
+          </h1>
+          <p className="mt-4 max-w-[34rem] text-body text-white/90 md:text-body-lg">
+            {lede}
+          </p>
+          <div className="mt-7 flex w-full max-w-[26rem] flex-col items-start gap-3 md:max-w-none md:flex-row">
+            <EditorialButton to={ctaTo} variant="primary" size="md">
+              {ctaLabel}
+            </EditorialButton>
+            {secondaryLabel && secondaryTo && (
+              <EditorialButton to={secondaryTo} variant="secondary" size="md">
+                {secondaryLabel}
               </EditorialButton>
-              {secondaryLabel && secondaryTo && (
-                <EditorialButton to={secondaryTo} variant="ghost" size="md" className="text-white hover:text-white">
-                  {secondaryLabel}
-                </EditorialButton>
-              )}
-            </div>
+            )}
+          </div>
           </div>
         </div>
       </div>
 
-      {/* Pagination dots — hairlines on a 44px tap target */}
+      {/* Pagination dots on a 44px tap target */}
       {total > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10">
           {slides.map((_, i) => {
@@ -137,8 +134,8 @@ const HeroCarousel = ({
                 <span
                   className={cn(
                     "block transition-all duration-300 ease-marvin",
-                    "h-[2px]",
-                    isActive ? "w-12 bg-white" : "w-8 bg-white/40 group-hover:bg-white/80"
+                    "h-2 rounded-full",
+                    isActive ? "w-2 bg-white" : "w-2 bg-white/40 group-hover:bg-white/80"
                   )}
                 />
               </button>
