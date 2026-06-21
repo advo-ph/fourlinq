@@ -69,7 +69,17 @@ export class CmsRagApi {
       credentials: "include",
       body: form,
     });
-    if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+    if (!res.ok) {
+      let message = `Upload failed: ${res.status}`;
+      const text = await res.text().catch(() => "");
+      try {
+        const data = JSON.parse(text) as { error?: string };
+        if (data.error) message = data.error;
+      } catch {
+        if (text) message = text;
+      }
+      throw new Error(message);
+    }
     return res.json();
   }
 }

@@ -31,4 +31,5 @@ dist-ssr
 # Playwright persistent browser profile for the Gemini image-gen script
 # (contains Google session cookies — never commit)
 .gemini-browser-state/
+.visual-qa/
 tsconfig.*.tsbuildinfo
