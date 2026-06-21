@@ -6,6 +6,10 @@ import { useCallback, useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
 import type { CmsRagApi } from "./api.js";
 
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+const ACCEPTED_IMAGE_EXTENSIONS = ".jpg,.jpeg,.png,.webp,.gif,.avif";
+const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+
 export interface MediaPickerProps {
   api: CmsRagApi;
   value?: string | null;
@@ -19,7 +23,16 @@ export function MediaPicker({ api, value, onChange, label }: MediaPickerProps) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const onDrop = useCallback(async (file: File) => {
-    setUploading(true); setError(null);
+    setError(null);
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setError("Unsupported format. Use JPEG, PNG, WebP, GIF, or AVIF.");
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError(`${(file.size / 1024 / 1024).toFixed(1)} MB exceeds the 8 MB limit.`);
+      return;
+    }
+    setUploading(true);
     try {
       const result = await api.upload(file);
       onChange(result.file_path);
@@ -52,7 +65,7 @@ export function MediaPicker({ api, value, onChange, label }: MediaPickerProps) {
           ) : (
             <>
               <Upload size={16} className="text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Drop image here, or</span>
+              <span className="text-xs text-muted-foreground">Drop JPEG, PNG, WebP, GIF, or AVIF under 8 MB, or</span>
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
@@ -74,7 +87,7 @@ export function MediaPicker({ api, value, onChange, label }: MediaPickerProps) {
       <input
         ref={fileRef}
         type="file"
-        accept="image/*"
+        accept={ACCEPTED_IMAGE_EXTENSIONS}
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];
