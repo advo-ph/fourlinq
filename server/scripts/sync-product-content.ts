@@ -29,7 +29,7 @@ async function sync() {
   console.log(`[sync-product-content] Syncing ${staticProducts.length} products by slug...`);
 
   let updated = 0;
-  let unchanged = 0;
+  const unchanged = 0;
   const missing: string[] = [];
 
   for (const p of staticProducts) {

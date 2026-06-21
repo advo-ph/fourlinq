@@ -4,6 +4,7 @@ import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import QuoteModal from "@/components/shared/QuoteModal";
 import { useProducts, Product } from "@/hooks/useProducts";
+import { useAluminium } from "@/hooks/useAluminium";
 import FinishSwatch from "@/components/shared/FinishSwatch";
 import SystemCardMedia from "@/components/shared/SystemCardMedia";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
@@ -15,11 +16,21 @@ import EditorialButton from "@/components/primitives/Button";
 type ProductCategory = "windows" | "doors" | "specialist" | "systems";
 type Filter = "all" | ProductCategory;
 
+// FourlinQ sells two material lines. uPVC is classified by operating style
+// (Casement, Sliding, …); aluminium by frame construction (Thermal Break, …).
+// They use different brochure taxonomies, so material is the top-level axis.
+type Material = "upvc" | "aluminium";
+
 const filters: { label: string; value: Filter }[] = [
   { label: "All Systems", value: "all" },
   { label: "Windows", value: "windows" },
   { label: "Doors", value: "doors" },
   { label: "Specialist", value: "specialist" },
+];
+
+const materials: { label: string; value: Material }[] = [
+  { label: "uPVC", value: "upvc" },
+  { label: "Aluminium", value: "aluminium" },
 ];
 
 const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => void }) => {
@@ -170,28 +181,48 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const paramFilter = (searchParams.get("filter") as Filter) || "all";
+  const paramMaterial: Material = searchParams.get("material") === "aluminium" ? "aluminium" : "upvc";
   const [activeFilter, setActiveFilterState] = useState<Filter>(paramFilter);
+  const [material, setMaterialState] = useState<Material>(paramMaterial);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     setActiveFilterState(paramFilter);
   }, [paramFilter]);
 
+  useEffect(() => {
+    setMaterialState(paramMaterial);
+  }, [paramMaterial]);
+
   const setActiveFilter = (f: Filter) => {
     setActiveFilterState(f);
-    if (f === "all") {
-      setSearchParams({});
+    // Type filters only apply to the uPVC line, so material stays uPVC here.
+    setSearchParams(f === "all" ? {} : { filter: f });
+  };
+
+  const setMaterial = (m: Material) => {
+    setMaterialState(m);
+    if (m === "aluminium") {
+      // Aluminium uses its own taxonomy — drop the operating-style filter.
+      setActiveFilterState("all");
+      setSearchParams({ material: "aluminium" });
     } else {
-      setSearchParams({ filter: f });
+      setSearchParams(activeFilter === "all" ? {} : { filter: activeFilter });
     }
   };
 
   const { data: products = [], isLoading } = useProducts();
+  const { systems: aluminium } = useAluminium();
 
   const filtered = useMemo(() => {
     if (activeFilter === "all") return products;
     return products.filter((p) => p.category === activeFilter);
   }, [activeFilter, products]);
+
+  const subtitle =
+    material === "aluminium"
+      ? "The aluminium line — for bigger spans, thinner sightlines, and climate-controlled interiors. Three systems, each suited to a different brief."
+      : "Custom-made uPVC windows and doors — quiet, thermally efficient, corrosion-resistant. Each profile tested for the heat, humidity, salt air, and storms that test what a home is made of.";
 
   return (
     <Layout>
@@ -200,41 +231,122 @@ const Products = () => {
         // TODO: client copy — replace with brochure-verified page intro
         title="Window, door, and specialist systems."
         breadcrumbLabel="Systems"
-        subtitle="Custom-made uPVC windows and doors — quiet, thermally efficient, corrosion-resistant. Each profile tested for the heat, humidity, salt air, and storms that test what a home is made of."
+        subtitle={subtitle}
       />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
-          {/* Filter rail + help-me-choose entry point */}
-          <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16">
-            <div className="flex items-end gap-8">
-              {filters.map((f) => {
-                const active = activeFilter === f.value;
+          {/* Material axis — the two product lines (uPVC vs aluminium) */}
+          <div className="mb-8 lg:mb-10">
+            <div
+              role="tablist"
+              aria-label="Material"
+              className="inline-flex p-1 border border-[color:var(--rule-soft)] bg-[color:var(--canvas-soft)]"
+            >
+              {materials.map((m) => {
+                const active = material === m.value;
                 return (
                   <button
-                    key={f.value}
-                    onClick={() => setActiveFilter(f.value)}
-                    className={`pb-4 text-body-sm font-medium transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end ${
+                    key={m.value}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setMaterial(m.value)}
+                    className={`px-6 py-2.5 text-body-sm font-medium transition-colors duration-300 ease-marvin min-h-[44px] ${
                       active
-                        ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
-                        : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
+                        ? "bg-[color:var(--accent)] text-white"
+                        : "text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)]"
                     }`}
                   >
-                    {f.label}
+                    {m.label}
                   </button>
                 );
               })}
             </div>
-            <a
-              href="/help-me-choose"
-              className="group inline-flex items-center gap-1.5 pb-4 text-body-sm font-medium text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
-            >
-              Not sure which one? Help me choose
-              <span className="inline-block transition-transform duration-300 ease-marvin group-hover:translate-x-1">→</span>
-            </a>
           </div>
 
-          {isLoading ? (
+          {/* uPVC: operating-style filter rail. Aluminium: its own taxonomy. */}
+          {material === "upvc" ? (
+            <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16">
+              <div className="flex items-end gap-8">
+                {filters.map((f) => {
+                  const active = activeFilter === f.value;
+                  return (
+                    <button
+                      key={f.value}
+                      onClick={() => setActiveFilter(f.value)}
+                      className={`pb-4 text-body-sm font-medium transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end ${
+                        active
+                          ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
+                          : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <a
+                href="/help-me-choose"
+                className="group inline-flex items-center gap-1.5 pb-4 text-body-sm font-medium text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+              >
+                Not sure which one? Help me choose
+                <span className="inline-block transition-transform duration-300 ease-marvin group-hover:translate-x-1">→</span>
+              </a>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16">
+              <p className="pb-4 text-body-sm text-[color:var(--ink-muted)]">
+                Three aluminium systems, classified by frame construction.
+              </p>
+              <a
+                href="/aluminium"
+                className="group inline-flex items-center gap-1.5 pb-4 text-body-sm font-medium text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+              >
+                Full aluminium detail &amp; spec sheets
+                <span className="inline-block transition-transform duration-300 ease-marvin group-hover:translate-x-1">→</span>
+              </a>
+            </div>
+          )}
+
+          {material === "aluminium" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14">
+              {aluminium.map((sys) => (
+                <a key={sys.slug} href="/aluminium" className="group block text-left">
+                  <div className="aspect-video bg-[color:var(--canvas-soft)] overflow-hidden flex items-center justify-center">
+                    {sys.hero_image_url ? (
+                      <img
+                        src={sys.hero_image_url}
+                        alt={sys.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <span className="eyebrow text-[color:var(--ink-muted)]">Aluminium</span>
+                    )}
+                  </div>
+                  <div className="mt-6">
+                    <p className="eyebrow mb-3">Aluminium</p>
+                    <div className="flex items-start justify-between gap-4">
+                      <h3 className="font-serif text-h5 lg:text-h4 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+                        {sys.name}
+                      </h3>
+                      <ArrowUpRight
+                        size={20}
+                        strokeWidth={1.5}
+                        className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-all duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
+                      />
+                    </div>
+                    {sys.best_for ? (
+                      <p className="mt-3 text-body-sm text-[color:var(--ink-secondary)] max-w-[24rem]">
+                        {sys.best_for}
+                      </p>
+                    ) : null}
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : isLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i}>
