@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sliding-door-accurate",
+    "output": "public/images/products/ai/sliding-door.png",
+    "prompt": "Editorial architectural product photograph, wide 16:9 landscape composition, of a modern uPVC SLIDING door system shown MID-SLIDE so the sliding action is unmistakable and it can never be mistaken for a fixed window: a large two-panel glass sliding door where ONE panel is slid roughly one-third open and clearly OFFSET, overlapping in front of the adjacent fixed panel, riding on a visible low bottom track at the floor, a slim vertical interlock stile where the panels meet, a discreet flush pull handle on the moving panel. Slim matte white uPVC frames, clear glass. Modern Philippine residential interior: warm white limewashed wall, polished concrete floor, a low pale-oak bench, tropical foliage (banana leaves, monstera, fiddle-leaf fig) visible through the glass to a garden. Soft late-afternoon golden daylight, gentle shadows. Show the floor-to-ceiling junction to anchor scale. Shot on Hasselblad 80mm at f/5.6, ISO 100, sharp focus on the door system, photorealistic, Architectural Digest tier, 8K. No people, no faces, no text, no signage, no logos, no brand names, no lens flare, no oversaturation, no motion blur, no reflections of a photographer."
+  },
+  {
+    "id": "curtain-wall-accurate",
+    "output": "public/images/products/ai/curtain-wall.png",
+    "prompt": "Editorial architectural product photograph, wide 16:9 landscape composition, of a large-format aluminium-and-glass CURTAIN WALL system that is emphatically TALL AND WIDE: a double-height, floor-to-ceiling glazed wall assembly spanning two storeys of a modern Philippine home, a wide grid of large glass panes divided by slim dark mullions and transoms, the sheer scale obvious from a staircase and upper-floor gallery visible behind the glass. Slim matte-dark aluminium framing, clear glass. Warm white walls, polished concrete and pale-oak interior, tropical foliage and sky visible through the glazing, soft late-afternoon daylight raking across the facade. A person-height doorway at the base for scale reference (door only, no people). Shot on Hasselblad 50mm at f/8, ISO 100, sharp architectural focus, photorealistic, Architectural Digest tier, 8K. No people, no faces, no text, no signage, no logos, no brand names, no lens flare, no oversaturation, no HDR-overcooked sky, no watermark."
+  }
+]
