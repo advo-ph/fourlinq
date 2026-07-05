@@ -11,9 +11,9 @@ For a record of what has actually changed and when, see [CHANGELOG.md](./CHANGEL
 ## Current state (snapshot)
 
 - **Live URL:** https://fourlinq.ph
-- **Deploy branch:** `cms-rag-multiuser` on origin (`./deploy.sh` rsyncs to advo VPS, pm2-managed)
-- **Vercel:** removed entirely as of 2026-05-25. No `vercel.json`, no `api/` directory, no `@vercel/node` dep.
-- **Tita demo round:** completed 2026-05-25. Hero locked at *"Built to Last. Designed to Inspire."* (her exact wording). Most surface-level revisions shipped. Remaining work captured below.
+- **Deploy:** push to `main` auto-deploys to the advo VPS via GitHub Actions (`.github/workflows/deploy.yml`, pm2-managed). `./deploy.sh` is the underlying rsync helper. All branches were consolidated into `main` on 2026-06-21 (the old `cms-rag-multiuser` / `supafinal` / `codex/tesla-marvin-design` deploy/work branches were merged and deleted).
+- **Vercel:** `vercel.json` was removed from the repo, but the **Vercel GitHub integration is still active** — it auto-deploys a preview on every PR (two projects: `fourlinq` and `fourlinq2` on a separate account). Not the production path (that's the VPS), but it should be reconciled or disconnected. *(The earlier "removed entirely" note was inaccurate.)*
+- **Client status:** Hero remains *"Built to Last. Designed to Inspire."* Round 3 (Imie 2026-07-02/05) is open — `/products` layout rebuild to Marvin-style cards, **blocked on a meeting** she requested 2026-07-05. See "chat round 3" below.
 
 ---
 
