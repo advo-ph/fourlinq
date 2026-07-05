@@ -94,6 +94,8 @@ const VideoHero = (props: VideoHeroProps) => {
       />
 
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+      {/* Top scrim — keeps the transparent white nav legible over bright hero content (e.g. sky-heavy fallback slides) */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/55 to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black/55 via-black/18 to-transparent pointer-events-none" />
 
       <div className="absolute inset-x-0 bottom-[5.75rem] sm:bottom-[6.5rem] md:bottom-[7rem] lg:bottom-[7.5rem]">
