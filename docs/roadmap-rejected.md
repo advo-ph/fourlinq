@@ -17,6 +17,7 @@ This file keeps rejected, stale, or blocked ideas from re-entering the roadmap a
 | Deploying directly from the Codex branch | Deploy guard intentionally restricts production branches. Codex branch should become production through merge/review, not bypass. | Emergency hotfix with `FORCE_DEPLOY=1` and explicit owner approval. |
 | Generic GitHub product-configurator import | Public examples are not specific enough to FourlinQ geometry/assets and would risk generic UI. | A specific library/repo proves it can model the selected FourlinQ system accurately. |
 | Telegram MCP as a repo feature | No Telegram connector/tool is available in this Codex environment, and the repo should not grow a Telegram integration just to read comments. | A real Telegram connector becomes available and the user asks to connect it. |
+| Clone Marvin's visual skin (amber `#ffc600`, Nationale type) | Imie references Marvin for *layout/quality*, not identity — and this log already rejects losing FourlinQ's black/red. The 2026-07-05 purplegradient scrape is a source for Marvin's card *structure + grammar only*; the skin stays FourlinQ (red `#C8102E`, Manrope/Fraunces). | Client explicitly asks to adopt Marvin's exact palette/type. |
 
 ## Triage or blocked
 
@@ -34,3 +35,4 @@ These are real signals but not ready for implementation without data or a decisi
 | Architect resource downloads | Would be valuable, but fake CAD/BIM/spec cards would harm credibility. | Real technical files or a deliberate request-form-only strategy. |
 | SMTP auto-email go-live | Code is scaffolded but no credentials are present. | Production SMTP/Gmail/Resend credentials. |
 | 22-year/founding-year claim | Prior docs mention it but exact year is unverified. | Client confirms founding year and allowed wording. |
+| **`/products` material data model** (Aluminium = per-product material option **vs** separate 4th catalog) | Her Jul 2 diagram shows "Aluminium Line" as a peer category; her words say "both are profile materials." This decides the entire Phase 8 rebuild (B18). | Imie confirms at the meeting she requested 2026-07-05. |
