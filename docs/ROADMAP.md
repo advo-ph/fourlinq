@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-06-16** (whole-project roadmap refresh on `codex/tesla-marvin-design` — client-comment drift, tablet/mobile QA, CMS/backend parity, blocked-data split)
+**Last updated: 2026-07-05** (Imie chat round 3 — `/products` layout rebuild to Marvin-style category cards, blocked on a meeting; see "chat round 3" below. Prior refresh 2026-06-16.)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -11,9 +11,9 @@ For a record of what has actually changed and when, see [CHANGELOG.md](./CHANGEL
 ## Current state (snapshot)
 
 - **Live URL:** https://fourlinq.ph
-- **Deploy branch:** `cms-rag-multiuser` on origin (`./deploy.sh` rsyncs to advo VPS, pm2-managed)
-- **Vercel:** removed entirely as of 2026-05-25. No `vercel.json`, no `api/` directory, no `@vercel/node` dep.
-- **Tita demo round:** completed 2026-05-25. Hero locked at *"Built to Last. Designed to Inspire."* (her exact wording). Most surface-level revisions shipped. Remaining work captured below.
+- **Deploy:** push to `main` auto-deploys to the advo VPS via GitHub Actions (`.github/workflows/deploy.yml`, pm2-managed). `./deploy.sh` is the underlying rsync helper. All branches were consolidated into `main` on 2026-06-21 (the old `cms-rag-multiuser` / `supafinal` / `codex/tesla-marvin-design` deploy/work branches were merged and deleted).
+- **Vercel:** `vercel.json` was removed from the repo, but the **Vercel GitHub integration is still active** — it auto-deploys a preview on every PR (two projects: `fourlinq` and `fourlinq2` on a separate account). Not the production path (that's the VPS), but it should be reconciled or disconnected. *(The earlier "removed entirely" note was inaccurate.)*
+- **Client status:** Hero remains *"Built to Last. Designed to Inspire."* Round 3 (Imie 2026-07-02/05) is open — `/products` layout rebuild to Marvin-style cards, **blocked on a meeting** she requested 2026-07-05. See "chat round 3" below.
 
 ---
 
@@ -50,6 +50,36 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 | 16 | "International feel despite being a local fabricator" | Shipped 2026-05-29 (Brand hero + AuthorityStrip + Warranty + Finishes provenance copy). | Remaining copy uses "European-spec" / "European fenestration standards" framing. |
 | 17 | Design names — "Mali yung design niyo, check internet for meaning of each" | Blocked on Imie | She didn't enumerate which products. The brochure-verified names should stay until she points at specific ones. One certain bug fixed: `id="entrance-door"` → `casement-door` (matched the `name` field and FinishExplorer reference). |
 | 18 | AI photo cleanup (remove objects on project sites) | Blocked on Imie | Needs her to flag specific photos + objects. |
+
+---
+
+## Open client requests (from Imie 2026-07-02 / 07-05 chat round 3) — ⚠️ /products LAYOUT REBUILD
+
+Round 3, after the 2026-06-19 delivery (window animations + thermal-break feature). On 2026-07-05 the team shipped a **uPVC / Aluminium material toggle** on `/products` and messaged Imie it was done. She reviewed on her phone and replied: *"Can we meet? It's not according to intended layout of the site 😭."* **The toggle did not match her intended layout and is superseded — see below.**
+
+Grounded in her Jul 2 diagram (`attachments/photo_2026-07-02_14-20-32.jpg`), the Marvin "Collections" reference she captioned *"should have something like this"* (`photo_2026-05-19_05-31-13.jpg`), and a full visual review of her sent screenshots — not OCR.
+
+**⚠️ Blocked on a meeting** (she requested it 2026-07-05; time TBD). Do NOT build until the data-model question (#21) is answered — a second wrong build would be costly with this at-risk client.
+
+### Intended `/products` — Marvin-style category cards (NOT tabs, NOT a material toggle)
+
+Four full-bleed **photo-cards** in a row, each a real project photo + name + item list. Replaces the current thin `All Systems · Windows · Doors · Specialist` tab bar. (The v1 site's own "Our Systems" 3-card section was already this pattern; she wants it back, plus a 4th card.)
+
+| Card | Items |
+|---|---|
+| Window Systems | Casement, Sliding, Awning, Special Shapes |
+| Door Systems | Slide & Fold, Large Panel, Lift & Slide, 90 Series |
+| Specialist Systems | Arch, Curtain Wall, Custom Shapes |
+| Aluminium Line | Thermal Break, Non-Thermal Break, Alu Slim |
+
+| # | Request | Status | Notes |
+|---|---|---|---|
+| 19 | Rebuild `/products` as a 4-card Marvin-Collections layout | Blocked on meeting | Aluminium Line is a peer 4th card, not a material toggle. Supersedes the 2026-07-05 toggle. |
+| 20 | Use REAL project photography on the cards, not synthetic 3D renders | Blocked on Imie assets | She rejects the white-bg renders — sliding door "looks like a 2-panel fixed," curtain wall doesn't read "tall and wide." Benchmark = kennethandmock real photography. Overlaps items #10, #13. |
+| 21 | **Data model:** is Aluminium a material option *per* window/door, OR a separate 4th catalog? | Blocked on meeting | Her diagram = separate category; her words (Jul 2) = "both are profile systems." **Decides the entire build — confirm first.** |
+| 22 | Add 3 door products: Large Panel, Lift & Slide, 90 Series | Blocked on Imie assets | Exist as names/icons in `configurator.ts`; need brochure-verified photos + specs. |
+| 23 | Why uPVC page too sparse — "just showed one photo, a cut section" | Planned | Build out; extend the interactive "zero leaks" style to alu thermal break (her 2026-05-31 ask). |
+| 24 | Confirm product re-assignments: Slide & Fold → Doors, Awning → Windows | Blocked on meeting | Per her Jul 2 diagram. |
 
 ---
 
