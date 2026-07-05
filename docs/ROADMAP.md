@@ -353,6 +353,26 @@ These have been considered and intentionally rejected. Reopen only if the busine
 
 ---
 
+## Phase 8 — /products Marvin-style category rebuild
+
+Formalizes chat round 3 (items 19–24). **⚠️ Blocked on the meeting Imie requested 2026-07-05** — do NOT start R1 until the data-model question is answered (see `roadmap-rejected.md` → Triage → "`/products` material data model").
+
+**Design source (locked):** the purplegradient Marvin audit at `/Users/angelonrevelo/Codex/purplegradient/websites/marvin` (`design.md`). Reuse Marvin's **structure + grammar only** — `collection-card` family (photo + eyebrow + name + item list + rectangular 4px CTA), 12-col/24px grid, breakpoints 576/768/992/1200/1400, mobile 2-col card grid, restrained hover. Keep FourlinQ's **skin** (red `#C8102E`, Manrope/Fraunces) — cloning Marvin's amber/Nationale is explicitly rejected (`roadmap-rejected.md`). The scrape confirmed Imie's reference is Marvin's Collections mega-menu (`evidence/state/desktop-click-07-button-button-collections.png`). Benchmarks: [roadmap-benchmarks/2026-07-05-products-marvin-rebuild.md](./roadmap-benchmarks/2026-07-05-products-marvin-rebuild.md).
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---|---|---|
+| **R1** Rebuild `/products` as 4 category cards (Window / Door / Specialist / Aluminium Line) | Imie's core round-3 rejection; supersedes the 2026-07-05 material toggle | ~1–1.5d | **B18** (Tier 1, gate-excluded) | Blocked on meeting |
+| **R2** Extract one reusable `SystemCategoryCard` primitive | 3 divergent card treatments (SystemsTiles / Products / Aluminium) | ~0.5d | **B19** (Tier 3) | Planned |
+| **R3** SystemsTiles homepage 3 → 4 cards (add Aluminium Line) | Homepage systems section omits the alu line | ~0.25d | **B20** (Tier 1, gate-excluded) | Planned |
+| **R4** Real project photography on cards, not synthetic renders | Imie rejects the white-bg renders | ~0.5d + assets | **B21** (Tier 3) | Blocked on Imie assets |
+| **R5** Build out Why uPVC (currently one cut-section photo); extend interactive style to alu thermal break | Imie 07-02 + 05-31 | ~0.75d | **B22** (Tier 3) | Planned |
+| **R6** Sync `DESIGN_SYSTEM.md` to shipped brand (Manrope/Fraunces, not "Instrument Serif+Inter"; drop "not yet merged") | Doc↔code drift flagged in `/background` | ~0.25d | **B23** (Tier 3; overlaps B3/B4) | Planned |
+| **R7** Responsive card grammar (desktop row / mobile 2-col) | Marvin recipe responsiveness | in R1 | **B24** (Tier 2, `qa:visual`) | Blocked on meeting |
+
+All Tier-1 benchmarks are **candidate-tier / expected-red until built**, gate-excluded per the benchmark doc; promoting each into the live gate green is its `/verify` acceptance moment.
+
+---
+
 ## Shipped
 
 ### Tita demo round (design + copy pass)
