@@ -32,4 +32,5 @@ dist-ssr
 # (contains Google session cookies — never commit)
 .gemini-browser-state/
 .visual-qa/
+.prod-surface-audit/
 tsconfig.*.tsbuildinfo
