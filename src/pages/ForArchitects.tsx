@@ -3,7 +3,7 @@ import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import EditorialButton from "@/components/primitives/Button";
 import { FileText, Hammer, Phone, MapPin, ArrowUpRight, Mail } from "lucide-react";
-import { CONTACT, BRAND } from "@/data/fourlinq-data";
+import { CONTACT, BRAND, phoneHref } from "@/data/fourlinq-data";
 
 /**
  * /for-architects — single-page architect's corner.
@@ -121,13 +121,13 @@ const ForArchitects = () => (
               </li>
               <li className="border-t border-[color:var(--rule-soft)] pt-4">
                 <p className="text-[color:var(--ink-muted)] mb-1">Sales line</p>
-                <a href={`tel:${CONTACT.mobileSales.replace(/-/g, "")}`} className="text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+                <a href={phoneHref(CONTACT.mobileSales)} className="text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                   {CONTACT.mobileSales}
                 </a>
               </li>
               <li className="border-t border-[color:var(--rule-soft)] pt-4">
                 <p className="text-[color:var(--ink-muted)] mb-1">Landline</p>
-                <a href={`tel:${CONTACT.landline.replace(/[()]/g, "")}`} className="text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+                <a href={phoneHref(CONTACT.landline)} className="text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                   {CONTACT.landline}
                 </a>
               </li>

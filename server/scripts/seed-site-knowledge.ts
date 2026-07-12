@@ -127,12 +127,26 @@ for (const p of PRODUCTS) {
 }
 
 // --- Materials (uPVC / Aluminum) ---
+// NAME the compatible finishes; do not just count them. Emitting the count
+// alone is why LinQ was answering "Aluminum frames are compatible with 6
+// finishes, but the specific finishes are not listed" — it had the number and
+// nothing else, so it said so. The names have been in the data since 05-31.
 for (const m of MATERIALS) {
+  const finishName = m.compatibleFinishIds
+    .map((id) => FRAME_FINISHES.find((f) => f.id === id)?.label)
+    .filter(Boolean);
   chunks.push({
     title: `Material — ${m.label}${m.badge ? ` (${m.badge})` : ""}`,
-    content: `${m.label} highlights: ${m.highlights.join("; ")}. Compatible finishes: ${m.compatibleFinishIds.length}.`,
+    content:
+      `${m.label} highlights: ${m.highlights.join("; ")}.\n` +
+      (finishName.length
+        ? `Compatible frame finishes (${finishName.length}): ${finishName.join(", ")}.`
+        : "Compatible frame finishes: not yet confirmed for this material.") +
+      (m.id === "aluminum"
+        ? `\nAluminium is also offered in powder-coat colours — popular ones: ${ALUMINUM_FINISHES.map((f) => f.name).join(", ")}.`
+        : ""),
     type: "material",
-    tags: ["material", m.id],
+    tags: ["material", m.id, "finish"],
     sourceUrl: `site://material/${m.id}`,
   });
 }

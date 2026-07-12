@@ -1,9 +1,9 @@
 // Re-exports verified brand data from the canonical source
 // Source: Official FourlinQ brochures — see fourlinq-data.ts
-import { BRAND, CONTACT, BRANCHES } from "./fourlinq-data";
+import { BRAND, CONTACT, BRANCHES, phoneHref } from "./fourlinq-data";
 import type { Branch } from "./fourlinq-data";
 
-export { BRAND, CONTACT, BRANCHES };
+export { BRAND, CONTACT, BRANCHES, phoneHref };
 export type { Branch };
 
 // Warranty scope items used as "certification-style" badges on the Brand page

@@ -34,6 +34,34 @@ export const CONTACT = {
   email:        "sales@fourlinq.com",
 };
 
+/**
+ * A local PH mobile number in E.164 — "0925-848-8888" becomes "+639258488888".
+ * Returns null for anything that is not an 09xx mobile (a landline has no Viber).
+ */
+export function toE164(phone: string): string | null {
+  const digit = phone.replace(/\D/g, "");
+  if (/^09\d{9}$/.test(digit)) return `+63${digit.slice(1)}`;
+  if (/^639\d{9}$/.test(digit)) return `+${digit}`;
+  return null;
+}
+
+/**
+ * Viber deep link for a mobile number.
+ *
+ * Imie, 2026-05-31, with a screenshot of the browser's "Open Skype?" prompt:
+ * "when i click the contact no. is it possible that it is directed to a viber
+ * app instead of skype?" A bare `tel:` link hands the number to whatever the OS
+ * has registered for the protocol, which on her desktop is Skype.
+ *
+ * Falls back to `tel:` for landlines, which Viber cannot dial.
+ */
+export function phoneHref(phone: string): string {
+  const e164 = toE164(phone);
+  return e164
+    ? `viber://chat?number=${encodeURIComponent(e164)}`
+    : `tel:${phone.replace(/[^\d+]/g, "")}`;
+}
+
 // ─────────────────────────────────────────────
 // BRANCHES
 // Source: Brochure footer — all 5 locations verified
