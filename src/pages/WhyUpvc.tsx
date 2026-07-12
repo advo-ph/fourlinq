@@ -26,7 +26,7 @@ const elaboration: Record<string, string> = {
   "corrosion-resistant":
     "uPVC doesn't oxidize, so coastal projects don't behave any differently from inland ones. We've installed frames a few hundred meters from the shoreline that still look unchanged years later.",
   "long-lasting-performance":
-    "Ten-year warranty on the profile, the weather seal, and the finish. The finish is fused into the surface, so the frame looks the same in year ten as it did the day it was installed. You don't paint it or sand it down at any point.",
+    "Ten-year limited warranty on the profile, the weather seal, and the finish. The finish is fused into the surface, so the frame looks the same in year ten as it did the day it was installed. You don't paint it or sand it down at any point.",
   "weather-resistance":
     "EPDM gaskets seal where the sash closes against the frame. If any water gets past the seal, drainage slots at the bottom let it run back out instead of sitting inside the profile. Tested against horizontal rain.",
   "sound-insulation":
@@ -266,9 +266,6 @@ uPV<span className="text-[color:var(--accent)]">C</span>
           When we'd point you elsewhere.
         </h2>
         <div className="lg:col-span-6 lg:col-start-7 space-y-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
-          <p>
-            If you're opening a whole wall in one panel with no mullion in the middle, uPVC isn't strong enough on its own. That's where we move you over to our aluminum line. Same if your architect is after very thin sightlines. Aluminum can hold more glass with less frame around it.
-          </p>
           <p>
             And if what you really want is hardwood, just buy hardwood. The wood-grain finish is good, but it's a finish. We'll tell you that before you order.
           </p>

@@ -40,7 +40,7 @@ const advantages: Advantage[] = [
   },
   {
     number: "05",
-    title: "10-year system warranty",
+    title: "10-year limited system warranty",
     body: "Structural performance, weather seal integrity, and finish stability. Covered for ten years from installation. The warranty period matches what we have observed in the field across our installs.",
   },
   {

@@ -9,7 +9,7 @@ const EditorialIntro = () => (
         Custom-made, to your specifications.
       </EyebrowHeading>
       <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.65]">
-        Every FourlinQ system is fabricated to your architect's drawings. Twelve finishes. uPVC and aluminum profiles. Backed by a 10-year warranty.
+        Every FourlinQ system is fabricated to your architect's drawings. Twelve finishes. uPVC and aluminum profiles. Backed by a 10-year limited warranty.
       </p>
       <div className="mt-10">
         <FeatureLink to="/why-upvc">Why uPVC</FeatureLink>

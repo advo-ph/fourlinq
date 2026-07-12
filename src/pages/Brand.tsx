@@ -41,7 +41,7 @@ const Brand = () => (
             Our brand
           </p>
           <h1 className="font-serif font-normal tracking-tight text-white text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02]">
-            European engineering. Philippine projects.
+            European engineering.
           </h1>
           <p className="mt-7 lg:mt-9 text-body-lg lg:text-lead text-white/80 max-w-[40rem] leading-[1.55]">
             {BRAND.promise}
@@ -108,7 +108,7 @@ const Brand = () => (
             10
           </p>
           <p className="text-[15px] lg:text-[18px] uppercase tracking-[0.18em] text-[color:var(--accent)] font-medium">
-            Year warranty.
+Year limited warranty.
           </p>
         </div>
 
@@ -183,7 +183,7 @@ const Brand = () => (
     <Section id="showrooms" tone="soft" size="lg" className="scroll-mt-28">
       <div className="grid lg:grid-cols-[1fr,auto] items-end gap-8 mb-12 lg:mb-16">
         <EyebrowHeading eyebrow="Where to find us" level={2}>
-          Four showrooms across the Philippines.
+          Three showrooms across the Philippines.
         </EyebrowHeading>
       </div>
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">

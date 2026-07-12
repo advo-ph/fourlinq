@@ -13,8 +13,8 @@ import { FRAME_FINISHES, BRANCHES } from "@/data/fourlinq-data";
  * K&M's European-partner-distributor model cannot honestly use.
  */
 
-// All 4 BRANCHES count as customer-visitable locations (Manila Main +
-// Ortigas + Alabang + Cebu — per fourlinq-data.ts).
+// All BRANCHES are customer-visitable showrooms (Ortigas + Alabang + Cebu —
+// per fourlinq-data.ts). Main Office was removed — it's not a showroom.
 const locationCount = BRANCHES.length;
 
 const stats = [
@@ -28,7 +28,7 @@ const stats = [
   },
   {
     value: 10,
-    label: "Year standard system warranty",
+    label: "Year limited system warranty",
   },
 ];
 
