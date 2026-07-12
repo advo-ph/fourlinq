@@ -14,6 +14,7 @@ import pool from "../db.js";
 import {
   BRAND, CONTACT, BRANCHES, ADVANTAGES, UPVC_PROFILE_FEATURES,
   PRODUCT_TYPES, MATERIALS, FRAME_FINISHES, DIMENSION_CONSTRAINTS,
+  ALUMINUM_FINISHES, PROFILE_SYSTEMS,
 } from "../../src/data/fourlinq-data.js";
 import { products as PRODUCTS } from "../../src/data/products.js";
 import { FAQ, FAQ_CATEGORIES } from "../../src/data/faq.js";
@@ -154,6 +155,24 @@ chunks.push({
   sourceUrl: "site://finishes",
 });
 
+// --- Aluminium finishes (popular powder-coat colours, distinct from uPVC) ---
+chunks.push({
+  title: "Aluminium Finishes — popular powder-coat colours",
+  content: `FourlinQ aluminium products come in a range of powder-coat colours. Popular finishes: ${ALUMINUM_FINISHES.map(f => f.name).join(", ")}. These are distinct from the uPVC frame finishes.`,
+  type: "finish_overview",
+  tags: ["finish", "aluminium", "aluminum", "powder-coat", "colours", "gray", "black", "brown", "white"],
+  sourceUrl: "site://aluminium-finishes",
+});
+
+// --- Profile systems (extrusion brands / lines we fabricate from) ---
+chunks.push({
+  title: "Profile Systems — uPVC and aluminium extrusion lines",
+  content: `uPVC profile systems: ${PROFILE_SYSTEMS.filter(p => p.material === "upvc").map(p => `${p.name} (${p.origin})`).join(", ")}. Aluminium profile systems: ${PROFILE_SYSTEMS.filter(p => p.material === "aluminum").map(p => `${p.name}${p.note ? ` — ${p.note}` : ""}`).join("; ")}.`,
+  type: "material",
+  tags: ["profile", "veka", "skyframe", "aluminium", "alu-slim", "systems"],
+  sourceUrl: "site://profile-systems",
+});
+
 // --- FAQ ---
 const faqCat = Object.fromEntries(FAQ_CATEGORIES.map((c) => [c.id, c.label]));
 for (let i = 0; i < FAQ.length; i++) {
@@ -181,7 +200,7 @@ for (const w of WHATS_NEW) {
 // --- Page map (where to find what on the site) ---
 const PAGES: Array<{ path: string; title: string; what: string }> = [
   { path: "/", title: "Home", what: "Hero, brand promise, advantages summary, featured projects, contact form entry." },
-  { path: "/products", title: "Products", what: "Browse all 5 product types (Casement, Sliding, Awning, Special Shapes, Slide & Fold) with images, specs, glass options, finish options." },
+  { path: "/products", title: "Products", what: "Browse all 6 product types (Casement, Sliding, Awning, Special Shapes, Slide & Fold, Lift & Slide) with images, specs, glass options, finish options." },
   { path: "/window-systems", title: "Window Systems", what: "Detailed window system specs, profile diagrams, technical drawings." },
   { path: "/door-systems", title: "Door Systems", what: "Detailed door system specs including swing, sliding, and slide & fold doors." },
   { path: "/specialist-systems", title: "Specialist Systems", what: "Curtain walls, large-span installations, custom commercial systems." },

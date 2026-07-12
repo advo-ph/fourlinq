@@ -649,6 +649,11 @@ const Admin = ({ onLogout, currentUser }: { onLogout: () => void; currentUser: C
                         <Phone size={14} /> {selected.phone}
                       </a>
                     )}
+                    {selected.phone && (
+                      <a href={`viber://chat?number=${encodeURIComponent(selected.phone.replace(/[\s()-]/g, ""))}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors">
+                        <MessageSquare size={14} /> Message on Viber
+                      </a>
+                    )}
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Calendar size={14} /> {new Date(selected.created_at).toLocaleString("en-PH")}
                     </div>
