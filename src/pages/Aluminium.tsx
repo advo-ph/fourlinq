@@ -3,6 +3,7 @@ import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
+import { ALUMINUM_FINISHES, PROFILE_SYSTEMS } from "@/data/fourlinq-data";
 
 /**
  * /aluminium — FourlinQ's aluminium product line.
@@ -127,6 +128,46 @@ const Aluminium = () => {
               ) : null}
             </article>
           ))}
+        </div>
+      </Section>
+
+      {/* Aluminium profile systems + finishes — static, client-supplied */}
+      <Section tone="soft" size="lg">
+        <div className="grid lg:grid-cols-12 gap-x-12 gap-y-10">
+          <div className="lg:col-span-5">
+            <p className="eyebrow mb-3">Profile systems</p>
+            <h2 className="font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+              Two aluminium profile lines.
+            </h2>
+          </div>
+          <ul className="lg:col-span-7 space-y-5">
+            {PROFILE_SYSTEMS.filter((p) => p.material === "aluminum").map((p) => (
+              <li key={p.name} className="border-b border-[color:var(--rule-soft)] pb-5">
+                <p className="font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight">{p.name}</p>
+                {p.note ? (
+                  <p className="mt-1 text-body text-[color:var(--ink-secondary)] leading-[1.5]">{p.note}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+
+          <div className="lg:col-span-5 lg:col-start-1 mt-6 lg:mt-10">
+            <p className="eyebrow mb-3">Popular finishes</p>
+            <h2 className="font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+              Powder-coat colours.
+            </h2>
+          </div>
+          <ul className="lg:col-span-7 mt-6 lg:mt-10 flex flex-wrap gap-x-8 gap-y-5">
+            {ALUMINUM_FINISHES.map((f) => (
+              <li key={f.id} className="flex items-center gap-3">
+                <span
+                  className="inline-block h-8 w-8 rounded-full border border-[color:var(--rule-soft)]"
+                  style={{ backgroundColor: f.hex }}
+                />
+                <span className="text-body text-[color:var(--ink-primary)]">{f.name}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 

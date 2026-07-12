@@ -13,7 +13,7 @@ export const BRAND = {
   promise: "A Lifetime of Satisfaction and Peace of Mind.",
   promiseSupport: "Windows and Doors are built to last.",
   heroQuote: "Custom-made Windows & Doors to suit customers' specifications.",
-  warranty: "10-Year Warranty",
+  warranty: "10-Year Limited Warranty",
   warrantyScope: [
     "Corrosion resistance",
     "Long lasting performance",
@@ -52,17 +52,6 @@ export interface Branch {
 }
 
 export const BRANCHES: Branch[] = [
-  {
-    id: "main",
-    label: "Main Office",
-    type: "main-office",
-    address: "#2635 Lamayan St., Sta. Ana, Manila",
-    city: "Manila",
-    region: "NCR",
-    lat: 14.5764,
-    lng: 121.0100,
-    mapQuery: "FourlinQ+2635+Lamayan+St+Sta+Ana+Manila",
-  },
   {
     id: "ortigas",
     label: "Ortigas — CW Home Depot",
@@ -144,7 +133,7 @@ export const ADVANTAGES: Advantage[] = [
     id: "long-lasting-performance",
     label: "Long Lasting Performance",
     description:
-      "Engineered for durability with a 10-year warranty. uPVC does not warp, rot, or require repainting over its lifetime.",
+      "Engineered for durability with a 10-year limited warranty. uPVC does not warp, rot, or require repainting over its lifetime.",
     icon: "clock",
   },
   {
@@ -232,7 +221,8 @@ export type WindowType =
   | "sliding"
   | "special-shapes"
   | "awning"
-  | "slide-and-fold";
+  | "slide-and-fold"
+  | "lift-and-slide";
 
 export type ProductCategory = "window" | "door" | "both";
 
@@ -297,6 +287,16 @@ export const PRODUCT_TYPES: ProductType[] = [
     primaryBenefit: "Full wall opening — seamless indoor-outdoor living",
     supportsCustomShapes: false,
   },
+  {
+    id: "lift-and-slide",
+    label: "Lift & Slide",
+    category: "door",
+    tagline: "Large panels. Effortless glide.",
+    description:
+      "A heavy-duty sliding door system. Turning the handle lifts the panel off its seals so it glides almost weightlessly, then drops it back to lock into a weather-tight seal. Built for large, heavy glass panels and wide openings.",
+    primaryBenefit: "Large, heavy panels that still glide effortlessly and seal tight",
+    supportsCustomShapes: false,
+  },
 ];
 
 // ─────────────────────────────────────────────
@@ -326,7 +326,7 @@ export const MATERIALS: MaterialOption[] = [
       "EPDM gaskets — fully weatherproof",
       "6mm–12mm glass options",
       "Sound insulating",
-      "10-Year Warranty",
+      "10-Year Limited Warranty",
     ],
     compatibleFinishIds: [
       "oak-light", "oak-malt", "jet-black", "charcoal-gray",
@@ -344,9 +344,47 @@ export const MATERIALS: MaterialOption[] = [
       "Suitable for large-span openings",
       "Corrosion-resistant",
     ],
-    // ⚠️ Confirm with client — aluminum finish availability not fully detailed in brochure
+    // Aluminium has its own powder-coat finish set — see ALUMINUM_FINISHES below.
+    // These uPVC finish ids are the swatches the configurator can preview today.
     compatibleFinishIds: ["oak-light", "silica-cream", "white", "jet-black", "charcoal-gray", "matte-quartz"],
   },
+];
+
+// ─────────────────────────────────────────────
+// ALUMINIUM FINISHES — popular powder-coat colours
+// Source: client (2026-05-31). Distinct from the 12 uPVC FRAME_FINISHES.
+// ─────────────────────────────────────────────
+
+export interface AluminumFinish {
+  id: string;
+  name: string;
+  hex: string;
+}
+
+export const ALUMINUM_FINISHES: AluminumFinish[] = [
+  { id: "alu-gray",  name: "Gray",  hex: "#8a8d8f" },
+  { id: "alu-black", name: "Black", hex: "#1b1b1d" },
+  { id: "alu-brown", name: "Brown", hex: "#5a4632" },
+  { id: "alu-white", name: "White", hex: "#f4f4f2" },
+];
+
+// ─────────────────────────────────────────────
+// PROFILE SYSTEMS — the extrusion brands / lines we fabricate from
+// Source: client (2026-05-31).
+// ─────────────────────────────────────────────
+
+export interface ProfileSystem {
+  material: Material;
+  name: string;
+  origin?: string; // brand origin, for uPVC
+  note?: string;   // spec note, e.g. wall thickness
+}
+
+export const PROFILE_SYSTEMS: ProfileSystem[] = [
+  { material: "upvc",     name: "Veka",                      origin: "German brand" },
+  { material: "upvc",     name: "Skyframe",                  origin: "Chinese brand" },
+  { material: "aluminum", name: "Standard / Regular Systems", note: "Wall thickness 1.2mm – 3.0mm." },
+  { material: "aluminum", name: "Alu Slim Systems",           note: "Minimum-sightline aluminium profile." },
 ];
 
 // ─────────────────────────────────────────────
@@ -502,6 +540,7 @@ export const DIMENSION_CONSTRAINTS: Record<
   "special-shapes":   { minW: 300,  maxW: 3000, minH: 300,  maxH: 3000 },
   "awning":           { minW: 400,  maxW: 1500, minH: 300,  maxH: 900  },
   "slide-and-fold":   { minW: 1800, maxW: 6000, minH: 2000, maxH: 2800 },
+  "lift-and-slide":   { minW: 1500, maxW: 6000, minH: 2000, maxH: 2700 },
 };
 
 // ─────────────────────────────────────────────
