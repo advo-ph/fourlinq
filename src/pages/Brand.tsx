@@ -6,7 +6,7 @@ import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import ConsultationForm from "@/components/shared/ConsultationForm";
-import { certifications, CONTACT, BRANCHES, BRAND } from "@/data/brand";
+import { certifications, CONTACT, BRANCHES, BRAND, phoneHref } from "@/data/brand";
 import { Phone, Mail, ArrowUpRight } from "lucide-react";
 
 const Brand = () => (
@@ -169,9 +169,9 @@ Year limited warranty.
           </p>
 
           <ul className="mt-10 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
-            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Sales" value={CONTACT.mobileSales} href={`tel:${CONTACT.mobileSales.replace(/-/g, "")}`} />
-            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Assistance" value={CONTACT.mobileAssist} href={`tel:${CONTACT.mobileAssist.replace(/-/g, "")}`} />
-            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Landline" value={CONTACT.landline} href={`tel:${CONTACT.landline.replace(/[()]/g, "")}`} />
+            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Sales" value={CONTACT.mobileSales} href={phoneHref(CONTACT.mobileSales)} />
+            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Assistance" value={CONTACT.mobileAssist} href={phoneHref(CONTACT.mobileAssist)} />
+            <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Landline" value={CONTACT.landline} href={phoneHref(CONTACT.landline)} />
             <ContactRow icon={<Mail size={16} strokeWidth={1.5} />} label="Email" value={CONTACT.email} href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`} external />
           </ul>
         </div>

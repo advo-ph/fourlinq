@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CONTACT } from "@/data/fourlinq-data";
+import { CONTACT, phoneHref } from "@/data/fourlinq-data";
 import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
 import Logo from "@/components/shared/Logo";
 import { ArrowUpRight } from "lucide-react";
@@ -46,7 +46,7 @@ const socials: FooterLink[] = [
 
 const EditorialFooter = () => {
   const gmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`;
-  const tel = `tel:${CONTACT.mobileSales.replace(/-/g, "")}`;
+  const tel = phoneHref(CONTACT.mobileSales);
 
   return (
     <footer className="bg-[color:var(--canvas-dark)] text-white">
