@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-07-05** (Imie chat round 3 — `/products` layout rebuild to Marvin-style category cards, blocked on a meeting; see "chat round 3" below. Prior refresh 2026-06-16.)
+**Last updated: 2026-07-10** (post-meeting production/Marvin realignment; the July 5 four-card build shipped and is now superseded as the final taxonomy by Tita's By type + By material direction.)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -13,7 +13,7 @@ For a record of what has actually changed and when, see [CHANGELOG.md](./CHANGEL
 - **Live URL:** https://fourlinq.ph
 - **Deploy:** push to `main` auto-deploys to the advo VPS via GitHub Actions (`.github/workflows/deploy.yml`, pm2-managed). `./deploy.sh` is the underlying rsync helper. All branches were consolidated into `main` on 2026-06-21 (the old `cms-rag-multiuser` / `supafinal` / `codex/tesla-marvin-design` deploy/work branches were merged and deleted).
 - **Vercel:** `vercel.json` was removed from the repo, but the **Vercel GitHub integration is still active** — it auto-deploys a preview on every PR (two projects: `fourlinq` and `fourlinq2` on a separate account). Not the production path (that's the VPS), but it should be reconciled or disconnected. *(The earlier "removed entirely" note was inaccurate.)*
-- **Client status:** Hero remains *"Built to Last. Designed to Inspire."* Round 3 (Imie 2026-07-02/05) is open — `/products` layout rebuild to Marvin-style cards, **blocked on a meeting** she requested 2026-07-05. See "chat round 3" below.
+- **Client status:** Hero remains *"Built to Last. Designed to Inspire."* The requested meeting occurred. The immediate direction is to fix website organization before new proposals: put categories before benefits, separate browsing By type from By material, make uPVC/Aluminium/Glass discoverable, and stop publishing unverified product/options/resource claims. See the 2026-07-10 refresh below.
 
 ---
 
@@ -53,13 +53,13 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 
 ---
 
-## Open client requests (from Imie 2026-07-02 / 07-05 chat round 3) — ⚠️ /products LAYOUT REBUILD
+## Historical client requests (from Imie 2026-07-02 / 07-05 chat round 3) — `/products` layout rebuild
 
 Round 3, after the 2026-06-19 delivery (window animations + thermal-break feature). On 2026-07-05 the team shipped a **uPVC / Aluminium material toggle** on `/products` and messaged Imie it was done. She reviewed on her phone and replied: *"Can we meet? It's not according to intended layout of the site 😭."* **The toggle did not match her intended layout and is superseded — see below.**
 
 Grounded in her Jul 2 diagram (`attachments/photo_2026-07-02_14-20-32.jpg`), the Marvin "Collections" reference she captioned *"should have something like this"* (`photo_2026-05-19_05-31-13.jpg`), and a full visual review of her sent screenshots — not OCR.
 
-**⚠️ Blocked on a meeting** (she requested it 2026-07-05; time TBD). Do NOT build until the data-model question (#21) is answered — a second wrong build would be costly with this at-risk client.
+**Historical status:** the meeting occurred after this snapshot. The four-card build shipped on 2026-07-05, but the meeting clarified that the durable model must separate **By type** from **By material**. Keep this section as decision history; the active plan is the 2026-07-10 refresh.
 
 ### Intended `/products` — Marvin-style category cards (NOT tabs, NOT a material toggle)
 
@@ -74,12 +74,12 @@ Four full-bleed **photo-cards** in a row, each a real project photo + name + ite
 
 | # | Request | Status | Notes |
 |---|---|---|---|
-| 19 | Rebuild `/products` as a 4-card Marvin-Collections layout | Blocked on meeting | Aluminium Line is a peer 4th card, not a material toggle. Supersedes the 2026-07-05 toggle. |
-| 20 | Use REAL project photography on the cards, not synthetic 3D renders | Blocked on Imie assets | She rejects the white-bg renders — sliding door "looks like a 2-panel fixed," curtain wall doesn't read "tall and wide." Benchmark = kennethandmock real photography. Overlaps items #10, #13. |
-| 21 | **Data model:** is Aluminium a material option *per* window/door, OR a separate 4th catalog? | Blocked on meeting | Her diagram = separate category; her words (Jul 2) = "both are profile systems." **Decides the entire build — confirm first.** |
-| 22 | Add 3 door products: Large Panel, Lift & Slide, 90 Series | Blocked on Imie assets | Exist as names/icons in `configurator.ts`; need brochure-verified photos + specs. |
-| 23 | Why uPVC page too sparse — "just showed one photo, a cut section" | Planned | Build out; extend the interactive "zero leaks" style to alu thermal break (her 2026-05-31 ask). |
-| 24 | Confirm product re-assignments: Slide & Fold → Doors, Awning → Windows | Blocked on meeting | Per her Jul 2 diagram. |
+| 19 | Rebuild `/products` as a 4-card Marvin-Collections layout | Shipped 2026-07-05; superseded as final taxonomy | The card grammar remains useful, but Aluminium cannot remain the lone material beside three type/family cards. |
+| 20 | Use REAL project photography on the cards, not synthetic 3D renders | Partial | Four existing project photos ship; per-category mapping, rights/approval, and mobile crops are not in a shared manifest. |
+| 21 | **Data model:** is Aluminium a material option *per* window/door, OR a separate 4th catalog? | Direction clarified 2026-07-10 | Build orthogonal By type and By material paths. Exact product compatibility and Glass placement still require client approval. |
+| 22 | Add 3 door products: Large Panel, Lift & Slide, 90 Series | Partial | Names, cutouts, and animation exist; product truth, photos, and specifications remain approval-blocked. |
+| 23 | Why uPVC page too sparse — "just showed one photo, a cut section" | Partial | Page is now substantial, but has a second 500vh pinned sequence, claim risk, and no parallel Aluminium/Glass evidence depth. |
+| 24 | Confirm product re-assignments: Slide & Fold → Doors, Awning → Windows | Implemented in current catalog; glossary approval still required | Current placement matches the meeting direction. |
 
 ---
 
@@ -100,6 +100,59 @@ Four full-bleed **photo-cards** in a row, each a real project photo + name + ite
 3. **Don't build for hypothetical needs.** Phases marked "Deferred" stay deferred until a real trigger appears (client ask, scaling pain, etc.).
 4. **Preserve the design system.** All work must comply with [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md). No emojis, no off-palette colors, no bouncy animations.
 5. **Document as you go.** Every shipped phase gets a CHANGELOG entry on the day it merges.
+
+---
+
+## 2026-07-10 post-meeting production + Marvin realignment
+
+**Scope:** deployed public UI, route/layout/motion/interaction behavior, product/data truth, meeting transcript, local Purplegradient Marvin corpus, and a bounded current-site scan of Marvin, Pella, Andersen, Milgard, and Schüco.
+
+**Verdict:** retain the existing FourlinQ identity and useful product motion. Repair buying structure, proof, consent, responsive containment, and documentation before adding more spectacle or proposals.
+
+**Discovery result:** 31 validated signals → **18 active items**, **6 hold/triage entries**, **7 rejected directions**. Full evidence and the granular section/asset matrix: [FOURLINQ_MARVIN_PROD_AUDIT_2026-07-10.md](./FOURLINQ_MARVIN_PROD_AUDIT_2026-07-10.md). Every active row has a falsifiable contract in [roadmap-benchmarks/2026-07-10-post-meeting-realignment.md](./roadmap-benchmarks/2026-07-10-post-meeting-realignment.md). Holds and rejections live in [roadmap-rejected.md](./roadmap-rejected.md).
+
+**Sequencing rule:** RM1 and RM2 are the product-truth gate. RM5, RM6, RM8, RM13, and RM17 can proceed independently. Do not build the final product navigation, Glass hub, configurator expansion, Collections, Solutions, or LinQ buyer tuning from guessed data.
+
+### P0 — Fix truth and the buying structure
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---:|---|---|
+| **RM1 — Client-approved product master + glossary** | Catalog, configurator, prompts, animation, and LinQ currently diverge on names, mechanism, material, options, and specifications | ~1–2d to prepare; client review separate | **RM1** | Blocked on client data/sign-off |
+| **RM2 — Orthogonal catalog taxonomy** | Current Window/Door/Specialist/Aluminium peer set mixes type/family with material and has no proper Glass placement | ~1–2d after RM1 | **RM2** | Blocked on RM1 + Glass decision |
+| **RM3 — Category-first homepage** | Products begin only after the hero and a 500vh benefits sequence, directly contradicting the meeting | ~0.5–1d | **RM3** | Planned after RM2 |
+| **RM4 — One taxonomy across nav/home/products/footer** | Five public discovery surfaces currently disagree | ~0.5–1d after RM2 | **RM4** | Planned after RM2 |
+| **RM5 — Public viewport containment** | FAQ expands to 919px at phone/tablet; Design Tool expands to 404px at 390px | ~0.5–1d | **RM5** | Planned |
+| **RM6 — Consent-enforced analytics** | Analytics fires before Accept/Decline and ignores Decline, contradicting the legal promise | ~0.5–1d | **RM6** | Planned |
+| **RM7 — Claim/warranty/finish/resource source registry** | Conflicting finish counts plus unsourced span, dB, storm, UV life, certification, warranty, brochure, CAD, and BIM language | ~1–2d + client sources | **RM7** | Blocked on source pack/client approval |
+| **RM8 — Documentation reality sync** | README, DESIGN_SYSTEM, old roadmap phases, and source reality disagree on deploy, fonts, routes, and shipped work | ~0.5–1d | **RM8** | Planned |
+
+### P1 — Make selection and proof complete
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---:|---|---|
+| **RM9 — Product detail truth + buyer questions** | Current drawers are polished but shallow and contain operation/content errors such as Casement “smooth-rolling” | ~2–4d after RM1/RM7 | **RM9** | Blocked on RM1/RM7 |
+| **RM10 — Aluminium evidence completion** | Three requested systems exist only as text; no page photos, cutaways, drawings, compatibility, or source-backed specification | ~1–2d after assets | **RM10** | Blocked on client assets/specs |
+| **RM11 — Approved Glass hub** | No category for independently ordered glass applications or advanced glazing mentioned in the meeting | ~1–3d after offering approval | **RM11** | Blocked on client offering/assets |
+| **RM12 — Compatibility-aware configurator** | Current Type → Finish → Glass → Size flow omits material/profile/options and implies broad compatibility | ~3–5d after RM1/RM2 | **RM12** | Blocked on RM1/RM2 |
+| **RM13 — Asset provenance + capture contract** | Project comments have partial provenance, but category/WP/generated/client assets lack one enforceable approval/rights model | ~1–2d | **RM13** | Planned; client metadata required for completion |
+| **RM14 — Rights-cleared Inspiration model** | Projects and updates are useful but disconnected; requested blog/vlog/exhibit/arrival content has no unified typed workflow | ~2–4d after RM13 | **RM14** | Blocked on RM13/content ownership |
+| **RM15 — Purposeful-motion + transfer budget** | Roughly 27.4 MB of home motion media, eager hero, two 500vh stories, and off-screen frame work compete with discovery | ~1–3d | **RM15** | Planned after RM3 ordering decision |
+
+### P2 — Improve navigation, access, and assisted buying
+
+| Item | What it closes | Effort | Benchmark | Status |
+|---|---|---:|---|---|
+| **RM16 — Product navigation + guided browse** | Text-only mixed-axis mega-menu lacks task-led By type / By material hierarchy | ~1–2d after RM2/RM4 | **RM16** | Blocked on RM2/RM4 |
+| **RM17 — Accessibility + fixed-layer QA** | Empty-alt animation layers and always-visible chat/banner layers obscure active controls | ~1–2d | **RM17** | Planned |
+| **RM18 — Disclosed, source-grounded LinQ assistance** | “Best uPVC” and bias/objectivity behavior cannot be trusted while its catalog sources are risky | ~1–2d after RM1/RM7 | **RM18** | Blocked on RM1/RM7 + policy decision |
+
+### Release order
+
+1. **Truth gate:** RM1, RM2, RM7, RM13.
+2. **Structural/trust repair:** RM3, RM4, RM5, RM6, RM8, RM17.
+3. **Selection depth:** RM9, RM10, RM11, RM12, RM15, RM16.
+4. **Proof and assistance:** RM14, then RM18.
+5. **Future launch gates:** Collections, Solutions, brochure, uncertain new products, and separate content/operations proposals only when their reopen conditions pass.
 
 ---
 
@@ -353,23 +406,23 @@ These have been considered and intentionally rejected. Reopen only if the busine
 
 ---
 
-## Phase 8 — /products Marvin-style category rebuild
+## Phase 8 — `/products` Marvin-style category rebuild (historical; partially shipped and superseded)
 
-Formalizes chat round 3 (items 19–24). **⚠️ Blocked on the meeting Imie requested 2026-07-05** — do NOT start R1 until the data-model question is answered (see `roadmap-rejected.md` → Triage → "`/products` material data model").
+This formalized chat round 3 (items 19–24). R1 shipped on 2026-07-05. The 2026-07-10 meeting then superseded the four-peer-card model as the final taxonomy: the useful photo-card grammar can remain, but active work must follow RM1–RM4's separate By type and By material model.
 
 **Design source (locked):** the purplegradient Marvin audit at `/Users/angelonrevelo/Codex/purplegradient/websites/marvin` (`design.md`). Reuse Marvin's **structure + grammar only** — `collection-card` family (photo + eyebrow + name + item list + rectangular 4px CTA), 12-col/24px grid, breakpoints 576/768/992/1200/1400, mobile 2-col card grid, restrained hover. Keep FourlinQ's **skin** (red `#C8102E`, Manrope/Fraunces) — cloning Marvin's amber/Nationale is explicitly rejected (`roadmap-rejected.md`). The scrape confirmed Imie's reference is Marvin's Collections mega-menu (`evidence/state/desktop-click-07-button-button-collections.png`). Benchmarks: [roadmap-benchmarks/2026-07-05-products-marvin-rebuild.md](./roadmap-benchmarks/2026-07-05-products-marvin-rebuild.md).
 
 | Item | What it closes | Effort | Benchmark | Status |
 |---|---|---|---|---|
-| **R1** Rebuild `/products` as 4 category cards (Window / Door / Specialist / Aluminium Line) | Imie's core round-3 rejection; supersedes the 2026-07-05 material toggle | ~1–1.5d | **B18** (Tier 1, gate-excluded) | Blocked on meeting |
-| **R2** Extract one reusable `SystemCategoryCard` primitive | 3 divergent card treatments (SystemsTiles / Products / Aluminium) | ~0.5d | **B19** (Tier 3) | Planned |
-| **R3** SystemsTiles homepage 3 → 4 cards (add Aluminium Line) | Homepage systems section omits the alu line | ~0.25d | **B20** (Tier 1, gate-excluded) | Planned |
-| **R4** Real project photography on cards, not synthetic renders | Imie rejects the white-bg renders | ~0.5d + assets | **B21** (Tier 3) | Blocked on Imie assets |
-| **R5** Build out Why uPVC (currently one cut-section photo); extend interactive style to alu thermal break | Imie 07-02 + 05-31 | ~0.75d | **B22** (Tier 3) | Planned |
-| **R6** Sync `DESIGN_SYSTEM.md` to shipped brand (Manrope/Fraunces, not "Instrument Serif+Inter"; drop "not yet merged") | Doc↔code drift flagged in `/background` | ~0.25d | **B23** (Tier 3; overlaps B3/B4) | Planned |
-| **R7** Responsive card grammar (desktop row / mobile 2-col) | Marvin recipe responsiveness | in R1 | **B24** (Tier 2, `qa:visual`) | Blocked on meeting |
+| **R1** Rebuild `/products` as 4 category cards (Window / Door / Specialist / Aluminium Line) | Imie's core round-3 rejection; superseded the material toggle | ~1–1.5d | **B18** (Tier 1, gate-excluded) | Shipped 2026-07-05; taxonomy superseded by RM2 |
+| **R2** Extract one reusable `SystemCategoryCard` primitive | 3 divergent card treatments (SystemsTiles / Products / Aluminium) | ~0.5d | **B19** (Tier 3) | Partial: primitive ships on `/products`, homepage still uses a divergent tile |
+| **R3** SystemsTiles homepage 3 → 4 cards (add Aluminium Line) | Homepage systems section omits the alu line | ~0.25d | **B20** (Tier 1, gate-excluded) | Superseded by RM2/RM3; do not add a mixed-axis fourth peer |
+| **R4** Real project photography on cards, not synthetic renders | Imie rejects the white-bg renders | ~0.5d + assets | **B21** (Tier 3) | Partial: real photos ship, mapping/approval manifest pending RM13 |
+| **R5** Build out Why uPVC (currently one cut-section photo); extend interactive style to alu thermal break | Imie 07-02 + 05-31 | ~0.75d | **B22** (Tier 3) | Partial: content expanded; claim/motion/Aluminium parity remain |
+| **R6** Sync `DESIGN_SYSTEM.md` to shipped brand (Manrope/Fraunces, not "Instrument Serif+Inter"; drop "not yet merged") | Doc↔code drift flagged in `/background` | ~0.25d | **B23** (Tier 3; overlaps B3/B4) | Folded into RM8 |
+| **R7** Responsive card grammar (desktop row / mobile 2-col) | Marvin recipe responsiveness | in R1 | **B24** (Tier 2, `qa:visual`) | Superseded by RM3/RM5 after the meeting |
 
-All Tier-1 benchmarks are **candidate-tier / expected-red until built**, gate-excluded per the benchmark doc; promoting each into the live gate green is its `/verify` acceptance moment.
+The original benchmark document remains historical evidence. RM1–RM18 are now the active acceptance contract.
 
 ---
 
