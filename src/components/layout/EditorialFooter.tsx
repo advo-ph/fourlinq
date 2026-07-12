@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CONTACT } from "@/data/fourlinq-data";
+import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
 import Logo from "@/components/shared/Logo";
 import { ArrowUpRight } from "lucide-react";
 
@@ -9,11 +10,14 @@ interface FooterLink {
   external?: boolean;
 }
 
+// Systems column is generated from the shared taxonomy — both axes, same labels
+// as the nav and /products. It previously listed only the three types, under
+// different labels ("Windows" vs "Window Systems"), and omitted material
+// entirely, which is one of the four surfaces that had drifted apart.
 const columns: Record<string, FooterLink[]> = {
   Systems: [
-    { label: "Windows", to: "/products?filter=windows" },
-    { label: "Doors", to: "/products?filter=doors" },
-    { label: "Specialist", to: "/products?filter=specialist" },
+    ...SYSTEM_TYPE.map((t) => ({ label: t.label, to: t.to })),
+    ...PROFILE_MATERIAL.map((m) => ({ label: m.label, to: m.to })),
     { label: "Finishes", to: "/finishes" },
   ],
   Resources: [
