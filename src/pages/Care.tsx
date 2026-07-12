@@ -116,7 +116,7 @@ const Care = () => (
           Following this routine isn't required to keep your warranty valid.
         </p>
         <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-relaxed">
-          The 10-year warranty on profiles and 5-year warranty on hardware cover normal use and weather exposure. The routine above is about <em>maximizing</em> the life of the seals and rollers beyond the warranty period. Not preserving the warranty itself. If anything goes wrong before then, we cover it.
+          The 10-year limited warranty on profiles and 5-year limited warranty on hardware cover normal use and weather exposure. The routine above is about <em>maximizing</em> the life of the seals and rollers beyond the warranty period. Not preserving the warranty itself. If anything goes wrong before then, we cover it.
         </p>
       </div>
     </Section>

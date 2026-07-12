@@ -17,9 +17,9 @@ const Warranty = () => (
   <Layout>
     <PageHeader
       eyebrow="The promise"
-      title="A 10-year warranty, written down."
+      title="A 10-year limited warranty, written down."
       breadcrumbLabel="Warranty"
-      subtitle="Every FourlinQ window and door is backed by a 10-year warranty covering the system's structural performance, weather resistance, and finish integrity."
+      subtitle="Every FourlinQ window and door is backed by a 10-year limited warranty covering the system's structural performance, weather resistance, and finish integrity."
     />
 
     <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
@@ -28,7 +28,7 @@ const Warranty = () => (
         <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-20 lg:mb-28">
           <div className="lg:col-span-7">
             <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
-              A FourlinQ system is engineered to last decades. The 10-year warranty is our way of putting that engineering in writing. And we stand behind it long after the install crew has gone home.
+              A FourlinQ system is engineered to last decades. The 10-year limited warranty is our way of putting that engineering in writing. And we stand behind it long after the install crew has gone home.
             </p>
           </div>
           <div className="lg:col-span-4 lg:col-start-9">
@@ -85,7 +85,7 @@ const Warranty = () => (
                     {scope}
                   </h3>
                   <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.65] max-w-md">
-                    {scopeDescriptions[scope] || "Covered for the full 10-year warranty term."}
+                    {scopeDescriptions[scope] || "Covered for the full 10-year limited warranty term."}
                   </p>
                 </li>
               );

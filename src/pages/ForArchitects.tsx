@@ -251,7 +251,7 @@ const ForArchitects = () => (
                 Walk through a showroom.
               </h2>
               <p className="text-body text-[color:var(--ink-secondary)] leading-[1.65] mb-8">
-                Bring a junior architect, bring a client, bring nothing. Ninety minutes with the FourlinQ team at one of our four showrooms across Metro Manila and Cebu.
+                Bring a junior architect, bring a client, bring nothing. Ninety minutes with the FourlinQ team at one of our three showrooms across Metro Manila and Cebu.
               </p>
               <EditorialButton to="/brand#showrooms" variant="secondary" size="md">
                 <MapPin size={16} strokeWidth={1.5} className="mr-2" />
