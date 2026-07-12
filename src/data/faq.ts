@@ -62,24 +62,24 @@ export const FAQ: FAQEntry[] = [
   {
     category: "material",
     q: "Will uPVC fade in the tropical sun?",
-    a: "Our uPVC profiles are engineered for tropical use and are corrosion resistant. The 10-Year Warranty covers long lasting performance and weather resistance. For specific color-stability questions about a particular finish, contact our sales team — 0925-848-8888 or sales@fourlinq.com.",
+    a: "Our uPVC profiles are engineered for tropical use and are corrosion resistant. The 10-Year Limited Warranty covers long lasting performance and weather resistance. For specific color-stability questions about a particular finish, contact our sales team — 0925-848-8888 or sales@fourlinq.com.",
   },
   {
     category: "material",
     q: "How does FourlinQ handle storm conditions?",
-    a: "Our profiles use galvanized steel reinforcement where structural strength is needed, EPDM gaskets for air and water tightness, and drainage holes for proper drainage. Weather resistance is one of the four areas covered by our 10-Year Warranty.",
+    a: "Our profiles use galvanized steel reinforcement where structural strength is needed, EPDM gaskets for air and water tightness, and drainage holes for proper drainage. Weather resistance is one of the four areas covered by our 10-Year Limited Warranty.",
   },
   {
     category: "material",
     q: "uPVC vs Aluminum — which should I choose?",
-    a: "We offer both. uPVC is the better thermal insulator (cooler interiors), sound insulator, and is fire retardant. Aluminum has slimmer sightlines for a more minimal look and suits very large spans. Use the Design Tool (/design-tool) to compare configurations, or visit any of our four showrooms for a hands-on look.",
+    a: "We offer both. uPVC is the better thermal insulator (cooler interiors), sound insulator, and is fire retardant. Aluminum has slimmer sightlines for a more minimal look and suits very large spans. Use the Design Tool (/design-tool) to compare configurations, or visit any of our three showrooms for a hands-on look.",
   },
 
   // ── Ordering ──────────────────────────────────────
   {
     category: "ordering",
     q: "How do I get a quote?",
-    a: "Three ways. (1) Use the Design Tool (/design-tool) to configure a system — we reply with a tailored quote. (2) Request a Quote from any system's detail page. (3) Visit a showroom (Manila, Pasig, Alabang, or Cebu) and we'll measure and quote on site. You can also reach sales directly at 0925-848-8888 or sales@fourlinq.com.",
+    a: "Three ways. (1) Use the Design Tool (/design-tool) to configure a system — we reply with a tailored quote. (2) Request a Quote from any system's detail page. (3) Visit a showroom (Pasig, Alabang, or Cebu) and we'll measure and quote on site. You can also reach sales directly at 0925-848-8888 or sales@fourlinq.com.",
   },
   {
     category: "ordering",
@@ -89,7 +89,7 @@ export const FAQ: FAQEntry[] = [
   {
     category: "ordering",
     q: "Where can I see your products in person?",
-    a: "We have four showrooms: Main Office (Sta. Ana, Manila), Ortigas (CW Home Depot, Pasig), Alabang (CW Home Depot, Westgate Alabang), and Cebu (Centro Fortuna Building, Banilad, Mandaue). Call the assistance line at 0925-896-5978 to schedule a visit.",
+    a: "We have three showrooms: Ortigas (CW Home Depot, Pasig), Alabang (CW Home Depot, Westgate Alabang), and Cebu (Centro Fortuna Building, Banilad, Mandaue). Call the assistance line at 0925-896-5978 to schedule a visit.",
   },
   {
     category: "ordering",
@@ -113,7 +113,7 @@ export const FAQ: FAQEntry[] = [
   {
     category: "warranty",
     q: "What does the warranty cover?",
-    a: "FourlinQ provides a 10-Year Warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation. The full warranty document goes out with every order — read it before signing.",
+    a: "FourlinQ provides a 10-Year Limited Warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation. The full warranty document goes out with every order — read it before signing.",
   },
   {
     category: "warranty",

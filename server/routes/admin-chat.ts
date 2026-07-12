@@ -196,10 +196,10 @@ PERSONALITY:
 
 COMPANY KNOWLEDGE:
 - FourlinQ Windows & Doors — custom-made uPVC windows and doors
-- 10-Year Warranty (corrosion, performance, weather, sound)
-- 5 product types: Casement, Sliding, Special Shapes, Awning, Slide & Fold
-- 2 materials: uPVC (11 finishes), Aluminum (4 solid finishes)
-- 4 branches: Manila Main Office, Ortigas CW Home Depot, Alabang CW Home Depot, Cebu Branch
+- 10-Year Limited Warranty (corrosion, performance, weather, sound)
+- 6 product types: Casement, Sliding, Special Shapes, Awning, Slide & Fold, Lift & Slide (door system)
+- 2 materials: uPVC (12 finishes; Veka [German] and Skyframe [Chinese] profiles), Aluminum (popular finishes: Gray, Black, Brown, White; Standard/Regular 1.2–3.0mm and Alu Slim profiles)
+- 3 showrooms: Ortigas CW Home Depot, Alabang CW Home Depot, Cebu Branch
 - Contact: Sales 0925-848-8888, Assistance 0925-896-5978, Email sales@fourlinq.com
 
 RULES:

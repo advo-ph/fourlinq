@@ -7,21 +7,21 @@ import { cn } from "@/lib/utils";
  * Multi-step consultation booking form — K&M-beat strategy from
  * docs/competitor-audit-kenneth-mock.md §8 Tier 2 #10.
  *
- * K&M ships a 4-field generic form (Name / Email / Subject / Message).
- * Ours qualifies the lead in 4 progressive steps:
- *   1. Project type   (New build / Renovation / Replacement / Architect-specifying)
- *   2. Timeline       (Now / 3-6 mo / 6-12 mo / Researching)
- *   3. Location       (province dropdown)
- *   4. Contact        (name, email, phone) + optional notes
+ * Qualifies the lead in 6 progressive steps:
+ *   1. Project type    (New build / Renovation / Replacement / Architect-specifying)
+ *   2. Timeline        (Now / 3-6 mo / 6-12 mo / Researching)
+ *   3. Product interest (multi-select, optional) — uPVC / Aluminium / Screen / etc.
+ *   4. Location        (City free-text + region dropdown)
+ *   5. Presentation    (optional — Zoom / onsite / other + preferred callback & presentation schedule)
+ *   6. Contact         (name, email, phone) + optional notes
  *
- * Each step has 4 chips except step 3 (dropdown) and step 4 (form). Visible
- * progress dots at top. Step content cross-fades; navigation is keyboard +
- * touch friendly. On submit, POSTs to /api/contact with a richer payload
- * than the previous Subject/Message form.
+ * Steps 3 and 5 are optional. On submit, POSTs to /api/contact with a richer
+ * payload than the previous Subject/Message form.
  */
 
 type ProjectType = "new-build" | "renovation" | "replacement" | "architect";
 type Timeline = "now" | "soon" | "later" | "researching";
+type PresentationMode = "zoom" | "onsite" | "other";
 
 const PROJECT_TYPES: { value: ProjectType; label: string; description: string }[] = [
   { value: "new-build", label: "New construction", description: "Building a home from the ground up." },
@@ -35,6 +35,18 @@ const TIMELINES: { value: Timeline; label: string; description: string }[] = [
   { value: "soon", label: "3 – 6 months", description: "Planning phase." },
   { value: "later", label: "6 – 12 months", description: "Early design phase." },
   { value: "researching", label: "Just researching", description: "Exploring options." },
+];
+
+// Product interest — multi-select, optional. Static for now; admin-managed list
+// is a future enhancement (Tita's note: "admin will be allowed to add more").
+const PRODUCT_INTERESTS = [
+  "uPVC",
+  "Aluminium",
+  "Screen Products",
+  "Window Coverings",
+  "Glass Products",
+  "Glass Railing",
+  "Shower Enclosure",
 ];
 
 const PH_REGIONS = [
@@ -53,6 +65,12 @@ const PH_REGIONS = [
   "International",
 ];
 
+const PRESENTATION_MODES: { value: PresentationMode; label: string; description: string }[] = [
+  { value: "zoom", label: "Zoom", description: "A live video walkthrough — no travel needed." },
+  { value: "onsite", label: "Onsite", description: "We come to your site or project location." },
+  { value: "other", label: "Other location", description: "Somewhere else that works for you." },
+];
+
 const inputClass =
   "w-full bg-transparent border-b border-[color:var(--rule-soft)] focus:border-[color:var(--ink-primary)] " +
   "py-3 text-body text-[color:var(--ink-primary)] outline-none placeholder:text-[color:var(--ink-faint)] " +
@@ -61,10 +79,18 @@ const inputClass =
 const labelClass =
   "block text-[11px] tracking-[0.12em] uppercase font-medium text-[color:var(--ink-muted)] mb-2";
 
+const TOTAL_STEPS = 6;
+
 interface FormState {
   projectType?: ProjectType;
   timeline?: Timeline;
+  productInterests: string[];
+  city: string;
   region?: string;
+  presentationMode?: PresentationMode;
+  presentationLocation: string;
+  preferredCallback: string;
+  preferredPresentation: string;
   name: string;
   email: string;
   phone: string;
@@ -73,7 +99,17 @@ interface FormState {
 
 const ConsultationForm = () => {
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState<FormState>({ name: "", email: "", phone: "", notes: "" });
+  const [form, setForm] = useState<FormState>({
+    productInterests: [],
+    city: "",
+    presentationLocation: "",
+    preferredCallback: "",
+    preferredPresentation: "",
+    name: "",
+    email: "",
+    phone: "",
+    notes: "",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -81,20 +117,40 @@ const ConsultationForm = () => {
     switch (step) {
       case 0: return !!form.projectType;
       case 1: return !!form.timeline;
-      case 2: return !!form.region;
-      case 3: return form.name.length > 1 && /^\S+@\S+\.\S+$/.test(form.email);
+      case 2: return true; // product interest is optional
+      case 3: return !!form.region; // region required; city optional but encouraged
+      case 4: return true; // presentation preferences are optional
+      case 5: return form.name.length > 1 && /^\S+@\S+\.\S+$/.test(form.email);
       default: return false;
     }
   }, [step, form]);
 
+  const toggleInterest = (value: string) =>
+    setForm((f) => ({
+      ...f,
+      productInterests: f.productInterests.includes(value)
+        ? f.productInterests.filter((v) => v !== value)
+        : [...f.productInterests, value],
+    }));
+
   const submit = async () => {
     setSubmitting(true);
     try {
-      const subject = `Consultation: ${PROJECT_TYPES.find((p) => p.value === form.projectType)?.label} · ${form.region}`;
+      const locationLabel = [form.city.trim(), form.region].filter(Boolean).join(", ");
+      const presentationLabel = form.presentationMode
+        ? PRESENTATION_MODES.find((m) => m.value === form.presentationMode)?.label
+        : null;
+      const subject = `Consultation: ${PROJECT_TYPES.find((p) => p.value === form.projectType)?.label} · ${locationLabel}`;
       const message = [
         `Project type: ${PROJECT_TYPES.find((p) => p.value === form.projectType)?.label}`,
         `Timeline: ${TIMELINES.find((t) => t.value === form.timeline)?.label}`,
-        `Location: ${form.region}`,
+        form.productInterests.length ? `Product interest: ${form.productInterests.join(", ")}` : null,
+        `Location: ${locationLabel}`,
+        presentationLabel
+          ? `Open to presentation: ${presentationLabel}${form.presentationMode === "other" && form.presentationLocation ? ` (${form.presentationLocation})` : ""}`
+          : null,
+        form.preferredCallback ? `Preferred callback: ${form.preferredCallback}` : null,
+        form.preferredPresentation ? `Preferred presentation: ${form.preferredPresentation}` : null,
         form.notes ? `\nNotes:\n${form.notes}` : null,
       ].filter(Boolean).join("\n");
       const res = await fetch("/api/contact", {
@@ -109,7 +165,13 @@ const ConsultationForm = () => {
           // Extra structured payload — backend may persist these directly
           projectType: form.projectType,
           timeline: form.timeline,
+          productInterests: form.productInterests,
+          city: form.city,
           region: form.region,
+          presentationMode: form.presentationMode,
+          presentationLocation: form.presentationLocation,
+          preferredCallback: form.preferredCallback,
+          preferredPresentation: form.preferredPresentation,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -129,9 +191,9 @@ const ConsultationForm = () => {
           Consultation request received.
         </h3>
         <p className="text-body text-[color:var(--ink-secondary)] mb-8 max-w-[32rem] mx-auto leading-[1.65]">
-          {result.message} A FourlinQ engineer will reach out within one business day to schedule your showroom visit. Bring your floor plan, or just your questions.
+          {result.message} A FourlinQ engineer will reach out within one business day to schedule your showroom visit or presentation. Bring your floor plan, or just your questions.
         </p>
-        <EditorialButton onClick={() => { setResult(null); setStep(0); setForm({ name: "", email: "", phone: "", notes: "" }); }} variant="secondary" size="sm">
+        <EditorialButton onClick={() => { setResult(null); setStep(0); setForm({ productInterests: [], city: "", presentationLocation: "", preferredCallback: "", preferredPresentation: "", name: "", email: "", phone: "", notes: "" }); }} variant="secondary" size="sm">
           Start another request
         </EditorialButton>
       </div>
@@ -142,14 +204,14 @@ const ConsultationForm = () => {
     <div className="space-y-10">
       {/* Step indicator */}
       <div className="flex items-center gap-3">
-        {[0, 1, 2, 3].map((i) => (
+        {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
           <div key={i} className={cn(
             "h-1 flex-1 transition-colors duration-300 ease-marvin",
             i <= step ? "bg-[color:var(--accent)]" : "bg-[color:var(--rule-soft)]"
           )} />
         ))}
         <span className="text-[11px] tracking-[0.1em] uppercase text-[color:var(--ink-muted)] font-medium ml-3 shrink-0">
-          Step {step + 1} of 4
+          Step {step + 1} of {TOTAL_STEPS}
         </span>
       </div>
 
@@ -180,23 +242,90 @@ const ConsultationForm = () => {
           </Step>
         )}
         {step === 2 && (
-          <Step eyebrow="Project location" title="Where is the project?" subtitle="So we know which showroom (Manila / Cebu) and which engineer is closest.">
-            <div className="max-w-md">
-              <label className={labelClass}>Region or province</label>
-              <select
-                value={form.region ?? ""}
-                onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}
-                className={cn(inputClass, "appearance-none cursor-pointer")}
-              >
-                <option value="" disabled>Select a region</option>
-                {PH_REGIONS.map((r) => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
-              </select>
-            </div>
+          <Step eyebrow="Product interest" title="What are you looking at? (optional)" subtitle="Pick as many as apply — or skip and we'll cover it on the call.">
+            <ul className="flex flex-wrap gap-3 max-w-2xl">
+              {PRODUCT_INTERESTS.map((p) => {
+                const active = form.productInterests.includes(p);
+                return (
+                  <li key={p}>
+                    <button
+                      type="button"
+                      onClick={() => toggleInterest(p)}
+                      aria-pressed={active}
+                      className={cn(
+                        "px-4 py-2.5 text-body-sm transition-all duration-300 ease-marvin border",
+                        active
+                          ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)] text-[color:var(--ink-primary)]"
+                          : "border-[color:var(--rule-soft)] text-[color:var(--ink-secondary)] hover:border-[color:var(--ink-primary)]"
+                      )}
+                    >
+                      {p}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           </Step>
         )}
         {step === 3 && (
+          <Step eyebrow="Project location" title="Where is the project?" subtitle="So we know which showroom and which engineer is closest.">
+            <div className="grid sm:grid-cols-2 gap-7 max-w-2xl">
+              <div>
+                <label className={labelClass}>City / Municipality</label>
+                <input type="text" value={form.city}
+                       onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                       className={inputClass} placeholder="e.g. Mandaue City" />
+              </div>
+              <div>
+                <label className={labelClass}>Region or province *</label>
+                <select
+                  value={form.region ?? ""}
+                  onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}
+                  className={cn(inputClass, "appearance-none cursor-pointer")}
+                >
+                  <option value="" disabled>Select a region</option>
+                  {PH_REGIONS.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </Step>
+        )}
+        {step === 4 && (
+          <Step eyebrow="Product presentation" title="Open to a product presentation? (optional)" subtitle="Tell us how you'd like to meet and when works best. Skip if you're not sure yet.">
+            <div className="space-y-8 max-w-2xl">
+              <ChipGrid
+                options={PRESENTATION_MODES}
+                value={form.presentationMode}
+                onChange={(v) => setForm((f) => ({ ...f, presentationMode: v as PresentationMode }))}
+              />
+              {form.presentationMode === "other" && (
+                <div>
+                  <label className={labelClass}>Preferred location</label>
+                  <input type="text" value={form.presentationLocation}
+                         onChange={(e) => setForm((f) => ({ ...f, presentationLocation: e.target.value }))}
+                         className={inputClass} placeholder="Where should we meet?" />
+                </div>
+              )}
+              <div className="grid sm:grid-cols-2 gap-7">
+                <div>
+                  <label className={labelClass}>Preferred callback schedule</label>
+                  <input type="text" value={form.preferredCallback}
+                         onChange={(e) => setForm((f) => ({ ...f, preferredCallback: e.target.value }))}
+                         className={inputClass} placeholder="e.g. Weekday mornings" />
+                </div>
+                <div>
+                  <label className={labelClass}>Preferred presentation schedule</label>
+                  <input type="text" value={form.preferredPresentation}
+                         onChange={(e) => setForm((f) => ({ ...f, preferredPresentation: e.target.value }))}
+                         className={inputClass} placeholder="e.g. Sat afternoon, or a date" />
+                </div>
+              </div>
+            </div>
+          </Step>
+        )}
+        {step === 5 && (
           <Step eyebrow="Your details" title="How do we reach you?" subtitle="We'll respond within one business day.">
             <div className="grid sm:grid-cols-2 gap-7 max-w-2xl">
               <div>
@@ -248,9 +377,9 @@ const ConsultationForm = () => {
           Back
         </button>
 
-        {step < 3 ? (
+        {step < TOTAL_STEPS - 1 ? (
           <EditorialButton
-            onClick={() => setStep((s) => Math.min(3, s + 1))}
+            onClick={() => setStep((s) => Math.min(TOTAL_STEPS - 1, s + 1))}
             disabled={!canProceed}
             variant="primary"
             size="md"

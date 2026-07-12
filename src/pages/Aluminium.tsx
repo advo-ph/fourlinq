@@ -3,6 +3,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { useAluminium } from "@/hooks/useAluminium";
+import { ALUMINUM_FINISHES } from "@/data/fourlinq-data";
 
 /**
  * /aluminium — FourlinQ's aluminium product line (the deep-dive page).
@@ -74,6 +75,30 @@ const Aluminium = () => {
               ) : null}
             </article>
           ))}
+        </div>
+      </Section>
+
+      {/* Powder-coat finishes — client-supplied. The systems above come from the
+          CMS via useAluminium; these swatches have no CMS table yet. */}
+      <Section tone="soft" size="lg">
+        <div className="grid lg:grid-cols-12 gap-x-12 gap-y-10">
+          <div className="lg:col-span-5">
+            <p className="eyebrow mb-3">Popular finishes</p>
+            <h2 className="font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+              Powder-coat colours.
+            </h2>
+          </div>
+          <ul className="lg:col-span-7 flex flex-wrap gap-x-8 gap-y-5">
+            {ALUMINUM_FINISHES.map((f) => (
+              <li key={f.id} className="flex items-center gap-3">
+                <span
+                  className="inline-block h-8 w-8 rounded-full border border-[color:var(--rule-soft)]"
+                  style={{ backgroundColor: f.hex }}
+                />
+                <span className="text-body text-[color:var(--ink-primary)]">{f.name}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 
