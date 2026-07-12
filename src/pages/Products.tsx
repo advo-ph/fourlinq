@@ -8,6 +8,7 @@ import SystemCategoryCard, { SystemCategory } from "@/components/shared/SystemCa
 import FinishSwatch from "@/components/shared/FinishSwatch";
 import SystemCardMedia from "@/components/shared/SystemCardMedia";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
+import { SYSTEM_TYPE, PROFILE_MATERIAL, findTypeByFilter } from "@/data/taxonomy";
 import { trackProductView } from "@/hooks/useAnalytics";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowUpRight } from "lucide-react";
@@ -16,60 +17,38 @@ import EditorialButton from "@/components/primitives/Button";
 type ProductCategory = "windows" | "doors" | "specialist" | "systems";
 type Filter = "all" | ProductCategory;
 
+// Drill-down tabs, derived from the type axis so they can't drift from the cards.
 const filters: { label: string; value: Filter }[] = [
   { label: "All Systems", value: "all" },
-  { label: "Windows", value: "windows" },
-  { label: "Doors", value: "doors" },
-  { label: "Specialist", value: "specialist" },
+  ...SYSTEM_TYPE.map((t) => ({ label: t.label, value: t.filter as Filter })),
 ];
 
-// The /products landing — four category cards per Imie's 2026-07-02 diagram
-// (design source: the purplegradient Marvin audit). uPVC families
-// (Window/Door/Specialist) drill into the filtered grid; the Aluminium Line is
-// its own page. Card images are real FourlinQ projects for now — per-category
-// art can be regenerated via docs/AI_PHOTO_RUNBOOK.md.
-const CATEGORIES: SystemCategory[] = [
-  {
-    key: "windows",
-    eyebrow: "System",
-    name: "Window Systems",
-    description:
-      "uPVC windows engineered for tropical performance — quiet, thermally efficient, corrosion-free.",
-    items: ["Casement", "Sliding", "Awning", "Special Shapes"],
-    image: "/images/wp-export/FQC-Project-17.jpg",
-    to: "/products?filter=windows",
-  },
-  {
-    key: "doors",
-    eyebrow: "System",
-    name: "Door Systems",
-    description:
-      "From folding walls to large-span panels — doors that open a room to the outside.",
-    items: ["Slide & Fold", "Large Panel", "Lift & Slide", "90 Series"],
-    image: "/images/wp-export/FQC-Project-18.jpg",
-    to: "/products?filter=doors",
-  },
-  {
-    key: "specialist",
-    eyebrow: "System",
-    name: "Specialist Systems",
-    description:
-      "Custom geometry to architect drawings: arches, curtain walls, bespoke shapes.",
-    items: ["Arch", "Curtain Wall", "Custom Shapes"],
-    image: "/images/wp-export/FourlinQ-Project-8.jpg",
-    to: "/products?filter=specialist",
-  },
-  {
-    key: "aluminium",
-    eyebrow: "Material line",
-    name: "Aluminium Line",
-    description:
-      "When uPVC isn't enough — bigger spans, thinner sightlines, thermal control.",
-    items: ["Thermal Break", "Non-Thermal Break", "Alu Slim"],
-    image: "/images/brand-story.jpg",
-    to: "/aluminium",
-  },
-];
+// The /products landing renders the two axes from src/data/taxonomy.ts as two
+// LABELLED GROUPS — never one mixed row.
+//
+// The 2026-07-05 build put an "Aluminium Line" card fourth in a row beside
+// Window/Door/Specialist, which reads as a fourth type. Imie rejected it, then
+// restated why on 07-02: "Aluminium is like uPVC — they are both profile
+// systems." Material is the other axis, so it gets its own heading.
+const TYPE_CARD: SystemCategory[] = SYSTEM_TYPE.map((t) => ({
+  key: t.type_code,
+  eyebrow: "By type",
+  name: t.label,
+  description: t.description,
+  items: t.item,
+  image: t.image,
+  to: t.to,
+}));
+
+const MATERIAL_CARD: SystemCategory[] = PROFILE_MATERIAL.map((m) => ({
+  key: m.material_code,
+  eyebrow: "By material",
+  name: m.label,
+  description: m.description,
+  items: m.item,
+  image: m.image,
+  to: m.to,
+}));
 
 const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => void }) => {
   const [quoteOpen, setQuoteOpen] = useState(false);
@@ -242,16 +221,16 @@ const Products = () => {
     return products.filter((p) => p.category === activeFilter);
   }, [activeFilter, products]);
 
-  const activeCategory = CATEGORIES.find((c) => c.key === activeFilter);
+  const activeType = findTypeByFilter(activeFilter);
   const subtitle = isLanding
-    ? "FourlinQ carries two material lines across four families — uPVC for most residential openings, and a dedicated Aluminium Line for bigger spans and thinner sightlines. Choose a family to explore its systems."
-    : "Custom-made uPVC windows and doors — quiet, thermally efficient, corrosion-resistant. Each profile tested for the heat, humidity, salt air, and storms that test what a home is made of.";
+    ? "Browse two ways. By type — window, door, or specialist. By material — the uPVC or aluminium profile system it is fabricated from. The two are separate choices, not one list."
+    : "Custom-made uPVC and aluminium windows and doors — quiet, thermally efficient, corrosion-resistant. Each profile tested for the heat, humidity, salt air, and storms that test what a home is made of.";
 
   return (
     <Layout>
       <PageHeader
         eyebrow="The catalog"
-        title={isLanding ? "Window, door, and specialist systems." : activeCategory?.name ?? "Systems"}
+        title={isLanding ? "Window, door, and specialist systems." : activeType?.label ?? "Systems"}
         breadcrumbLabel="Systems"
         subtitle={subtitle}
       />
@@ -259,12 +238,37 @@ const Products = () => {
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
           {isLanding ? (
-            /* Landing — four category cards (Imie's 2026-07-02 layout) */
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
-              {CATEGORIES.map((c) => (
-                <SystemCategoryCard key={c.key} category={c} />
-              ))}
-            </div>
+            /* Landing — the two axes, as two labelled groups. Never one mixed row. */
+            <>
+              <div>
+                <h2 className="font-serif font-normal tracking-tight text-h4 lg:text-h3 text-[color:var(--ink-primary)]">
+                  Browse by type.
+                </h2>
+                <p className="mt-3 text-body text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.6]">
+                  What the opening is — a window, a door, or a custom shape.
+                </p>
+                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14">
+                  {TYPE_CARD.map((c) => (
+                    <SystemCategoryCard key={c.key} category={c} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-20 lg:mt-28 pt-16 lg:pt-20 border-t border-[color:var(--rule-strong)]">
+                <h2 className="font-serif font-normal tracking-tight text-h4 lg:text-h3 text-[color:var(--ink-primary)]">
+                  Browse by material.
+                </h2>
+                <p className="mt-3 text-body text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.6]">
+                  What it is fabricated from. Windows and doors are built in either
+                  profile system — the material is a separate choice from the type.
+                </p>
+                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-14 lg:max-w-[52rem]">
+                  {MATERIAL_CARD.map((c) => (
+                    <SystemCategoryCard key={c.key} category={c} />
+                  ))}
+                </div>
+              </div>
+            </>
           ) : (
             <>
               {/* Drill-down: back to the four families + sibling category tabs */}

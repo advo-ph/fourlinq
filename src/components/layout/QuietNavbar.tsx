@@ -3,25 +3,52 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
+import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
+
+interface NavChild {
+  label: string;
+  to: string;
+  description?: string;
+}
+
+interface NavGroup {
+  title: string;
+  child: NavChild[];
+}
 
 interface NavLink {
   label: string;
   to: string;
-  /** Optional dropdown of sub-buckets, surfaced on hover (desktop) and as a nested list (mobile). */
-  children?: { label: string; to: string; description?: string }[];
+  /** Optional dropdown, surfaced on hover (desktop) and as a nested list (mobile). */
+  group?: NavGroup[];
 }
 
-const navLinks: NavLink[] = [
+// The Systems menu is the site's real product navigator, so it carries both
+// axes as SEPARATE GROUPS — not one flat row of four. It used to list
+// "Aluminium Line" as a fourth peer beside the three types, which reads as a
+// fourth type; aluminium is a material (Imie, 2026-07-02). Labels and
+// destinations come from src/data/taxonomy.ts.
+const SYSTEM_GROUP: NavGroup[] = [
   {
-    label: "Systems",
-    to: "/products",
-    children: [
-      { label: "Window Systems", to: "/products?filter=windows", description: "Casement, Sliding, Awning, Special Shapes" },
-      { label: "Door Systems", to: "/products?filter=doors", description: "Slide & Fold, Large Panel, Lift & Slide, 90 Series" },
-      { label: "Specialist Systems", to: "/products?filter=specialist", description: "Arch, Curtain Wall, Custom Shapes" },
-      { label: "Aluminium Line", to: "/aluminium", description: "Thermal Break, Non-Thermal Break, Alu Slim" },
-    ],
+    title: "By type",
+    child: SYSTEM_TYPE.map((t) => ({
+      label: t.label,
+      to: t.to,
+      description: t.item.join(", "),
+    })),
   },
+  {
+    title: "By material",
+    child: PROFILE_MATERIAL.map((m) => ({
+      label: m.label,
+      to: m.to,
+      description: m.item.join(", "),
+    })),
+  },
+];
+
+const navLinks: NavLink[] = [
+  { label: "Systems", to: "/products", group: SYSTEM_GROUP },
   { label: "Our Projects", to: "/inspiration" },
   { label: "What's New", to: "/whats-new" },
   { label: "Why uPVC", to: "/why-upvc" },
@@ -94,7 +121,7 @@ const QuietNavbar = () => {
                       {link.label}
                     </Link>
 
-                    {link.children && (
+                    {link.group && (
                       <div
                         className={cn(
                           "fixed left-0 right-0 top-[72px]",
@@ -106,25 +133,39 @@ const QuietNavbar = () => {
                       >
                         <div className="bg-white text-[color:var(--ink-primary)]">
                           <div className="container-editorial py-9">
-                            <ul className="grid grid-cols-4 gap-4">
-                              {link.children.map((c) => (
-                                <li key={c.to}>
-                                  <Link
-                                    to={c.to}
-                                    className="block rounded-sm px-4 py-5 text-center transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
-                                  >
-                                    <p className="text-[17px] font-medium text-[color:var(--ink-primary)]">
-                                      {c.label}
-                                    </p>
-                                    {c.description && (
-                                      <p className="mx-auto mt-3 max-w-[14rem] text-body-sm text-[color:var(--ink-muted)] leading-snug">
-                                        {c.description}
-                                      </p>
+                            <div className="grid grid-cols-[3fr_2fr] gap-x-12">
+                              {link.group.map((g) => (
+                                <div key={g.title}>
+                                  <p className="eyebrow mb-5 pb-3 border-b border-[color:var(--rule-soft)]">
+                                    {g.title}
+                                  </p>
+                                  <ul
+                                    className={cn(
+                                      "grid gap-2",
+                                      g.child.length > 2 ? "grid-cols-3" : "grid-cols-2",
                                     )}
-                                  </Link>
-                                </li>
+                                  >
+                                    {g.child.map((c) => (
+                                      <li key={c.to}>
+                                        <Link
+                                          to={c.to}
+                                          className="block h-full rounded-sm px-4 py-4 transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
+                                        >
+                                          <p className="text-[17px] font-medium text-[color:var(--ink-primary)]">
+                                            {c.label}
+                                          </p>
+                                          {c.description && (
+                                            <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] leading-snug">
+                                              {c.description}
+                                            </p>
+                                          )}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
                               ))}
-                            </ul>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -199,19 +240,26 @@ const QuietNavbar = () => {
                     >
                       {link.label}
                     </Link>
-                    {link.children && (
-                      <ul className="pb-4 -mt-2 space-y-1">
-                        {link.children.map((c) => (
-                          <li key={c.to}>
-                            <Link
-                              to={c.to}
-                              className="block py-1.5 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
-                            >
-                              {c.label}
-                            </Link>
-                          </li>
+                    {link.group && (
+                      <div className="pb-4 -mt-2 space-y-4">
+                        {link.group.map((g) => (
+                          <div key={g.title}>
+                            <p className="eyebrow mb-1.5">{g.title}</p>
+                            <ul className="space-y-1">
+                              {g.child.map((c) => (
+                                <li key={c.to}>
+                                  <Link
+                                    to={c.to}
+                                    className="block py-1.5 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+                                  >
+                                    {c.label}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     )}
                   </li>
                 );
