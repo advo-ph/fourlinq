@@ -1,11 +1,10 @@
-import { lazy, Suspense } from "react";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
 
-const ScrollWindow = lazy(() => import("@/components/home/ScrollWindow"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
 import SystemsTiles from "@/components/home/SystemsTiles";
+import SystemProof from "@/components/home/SystemProof";
 import ProjectReels from "@/components/home/ProjectReels";
 import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
@@ -42,17 +41,15 @@ const Index = () => {
 
       {/* Categories before benefits. Imie, meeting 2026-07-10 (00:35:06):
           "categorize muna" — the site was reaching the benefit story before it
-          ever showed what we sell. The product gateway used to sit below the
-          500vh ScrollWindow sequence, starting around y=5400 on desktop. It now
-          comes first, within one viewport of the hero; the benefit sequence
-          follows it. */}
+          ever showed what we sell. The static product gateway now comes first,
+          followed by a compact, evidence-led performance section. */}
       <Section tone="soft" size="lg">
         <SystemsTiles />
       </Section>
 
-      <Suspense fallback={null}>
-        <ScrollWindow />
-      </Suspense>
+      <Section tone="canvas" size="lg">
+        <SystemProof />
+      </Section>
 
       <ProjectReels />
 
