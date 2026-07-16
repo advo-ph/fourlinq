@@ -180,8 +180,8 @@ components:
   button-primary:
     background: "accent"
     color: "on-primary"
-    radius: "pill"
-    border: "2px solid accent"
+    radius: "rounded-small"
+    border: "1px solid transparent"
     paddingY: "12px"
     paddingX: "24px"
     fontWeight: 500
@@ -191,17 +191,17 @@ components:
     transition: "duration-base ease"
     focus-ring: "2px solid accent, offset 3px"
   button-secondary:
-    background: "transparent"
+    background: "canvas-white"
     color: "ink-primary"
-    radius: "none"
-    border: "2px solid ink-primary"
+    radius: "rounded-small"
+    border: "1px solid rule-strong"
     paddingY: "12px"
     paddingX: "24px"
     fontWeight: 500
     fontSize: "body"
     minHeight: "44px"
-    hover-background: "ink-primary"
-    hover-color: "on-dark"
+    hover-background: "canvas-soft"
+    hover-border: "ink-primary"
   button-ghost:
     background: "transparent"
     color: "ink-primary"
@@ -211,14 +211,14 @@ components:
     fontWeight: 500
     fontSize: "body"
     minHeight: "44px"
-    hover-color: "accent"
+    hover-color: "ink-primary"
     hover-underline: true
     underline-offset: "4px"
   feature-link:
     description: "Signature link with chevron arrow that translates on hover. Stolen from Marvin's `FeatureLink_*` component."
     color: "ink-primary"
     icon: "ArrowUpRight from lucide"
-    hover-color: "accent"
+    hover-color: "ink-primary"
     hover-icon-translate: "+0.5px right, -0.5px up"
   eyebrow:
     fontFamily: "Inter, sans-serif"
@@ -226,18 +226,18 @@ components:
     textTransform: "uppercase"
     letterSpacing: "0.12em"
     color: "ink-muted"
-    optional-prefix: "12px × 1px hairline rule, gap 12px"
+    optional-prefix: "none"
   card-image-led:
     description: "No border, no shadow at rest. Image tops a content block with eyebrow + serif title + body-sm description + chevron arrow."
     aspect: "4/5 portrait"
     image-hover-scale: 1.03
     image-hover-duration: "700ms ease"
-    title-hover-color: "accent"
+    title-hover-color: "ink-secondary"
     chevron-hover-translate: "+0.5px right, -0.5px up"
   filter-tab-rail:
     description: "Hairline-underlined tab row, not pills. Active gets red underline."
     active-color: "ink-primary"
-    active-border: "2px solid accent"
+    active-border: "1px solid accent"
     rest-color: "ink-muted"
     rest-border: "transparent"
     hover-color: "ink-primary"
@@ -246,7 +246,7 @@ components:
     description: "Vertical stack of items separated by 1px rules. Used for FAQ accordion, action links in chat, contact rows."
     divider: "1px rule-soft"
     item-padding: "16px 0"
-    hover-color: "accent"
+    hover-color: "ink-primary"
   section-band:
     description: "Page composition unit with tone alternation."
     tones: ["canvas-white", "canvas-soft", "canvas-cream", "canvas-dark"]
@@ -361,7 +361,7 @@ Five-step shadow scale. **All extremely subtle** — `depth-2` is 1px blur, `dep
 
 ## Shapes
 
-**Buttons are binary:** either `pill` (rounded-full) for primary CTAs OR `none` (zero radius) for utility / data UI. Never 4px, 8px, or 12px on a button — those are mid-range radii reserved for cards, inputs, and dialogs.
+**Controls are rectilinear:** buttons, segmented controls, and option grids use a 4px maximum radius with 1px borders. Circles are reserved for inherently circular indicators such as carousel pagination and status dots.
 
 **Cards:** zero radius preferred (matches Marvin's `border-radius: 0`). 4px maximum if the card is enclosed by other rounded elements (e.g. a 4px corner on a form field's submit button).
 
@@ -371,15 +371,15 @@ Five-step shadow scale. **All extremely subtle** — `depth-2` is 1px blur, `dep
 
 ### Buttons
 
-- **Primary** = filled pill, red accent, white text, 2px accent border. Used once per fold. Min 44px height (tap target).
-- **Secondary** = outlined square (zero radius), 2px charcoal border, transparent fill. Used for paired secondary action in a CTA row.
+- **Primary** = filled rectangle, red accent, white text, 4px radius, 1px transparent border. Used once per fold. Min 44px height (tap target).
+- **Secondary** = white rectangle, 4px radius, 1px neutral hairline that darkens on hover. Used for a paired secondary action in a CTA row.
 - **Ghost** = text-only with underline-on-hover. Used for tertiary actions where a button would feel heavy.
 
 All buttons use `cubic-bezier(.68,0,.33,1)` at 300ms for color/state transitions.
 
 ### Feature Link
 
-Signature pattern: text + `ArrowUpRight` icon. On hover: text turns accent red, arrow translates `+0.5px` right and `-0.5px` up. Used 50+ times across the site for navigation between related sections. Stolen verbatim from Marvin's `FeatureLink_*` component.
+Signature pattern: text + `ArrowUpRight` icon. On hover: the neutral underline strengthens and the arrow translates `+0.5px` right and `-0.5px` up. Red is not used for routine link hover. Used across the site for navigation between related sections.
 
 ### Hairline list
 
@@ -416,7 +416,7 @@ Same shape: 480px width on desktop, 100vw on mobile, 3px red accent stripe at to
 - Use full-bleed photography as a section's hero element when one exists.
 - Use a single accent CTA per fold. If you need two CTAs, the second is `ghost` or `secondary`, not a second filled accent.
 - Use `text-h2 lg:text-h2` pattern for editorial section headlines — same desktop size, slightly smaller mobile (48px) — see `EyebrowHeading` primitive.
-- Eyebrow above headline with hairline-prefix: `eyebrow mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-rule-strong`. This is the signature opener.
+- Place the structural eyebrow directly above the headline in muted ink. Do not add a decorative prefix rule or accent color.
 - Lazy-load below-fold images (`loading="lazy" decoding="async"`).
 - For modals/drawers: enforce Escape close, scroll-lock body, restore focus on close.
 

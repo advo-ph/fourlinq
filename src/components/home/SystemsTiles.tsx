@@ -127,12 +127,12 @@ function SystemFrameTile({ system }: { system: SystemTile }) {
           />
         </div>
         <div className="flex items-start justify-between gap-4">
-          <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+          <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--ink-secondary)] transition-colors duration-300 ease-marvin">
             {system.name}
           </h3>
           <ArrowUpRight
             size={20}
-            className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
+            className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--ink-primary)]"
           />
         </div>
         <p className="mt-3 text-body-sm lg:text-body text-[color:var(--ink-secondary)] max-w-[24rem]">
@@ -177,13 +177,13 @@ const SystemsTiles = () => (
         {PROFILE_MATERIAL.map((m) => (
           <li key={m.material_code}>
             <Link to={m.to} className="group block">
-              <div className="flex items-start justify-between gap-4 border-t-[3px] border-[color:var(--accent)] pt-5">
-                <h3 className="font-serif text-h5 lg:text-h4 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+              <div className="flex items-start justify-between gap-4 border-t border-[color:var(--rule-strong)] pt-5">
+                <h3 className="font-serif text-h5 lg:text-h4 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--ink-secondary)] transition-colors duration-300 ease-marvin">
                   {m.label}
                 </h3>
                 <ArrowUpRight
                   size={20}
-                  className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
+                  className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--ink-primary)]"
                 />
               </div>
               <p className="mt-3 text-body-sm lg:text-body text-[color:var(--ink-secondary)] max-w-[26rem]">
