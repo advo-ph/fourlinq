@@ -3,7 +3,7 @@ import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useProductTypes, useFinishes, useGlassTypes } from "@/hooks/useConfigurator";
+import { useProductTypes, useMaterials, useFinishes, useGlassTypes, finishesForMaterial } from "@/hooks/useConfigurator";
 import { Link, useSearchParams } from "react-router-dom";
 import { Loader2, CheckCircle, X } from "lucide-react";
 import WindowPreview from "@/components/configurator/WindowPreview";
@@ -54,13 +54,18 @@ const sizeConstraints = {
   height: { min: 400, max: 3000, step: 50 },
 };
 
-const stepLabels = ["Type", "Finish", "Glass", "Size"];
+// Type → Material → Finish → Glass → Size. The Material step was added to match
+// the meeting's "like Apple selection" flow (00:11:11–00:11:28) and the site's
+// type-vs-material axes: material decides which finishes are offered next.
+const stepLabels = ["Type", "Material", "Finish", "Glass", "Size"];
+const LAST_STEP = stepLabels.length - 1;
 
-const SaveModal = ({ isOpen, onClose, config, selectedType, selectedFinish, selectedGlass }: {
+const SaveModal = ({ isOpen, onClose, config, selectedType, selectedMaterial, selectedFinish, selectedGlass }: {
   isOpen: boolean;
   onClose: () => void;
-  config: { type: string; finish: string; glass: string; width: number; height: number };
+  config: { type: string; material: string; finish: string; glass: string; width: number; height: number };
   selectedType: { name: string };
+  selectedMaterial: { name: string };
   selectedFinish: { name: string };
   selectedGlass: { name: string };
 }) => {
@@ -119,6 +124,7 @@ const SaveModal = ({ isOpen, onClose, config, selectedType, selectedFinish, sele
             <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
               <div className="bg-muted rounded-lg p-3 text-xs space-y-1">
                 <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Type</span><span className="font-medium text-primary">{selectedType.name}</span></div>
+                <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Material</span><span className="font-medium text-primary">{selectedMaterial.name}</span></div>
                 <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Finish</span><span className="font-medium text-primary">{selectedFinish.name}</span></div>
                 <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Glass</span><span className="font-medium text-primary">{selectedGlass.name}</span></div>
                 <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Size</span><span className="font-medium text-primary">{config.width} × {config.height} mm</span></div>
@@ -157,6 +163,7 @@ const DesignTool = () => {
   const [saveOpen, setSaveOpen] = useState(false);
   const [config, setConfig] = useState({
     type: "casement",
+    material: "upvc",
     finish: "white",
     glass: "clear-float",
     width: 1200,
@@ -168,19 +175,39 @@ const DesignTool = () => {
     if (typeof value === "string") trackConfigChange(field, value);
   };
 
+  // Switching material re-scopes the finish set, so snap the finish to the first
+  // valid one for the new material — otherwise a uPVC finish id would linger on
+  // an aluminium config and the preview/summary would show a finish that isn't
+  // offered for that material.
+  const selectMaterial = (materialId: string) => {
+    setConfig((prev) => {
+      const nextFinishes = finishesForMaterial(materialId);
+      const finishStillValid = nextFinishes.some((f) => f.id === prev.finish);
+      return {
+        ...prev,
+        material: materialId,
+        finish: finishStillValid ? prev.finish : nextFinishes[0]?.id ?? prev.finish,
+      };
+    });
+    trackConfigChange("material", materialId);
+  };
+
   const { data: productTypes = [], isLoading: typesLoading } = useProductTypes();
-  const { data: finishOptions = [], isLoading: finishesLoading } = useFinishes();
+  const { data: materials = [], isLoading: materialsLoading } = useMaterials();
+  const { isLoading: finishesLoading } = useFinishes();
   const { data: glassOptions = [], isLoading: glassLoading } = useGlassTypes();
 
-  const isLoading = typesLoading || finishesLoading || glassLoading;
+  const isLoading = typesLoading || materialsLoading || finishesLoading || glassLoading;
 
-  const selectedFinish = finishOptions.find((f) => f.id === config.finish) || { name: "White", color: "#F5F5F5", id: "white" };
+  const finishOptions = finishesForMaterial(config.material);
+  const selectedFinish = finishOptions.find((f) => f.id === config.finish) || finishOptions[0] || { name: "White", color: "#F5F5F5", id: "white" };
   const selectedGlass = glassOptions.find((g) => g.id === config.glass) || { name: "Clear", id: "clear-float" };
   const selectedType = productTypes.find((t) => t.id === config.type) || { name: "Casement", id: "casement", iconKey: "casement" };
+  const selectedMaterial = materials.find((m) => m.id === config.material) || { name: "uPVC", id: "upvc" };
 
   const glassVisual = glassVisuals[config.glass] || { opacity: 0.1, tint: "rgba(200,220,240,0.1)" };
 
-  const canContinue = step < 3;
+  const canContinue = step < LAST_STEP;
   const canBack = step > 0;
 
   const Chrome = ({ children }: { children: React.ReactNode }) =>
@@ -208,7 +235,7 @@ const DesignTool = () => {
           eyebrow="Configurator"
           title="Build your window. Save it. Share it."
           breadcrumbLabel="Design Tool"
-          subtitle="Choose a type, pick a finish, set the size — then save your spec or send it to our team for a tailored quote."
+          subtitle="Choose a type and material, pick a finish and glass, set the size — then save your spec or send it to our team for a tailored quote."
         />
       )}
 
@@ -225,7 +252,7 @@ const DesignTool = () => {
                   }`}
                 >{i + 1}</button>
                 <span className={`text-sm hidden sm:inline ${i === step ? "text-[color:var(--ink-primary)] font-medium" : "text-[color:var(--ink-muted)]"}`}>{label}</span>
-                {i < 3 && <div className={`w-8 h-px ${i < step ? "bg-primary" : "bg-border"}`} />}
+                {i < LAST_STEP && <div className={`w-8 h-px ${i < step ? "bg-primary" : "bg-border"}`} />}
               </div>
             ))}
           </div>
@@ -281,7 +308,31 @@ const DesignTool = () => {
               )}
               {step === 1 && (
                 <div>
+                  <h2 className="text-lg font-medium text-primary mb-4">Choose Material</h2>
+                  <p className="text-sm text-[color:var(--ink-secondary)] mb-6 max-w-md leading-relaxed">
+                    uPVC and aluminium are both profile systems. The material sets which
+                    finishes are available next.
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {materials.map((mat) => (
+                      <button
+                        key={mat.id}
+                        onClick={() => selectMaterial(mat.id)}
+                        className={`p-5 rounded-lg border-2 text-left transition-colors ${config.material === mat.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}
+                      >
+                        <span className="block text-base font-medium text-primary mb-1">{mat.name}</span>
+                        <span className="block text-xs text-[color:var(--ink-muted)] leading-snug">{mat.description}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {step === 2 && (
+                <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Choose Finish</h2>
+                  <p className="text-sm text-[color:var(--ink-muted)] mb-4">
+                    {selectedMaterial.name} finishes
+                  </p>
                   <h3 className="eyebrow mb-3">Solid</h3>
                   <div className="grid grid-cols-4 gap-3 mb-6">
                     {finishOptions.filter((f) => f.finishType === "solid").map((finish) => (
@@ -291,18 +342,22 @@ const DesignTool = () => {
                       </button>
                     ))}
                   </div>
-                  <h3 className="eyebrow mb-3">Wood Grain</h3>
-                  <div className="grid grid-cols-4 gap-3">
-                    {finishOptions.filter((f) => f.finishType === "wood-grain").map((finish) => (
-                      <button key={finish.id} onClick={() => updateConfig("finish", finish.id)} className="flex flex-col items-center gap-2 group" title={finish.description}>
-                        <FinishSwatch finishId={finish.id} color={finish.color} finishType="wood-grain" selected={config.finish === finish.id} />
-                        <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-[color:var(--ink-primary)] font-medium" : "text-[color:var(--ink-muted)]"}`}>{finish.name}</span>
-                      </button>
-                    ))}
-                  </div>
+                  {finishOptions.some((f) => f.finishType === "wood-grain") && (
+                    <>
+                      <h3 className="eyebrow mb-3">Wood Grain</h3>
+                      <div className="grid grid-cols-4 gap-3">
+                        {finishOptions.filter((f) => f.finishType === "wood-grain").map((finish) => (
+                          <button key={finish.id} onClick={() => updateConfig("finish", finish.id)} className="flex flex-col items-center gap-2 group" title={finish.description}>
+                            <FinishSwatch finishId={finish.id} color={finish.color} finishType="wood-grain" selected={config.finish === finish.id} />
+                            <span className={`text-[11px] text-center leading-tight ${config.finish === finish.id ? "text-[color:var(--ink-primary)] font-medium" : "text-[color:var(--ink-muted)]"}`}>{finish.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
-              {step === 2 && (
+              {step === 3 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Select Glass Type</h2>
                   <div className="grid grid-cols-3 gap-3">
@@ -318,7 +373,7 @@ const DesignTool = () => {
                   </div>
                 </div>
               )}
-              {step === 3 && (
+              {step === 4 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-6">Set Dimensions</h2>
                   <div className="space-y-8">
@@ -352,6 +407,7 @@ const DesignTool = () => {
               />
               <div className="mt-8 w-full border-t border-border pt-6 space-y-2">
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Type</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedType.name}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Material</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedMaterial.name}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Finish</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedFinish.name}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Glass</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedGlass.name}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Dimensions</span><span className="text-[color:var(--ink-primary)] font-medium">{config.width} × {config.height} mm</span></div>
@@ -365,6 +421,7 @@ const DesignTool = () => {
                 onClose={() => setSaveOpen(false)}
                 config={config}
                 selectedType={selectedType}
+                selectedMaterial={selectedMaterial}
                 selectedFinish={selectedFinish}
                 selectedGlass={selectedGlass}
               />
