@@ -1,33 +1,21 @@
-import { useRef, useEffect, useState, useCallback } from "react";
-import { useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useFramePreloader } from "@/hooks/useFramePreloader";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import FeatureLink from "@/components/primitives/FeatureLink";
 import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
 
-const TILE_FRAMES = 53;
-
 interface SystemTile {
   name: string;
   description: string;
-  framePath: string;
-  staticSrc: string;
+  imageSrc: string;
   to: string;
 }
 
 // The homepage product gateway. Labels and destinations come from the shared
-// taxonomy so the home, nav, /products, and footer can't drift apart; only the
-// scroll-animation frame path is local to this surface.
-const FRAME_PATH: Record<string, string> = {
-  window: "/images/systems/window/frame_{index}.jpg",
-  door: "/images/systems/door/frame_{index}.jpg",
-  specialist: "/images/systems/specialist/frame_{index}.jpg",
-};
-
-const STATIC_PATH: Record<string, string> = {
+// taxonomy so the home, nav, /products, and footer can't drift apart. Each
+// category uses one ordinary image: the product remains understandable without
+// JavaScript, motion preferences, or hundreds of frame requests.
+const SYSTEM_IMAGE: Record<string, string> = {
   window: "/images/systems/window/frame_0001.jpg",
   door: "/images/systems/door/frame_0001.jpg",
   specialist: "/images/wp-export/specialshapes.webp",
@@ -36,118 +24,23 @@ const STATIC_PATH: Record<string, string> = {
 const systemTile: SystemTile[] = SYSTEM_TYPE.map((t) => ({
   name: t.label,
   description: t.description,
-  framePath: FRAME_PATH[t.type_code],
-  staticSrc: STATIC_PATH[t.type_code],
+  imageSrc: SYSTEM_IMAGE[t.type_code],
   to: t.to,
 }));
 
-function SystemFrameTile({ system }: { system: SystemTile }) {
-  const tileRef = useRef<HTMLLIElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const frameRef = useRef(0);
-  const rafRef = useRef(0);
-  const [near, setNear] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
-
-  const { images, isLoaded } = useFramePreloader(
-    TILE_FRAMES,
-    system.framePath,
-    { enabled: near && !prefersReducedMotion, padLength: 4 },
-  );
-
-  useEffect(() => {
-    if (prefersReducedMotion) return;
-    const el = tileRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setNear(true);
-          obs.disconnect();
-        }
-      },
-      { rootMargin: "50% 0px" },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [prefersReducedMotion]);
-
-  const draw = useCallback(
-    (f: number) => {
-      const cvs = canvasRef.current;
-      if (!cvs) return;
-      const ctx = cvs.getContext("2d");
-      if (!ctx) return;
-      const img = images[f];
-      if (!img?.naturalWidth) return;
-      if (cvs.width !== img.naturalWidth || cvs.height !== img.naturalHeight) {
-        cvs.width = img.naturalWidth;
-        cvs.height = img.naturalHeight;
-      }
-      ctx.drawImage(img, 0, 0);
-    },
-    [images],
-  );
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    draw(0);
-  }, [isLoaded, draw]);
-
-  // Scroll-based: map tile's viewport travel to frame index
-  useEffect(() => {
-    if (prefersReducedMotion || !isLoaded) return;
-
-    const onScroll = () => {
-      const el = tileRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-
-      const progress = Math.max(0, Math.min(1, (vh - rect.top) / (vh / 2 + rect.height / 2)));
-      const target = Math.min(
-        TILE_FRAMES - 1,
-        Math.floor(progress * TILE_FRAMES),
-      );
-
-      if (target !== frameRef.current) {
-        frameRef.current = target;
-        draw(target);
-      }
-    };
-
-    const tick = () => {
-      onScroll();
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [prefersReducedMotion, isLoaded, draw]);
-
+function SystemCard({ system }: { system: SystemTile }) {
   return (
-    <li ref={tileRef}>
+    <li>
       <Link to={system.to} className="group block">
         <div className="relative aspect-video overflow-hidden bg-neutral-50 mb-6">
-          {prefersReducedMotion ? (
-            <img
-              src={system.staticSrc}
-              alt=""
-              aria-hidden="true"
-              data-motion="reduced"
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-contain"
-            />
-          ) : (
-            <canvas
-              ref={canvasRef}
-              className={cn(
-                "w-full h-full object-cover transition-opacity duration-500",
-                isLoaded ? "opacity-100" : "opacity-0",
-              )}
-            />
-          )}
+          <img
+            src={system.imageSrc}
+            alt={`${system.name} product example`}
+            data-product-media="static"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-contain"
+          />
         </div>
         <div className="flex items-start justify-between gap-4">
           <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
@@ -181,7 +74,7 @@ const SystemsTiles = () => (
 
     <ul className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-12">
       {systemTile.map((sys) => (
-        <SystemFrameTile key={sys.name} system={sys} />
+        <SystemCard key={sys.name} system={sys} />
       ))}
     </ul>
 

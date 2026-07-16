@@ -14,7 +14,6 @@ vi.mock("framer-motion", async () => {
 
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import ProjectReels from "@/components/home/ProjectReels";
-import ScrollWindow from "@/components/home/ScrollWindow";
 import SystemsTiles from "@/components/home/SystemsTiles";
 import VideoHero from "@/components/home/VideoHero";
 
@@ -85,16 +84,7 @@ describe("Marvin-aligned motion budget", () => {
     );
 
     expect(document.querySelectorAll("canvas")).toHaveLength(0);
-    expect(document.querySelectorAll('img[data-motion="reduced"]')).toHaveLength(3);
-    expect(requestAnimationFrame).not.toHaveBeenCalled();
-  });
-
-  it("collapses the long scroll sequence into static product proof", () => {
-    render(<ScrollWindow />);
-
-    expect(screen.getByRole("heading", { name: "How the system performs." })).toBeInTheDocument();
-    expect(document.querySelector('[data-motion="reduced"]')).toBeInTheDocument();
-    expect(document.querySelectorAll("canvas")).toHaveLength(0);
+    expect(document.querySelectorAll('img[data-product-media="static"]')).toHaveLength(3);
     expect(requestAnimationFrame).not.toHaveBeenCalled();
   });
 
