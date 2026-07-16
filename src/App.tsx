@@ -23,6 +23,7 @@ const Legal = lazy(() => import("./pages/Legal"));
 const Admin = lazy(() => import("./pages/Admin"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Care = lazy(() => import("./pages/Care"));
+const Glossary = lazy(() => import("./pages/Glossary"));
 const HowToChoose = lazy(() => import("./pages/HowToChoose"));
 const Finishes = lazy(() => import("./pages/Finishes"));
 
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/brand" element={<Brand />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/care" element={<Care />} />
+            <Route path="/glossary" element={<Glossary />} />
             <Route path="/help-me-choose" element={<HowToChoose />} />
             <Route path="/finishes" element={<Finishes />} />
             <Route path="/legal" element={<Legal />} />
