@@ -241,7 +241,7 @@ const HowToChoose = () => {
         ) : (
           /* Results */
           <div className="max-w-[60rem]">
-            <p className="eyebrow mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-[color:var(--rule-strong)]">
+            <p className="eyebrow mb-5">
               Recommendation
             </p>
             <h2 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] mb-8">

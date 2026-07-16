@@ -150,7 +150,7 @@ const WhyUpvc = () => (
       <div className="container-editorial flex-1 flex items-center py-12 lg:py-16">
         <div className="grid lg:grid-cols-12 gap-x-12 gap-y-16 items-center w-full">
           <div className="lg:col-span-5">
-            <p className="eyebrow mb-6 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-[color:var(--rule-strong)]">
+            <p className="eyebrow mb-6">
               The material
             </p>
             <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02] max-w-[14ch]">

@@ -45,7 +45,6 @@ const EyebrowHeading = ({
         <p className={cn(
           "eyebrow mb-v400",
           eyebrowInkClass,
-          align === "left" && "inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-[color:var(--rule-strong)]"
         )}>
           {eyebrow}
         </p>
