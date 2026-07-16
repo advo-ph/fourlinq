@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback, type ReactNode } from "react";
+import { useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
 import { useScrollFrames } from "@/hooks/useScrollFrames";
@@ -91,8 +92,53 @@ const SCROLL_HEIGHT_VH = 500;
 const THERMAL_END_FRAME =
   SCROLL_PHASES.find((p) => p.id === THERMAL_PHASE_ID)?.endFrame ?? 0;
 const ALU_SYSTEM = THERMAL_SYSTEMS.find((s) => s.id === "alu");
+const STATIC_FRAME_SRC = FRAME_PATH_TEMPLATE.replace(
+  "{index}",
+  String(THERMAL_END_FRAME + 1).padStart(FRAME_PAD_LENGTH, "0"),
+);
 
-const ScrollWindow = () => {
+const StaticScrollWindow = () => (
+  <section
+    data-motion="reduced"
+    className="bg-[color:var(--canvas)] py-section-mobile md:py-section-tablet lg:py-section-desktop"
+  >
+    <div className="container-editorial grid items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
+      <div className="aspect-video overflow-hidden bg-[color:var(--canvas-soft)]">
+        <img
+          src={STATIC_FRAME_SRC}
+          alt="Cross-section of a FourLinQ window profile"
+          loading="eager"
+          decoding="async"
+          className="h-full w-full object-contain"
+        />
+      </div>
+
+      <div>
+        <p className="eyebrow mb-4 text-[color:var(--ink-muted)]">System performance</p>
+        <h2 className="font-serif text-[2.25rem] font-normal leading-[1.15] tracking-tight text-[color:var(--ink-primary)] lg:text-h2">
+          How the system performs.
+        </h2>
+        <ul className="mt-8 border-t border-[color:var(--rule-soft)]">
+          {SCROLL_PHASES.map((phase) =>
+            phase.text ? (
+              <li key={phase.id} className="border-b border-[color:var(--rule-soft)] py-5">
+                <p className="eyebrow text-[color:var(--ink-muted)]">{phase.text.eyebrow}</p>
+                <h3 className="mt-2 text-h5 font-medium text-[color:var(--ink-primary)]">
+                  {phase.text.headline}
+                </h3>
+                <p className="mt-2 text-body-sm leading-[1.6] text-[color:var(--ink-secondary)]">
+                  {phase.text.body}
+                </p>
+              </li>
+            ) : null,
+          )}
+        </ul>
+      </div>
+    </div>
+  </section>
+);
+
+const AnimatedScrollWindow = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [nearViewport, setNearViewport] = useState(false);
@@ -284,6 +330,11 @@ const ScrollWindow = () => {
       </div>
     </div>
   );
+};
+
+const ScrollWindow = () => {
+  const prefersReducedMotion = useReducedMotion();
+  return prefersReducedMotion ? <StaticScrollWindow /> : <AnimatedScrollWindow />;
 };
 
 export default ScrollWindow;

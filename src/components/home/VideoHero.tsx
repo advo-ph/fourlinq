@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useReducedMotion } from "framer-motion";
 import HeroCarousel, { type HeroSlide } from "./HeroCarousel";
 import EditorialButton from "@/components/primitives/Button";
 
@@ -57,7 +58,9 @@ interface VideoHeroProps {
  */
 const VideoHero = (props: VideoHeroProps) => {
   // Decide on FIRST RENDER — no useEffect-driven swap, no flash of carousel.
-  const [useVideo] = useState(shouldUseVideo);
+  const [isVideoEligible] = useState(shouldUseVideo);
+  const prefersReducedMotion = useReducedMotion();
+  const useVideo = isVideoEligible && !prefersReducedMotion;
 
   // Fallback to the existing photo carousel when video isn't appropriate
   if (!useVideo) {

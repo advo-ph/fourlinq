@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ interface SystemTile {
   name: string;
   description: string;
   framePath: string;
+  staticSrc: string;
   to: string;
 }
 
@@ -25,10 +27,17 @@ const FRAME_PATH: Record<string, string> = {
   specialist: "/images/systems/specialist/frame_{index}.jpg",
 };
 
+const STATIC_PATH: Record<string, string> = {
+  window: "/images/systems/window/frame_0001.jpg",
+  door: "/images/systems/door/frame_0001.jpg",
+  specialist: "/images/wp-export/specialshapes.webp",
+};
+
 const systemTile: SystemTile[] = SYSTEM_TYPE.map((t) => ({
   name: t.label,
   description: t.description,
   framePath: FRAME_PATH[t.type_code],
+  staticSrc: STATIC_PATH[t.type_code],
   to: t.to,
 }));
 
@@ -38,14 +47,16 @@ function SystemFrameTile({ system }: { system: SystemTile }) {
   const frameRef = useRef(0);
   const rafRef = useRef(0);
   const [near, setNear] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   const { images, isLoaded } = useFramePreloader(
     TILE_FRAMES,
     system.framePath,
-    { enabled: near, padLength: 4 },
+    { enabled: near && !prefersReducedMotion, padLength: 4 },
   );
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
     const el = tileRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
@@ -59,7 +70,7 @@ function SystemFrameTile({ system }: { system: SystemTile }) {
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const draw = useCallback(
     (f: number) => {
@@ -85,7 +96,7 @@ function SystemFrameTile({ system }: { system: SystemTile }) {
 
   // Scroll-based: map tile's viewport travel to frame index
   useEffect(() => {
-    if (!isLoaded) return;
+    if (prefersReducedMotion || !isLoaded) return;
 
     const onScroll = () => {
       const el = tileRef.current;
@@ -112,19 +123,31 @@ function SystemFrameTile({ system }: { system: SystemTile }) {
     rafRef.current = requestAnimationFrame(tick);
 
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isLoaded, draw]);
+  }, [prefersReducedMotion, isLoaded, draw]);
 
   return (
     <li ref={tileRef}>
       <Link to={system.to} className="group block">
         <div className="relative aspect-video overflow-hidden bg-neutral-50 mb-6">
-          <canvas
-            ref={canvasRef}
-            className={cn(
-              "w-full h-full object-cover transition-opacity duration-500",
-              isLoaded ? "opacity-100" : "opacity-0",
-            )}
-          />
+          {prefersReducedMotion ? (
+            <img
+              src={system.staticSrc}
+              alt=""
+              aria-hidden="true"
+              data-motion="reduced"
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <canvas
+              ref={canvasRef}
+              className={cn(
+                "w-full h-full object-cover transition-opacity duration-500",
+                isLoaded ? "opacity-100" : "opacity-0",
+              )}
+            />
+          )}
         </div>
         <div className="flex items-start justify-between gap-4">
           <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">

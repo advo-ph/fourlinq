@@ -66,7 +66,7 @@ const Index = () => {
         <WhatsNew />
       </Section>
 
-      <Section tone="dark" size="lg" noAnimation>
+      <Section tone="dark" size="lg">
         <BrandCTA />
       </Section>
     </Layout>
