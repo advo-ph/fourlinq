@@ -35,7 +35,6 @@ const FeatureLink = ({
       "transition-colors duration-300 ease-marvin",
       sizeClass,
       inkClass,
-      "hover:text-[color:var(--accent)]",
       "border-b border-[color:var(--rule-strong)] hover:border-current pb-0.5",
       className
     )}>

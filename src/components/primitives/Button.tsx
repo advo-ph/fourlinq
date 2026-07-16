@@ -34,14 +34,14 @@ const EditorialButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Editor
 
     const variantClass =
       variant === "primary"
-        ? "rounded-sm bg-[color:var(--accent)] text-white border-[3px] border-transparent hover:bg-[color:var(--accent-hover)] focus-visible:border-white focus-visible:shadow-[inset_0_0_0_2px_rgba(255,255,255,0.75)]"
+        ? "rounded-sm bg-[color:var(--accent)] text-white border border-transparent hover:bg-[color:var(--accent-hover)] focus-visible:border-white"
         : variant === "secondary"
-        ? "rounded-sm bg-white text-[color:var(--ink-secondary)] border-[3px] border-transparent hover:bg-[color:var(--canvas-soft)] focus-visible:border-[color:var(--ink-primary)]"
+        ? "rounded-sm bg-white text-[color:var(--ink-secondary)] border border-[color:var(--rule-strong)] hover:border-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)] focus-visible:border-[color:var(--ink-primary)]"
         : "bg-transparent text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)] underline underline-offset-[6px] decoration-1 decoration-[color:var(--rule-strong)] hover:decoration-[color:var(--ink-primary)]";
 
     const classes = cn(
       "inline-flex items-center justify-center font-sans font-medium tracking-normal",
-      "transition-[background-color,border-color,color,box-shadow] duration-300 ease-marvin",
+      "transition-[background-color,border-color,color] duration-300 ease-marvin",
       !fullWidth && variant !== "ghost" && "w-full sm:w-[200px]",
       sizeClass,
       variantClass,

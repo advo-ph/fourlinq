@@ -106,7 +106,7 @@ const SaveModal = ({ isOpen, onClose, config, selectedType, selectedMaterial, se
     <>
       <div className="fixed inset-0 bg-foreground/30 z-50" onClick={handleClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-surface rounded-xl shadow-2xl border border-border w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-surface rounded-sm shadow-depth-8 border border-border w-full max-w-md" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <h2 className="text-lg font-semibold text-primary">Save Your Configuration</h2>
             <button onClick={handleClose} className="text-[color:var(--ink-muted)] hover:text-primary p-1"><X size={18} /></button>
@@ -122,7 +122,7 @@ const SaveModal = ({ isOpen, onClose, config, selectedType, selectedMaterial, se
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
-              <div className="bg-muted rounded-lg p-3 text-xs space-y-1">
+              <div className="bg-muted rounded-sm p-3 text-xs space-y-1">
                 <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Type</span><span className="font-medium text-primary">{selectedType.name}</span></div>
                 <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Material</span><span className="font-medium text-primary">{selectedMaterial.name}</span></div>
                 <div className="flex justify-between"><span className="text-[color:var(--ink-muted)]">Finish</span><span className="font-medium text-primary">{selectedFinish.name}</span></div>
@@ -247,7 +247,7 @@ const DesignTool = () => {
               <div key={label} className="flex items-center gap-2">
                 <button
                   onClick={() => setStep(i)}
-                  className={`w-8 h-8 rounded-full text-sm font-medium flex items-center justify-center transition-colors ${
+                  className={`w-8 h-8 rounded-sm text-sm font-medium flex items-center justify-center transition-colors ${
                     i === step ? "bg-primary text-primary-foreground" : i < step ? "bg-primary/20 text-primary" : "bg-muted text-[color:var(--ink-muted)]"
                   }`}
                 >{i + 1}</button>
@@ -267,7 +267,7 @@ const DesignTool = () => {
                     {productTypes.filter((t) => t.category === "windows").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
-                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
+                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-sm border text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
                           <div className="flex justify-center mb-2">
                             {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-[color:var(--ink-muted)]"} strokeWidth={1} />}
                           </div>
@@ -281,7 +281,7 @@ const DesignTool = () => {
                     {productTypes.filter((t) => t.category === "doors").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
-                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
+                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-sm border text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
                           <div className="flex justify-center mb-2">
                             {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-[color:var(--ink-muted)]"} strokeWidth={1} />}
                           </div>
@@ -295,7 +295,7 @@ const DesignTool = () => {
                     {productTypes.filter((t) => t.category === "specialist").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
-                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-lg border-2 text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
+                        <button key={type.id} onClick={() => updateConfig("type", type.id)} className={`p-4 rounded-sm border text-center transition-colors ${config.type === type.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
                           <div className="flex justify-center mb-2">
                             {Icon && <Icon size={36} className={config.type === type.id ? "text-primary" : "text-[color:var(--ink-muted)]"} strokeWidth={1} />}
                           </div>
@@ -318,7 +318,7 @@ const DesignTool = () => {
                       <button
                         key={mat.id}
                         onClick={() => selectMaterial(mat.id)}
-                        className={`p-5 rounded-lg border-2 text-left transition-colors ${config.material === mat.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}
+                        className={`p-5 rounded-sm border text-left transition-colors ${config.material === mat.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}
                       >
                         <span className="block text-base font-medium text-primary mb-1">{mat.name}</span>
                         <span className="block text-xs text-[color:var(--ink-muted)] leading-snug">{mat.description}</span>
@@ -365,7 +365,7 @@ const DesignTool = () => {
                       const visual = glassVisuals[glass.id] || { tint: "rgba(200,220,240,0.1)" };
                       return (
                         <button key={glass.id} onClick={() => updateConfig("glass", glass.id)} className={`p-3 border text-center transition-colors duration-300 ease-marvin ${config.glass === glass.id ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]" : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"}`}>
-                          <div className="w-10 h-14 mx-auto rounded mb-2 border border-border" style={{ backgroundColor: visual.tint }} />
+                          <div className="w-10 h-14 mx-auto rounded-sm mb-2 border border-border" style={{ backgroundColor: visual.tint }} />
                           <span className="text-xs font-medium text-primary">{glass.name}</span>
                         </button>
                       );
@@ -394,7 +394,7 @@ const DesignTool = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-xl border border-border p-8 flex flex-col items-center justify-center">
+            <div className="bg-card rounded-sm border border-border p-8 flex flex-col items-center justify-center">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/50 mb-6">Live Preview</h3>
               <WindowPreview
                 type={config.type}

@@ -1,25 +1,24 @@
 # FourlinQ Design System
 
-**Version 2.0 — March 2026** *(superseded by v3.0 on `redesign-marvin` branch — see banner below)*
-This document is the single source of truth for all UI decisions on the FourlinQ website. Any AI agent, developer, or designer working on this codebase must follow these guidelines exactly. Do not deviate without explicit instruction.
+**Historical v2.0 archive — March 2026.** This file documents the pre-Marvin system and is not authoritative for the shipped site. The current contract lives in [`DESIGN.md`](../DESIGN.md), with implementation tokens in [`src/theme.config.ts`](../src/theme.config.ts).
 
 ---
 
-## ⚠️ v3.0 — Marvin direction (in progress, on `redesign-marvin` branch — NOT yet merged to main)
+## v3.0 — Marvin direction (shipped on `main`)
 
-The full redesign described in [REDESIGN_ROADMAP.md](./REDESIGN_ROADMAP.md) is shipping as **v3.0** on a feature branch. Until that branch merges to `main`, the v2.0 specs below remain authoritative for `main`. When `redesign-marvin` ships, v2.0 becomes historical and the v3.0 contract takes over.
+The Marvin-aligned redesign is shipped. The v2.0 material below remains only as migration history; do not use it to make current UI decisions.
 
 **v3.0 key shifts from v2.0:**
 
 - **Aesthetic**: "Tropical Futurism / Tesla-inspired" → "Editorial / Marvin-aligned" — full-bleed photography, hairline rules, serif display typography, restrained accent usage.
-- **Logo font**: Playfair Display → kept (logo is a stable brand asset) but body / display typography moved to Instrument Serif + Inter pairing.
+- **Typography**: the stable logo asset remains; the shipped UI uses Manrope for sans text, Fraunces for editorial display, and Cormorant for the wordmark treatment.
 - **Single source of truth**: tokens are now consolidated in [src/theme.config.ts](../src/theme.config.ts) (with mirrors in `tailwind.config.ts` and `src/index.css :root`). For day-to-day client requests like "make the buttons square" or "change the accent color", that file is the entry point.
 - **Motion**: all transitions standardized to the Marvin signature curve `cubic-bezier(.68, 0, .33, 1)` at 300ms hover / 700ms image Ken-Burns, exposed as `ease-marvin` Tailwind class. Grep'd from Marvin's production CSS — see [REDESIGN_ROADMAP §13.5](./REDESIGN_ROADMAP.md#135--motion-system).
-- **Accent color**: still `#C8102E` FourlinQ red, but applied with Marvin-style restraint (hairlines + single CTA per fold + state markers, not as background blocks).
+- **Accent color**: still `#C8102E` FourlinQ red, reserved for a single earned CTA or active state per viewport. Structural hairlines, eyebrows, routine hovers, and card borders stay neutral.
 - **Accessibility upgraded**: global `*:focus-visible` ring; `--ink-faint` bumped to AA-compliant `#767676`; skip-to-content link; `prefers-reduced-motion` honored; Escape-close on all modals/drawers. The v2.0 spec did not document these and the codebase did not implement them.
 - **Components**: 6 dead home components and 3 layout components removed (see [REDESIGN_ROADMAP §14](./REDESIGN_ROADMAP.md#14--implementation-log) for the full list). New editorial primitives live in [src/components/primitives/](../src/components/primitives/).
 
-The detailed v3.0 token spec (color ramps, type scale, spacing scale, motion curves, breakpoints, component conventions) lives in `REDESIGN_ROADMAP.md §13`. This document will be fully rewritten as v3.0 when the redesign branch merges; until then, the v2.0 content below remains the spec for `main`.
+The detailed current token and component spec lives in [`DESIGN.md`](../DESIGN.md). Everything below this point is the archived v2.0 reference.
 
 ---
 

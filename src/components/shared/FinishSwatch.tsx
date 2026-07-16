@@ -18,24 +18,21 @@ const sizeMap = {
 const FinishSwatch = ({
   finishId,
   color,
-  finishType,
   size = "md",
   selected = false,
   className = "",
 }: FinishSwatchProps) => {
   const finish = FRAME_FINISHES.find((f) => f.id === finishId);
-  const resolvedType = finishType ?? finish?.category ?? "solid";
-  const isWoodGrain = resolvedType === "wood-grain";
-  const shape = isWoodGrain ? "rounded-lg" : "rounded-full";
+  const shape = "rounded-sm";
   const borderStyle = selected
-    ? "border-primary ring-2 ring-primary/30"
+    ? "border-[color:var(--ink-primary)] ring-1 ring-[color:var(--ink-primary)]"
     : "border-border";
 
   const hasRealTexture = finish?.hasTexture && finish.textureImagePath;
 
   return (
     <div
-      className={`${sizeMap[size]} ${shape} border-[3px] ${borderStyle} relative overflow-hidden transition-colors ${className}`}
+      className={`${sizeMap[size]} ${shape} border ${borderStyle} relative overflow-hidden transition-colors ${className}`}
       style={hasRealTexture ? undefined : { backgroundColor: color }}
     >
       {hasRealTexture && (

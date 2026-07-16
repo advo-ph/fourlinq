@@ -65,7 +65,7 @@ export const BUTTON = {
   /** Tailwind class to apply to primary buttons. */
   primaryRadiusClass: "rounded-sm",
   /** Outline thickness for buttons + tabs. */
-  borderWidth: "3px",
+  borderWidth: "1px",
 } as const;
 
 /* ─── MOTION ──────────────────────────────────────────────────────── */
