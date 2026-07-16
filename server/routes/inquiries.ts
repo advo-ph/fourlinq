@@ -122,7 +122,7 @@ router.post("/quote-request", quoteLimiter, async (req, res) => {
 
 /**
  * POST /api/save-configuration
- * Body: { name?, email?, phone?, config: { type, finish, glass, width, height } }
+ * Body: { name?, email?, phone?, config: { type, material, finish, glass, width, height } }
  */
 router.post("/save-configuration", configurationLimiter, async (req, res) => {
   const { name, email, phone, config } = req.body;
