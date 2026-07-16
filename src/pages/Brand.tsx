@@ -37,7 +37,7 @@ const Brand = () => (
         </nav>
 
         <div className="mt-auto pb-16 lg:pb-24 max-w-[58rem]">
-          <p className="eyebrow !text-white/70 mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-white/50">
+          <p className="eyebrow !text-white/70 mb-5">
             Our brand
           </p>
           <h1 className="font-serif font-normal tracking-tight text-white text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02]">
@@ -55,7 +55,7 @@ const Brand = () => (
         no shadows, just thin rules and typography. */}
     <Section tone="canvas" size="lg">
       <div className="mb-12 lg:mb-16 flex items-end justify-between gap-8 flex-wrap">
-        <p className="eyebrow inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-[color:var(--rule-strong)]">
+        <p className="eyebrow">
           Our story
         </p>
         <span className="eyebrow text-[color:var(--ink-muted)]">FourlinQ / 2026</span>

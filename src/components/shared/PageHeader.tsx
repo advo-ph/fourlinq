@@ -25,7 +25,7 @@ const PageHeader = ({ title, subtitle, breadcrumbLabel, eyebrow }: PageHeaderPro
       </nav>
 
       {eyebrow && (
-        <p className="eyebrow mb-5 inline-flex items-center gap-3 before:content-[''] before:w-12 before:h-px before:bg-[color:var(--rule-strong)]">
+        <p className="eyebrow mb-5">
           {eyebrow}
         </p>
       )}
