@@ -6,6 +6,7 @@ import PageBody from "@/components/shared/PageBody";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { benefits, comparisonData } from "@/data/benefits";
+import { UPVC_PROFILE_FEATURES } from "@/data/fourlinq-data";
 
 /**
  * /why-upvc — restrained rewrite (2026-05-24, round 3).
@@ -172,6 +173,47 @@ const WhyUpvc = () => (
         </div>
       </div>
     </header>
+
+    {/* ── What's in the frame ── the brochure's 7 cut-section features ──
+        Answers Imie 2026-07-15: "lacking so much information as to why you
+        should choose uPVC — it just indicated the color?" The engineering case
+        now runs BEFORE the finish/texture scroll, so the page argues the
+        material first and shows colour second. Copy is brochure-verbatim
+        (descriptionVerbatim) with a plain-language benefit under each. */}
+    <Section tone="canvas" size="lg">
+      <div className="grid lg:grid-cols-12 gap-x-12 mb-14">
+        <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+          What's actually in the frame.
+        </h2>
+        <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
+          Seven things engineered into every FourlinQ uPVC profile — and what each one means once the window is in your wall.
+        </p>
+      </div>
+
+      <ul className="border-t border-[color:var(--rule-strong)]">
+        {UPVC_PROFILE_FEATURES.map((f) => (
+          <li
+            key={f.number}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-3 border-b border-[color:var(--rule-soft)] py-8 lg:py-10"
+          >
+            <span className="lg:col-span-1 font-serif text-h4 leading-none text-[color:var(--accent)] tabular-nums">
+              {f.number}
+            </span>
+            <h3 className="lg:col-span-4 font-serif font-normal tracking-tight text-h5 text-[color:var(--ink-primary)] leading-[1.2]">
+              {f.label}
+            </h3>
+            <div className="lg:col-span-7">
+              <p className="text-body text-[color:var(--ink-primary)] leading-[1.6]">
+                {f.descriptionVerbatim}
+              </p>
+              <p className="mt-2 text-body-sm text-[color:var(--ink-secondary)] leading-[1.6]">
+                {f.benefitPlain}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Section>
 
     {/* ── Featured advantage ── pinned scroll, cross-fades through 5 finishes ── */}
     <FeaturedTextureScroll />
