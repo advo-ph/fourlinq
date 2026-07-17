@@ -7,6 +7,7 @@ import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { benefits, comparisonData } from "@/data/benefits";
 import { UPVC_PROFILE_FEATURES } from "@/data/fourlinq-data";
+import ProfileSystems from "@/components/shared/ProfileSystems";
 
 /**
  * /why-upvc — restrained rewrite (2026-05-24, round 3).
@@ -213,6 +214,22 @@ const WhyUpvc = () => (
           </li>
         ))}
       </ul>
+    </Section>
+
+    {/* ── The profiles we build with ── Veka / Skyframe, supplied by Imie
+        2026-05-31. Lives here because the brand and origin of the profile is
+        part of the answer to "why uPVC", and it's what actually backs the
+        European-engineering claim. */}
+    <Section tone="soft" size="lg">
+      <div className="grid lg:grid-cols-12 gap-x-12 mb-12">
+        <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+          The profiles we build with.
+        </h2>
+        <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
+          We don't extrude our own profile. We fabricate on established systems, and we'll tell you which one is in your wall.
+        </p>
+      </div>
+      <ProfileSystems material="upvc" />
     </Section>
 
     {/* ── Featured advantage ── pinned scroll, cross-fades through 5 finishes ── */}

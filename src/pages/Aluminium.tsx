@@ -4,6 +4,7 @@ import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { useAluminium } from "@/hooks/useAluminium";
 import { ALUMINUM_FINISHES } from "@/data/fourlinq-data";
+import ProfileSystems from "@/components/shared/ProfileSystems";
 
 /**
  * /aluminium — FourlinQ's aluminium product line (the deep-dive page).
@@ -76,6 +77,20 @@ const Aluminium = () => {
             </article>
           ))}
         </div>
+      </Section>
+
+      {/* Profile systems — Standard / Regular and Alu Slim, supplied by Imie
+          2026-05-31. Data existed in PROFILE_SYSTEMS but rendered nowhere. */}
+      <Section tone="canvas" size="lg">
+        <div className="grid lg:grid-cols-12 gap-x-12 mb-12">
+          <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+            The aluminium profiles.
+          </h2>
+          <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
+            Two profile families sit under the systems above — the choice is wall thickness against sightline.
+          </p>
+        </div>
+        <ProfileSystems material="aluminum" />
       </Section>
 
       {/* Powder-coat finishes — client-supplied. The systems above come from the
