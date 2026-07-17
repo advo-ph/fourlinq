@@ -46,6 +46,12 @@ const Brand = () => (
           <p className="mt-7 lg:mt-9 text-body-lg lg:text-lead text-white/80 max-w-[40rem] leading-[1.55]">
             {BRAND.promise}
           </p>
+          {/* Answers Imie 2026-07-15: "what is the purpose of Brand? what does
+              it show for you?" The page never said what it was for. This states
+              the job in the visitor's terms, using only what the page holds. */}
+          <p className="mt-5 text-body text-white/60 max-w-[38rem] leading-[1.6]">
+            What we promise, what the warranty actually covers, and where you can put your hands on a full-scale system before you commit to one.
+          </p>
         </div>
       </div>
     </header>
@@ -75,27 +81,42 @@ const Brand = () => (
           </div>
         </article>
 
-        {/* Top-right card */}
-        <article className="lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col">
+        {/* Top-right card — routes to the finishes page rather than dead-ending
+            on a fact the visitor can't act on. */}
+        <Link
+          to="/finishes"
+          className="group lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
+        >
           <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Finishes</p>
-          <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1]">
+          <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1] transition-colors duration-300 ease-marvin group-hover:text-[color:var(--accent)]">
             Twelve total.
           </h3>
           <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
             Six solid colors and six wood-grain laminates, heat-fused into the profile.
           </p>
-        </article>
+          <span className="mt-6 inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)]">
+            See all twelve
+            <ArrowUpRight size={16} strokeWidth={1.5} className="transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </span>
+        </Link>
 
-        {/* Bottom-right card */}
-        <article className="lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col">
+        {/* Bottom-right card — jumps to the showroom addresses further down. */}
+        <a
+          href="#contact"
+          className="group lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
+        >
           <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Showrooms</p>
-          <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1]">
+          <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1] transition-colors duration-300 ease-marvin group-hover:text-[color:var(--accent)]">
             Manila and Cebu.
           </h3>
           <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
             Walk through full-scale systems with our consultants. Frames you can open, finishes you can touch, hardware that's already in your wall.
           </p>
-        </article>
+          <span className="mt-6 inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)]">
+            Get the addresses
+            <ArrowUpRight size={16} strokeWidth={1.5} className="transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </span>
+        </a>
       </div>
     </Section>
 
