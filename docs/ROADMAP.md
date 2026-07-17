@@ -441,23 +441,35 @@ Only the four below had **zero** coverage in any roadmap doc.
 
 | # | Item | What it closes | Effort | Benchmark | Status |
 |---|---|---|---|---|---|
-| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. `src/pages/Inspiration.tsx:24-32` filters by Casement/Sliding/Doors/Specialist + Interior/Exterior — a **system-type** axis, never a room/area or residential/commercial one. | ~0.5d | **D-B1** (Tier 1, gate-excluded) | **Occupancy axis UNBLOCKED 2026-07-17** (see below); room-level axis still blocked |
+| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. `src/pages/Inspiration.tsx:24-32` filters by Casement/Sliding/Doors/Specialist + Interior/Exterior — a **system-type** axis, never a room/area or residential/commercial one. | ~0.5d | **D-B1** (Tier 1, gate-excluded) | **Blocked — needs project *records*, not photos (see below)** |
 | **D3** | `/inspiration` is a 5th surface with a mixed-axis filter over a single-vocabulary field | **Verified 2026-07-17.** `src/data/projects.ts` gives each project ONE `category` string drawn from two different vocabularies — system (`casement`/`sliding`/`doors`/`specialist`, 4 projects) **or** view (`interior`/`exterior`, 8 projects), **never both**. `Inspiration.tsx:24-32` then renders all seven as one peer row. Two consequences: (a) it repeats the exact mixed-axis error Imie rejected on `/products` (*"Aluminium is like uPVC — they are both profile systems"*), and (b) **the filter silently lies** — selecting *Interior* hides every casement/doors project that is also interior. RM4 governs this but lists only nav, home, product, and footer; `/inspiration` is an uncovered fifth surface. | ~0.5d + data | **D-B3** (Tier 1, gate-excluded) | Blocked on per-project axis values |
 
-### D1 — occupancy axis unblocked 2026-07-17; room-level axis still blocked
+### D1 — still blocked. A photo is not a project record.
 
-**Originally blocked** because all 12 projects in `src/data/projects.ts` are residences, making a
-residential/commercial split 12 / 0, and no room field exists.
+**Corrected 2026-07-17.** An earlier revision of this section claimed the client photo drop unblocked
+the occupancy axis, because the set contains a **church** and a **resort/multi-unit**
+([CLIENT_PHOTO_INVENTORY.md](./CLIENT_PHOTO_INVENTORY.md)). That was over-claimed. It proves FourlinQ
+does commercial work — it does **not** produce a publishable project.
 
-**The client photo drop (2026-07-17) resolves half of it.** See
-[CLIENT_PHOTO_INVENTORY.md](./CLIENT_PHOTO_INVENTORY.md) — the set contains a **church** and a
-**resort/multi-unit**, matching *"maraming dami namin hospital, churches"* (`00:30:20`). So:
+A `Project` (`src/data/projects.ts`) requires:
 
-- **residential / commercial** is now buildable. Occupancy is a **visible property of the photo**, not
-  an invented one — a church is a church. This satisfies her interim instruction *"O pwede residential,
-  commercial"* (`00:23:14`).
-- **"MBR / Living"** stays blocked. Room identity is not reliably visible and assigning it would invent
-  a fact about the client's project — the failure `roadmap-rejected.md` exists to prevent.
+- `location` — typed comment: *"Real location from the FourlinQ Facebook caption."* The dropped files
+  have **no EXIF and hash filenames**; the location is unknown. `Inspiration.tsx:100` renders location
+  **unconditionally** as the card eyebrow, so an empty value ships a blank line.
+- `name`, `description`, `gallery` — every card links to `/projects/:slug`, a **detail page**. A photo
+  supplies none of these.
+
+Inventing any of them is precisely the error already committed once and reverted in
+`779d889 copy: strip fake project locations`.
+
+So the axis needs **project records**, not imagery:
+
+- **residential / commercial** — buildable the moment two commercial projects have a confirmed name +
+  location (she referenced *"maraming dami namin hospital, churches"*, `00:30:20`).
+- **"MBR / Living"** — blocked regardless; room identity is not reliably visible.
+
+Adding `occupancy` to the existing 12 alone is pointless: all 12 are residences, so the filter would
+render 12 / 0.
 
 D3 (the single mixed `category` field) remains blocked on per-project axis values regardless.
 

@@ -33,20 +33,20 @@ attribute them to a named project without the client confirming.
 Already imported separately: `public/images/products/real/sliding-door.webp` (corner sliding set, on the
 Door Systems card — PR #28).
 
-## 🔓 This unblocks D1's occupancy axis
+## ⚠️ This does NOT unblock D1 (corrected)
 
-D1 (projects browsable by area) was marked **blocked** because every project in `src/data/projects.ts`
-is a residence, making a residential/commercial split 12/0. That is no longer true:
+The set contains a **church** (`church-glazed-partition`) and a **resort/multi-unit**
+(`resort-multi-unit`), which **proves FourlinQ does commercial work** — matching *"maraming dami namin
+**hospital, churches**"* (`00:30:20`).
 
-- `church-glazed-partition` — institutional
-- `resort-multi-unit` — commercial/hospitality
+It does **not** unblock D1. A `Project` needs `name`, `location` (typed as *"Real location from the
+FourlinQ Facebook caption"*), `description`, and `gallery` — every card links to a `/projects/:slug`
+detail page. These files have no EXIF and hash filenames, so all four would be invented. That is the
+error already committed and reverted once in `779d889 copy: strip fake project locations`.
 
-This matches the meeting: *"maraming dami namin **hospital, churches**"* (`00:30:20`) and her interim
-instruction *"O pwede **residential, commercial**"* (`00:23:14`). **Occupancy is a visible property of
-the photo, not an invented one** — so this axis can be built without fabricating.
-
-The **room-level axis ("MBR, Living")** remains blocked: room identity is not reliably visible and
-would be invented.
+**A photo is not a project record.** D1 needs two commercial projects with a confirmed name +
+location. The room-level axis ("MBR, Living") stays blocked regardless — room identity is not
+reliably visible.
 
 ## Provenance caveat (read before publishing any of these)
 
