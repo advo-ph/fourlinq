@@ -196,7 +196,7 @@ const ForArchitects = () => (
               {
                 step: "01",
                 title: "Drawing review",
-                body: "Send us your elevations and we'll review fenestration geometry, flag any spans that need aluminum-reinforced systems, and propose alternates where uPVC isn't the right answer.",
+                body: "Send us your elevations and we'll review fenestration geometry, flag any spans that need aluminium-reinforced systems, and propose alternates where uPVC isn't the right answer.",
               },
               {
                 step: "02",

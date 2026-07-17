@@ -73,7 +73,7 @@ describe("benefits + comparisonData", () => {
     }
   });
 
-  it("comparison table has uPVC + Aluminum + Timber columns per row", () => {
+  it("comparison table has uPVC + Aluminium + Timber columns per row", () => {
     expect(comparisonData.length).toBeGreaterThan(0);
     for (const row of comparisonData) {
       expect(row.feature).toBeTruthy();

@@ -109,7 +109,7 @@ export const projects: Project[] = [
       "Fresh views, new beginnings. We've just completed our windows and doors turnover in the breathtaking Tagaytay City, Cavite. Style meets function, and every view is framed with perfection.",
   },
   {
-    id: "san-lorenzo-makati-aluminum",
+    id: "san-lorenzo-makati-aluminium",
     name: "San Lorenzo, Makati",
     location: "San Lorenzo, Makati",
     // Hero swapped to the finished-interior shot. The original hero
@@ -124,9 +124,9 @@ export const projects: Project[] = [
       `${FB}/2vzBfKBe.jpg`,
     ],
     category: "doors",
-    caption: "FourlinQ's first aluminum windows and doors installation.",
+    caption: "FourlinQ's first aluminium windows and doors installation.",
     description:
-      "Turn-over completed. Proud to unveil our first aluminum windows and doors installation at San Lorenzo, Makati. A remarkable milestone made possible by the hard work of our team.",
+      "Turn-over completed. Proud to unveil our first aluminium windows and doors installation at San Lorenzo, Makati. A remarkable milestone made possible by the hard work of our team.",
   },
   {
     id: "cebu-s-residences",

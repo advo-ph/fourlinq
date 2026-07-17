@@ -25,11 +25,14 @@ const FAQPage = () => {
       />
 
       <Section tone="canvas" size="lg" className="!pt-0">
-        <div className="grid lg:grid-cols-[18rem,1fr] gap-12 lg:gap-20">
-          {/* Category rail (becomes a horizontal scroll on mobile) */}
-          <aside>
+        <div className="grid lg:grid-cols-[18rem,1fr] gap-12 lg:gap-20 min-w-0">
+          {/* Category rail — a horizontal scroll strip on mobile, a sidebar at lg.
+              min-w-0 all the way down so the grid item can shrink below the
+              intrinsic width of the nowrap topic list and let overflow-x scroll
+              (a grid/flex item defaults to min-width:auto and won't). */}
+          <aside className="min-w-0">
             <p className="eyebrow mb-5">Topics</p>
-            <ul className="flex lg:flex-col gap-1 lg:gap-0 overflow-x-auto lg:overflow-visible no-scrollbar lg:border-y lg:border-[color:var(--rule-soft)]">
+            <ul className="flex lg:flex-col gap-1 lg:gap-0 min-w-0 overflow-x-auto lg:overflow-visible no-scrollbar lg:border-y lg:border-[color:var(--rule-soft)]">
               <li className="lg:border-b lg:border-[color:var(--rule-soft)] shrink-0">
                 <button
                   onClick={() => { setActive("all"); setOpen(null); }}

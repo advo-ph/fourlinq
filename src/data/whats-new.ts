@@ -3,7 +3,7 @@
 //
 // Dates: the FB scrape captured post bodies + images but not timestamps.
 // We use approximate dates inferred from post sequence and known events
-// (WORLDBEX 2026 was March 12-15, 2026; first aluminum install milestone
+// (WORLDBEX 2026 was March 12-15, 2026; first aluminium install milestone
 // was Q4 2025). Once Tita confirms exact dates, update here.
 
 export type WhatsNewCategory = "project" | "product" | "event" | "press";
@@ -48,13 +48,13 @@ export const whatsNew: WhatsNewEntry[] = [
     link: "/projects/tagaytay-cavite-residence",
   },
   {
-    id: "first-aluminum-install",
+    id: "first-aluminium-install",
     date: "2026-01-20",
     category: "product",
-    title: "First aluminum installation at San Lorenzo, Makati",
-    excerpt: "Proud to unveil our first aluminum windows and doors installation. A remarkable milestone for the FourlinQ team.",
+    title: "First aluminium installation at San Lorenzo, Makati",
+    excerpt: "Proud to unveil our first aluminium windows and doors installation. A remarkable milestone for the FourlinQ team.",
     image: `${FB}/P7DLic-T.jpg`,
-    link: "/projects/san-lorenzo-makati-aluminum",
+    link: "/projects/san-lorenzo-makati-aluminium",
   },
   {
     id: "nuvali-laguna-turnover",

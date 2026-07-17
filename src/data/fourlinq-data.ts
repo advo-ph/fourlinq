@@ -331,7 +331,7 @@ export const PRODUCT_TYPES: ProductType[] = [
 // MATERIAL OPTIONS
 // ─────────────────────────────────────────────
 
-export type Material = "upvc" | "aluminum";
+export type Material = "upvc" | "aluminium";
 
 export interface MaterialOption {
   id: Material;
@@ -363,8 +363,8 @@ export const MATERIALS: MaterialOption[] = [
     ],
   },
   {
-    id: "aluminum",
-    label: "Aluminum",
+    id: "aluminium",
+    label: "Aluminium",
     badge: "New",
     highlights: [
       "Slim sightlines for a modern minimal look",
@@ -372,7 +372,7 @@ export const MATERIALS: MaterialOption[] = [
       "Suitable for large-span openings",
       "Corrosion-resistant",
     ],
-    // Aluminium has its own powder-coat finish set — see ALUMINUM_FINISHES below.
+    // Aluminium has its own powder-coat finish set — see ALUMINIUM_FINISHES below.
     // These uPVC finish ids are the swatches the configurator can preview today.
     compatibleFinishIds: ["oak-light", "silica-cream", "white", "jet-black", "charcoal-gray", "matte-quartz"],
   },
@@ -383,13 +383,13 @@ export const MATERIALS: MaterialOption[] = [
 // Source: client (2026-05-31). Distinct from the 12 uPVC FRAME_FINISHES.
 // ─────────────────────────────────────────────
 
-export interface AluminumFinish {
+export interface AluminiumFinish {
   id: string;
   name: string;
   hex: string;
 }
 
-export const ALUMINUM_FINISHES: AluminumFinish[] = [
+export const ALUMINIUM_FINISHES: AluminiumFinish[] = [
   { id: "alu-gray",  name: "Gray",  hex: "#8a8d8f" },
   { id: "alu-black", name: "Black", hex: "#1b1b1d" },
   { id: "alu-brown", name: "Brown", hex: "#5a4632" },
@@ -411,8 +411,8 @@ export interface ProfileSystem {
 export const PROFILE_SYSTEMS: ProfileSystem[] = [
   { material: "upvc",     name: "Veka",                      origin: "German brand" },
   { material: "upvc",     name: "Skyframe",                  origin: "Chinese brand" },
-  { material: "aluminum", name: "Standard / Regular Systems", note: "Wall thickness 1.2mm – 3.0mm." },
-  { material: "aluminum", name: "Alu Slim Systems",           note: "Minimum-sightline aluminium profile." },
+  { material: "aluminium", name: "Standard / Regular Systems", note: "Wall thickness 1.2mm – 3.0mm." },
+  { material: "aluminium", name: "Alu Slim Systems",           note: "Minimum-sightline aluminium profile." },
 ];
 
 // ─────────────────────────────────────────────

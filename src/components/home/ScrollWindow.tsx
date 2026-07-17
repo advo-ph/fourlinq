@@ -97,7 +97,7 @@ const ScrollWindow = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [nearViewport, setNearViewport] = useState(false);
 
-  // Thermal system selector — uPVC (canvas frame) vs Aluminum Thermal Break
+  // Thermal system selector — uPVC (canvas frame) vs Aluminium Thermal Break
   // (overlay image). `aluFade` toggles the cross-fade: user picks = fade,
   // scrolling out of the section = instant (the frame is about to animate).
   const [thermalSystem, setThermalSystem] = useState<ThermalSystemId>("upvc");
@@ -232,7 +232,7 @@ const ScrollWindow = () => {
           )}
         />
 
-        {/* Aluminum Thermal Break overlay — same box/scale as the canvas frame.
+        {/* Aluminium Thermal Break overlay — same box/scale as the canvas frame.
             Cross-fades in when selected; snaps out instantly on scroll-away. */}
         {nearViewport && ALU_SYSTEM?.image && (
           <img
