@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { getConsent, setConsent } from "@/lib/consent";
 
-const COOKIE_KEY = "fourlinq_cookie_consent";
+// Consent lives in one place so the banner (writer) and useAnalytics (reader)
+// cannot drift apart — see src/lib/consent.ts (RM6).
 
 const CookieBanner = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem(COOKIE_KEY);
-    if (!consent) {
+    if (getConsent() === "unset") {
       const timer = setTimeout(() => setVisible(true), 1500);
       return () => clearTimeout(timer);
     }
@@ -20,12 +21,12 @@ const CookieBanner = () => {
   }, [visible]);
 
   const accept = () => {
-    localStorage.setItem(COOKIE_KEY, "accepted");
+    setConsent("accepted");
     setVisible(false);
   };
 
   const decline = () => {
-    localStorage.setItem(COOKIE_KEY, "declined");
+    setConsent("declined");
     setVisible(false);
   };
 

@@ -1,19 +1,41 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import { hasAnalyticsConsent } from "@/lib/consent";
 
-// Generate a persistent session ID per browser tab
-const SESSION_ID =
-  sessionStorage.getItem("flq_sid") ||
-  (() => {
+const SID_KEY = "flq_sid";
+
+/**
+ * Session ID, created lazily and ONLY once consent exists.
+ *
+ * RM6: this used to run at module load, so merely importing the hook wrote to
+ * sessionStorage before the visitor had chosen anything. Nothing here touches
+ * storage until hasAnalyticsConsent() is true.
+ */
+function getSessionId(): string {
+  try {
+    const existing = sessionStorage.getItem(SID_KEY);
+    if (existing) return existing;
     const id = Math.random().toString(36).slice(2) + Date.now().toString(36);
-    sessionStorage.setItem("flq_sid", id);
+    sessionStorage.setItem(SID_KEY, id);
     return id;
-  })();
+  } catch {
+    // Storage unavailable — still don't block, just use an ephemeral id.
+    return "ephemeral";
+  }
+}
 
-// Fire-and-forget — never blocks UI
+/**
+ * Fire-and-forget — never blocks UI, and never fires without consent.
+ *
+ * Consent is read at send time rather than cached, so Decline (or clearing the
+ * preference) takes effect immediately with no stale tracking. Opt-in: an
+ * absent choice means no request.
+ */
 function sendEvent(event: string, extra: Record<string, unknown> = {}) {
+  if (!hasAnalyticsConsent()) return;
+
   const payload = {
-    sessionId: SESSION_ID,
+    sessionId: getSessionId(),
     event,
     page: window.location.pathname,
     referrer: document.referrer || undefined,
