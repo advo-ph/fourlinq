@@ -83,7 +83,13 @@ export const SYSTEM_TYPE: SystemType[] = [
     item: ["Slide & Fold", "Large Panel", "Lift & Slide", "90 Series"],
     filter: "doors",
     to: "/products?filter=doors",
-    image: "/images/wp-export/FQC-Project-18.jpg",
+    // Real FourlinQ install, client-supplied 2026-07-17. A corner sliding-door
+    // set with the panels visibly offset on their track — it reads as sliding
+    // at a glance, which is what Imie said the synthetic render never did
+    // ("this is your sliding door but it looks like a two-panel fixed",
+    // 2026-05-28). Safe here: category cards carry no frame animation, and the
+    // card makes no location claim (these files have no EXIF or place data).
+    image: "/images/products/real/sliding-door.webp",
   },
   {
     type_code: "specialist",
