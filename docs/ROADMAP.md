@@ -426,9 +426,36 @@ The original benchmark document remains historical evidence. RM1–RM18 are now 
 
 ---
 
-## Shipped
+## 2026-07-17 delta — asks not covered by RM1–RM18
 
-### Tita demo round (design + copy pass)
+An exhaustive re-read of every client ask (transcript verbatim in
+[MEETING_INSTRUCTION_INVENTORY.md](./MEETING_INSTRUCTION_INVENTORY.md), plus the full Telegram thread
+Mar 8 → Jul 17) against the 2026-07-10 contract.
+
+**Result: the 07-10 contract already covers nearly everything.** Glass → RM11 + RM2. Gazebo /
+"sliding piece" / pocket door → triage "Newly mentioned products". Solutions → hold ("Tita explicitly
+said FourlinQ is not ready"). Catalog/brochure claim → hold. Chinese-text video → hold. Screens /
+hardware / muntin / casing / automation → RM1. AI "best uPVC" → RM18. Category-first → RM3.
+
+Only the four below had **zero** coverage in any roadmap doc.
+
+| # | Item | What it closes | Effort | Benchmark | Status |
+|---|---|---|---|---|---|
+| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. `src/pages/Inspiration.tsx:24-32` filters by Casement/Sliding/Doors/Specialist + Interior/Exterior — a **system-type** axis, never a room/area or residential/commercial one. | ~0.5d | **D-B1** (Tier 1, gate-excluded) | Planned |
+| **D2** | Replacement windows | Meeting `00:21:52`: *"**Replacement window, I also want this.**"* plus the real process she described (remove old → corrosion on the side → must chip before refit → board it up?). Appears in `competitor-audit-andersen.md` only; no FourlinQ surface. | ~0.75d + approval | **D-B2** (Tier 3) | Blocked on approved copy |
+
+### D-B1 — Projects expose an area axis (Tier 1, gate-excluded)
+Pass iff `/inspiration` exposes an **area/occupancy axis** (MBR, Living, … or residential/commercial)
+that is **distinct from** the existing system-type axis; a `*.roadmap.test.tsx` asserts both axes
+render as separate labelled groups and do not collapse into one mixed row (the same failure mode as
+the rejected 2026-07-05 `/products` build). Expected-red until built; promote-on-build.
+
+### D-B2 — Replacement windows surface (Tier 3)
+Pass iff a Replacement surface exists whose process copy is client-approved and traceable to a source
+per RM7, and it states the real constraint (corrosion/chipping on removal) rather than implying a
+like-for-like swap. Blocked until the copy is approved — do not publish an invented process.
+
+---
 **Shipped:** 2026-05-24 → 2026-05-25
 Removed AI-generated surface tells across the site per Tita's explicit feedback. Hero locked at *"Built to Last. Designed to Inspire."* (her exact wording). Page-by-page restraint pass on /why-upvc, /finishes, /brand, /. Mobile drawer rebuilt with red CTA box at top. ScrollWindow gets a stacked mobile layout. Footer mobile density pass. Marquee warranty band on /brand. All invented brand-statement lines stripped or replaced with brochure-verified BRAND values. RESTRAINT.md added at repo root as the external anti-pattern rulebook (no stacked gradients, no italic display words, no numbered eyebrows, no by-the-numbers strips). See CHANGELOG `[Unreleased]` section for the full list.
 

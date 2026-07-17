@@ -46,7 +46,9 @@ These are real signals but not ready for implementation without data or a decisi
 | Aluminium system spec sheets/photos | Page exists but lacks verified per-system details. | Brochure specs, max spans, finish/glass limits, photos, PDFs. |
 | Architect resource downloads | Would be valuable, but fake CAD/BIM/spec cards would harm credibility. | Real technical files or a deliberate request-form-only strategy. |
 | SMTP auto-email go-live | Code is scaffolded but no credentials are present. | Production SMTP/Gmail/Resend credentials. |
-| 22-year/founding-year claim | Prior docs mention it but exact year is unverified. | Client confirms founding year and allowed wording. |
+| 22-year/founding-year claim | Prior docs mention it but exact year is unverified. Meeting `00:30:20` is the first support: *"20 years na kami."* Still needs an exact year. | Client confirms founding year and allowed wording. |
+| 🚩 **Materials Tita already sent that we have never read** | Meeting `00:58:06`: *"**Nasa kanya kasi yung catalog** oh… **Hindi, nasa GC.** … **Hindi kayo nagbabasa, eh.**"* Also `00:39:04` (*"I only have a line of flyers. **Pero sinend ko na sa'yo**"*) and `00:28:46` (*"within the week, I'll send you more [photos]… **If I add you to our group na may photos**"*). **This is the missing input to RM1 (product master), RM7 (claim/source registry), and RM11 (Glass hub)** — those cannot pass on invented content. It is a retrieval task, not a build task, and it is currently the highest-leverage unblock on the board. | Locate the GC/flyers/photo group, read it, and register each artefact (owner, date, version) into the RM1/RM7 source registry. |
+| Excalibur Builders — project photo lead | Meeting `00:31:39`: *"type mo **Excalibur sa Instagram**… Builders. **Lahat yan, project ko.**"* A named client whose projects are reportedly all FourlinQ — a concrete lead for the rights-cleared imagery that blocks Collections (hold) and RM14. Unverified; no rights position established. | Confirm the relationship, which installs are FourlinQ, and written permission before any image is published. |
 
 ### Hold after the 2026-07-10 meeting
 
