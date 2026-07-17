@@ -441,7 +441,28 @@ Only the four below had **zero** coverage in any roadmap doc.
 
 | # | Item | What it closes | Effort | Benchmark | Status |
 |---|---|---|---|---|---|
-| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. `src/pages/Inspiration.tsx:24-32` filters by Casement/Sliding/Doors/Specialist + Interior/Exterior — a **system-type** axis, never a room/area or residential/commercial one. | ~0.5d | **D-B1** (Tier 1, gate-excluded) | Planned |
+| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. `src/pages/Inspiration.tsx:24-32` filters by Casement/Sliding/Doors/Specialist + Interior/Exterior — a **system-type** axis, never a room/area or residential/commercial one. | ~0.5d | **D-B1** (Tier 1, gate-excluded) | **Blocked on project data — see below** |
+| **D3** | `/inspiration` is a 5th surface with a mixed-axis filter over a single-vocabulary field | **Verified 2026-07-17.** `src/data/projects.ts` gives each project ONE `category` string drawn from two different vocabularies — system (`casement`/`sliding`/`doors`/`specialist`, 4 projects) **or** view (`interior`/`exterior`, 8 projects), **never both**. `Inspiration.tsx:24-32` then renders all seven as one peer row. Two consequences: (a) it repeats the exact mixed-axis error Imie rejected on `/products` (*"Aluminium is like uPVC — they are both profile systems"*), and (b) **the filter silently lies** — selecting *Interior* hides every casement/doors project that is also interior. RM4 governs this but lists only nav, home, product, and footer; `/inspiration` is an uncovered fifth surface. | ~0.5d + data | **D-B3** (Tier 1, gate-excluded) | Blocked on per-project axis values |
+
+### Why D1 is blocked (do not build it by inventing)
+
+All 12 projects in `src/data/projects.ts` are residences; there is no room/area field and no
+residential/commercial field. So:
+
+- **"MBR / Living"** cannot be derived — assigning a room to a photo would be inventing a fact about
+  the client's project, which is exactly the failure mode `roadmap-rejected.md` exists to prevent.
+- **"residential / commercial"** would render 12 / 0. She *has* the other side — *"maraming dami namin
+  hospital, churches"* (`00:30:20`) — but **none of those projects are in the repo**; they sit in the
+  photos she has not sent.
+
+**D1 and D3 are both blocked by the same input: the GC photos/catalog (triage T1).** D1 is not a code
+task that is waiting on effort; it is waiting on data. Building it now would fabricate.
+
+### D-B3 — `/inspiration` axes are separate and honest (Tier 1, gate-excluded)
+Pass iff every project carries an explicit **system** value AND an explicit **view** value (no single
+mixed `category` string); `/inspiration` renders them as two labelled groups, never one peer row; and
+a test proves selecting a view value returns projects across all system values (i.e. the filter no
+longer hides matching projects). Expected-red until the per-project values exist; promote-on-build.
 | **D2** | Replacement windows | Meeting `00:21:52`: *"**Replacement window, I also want this.**"* plus the real process she described (remove old → corrosion on the side → must chip before refit → board it up?). Appears in `competitor-audit-andersen.md` only; no FourlinQ surface. | ~0.75d + approval | **D-B2** (Tier 3) | Blocked on approved copy |
 
 ### D-B1 — Projects expose an area axis (Tier 1, gate-excluded)
