@@ -42,7 +42,7 @@ function getFollowUps(text: string, allMessages: Message[]): FollowUp[] {
   if (t.includes("finish") || t.includes("laminate") || t.includes("wood grain") || t.includes("oak") || t.includes("walnut")) {
     if (!followUps.some((f) => f.label.includes("Design Tool")))
       followUps.push({ label: "Open the Design Tool →", message: "", href: "/design-tool" });
-    followUps.push({ label: "Which finishes for aluminum?", message: "Which finishes are available for aluminum frames?" });
+    followUps.push({ label: "Which finishes for aluminium?", message: "Which finishes are available for aluminium frames?" });
   }
   if (t.includes("price") || t.includes("cost") || t.includes("quote") || t.includes("budget")) {
     followUps.push({ label: "Visit a showroom", message: "Where are your showrooms?" });
@@ -57,7 +57,7 @@ function getFollowUps(text: string, allMessages: Message[]): FollowUp[] {
     followUps.push({ label: "Call sales", message: "What's your sales phone number?" });
   }
   if (t.includes("fire retardant") || t.includes("corrosion") || t.includes("thermal") || t.includes("sound insulation") || t.includes("weather")) {
-    followUps.push({ label: "uPVC vs aluminum?", message: "What's the difference between your uPVC and aluminum options?" });
+    followUps.push({ label: "uPVC vs aluminium?", message: "What's the difference between your uPVC and aluminium options?" });
     followUps.push({ label: "See all 7 advantages", message: "What are all 7 FourlinQ advantages?" });
   }
   if (t.includes("design tool") || t.includes("configurator") || t.includes("customize")) {

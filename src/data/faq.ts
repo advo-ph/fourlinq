@@ -35,7 +35,7 @@ export const FAQ: FAQEntry[] = [
   {
     category: "products",
     q: "What systems do you offer?",
-    a: "Five system types, each custom-made to your specifications: Casement, Sliding, Awning, Special Shapes, and Slide & Fold. All are available in uPVC, with Aluminum as an alternate material for certain frames. Detailed specs live on the Products page (/products).",
+    a: "Five system types, each custom-made to your specifications: Casement, Sliding, Awning, Special Shapes, and Slide & Fold. All are available in uPVC, with Aluminium as an alternate material for certain frames. Detailed specs live on the Products page (/products).",
   },
   {
     category: "products",
@@ -71,8 +71,8 @@ export const FAQ: FAQEntry[] = [
   },
   {
     category: "material",
-    q: "uPVC vs Aluminum — which should I choose?",
-    a: "We offer both. uPVC is the better thermal insulator (cooler interiors), sound insulator, and is fire retardant. Aluminum has slimmer sightlines for a more minimal look and suits very large spans. Use the Design Tool (/design-tool) to compare configurations, or visit any of our three showrooms for a hands-on look.",
+    q: "uPVC vs Aluminium — which should I choose?",
+    a: "We offer both. uPVC is the better thermal insulator (cooler interiors), sound insulator, and is fire retardant. Aluminium has slimmer sightlines for a more minimal look and suits very large spans. Use the Design Tool (/design-tool) to compare configurations, or visit any of our three showrooms for a hands-on look.",
   },
 
   // ── Ordering ──────────────────────────────────────

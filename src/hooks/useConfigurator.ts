@@ -3,7 +3,7 @@ import {
   finishOptions as staticFinishes,
   glassOptions as staticGlassOptions,
 } from "@/data/configurator";
-import { ALUMINUM_FINISHES } from "@/data/fourlinq-data";
+import { ALUMINIUM_FINISHES } from "@/data/fourlinq-data";
 
 export interface ProductTypeItem {
   id: string;
@@ -60,7 +60,7 @@ const upvcFinishData: FinishOption[] = staticFinishes.map((f) => ({
 }));
 
 // Aluminium powder-coat colours (Imie, 2026-05-31). Rendered as solid swatches.
-const aluminiumFinishData: FinishOption[] = ALUMINUM_FINISHES.map((f) => ({
+const aluminiumFinishData: FinishOption[] = ALUMINIUM_FINISHES.map((f) => ({
   id: f.id,
   name: f.name,
   color: f.hex,

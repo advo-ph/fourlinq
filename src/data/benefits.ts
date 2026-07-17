@@ -25,7 +25,7 @@ export interface ComparisonRow {
   timber: string;
 }
 
-// Comparison framing: we sell BOTH uPVC and aluminum at FourlinQ. The table
+// Comparison framing: we sell BOTH uPVC and aluminium at FourlinQ. The table
 // describes where each material genuinely fits rather than ranking them. Most
 // rows show real differences without calling any material "bad" — the
 // architect/owner chooses based on the project's actual constraints.

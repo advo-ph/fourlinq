@@ -3,7 +3,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { useAluminium } from "@/hooks/useAluminium";
-import { ALUMINUM_FINISHES } from "@/data/fourlinq-data";
+import { ALUMINIUM_FINISHES } from "@/data/fourlinq-data";
 import ProfileSystems from "@/components/shared/ProfileSystems";
 
 /**
@@ -24,6 +24,21 @@ const Aluminium = () => {
         breadcrumbLabel="Aluminium"
         subtitle="FourlinQ carries two material lines. uPVC for most residential openings, aluminium for the projects that need bigger spans, thinner sightlines, or a different aesthetic. Three aluminium systems, each suited to a different brief."
       />
+
+      {/* Hero image — the page was text-only and read as unfinished next to the
+          photo-led /why-upvc. A real FourlinQ install with the slim dark-frame
+          aluminium look the page describes (bigger glass, thinner sightlines). */}
+      <div className="container-editorial">
+        <div className="aspect-[16/9] overflow-hidden bg-[color:var(--canvas-soft)]">
+          <img
+            src="/images/aluminium/hero-slim-frame-residence.webp"
+            alt="A three-storey FourlinQ residence with slim dark-frame aluminium windows and doors"
+            loading="eager"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
 
       {/* Sub-systems — content editable from /admin > Content > Aluminium */}
       <Section tone="canvas" size="lg">
@@ -90,7 +105,7 @@ const Aluminium = () => {
             Two profile families sit under the systems above — the choice is wall thickness against sightline.
           </p>
         </div>
-        <ProfileSystems material="aluminum" />
+        <ProfileSystems material="aluminium" />
       </Section>
 
       {/* Powder-coat finishes — client-supplied. The systems above come from the
@@ -104,7 +119,7 @@ const Aluminium = () => {
             </h2>
           </div>
           <ul className="lg:col-span-7 flex flex-wrap gap-x-8 gap-y-5">
-            {ALUMINUM_FINISHES.map((f) => (
+            {ALUMINIUM_FINISHES.map((f) => (
               <li key={f.id} className="flex items-center gap-3">
                 <span
                   className="inline-block h-8 w-8 rounded-full border border-[color:var(--rule-soft)]"

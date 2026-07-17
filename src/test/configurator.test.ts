@@ -8,19 +8,19 @@
  */
 import { describe, expect, it } from "vitest";
 import { finishesForMaterial } from "@/hooks/useConfigurator";
-import { ALUMINUM_FINISHES, FRAME_FINISHES } from "@/data/fourlinq-data";
+import { ALUMINIUM_FINISHES, FRAME_FINISHES } from "@/data/fourlinq-data";
 
 describe("material decides the finish set", () => {
   it("uPVC offers the full frame-finish set", () => {
     const upvc = finishesForMaterial("upvc");
     expect(upvc.length).toBe(FRAME_FINISHES.length);
-    expect(upvc.length).toBeGreaterThan(ALUMINUM_FINISHES.length);
+    expect(upvc.length).toBeGreaterThan(ALUMINIUM_FINISHES.length);
   });
 
   it("aluminium offers exactly the powder-coat colours", () => {
     const alu = finishesForMaterial("aluminium");
     expect(alu.map((f) => f.id).sort()).toEqual(
-      ALUMINUM_FINISHES.map((f) => f.id).sort(),
+      ALUMINIUM_FINISHES.map((f) => f.id).sort(),
     );
   });
 

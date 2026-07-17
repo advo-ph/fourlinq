@@ -262,10 +262,10 @@ const WhyUpvc = () => (
     <Section tone="soft" size="lg">
       <div className="grid lg:grid-cols-12 gap-x-12 mb-14">
         <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
-          uPVC. Aluminum. Timber.
+          uPVC. Aluminium. Timber.
         </h2>
         <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
-          We carry uPVC and aluminum. Most houses end up with uPVC; bigger openings or thinner sightlines go to aluminum. Timber sits in the third column for comparison — we don't sell it.
+          We carry uPVC and aluminium. Most houses end up with uPVC; bigger openings or thinner sightlines go to aluminium. Timber sits in the third column for comparison — we don't sell it.
         </p>
       </div>
 
@@ -279,7 +279,7 @@ const WhyUpvc = () => (
 uPV<span className="text-[color:var(--accent)]">C</span>
             </span>
             <span className="py-5 px-4 font-serif text-h5 font-normal text-[color:var(--ink-secondary)] leading-none">
-              Aluminum
+              Aluminium
             </span>
             <span className="py-5 px-4 font-serif text-h5 font-normal text-[color:var(--ink-secondary)] leading-none">
               Timber

@@ -60,7 +60,7 @@ export const SCROLL_PHASES: ScrollPhase[] = [
 // ── Thermal system selector ─────────────────────────────────
 // The thermal phase locks on its end frame; a toggle below the phase text
 // lets the user swap between the uPVC system (the canvas frame as-is) and the
-// Aluminum Thermal Break system (an overlay image cross-faded over the frame).
+// Aluminium Thermal Break system (an overlay image cross-faded over the frame).
 // Only interactive once the thermal phase has settled on this frame.
 
 export const THERMAL_PHASE_ID = "thermal";
@@ -92,11 +92,11 @@ export const THERMAL_SYSTEMS: ThermalSystem[] = [
   },
   {
     id: "alu",
-    label: "Aluminum Thermal Break System",
+    label: "Aluminium Thermal Break System",
     text: {
       eyebrow: "Thermal Break Technology",
       headline: "Keeps heat on the outside.",
-      body: "The system uses internal and external aluminum profiles divided by a polyamide thermal break. This barrier reduces direct heat transfer, so the inner side of the frame stays cooler even when the outside surface is exposed to sun.",
+      body: "The system uses internal and external aluminium profiles divided by a polyamide thermal break. This barrier reduces direct heat transfer, so the inner side of the frame stays cooler even when the outside surface is exposed to sun.",
     },
     image: "/images/thermal-alu-break.webp",
   },
