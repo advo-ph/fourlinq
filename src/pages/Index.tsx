@@ -10,6 +10,7 @@ import ProjectReels from "@/components/home/ProjectReels";
 import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
 import BrandCTA from "@/components/home/BrandCTA";
+import UtilityBand from "@/components/home/UtilityBand";
 import DesignToolPreview from "@/components/home/DesignToolPreview";
 
 // Captions are intentionally generic until client confirms actual project locations.
@@ -68,6 +69,14 @@ const Index = () => {
 
       <Section tone="dark" size="lg" noAnimation>
         <BrandCTA />
+      </Section>
+
+      {/* Three-card utility band — the one Marvin homepage module we lacked
+          (Find a Dealer / Professional Resources / Photo Gallery → Showrooms /
+          For Architects / Inspiration). Closes the completeness gap Imie
+          flagged without cloning Marvin's collection architecture. */}
+      <Section tone="dark" size="md" noAnimation className="!pt-0">
+        <UtilityBand />
       </Section>
     </Layout>
   );
