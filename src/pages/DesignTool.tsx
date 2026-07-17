@@ -257,13 +257,13 @@ const DesignTool = () => {
             ))}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12">
-            <div className="min-h-[320px]">
+          <div className="grid md:grid-cols-2 gap-12 min-w-0">
+            <div className="min-h-[320px] min-w-0">
               {step === 0 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Select Product Type</h2>
                   <h3 className="eyebrow mb-3">Windows</h3>
-                  <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                     {productTypes.filter((t) => t.category === "windows").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
@@ -277,7 +277,7 @@ const DesignTool = () => {
                     })}
                   </div>
                   <h3 className="eyebrow mb-3">Doors</h3>
-                  <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                     {productTypes.filter((t) => t.category === "doors").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
@@ -291,7 +291,7 @@ const DesignTool = () => {
                     })}
                   </div>
                   <h3 className="eyebrow mb-3">Specialist</h3>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {productTypes.filter((t) => t.category === "specialist").map((type) => {
                       const Icon = iconMap[type.iconKey];
                       return (
@@ -334,7 +334,7 @@ const DesignTool = () => {
                     {selectedMaterial.name} finishes
                   </p>
                   <h3 className="eyebrow mb-3">Solid</h3>
-                  <div className="grid grid-cols-4 gap-3 mb-6">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-6">
                     {finishOptions.filter((f) => f.finishType === "solid").map((finish) => (
                       <button key={finish.id} onClick={() => updateConfig("finish", finish.id)} className="flex flex-col items-center gap-2 group" title={finish.description}>
                         <FinishSwatch finishId={finish.id} color={finish.color} finishType="solid" selected={config.finish === finish.id} />
@@ -345,7 +345,7 @@ const DesignTool = () => {
                   {finishOptions.some((f) => f.finishType === "wood-grain") && (
                     <>
                       <h3 className="eyebrow mb-3">Wood Grain</h3>
-                      <div className="grid grid-cols-4 gap-3">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                         {finishOptions.filter((f) => f.finishType === "wood-grain").map((finish) => (
                           <button key={finish.id} onClick={() => updateConfig("finish", finish.id)} className="flex flex-col items-center gap-2 group" title={finish.description}>
                             <FinishSwatch finishId={finish.id} color={finish.color} finishType="wood-grain" selected={config.finish === finish.id} />
@@ -360,7 +360,7 @@ const DesignTool = () => {
               {step === 3 && (
                 <div>
                   <h2 className="text-lg font-medium text-primary mb-4">Select Glass Type</h2>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {glassOptions.map((glass) => {
                       const visual = glassVisuals[glass.id] || { tint: "rgba(200,220,240,0.1)" };
                       return (
@@ -394,7 +394,7 @@ const DesignTool = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-xl border border-border p-8 flex flex-col items-center justify-center">
+            <div className="bg-card rounded-xl border border-border p-5 sm:p-8 min-w-0 flex flex-col items-center justify-center">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/50 mb-6">Live Preview</h3>
               <WindowPreview
                 type={config.type}
