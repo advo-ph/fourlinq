@@ -441,22 +441,25 @@ Only the four below had **zero** coverage in any roadmap doc.
 
 | # | Item | What it closes | Effort | Benchmark | Status |
 |---|---|---|---|---|---|
-| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. `src/pages/Inspiration.tsx:24-32` filters by Casement/Sliding/Doors/Specialist + Interior/Exterior — a **system-type** axis, never a room/area or residential/commercial one. | ~0.5d | **D-B1** (Tier 1, gate-excluded) | **Blocked on project data — see below** |
+| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. `src/pages/Inspiration.tsx:24-32` filters by Casement/Sliding/Doors/Specialist + Interior/Exterior — a **system-type** axis, never a room/area or residential/commercial one. | ~0.5d | **D-B1** (Tier 1, gate-excluded) | **Occupancy axis UNBLOCKED 2026-07-17** (see below); room-level axis still blocked |
 | **D3** | `/inspiration` is a 5th surface with a mixed-axis filter over a single-vocabulary field | **Verified 2026-07-17.** `src/data/projects.ts` gives each project ONE `category` string drawn from two different vocabularies — system (`casement`/`sliding`/`doors`/`specialist`, 4 projects) **or** view (`interior`/`exterior`, 8 projects), **never both**. `Inspiration.tsx:24-32` then renders all seven as one peer row. Two consequences: (a) it repeats the exact mixed-axis error Imie rejected on `/products` (*"Aluminium is like uPVC — they are both profile systems"*), and (b) **the filter silently lies** — selecting *Interior* hides every casement/doors project that is also interior. RM4 governs this but lists only nav, home, product, and footer; `/inspiration` is an uncovered fifth surface. | ~0.5d + data | **D-B3** (Tier 1, gate-excluded) | Blocked on per-project axis values |
 
-### Why D1 is blocked (do not build it by inventing)
+### D1 — occupancy axis unblocked 2026-07-17; room-level axis still blocked
 
-All 12 projects in `src/data/projects.ts` are residences; there is no room/area field and no
-residential/commercial field. So:
+**Originally blocked** because all 12 projects in `src/data/projects.ts` are residences, making a
+residential/commercial split 12 / 0, and no room field exists.
 
-- **"MBR / Living"** cannot be derived — assigning a room to a photo would be inventing a fact about
-  the client's project, which is exactly the failure mode `roadmap-rejected.md` exists to prevent.
-- **"residential / commercial"** would render 12 / 0. She *has* the other side — *"maraming dami namin
-  hospital, churches"* (`00:30:20`) — but **none of those projects are in the repo**; they sit in the
-  photos she has not sent.
+**The client photo drop (2026-07-17) resolves half of it.** See
+[CLIENT_PHOTO_INVENTORY.md](./CLIENT_PHOTO_INVENTORY.md) — the set contains a **church** and a
+**resort/multi-unit**, matching *"maraming dami namin hospital, churches"* (`00:30:20`). So:
 
-**D1 and D3 are both blocked by the same input: the GC photos/catalog (triage T1).** D1 is not a code
-task that is waiting on effort; it is waiting on data. Building it now would fabricate.
+- **residential / commercial** is now buildable. Occupancy is a **visible property of the photo**, not
+  an invented one — a church is a church. This satisfies her interim instruction *"O pwede residential,
+  commercial"* (`00:23:14`).
+- **"MBR / Living"** stays blocked. Room identity is not reliably visible and assigning it would invent
+  a fact about the client's project — the failure `roadmap-rejected.md` exists to prevent.
+
+D3 (the single mixed `category` field) remains blocked on per-project axis values regardless.
 
 ### D-B3 — `/inspiration` axes are separate and honest (Tier 1, gate-excluded)
 Pass iff every project carries an explicit **system** value AND an explicit **view** value (no single
