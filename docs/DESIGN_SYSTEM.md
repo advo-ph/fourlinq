@@ -1,25 +1,23 @@
 # FourlinQ Design System
 
-**Version 2.0 — March 2026** *(superseded by v3.0 on `redesign-marvin` branch — see banner below)*
-This document is the single source of truth for all UI decisions on the FourlinQ website. Any AI agent, developer, or designer working on this codebase must follow these guidelines exactly. Do not deviate without explicit instruction.
+**v3.0 (Editorial / Marvin-aligned) — SHIPPED and live on `main`.**
+This document is the single source of truth for UI decisions on the FourlinQ website. The authoritative tokens live in [src/theme.config.ts](../src/theme.config.ts) (mirrored in `tailwind.config.ts` and `src/index.css :root`); when this prose disagrees with that file, the file wins.
 
 ---
 
-## ⚠️ v3.0 — Marvin direction (in progress, on `redesign-marvin` branch — NOT yet merged to main)
+## What's live (v3.0, on `main`)
 
-The full redesign described in [REDESIGN_ROADMAP.md](./REDESIGN_ROADMAP.md) is shipping as **v3.0** on a feature branch. Until that branch merges to `main`, the v2.0 specs below remain authoritative for `main`. When `redesign-marvin` ships, v2.0 becomes historical and the v3.0 contract takes over.
+The v3.0 redesign is **merged and deployed** — it is not a feature-branch plan. (An earlier version of this banner said it was "in progress on the `redesign-marvin` branch, NOT yet merged." That branch was merged and deleted on 2026-06-21; the note was stale.)
 
-**v3.0 key shifts from v2.0:**
+- **Aesthetic**: Editorial / Marvin-aligned — full-bleed photography, hairline rules, serif display typography, restrained accent usage. (Superseded the earlier "Tropical Futurism / Tesla" direction.)
+- **Typography — as actually shipped** (`tailwind.config.ts`): **Manrope** (body/UI, `font-sans`), **Fraunces** (serif display, `font-serif` / `font-display`), **Cormorant Garamond** (accent serif, `font-promise`). The **logo** wordmark stays **Playfair Display**. *(An earlier banner claimed "Instrument Serif + Inter" — that pairing was never shipped; the code uses Manrope + Fraunces.)*
+- **Accent color**: `#C8102E` FourlinQ red (hover `#A00D26`), applied with restraint — hairlines + a single CTA per fold + state markers, not background blocks. Ink `#242424`.
+- **Buttons**: squared (`rounded-sm`), heavier border. Radius token `--radius: 0.25rem`.
+- **Motion**: all transitions on the Marvin curve `cubic-bezier(.68, 0, .33, 1)`, exposed as the `ease-marvin` Tailwind class (300ms hover / 700ms image).
+- **Accessibility**: global `*:focus-visible` ring; `--ink-faint` at AA `#767676`; skip-to-content link; `prefers-reduced-motion` honored; Escape-closes modals/drawers.
+- **Analytics**: consent-gated — no tracking fires before the visitor accepts cookies (`src/lib/consent.ts`).
 
-- **Aesthetic**: "Tropical Futurism / Tesla-inspired" → "Editorial / Marvin-aligned" — full-bleed photography, hairline rules, serif display typography, restrained accent usage.
-- **Logo font**: Playfair Display → kept (logo is a stable brand asset) but body / display typography moved to Instrument Serif + Inter pairing.
-- **Single source of truth**: tokens are now consolidated in [src/theme.config.ts](../src/theme.config.ts) (with mirrors in `tailwind.config.ts` and `src/index.css :root`). For day-to-day client requests like "make the buttons square" or "change the accent color", that file is the entry point.
-- **Motion**: all transitions standardized to the Marvin signature curve `cubic-bezier(.68, 0, .33, 1)` at 300ms hover / 700ms image Ken-Burns, exposed as `ease-marvin` Tailwind class. Grep'd from Marvin's production CSS — see [REDESIGN_ROADMAP §13.5](./REDESIGN_ROADMAP.md#135--motion-system).
-- **Accent color**: still `#C8102E` FourlinQ red, but applied with Marvin-style restraint (hairlines + single CTA per fold + state markers, not as background blocks).
-- **Accessibility upgraded**: global `*:focus-visible` ring; `--ink-faint` bumped to AA-compliant `#767676`; skip-to-content link; `prefers-reduced-motion` honored; Escape-close on all modals/drawers. The v2.0 spec did not document these and the codebase did not implement them.
-- **Components**: 6 dead home components and 3 layout components removed (see [REDESIGN_ROADMAP §14](./REDESIGN_ROADMAP.md#14--implementation-log) for the full list). New editorial primitives live in [src/components/primitives/](../src/components/primitives/).
-
-The detailed v3.0 token spec (color ramps, type scale, spacing scale, motion curves, breakpoints, component conventions) lives in `REDESIGN_ROADMAP.md §13`. This document will be fully rewritten as v3.0 when the redesign branch merges; until then, the v2.0 content below remains the spec for `main`.
+The `## Brand Identity` section and below is retained as historical v2.0 reference; where it conflicts with the shipped tokens above or with `src/theme.config.ts`, the shipped tokens win.
 
 ---
 
