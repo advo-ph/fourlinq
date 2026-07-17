@@ -103,6 +103,13 @@ export const products: Product[] = [
     category: "doors",
     description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
+    // NOTE: do not swap this to a real photo in isolation. This card has a
+    // 28-frame hover animation (systemAnimations.ts) rendered from the same
+    // synthetic white-bg master, and the animation is what actually answers
+    // Imie's 2026-05-28 "looks like a two-panel fixed" — it plays closed→open,
+    // and she approved it at meeting 00:17:07. A real resting photo would jump
+    // to a synthetic render on hover. Replace the resting image only together
+    // with a re-rendered frame set.
     image: "/images/wp-export/slidingdoor.webp",
     specs: [
       "Multi-chamber uPVC profile",
