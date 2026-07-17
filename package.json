@@ -12,6 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "qa:visual": "node scripts/visual-qa.mjs",
+    "qa:a11y": "node scripts/rm17-a11y-scan.mjs",
+    "qa:viewport": "node scripts/rm5-viewport-scan.mjs",
     "audit:prod-surface": "node scripts/audit-prod-surface.mjs",
     "preview": "vite preview",
     "dev:api": "tsx watch server/index.ts",

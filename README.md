@@ -45,6 +45,8 @@ DATABASE_URL=your_neon_postgres_connection_string
 | `build` / `preview` | Production build / preview |
 | `typecheck` / `lint` / `test` | `tsc --build` / eslint / vitest |
 | `qa:visual` | Playwright visual-QA capture (`scripts/visual-qa.mjs`) |
+| `qa:a11y` | RM17 accessibility + fixed-layer scan (alt, control names, chat/banner overlap) |
+| `qa:viewport` | RM5 viewport-containment scan (no horizontal document overflow) |
 | `audit:prod-surface` | Read-only production-surface audit harness |
 | `deploy` / `deploy:status` / `deploy:log` | VPS deploy helpers (`deploy.sh`) |
 
