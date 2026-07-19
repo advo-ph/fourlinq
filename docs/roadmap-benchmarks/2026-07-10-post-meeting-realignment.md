@@ -217,6 +217,8 @@ Pass iff:
 - chat follows the documented delay/scroll reveal and never covers the active control;
 - reduced-motion and focus-visible behavior is verified on all interaction states.
 
+**Status (2026-07-18):** Tier-1 harness `scripts/rm17-a11y-scan.mjs` (`npm run qa:a11y`) lands and passes: 15 routes × mobile/desktop, asserting no `<img>` missing alt, no unnamed button/link, no fixed overlay winning the hit-test over a control, and the chat bubble not colliding with the cookie banner on a fresh visit. Red→green proven — strip the aluminium hero alt or pin the chat bubble's `bottom` and the scan fails; restore and it passes. Infra failures (server unreachable / app shell absent) exit 2, never masquerading as an a11y finding. The focus-visible ring (`src/index.css` global `*:focus-visible`) and blanket `prefers-reduced-motion: reduce` reset were already in place and verified; keyboard-trap and per-state focus review remain the Tier-2 manual portion.
+
 ### RM18 — Disclosed, source-grounded LinQ buyer assistance (Tier 1 + Tier 3)
 
 **Grounds:** meeting `00:27:51–00:28:46` asks what bias the AI has and how it answers “best uPVC”; current RAG inherits risky catalog claims.
