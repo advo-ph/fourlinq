@@ -87,15 +87,28 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Install prod deps + restart"
+          # tsx and typescript are RUNTIME dependencies: pm2 boots the app via
+          # node_modules/tsx/dist/cli.mjs (see ecosystem.config.cjs). They are
+          # in "dependencies" so --omit=dev cannot strip them.
+          #
+          # This step used to delete them (they were devDependencies) and then
+          # re-add them with `npm install --no-save tsx@4 typescript@5`. That
+          # re-install could land half-written — the tsx directory present but
+          # dist/cli.mjs missing — so the app crash-looped on ERR_MODULE_NOT_FOUND
+          # and the site served 502 while every step here reported success.
           $SSH "$VPS" "cd $REMOTE_DIR && npm ci --omit=dev --no-audit --no-fund"
-          # tsx/typescript live in devDependencies but the runtime needs them.
-          $SSH "$VPS" "cd $REMOTE_DIR && npm install --no-save --no-audit --no-fund tsx@4 typescript@5"
+          # Assert the boot entrypoint actually exists before restarting onto it.
+          # A present directory is NOT proof — check the file pm2 will execute.
+          $SSH "$VPS" "test -s $REMOTE_DIR/node_modules/tsx/dist/cli.mjs || { echo 'FATAL: tsx runtime incomplete — refusing to restart'; exit 1; }"
           $SSH "$VPS" "cd $REMOTE_DIR && pm2 startOrRestart ecosystem.config.cjs && pm2 save"
           echo "::endgroup::"
 
           echo "::group::Health check"
-          sleep 2
-          $SSH "$VPS" "curl -fsS http://localhost:3001/api/health" && echo
+          # scripts/verify-deploy.sh requires consecutive successes AND a pm2
+          # restart counter that stops climbing, so a boot loop fails the deploy
+          # instead of hiding inside it. Piped in rather than rsynced because
+          # scripts/ is excluded from the deploy payload above.
+          $SSH "$VPS" bash -s < scripts/verify-deploy.sh
           echo "::endgroup::"
 
           echo "Deployed ${{ github.sha }} → https://fourlinq.ph"
