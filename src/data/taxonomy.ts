@@ -69,7 +69,7 @@ export const SYSTEM_TYPE: SystemType[] = [
     type_code: "window",
     label: "Window Systems",
     description:
-      "uPVC and aluminium windows engineered for tropical performance — quiet, thermally efficient, corrosion-free.",
+      "Catalog group for casement, sliding, awning, and special-shape windows. Confirm the material and exact assembly per product.",
     item: ["Casement", "Sliding", "Awning", "Special Shapes"],
     filter: "windows",
     to: "/products?filter=windows",
@@ -79,7 +79,7 @@ export const SYSTEM_TYPE: SystemType[] = [
     type_code: "door",
     label: "Door Systems",
     description:
-      "From folding walls to large-span panels — doors that open a room to the outside.",
+      "Catalog group for sliding, folding, hinged, and large-panel door names. Confirm the operation and proposed assembly per opening.",
     item: ["Slide & Fold", "Large Panel", "Lift & Slide", "90 Series"],
     filter: "doors",
     to: "/products?filter=doors",
@@ -95,7 +95,7 @@ export const SYSTEM_TYPE: SystemType[] = [
     type_code: "specialist",
     label: "Specialist Systems",
     description:
-      "Custom geometry to architect drawings: arches, curtain walls, bespoke shapes.",
+      "Catalog group for arch, curtain-wall, and custom-shape names. Fabrication feasibility requires project review.",
     item: ["Arch", "Curtain Wall", "Custom Shapes"],
     filter: "specialist",
     to: "/products?filter=specialist",
@@ -122,7 +122,7 @@ export const PROFILE_MATERIAL: ProfileMaterial[] = [
     material_code: "upvc",
     label: "uPVC profile system",
     description:
-      "The default for most residential openings. Multi-chamber profile, steel-reinforced, corrosion-free.",
+      "Material path with client-supplied Veka and Skyframe profile names. Confirm the exact profile, reinforcement, and compatibility.",
     item: ["Veka — German profile", "Skyframe — Chinese profile"],
     to: "/why-upvc",
     image: "/images/wp-export/FourlinQ-Project-7.jpg",
@@ -131,7 +131,7 @@ export const PROFILE_MATERIAL: ProfileMaterial[] = [
     material_code: "aluminium",
     label: "Aluminium profile system",
     description:
-      "For bigger spans, thinner sightlines, and thermal control where uPVC is not enough.",
+      "Material path with client-supplied Thermal Break, Non-Thermal Break, and Alu Slim names. Confirm the exact profile and ratings.",
     item: [
       "Thermal Break",
       "Non-Thermal Break (Regular)",

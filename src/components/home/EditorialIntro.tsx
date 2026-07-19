@@ -9,7 +9,7 @@ const EditorialIntro = () => (
         Custom-made, to your specifications.
       </EyebrowHeading>
       <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.65]">
-        Every FourlinQ system is fabricated to your architect's drawings. Twelve finishes. uPVC and aluminium profiles. Backed by a 10-year limited warranty.
+        FourlinQ publishes custom-made window and door systems, uPVC and aluminium profile paths, and a twelve-entry uPVC finish library. Confirm the exact system and written warranty terms per order.
       </p>
       <div className="mt-10">
         <FeatureLink to="/why-upvc">Why uPVC</FeatureLink>

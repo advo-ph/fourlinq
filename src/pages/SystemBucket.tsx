@@ -144,11 +144,11 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
                 Every project starts with a conversation.
               </h2>
               <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] mb-10">
-                Bring your floor plan or just your questions. Ninety minutes with a FourlinQ engineer at one of our three showrooms across Metro Manila and Cebu.
+                Bring your floor plan or project questions. Contact FourlinQ first to confirm the relevant sample, location access, meeting format, and appointment time.
               </p>
               <div className="flex flex-wrap gap-x-8 gap-y-3 items-center">
                 <EditorialButton to="/brand#showrooms" variant="primary" size="lg">
-                  Visit a Showroom
+                  View locations
                 </EditorialButton>
                 <Link to="/brand#contact" className="text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin underline-offset-4 hover:underline">
                   Request a Quote →

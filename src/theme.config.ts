@@ -104,7 +104,7 @@ export const CHAT = {
   scrollThresholdToReveal: 120, // px — scroll distance before bubble qualifies for reveal
   suggestions: [
     "What systems do you offer?",
-    "Is uPVC good for typhoons?",
+    "How is storm performance verified?",
     "How do I request a quote?",
     "Tell me about your finishes",
   ],

@@ -1,5 +1,51 @@
 # FourlinQ production + Marvin comparison audit — 2026-07-10
 
+## Remediation evidence — 2026-07-18
+
+The July 10 production baseline remains historical evidence. A new 33-row Marvin-to-FourlinQ reconciliation was plotted in [Figma](https://www.figma.com/design/rkxrwBdudbFAg7L0OgcV8V) and checked against both current production and the local source. The first local checkpoint fixes the two critical San Lorenzo route rows as one implementation defect: American `aluminum` canonicalizes to the published British `aluminium` slug; partial CMS responses merge over verified fallback projects instead of replacing them; unknown slugs redirect only after the CMS request settles; and 1/2/3/5-photo gallery states have regression coverage. The second checkpoint repairs the buyer-decision lane: a failed Design Tool request cannot invent a reference or claim submission; modal, preview, FAQ disclosure, and chooser transitions have explicit keyboard/screen-reader state; the Brand page no longer labels brochure warranty bullets as certifications; the verified finish count is five solid plus seven wood-grain; and unverified compatibility, process, exclusion, and response-time promises are replaced with bounded confirmation language. The third checkpoint bounds warranty, care, architect, material, finish, legal, news, project, product, quote, and 404 content to available evidence; keeps unsupported product matrices empty through both fallback and DB routes; replaces stale knowledge passages with a fail-closed seeding contract; removes unsupported project taxonomy/location/performance presentation; and gives real reel media source-derived posters plus accessible motion controls. The fourth checkpoint hardens browser QA and the shared focus contract. The fifth runs the exact 33-row closure on mobile and desktop. The sixth isolates the embedded Design Tool from FourlinQ's cookie/navigation/footer/chat layers and gives its five-step flow grouped families, a compact auto-sized responsive preview, an honest glass state, and an explicit final action. Fresh local build, typecheck, lint, and test commands all exit 0 (89/89 tests); viewport, a11y, visual, and parity gates also exit 0. These checkpoints are not deployed, migration 013 has not been applied, and the production baseline below is intentionally unchanged.
+
+### Exact 33-row local closure
+
+“Green” below means the intended FourlinQ outcome is verified locally. It does **not** retroactively turn every historical Marvin depth score into a visual-clone PASS. FourlinQ keeps its own brand, local conversion model, real source inventory, and explicit no-invention boundary; content depth that requires client-approved products, documents, rights, or project facts remains source-blocked.
+
+| # | Matrix row | Local disposition | Closure evidence |
+|---:|---|---|---|
+| 1 | `shared-chrome` | Green adaptation | Lean Systems/projects/news/material/brand navigation, skip link, footer, chat, and accessible mobile dialog verified. |
+| 2 | `home` | Green adaptation | FourlinQ hero, category/benefit ordering, real media, reduced motion, and local CTA grammar retained. |
+| 3 | `product-hub` | Green, source-bounded | By type and By material stay orthogonal; unsupported specification depth is not invented. |
+| 4 | `product-window` | Green, source-bounded | Active state, cards, accessible product drawer, quote path, and empty-until-verified matrices pass. |
+| 5 | `product-door` | Green, source-bounded | Active state, cards, accessible product drawer, quote path, and empty-until-verified matrices pass. |
+| 6 | `product-specialist` | Accepted no-equivalent | Local specialist path remains functional and explicitly requires feasibility review. |
+| 7 | `product-alias-window` | Green | Canonicalizes to `?filter=windows`. |
+| 8 | `product-alias-door` | Green | Canonicalizes to `?filter=doors`. |
+| 9 | `product-alias-specialist` | Green | Canonicalizes to `?filter=specialist`. |
+| 10 | `news-index` | Green, source-bounded | No false links or fabricated publication dates; CMS/fallback date state is explicit. |
+| 11 | `warranty` | Green, source-bounded | Brochure scope is distinguished from full controlling terms; no invented process or exclusions. |
+| 12 | `project-index` | Green, source-bounded | Published archive remains browsable without invented category, attribution, or performance metadata. |
+| 13 | `project-detail-gallery-4` | Green | Five total photos, one active accessible image, and usable thumbnail/cursor behavior verified. |
+| 14 | `project-detail-gallery-2` | Green | Three total photos and the same gallery contract verified. |
+| 15 | `project-detail-gallery-1` | Green | Two total photos and the same gallery contract verified. |
+| 16 | `project-detail-gallery-0` | Green | Single-photo state renders without an empty thumbnail rail or fabricated media. |
+| 17 | `project-san-lorenzo-aluminium` | Green; critical fixed locally | Published British spelling reaches the project. |
+| 18 | `project-san-lorenzo-aluminum` | Green; same critical fixed locally | American spelling canonicalizes to the same published project. |
+| 19 | `architect-resource` | Green, source-bounded | Technical request intake is truthful; no fake CAD/BIM/specification library. |
+| 20 | `design-tool` | Accepted no-equivalent | Five-step visual brief works; only a server-confirmed reference can claim submission; embedded mode is chrome/cookie isolated, responsive, and has a visible final review action. |
+| 21 | `material-upvc` | Green adaptation | Brochure statements are separated from project-specific ratings and compatibility. |
+| 22 | `material-aluminium` | Green, source-bounded | Published system names remain; exact profiles, limits, options, ratings, and assets require confirmation. |
+| 23 | `brand` | Green adaptation | FourlinQ story, brochure summary, consultation, and location outcomes remain distinct from Marvin history/dealer depth. |
+| 24 | `brand-contact-anchor` | Green | `#contact` settles below fixed navigation on mobile and desktop. |
+| 25 | `brand-showroom-anchor` | Green | `#showrooms` settles below fixed navigation on mobile and desktop. |
+| 26 | `faq` | Accepted no-equivalent | Stable deep links, complete disclosure semantics, and bounded answers verified. |
+| 27 | `care` | Green, source-bounded | Conservative system-specific checklist replaces an invented manufacturer manual. |
+| 28 | `chooser` | Accepted no-equivalent | Focused three-question flow returns a non-authoritative starting direction. |
+| 29 | `finish` | Green, source-bounded | Verified five-solid/seven-wood-grain library is explicit; universal compatibility is not claimed. |
+| 30 | `legal-privacy` | Green | Current website behavior and data limits are described; active legal notice state verified. |
+| 31 | `legal-terms` | Green | Configurator/site limitations and controlling project documents are explicit; active state verified. |
+| 32 | `legal-cookies` | Green adaptation | First-party opt-in mechanism and preference reset are described; active state verified. |
+| 33 | `not-found` | Green | Recovery UI resolves locally and the Express wildcard contract returns HTTP 404. |
+
+Automated closure: `npm run qa:parity` passes all 33 rows at 390×844 and 1280×900. Supporting gates pass 20 rendered states × seven widths, 20 states × two accessibility viewports, three product aliases, nested focus states, fresh-session embed isolation, and 280 top/bottom screenshots. The original two CRITICAL rows are recorded as one fixed local defect, not two separate fixes.
+
 ## Decision
 
 FourlinQ does not primarily have a visual-design problem. The production site is already polished, editorial, image-led, and more animated than the reference in several places. Its urgent problem is that the buying structure is less clear than the spectacle around it.

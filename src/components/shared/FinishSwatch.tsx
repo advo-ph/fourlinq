@@ -6,6 +6,7 @@ interface FinishSwatchProps {
   finishType?: "solid" | "wood-grain";
   size?: "sm" | "md" | "lg";
   selected?: boolean;
+  decorative?: boolean;
   className?: string;
 }
 
@@ -21,6 +22,7 @@ const FinishSwatch = ({
   finishType,
   size = "md",
   selected = false,
+  decorative = false,
   className = "",
 }: FinishSwatchProps) => {
   const finish = FRAME_FINISHES.find((f) => f.id === finishId);
@@ -41,7 +43,8 @@ const FinishSwatch = ({
       {hasRealTexture && (
         <img
           src={finish.textureImagePath}
-          alt={finish.label}
+          alt={decorative ? "" : finish.label}
+          aria-hidden={decorative || undefined}
           className="absolute inset-0 w-full h-full object-cover"
         />
       )}

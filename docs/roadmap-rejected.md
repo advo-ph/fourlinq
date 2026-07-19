@@ -1,6 +1,6 @@
 # Roadmap rejected and triage log
 
-Last updated: 2026-07-10.
+Last updated: 2026-07-18.
 
 This file keeps rejected, stale, or blocked ideas from re-entering the roadmap as vague "maybe we should" work. Reopen an item only if the trigger changes.
 
@@ -66,3 +66,9 @@ These are real signals but not ready for implementation without data or a decisi
 | Item | Resolution | Active follow-through |
 |---|---|---|
 | `/products` material data model | The meeting clarified that durable browsing needs separate **By type** and **By material** paths; Aluminium should not remain the lone material beside type/family cards. Glass placement still requires client approval. | RM1–RM4 in `ROADMAP.md`. |
+| San Lorenzo project slug spelling | Resolved locally on 2026-07-18 by canonicalizing `aluminum` to the published `aluminium` route and preserving fallback project data during CMS merges. No migration or invented content was required. | Keep the alias and merge regression tests green; production proof follows deployment. |
+| Brand “certifications” framing | Resolved locally on 2026-07-18 by labeling the list as brochure-stated limited-warranty scope and explicitly stating that it is not third-party certification. | Publish named certifications only after the exact certificate and scope are verified. |
+| Design Tool offline false success | Resolved locally on 2026-07-18 by accepting only a server-confirmed success/reference. Failure remains unsent and visible; no browser-generated lead reference is created. | Keep failure-path regression tests green and prove the live endpoint after deployment. |
+| Unsupported legacy product/knowledge claim matrix | Resolved locally on 2026-07-18 by keeping unverified product arrays empty, making the API respect intentional empties, deactivating stale generated passages, and authoring a source-bounded reseed. | Review and apply migration 013, then run the bounded seeder and prove the live API/assistant. No production action occurred in this session. |
+| Project archive categories and unverified metadata | Category filtering/labels and unsupported location/performance claims were removed locally; the archive remains browsable without inventing a taxonomy. | Complete RM13 provenance registration and RM14 rights-cleared information modeling before restoring structured categories or client attribution. |
+| Browser-QA false passes on unreachable or blank pages | Resolved locally on 2026-07-18 by sharing one route/app-shell contract across viewport, a11y, visual, and parity scans. App findings exit 1; infra/incomplete evidence exits 2; browser cleanup runs in `finally`. | Keep the 20-state, three-alias, seven-width, interaction-state, and exact 33-row gates green; repeat against the served production bundle after deployment. |

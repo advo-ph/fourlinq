@@ -6,7 +6,7 @@ import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import ConsultationForm from "@/components/shared/ConsultationForm";
-import { certifications, CONTACT, BRANCHES, BRAND, phoneHref } from "@/data/brand";
+import { brandEvidence, CONTACT, BRANCHES, BRAND, phoneHref } from "@/data/brand";
 import { Phone, Mail, ArrowUpRight } from "lucide-react";
 
 const Brand = () => (
@@ -41,7 +41,7 @@ const Brand = () => (
             Our brand
           </p>
           <h1 className="font-serif font-normal tracking-tight text-white text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02]">
-            European engineering.
+            Custom systems. Clear source boundaries.
           </h1>
           <p className="mt-7 lg:mt-9 text-body-lg lg:text-lead text-white/80 max-w-[40rem] leading-[1.55]">
             {BRAND.promise}
@@ -50,7 +50,7 @@ const Brand = () => (
               it show for you?" The page never said what it was for. This states
               the job in the visitor's terms, using only what the page holds. */}
           <p className="mt-5 text-body text-white/60 max-w-[38rem] leading-[1.6]">
-            What we promise, what the warranty actually covers, and where you can put your hands on a full-scale system before you commit to one.
+            What the brochure promises, what its limited-warranty summary says, and where you can view FourlinQ systems and finish samples in person.
           </p>
         </div>
       </div>
@@ -76,7 +76,7 @@ const Brand = () => (
               {BRAND.heroQuote}
             </h3>
             <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] max-w-[34rem]">
-              {BRAND.promiseSupport} Every system is fabricated to the architect's specifications. No standard sizes off the shelf.
+              {BRAND.promiseSupport} FourlinQ's verified brochure describes custom-made windows and doors to customer specifications; the quotation must identify the exact profile, options, and project limits.
             </p>
           </div>
         </article>
@@ -89,10 +89,10 @@ const Brand = () => (
         >
           <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Finishes</p>
           <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1] transition-colors duration-300 ease-marvin group-hover:text-[color:var(--accent)]">
-            Twelve total.
+            Twelve uPVC finishes.
           </h3>
           <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
-            Six solid colors and six wood-grain laminates, heat-fused into the profile.
+            Five solid colors and seven wood-grain options in the verified finish library.
           </p>
           <span className="mt-6 inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)]">
             See all twelve
@@ -102,15 +102,15 @@ const Brand = () => (
 
         {/* Bottom-right card — jumps to the showroom addresses further down. */}
         <a
-          href="#contact"
+          href="#showrooms"
           className="group lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
         >
-          <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Showrooms</p>
+          <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Published locations</p>
           <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1] transition-colors duration-300 ease-marvin group-hover:text-[color:var(--accent)]">
             Manila and Cebu.
           </h3>
           <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
-            Walk through full-scale systems with our consultants. Frames you can open, finishes you can touch, hardware that's already in your wall.
+            View FourlinQ systems and physical finish samples before your project is quoted.
           </p>
           <span className="mt-6 inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)]">
             Get the addresses
@@ -155,23 +155,23 @@ Year limited warranty.
       </div>
     </Section>
 
-    {/* Certifications */}
+    {/* Brochure warranty summary — not presented as third-party certification. */}
     <Section id="certifications" tone="soft" size="lg" className="scroll-mt-28">
       <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-12 lg:mb-16">
         <div className="lg:col-span-5">
-          <EyebrowHeading eyebrow="Trust" level={2} align="left">
-            Certifications & standards.
+          <EyebrowHeading eyebrow="Brochure summary" level={2} align="left">
+            Limited-warranty scope.
           </EyebrowHeading>
         </div>
         <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
-          Every FourlinQ system is engineered, fabricated, and installed against the standards listed below. The certifications hold whether your project is a private residence or a commercial fitout.
+          These are the warranty statements in FourlinQ's verified brochure source. They are not third-party certifications. Ask for the current signed warranty terms before ordering; those terms govern the exact coverage and exclusions.
         </p>
       </div>
       <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-        {certifications.map((cert) => (
-          <li key={cert.name} className="border-t border-[color:var(--rule-soft)] pt-5">
+        {brandEvidence.map((evidence) => (
+          <li key={evidence.name} className="border-t border-[color:var(--rule-soft)] pt-5">
             <p className="text-body-sm font-medium text-[color:var(--ink-primary)] leading-snug">
-              {cert.name}
+              {evidence.name}
             </p>
           </li>
         ))}
@@ -186,7 +186,7 @@ Year limited warranty.
             Start with a conversation.
           </EyebrowHeading>
           <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[28rem] leading-[1.65]">
-            Tell us about your project in four quick questions. A FourlinQ engineer will respond within one business day to schedule your ninety-minute showroom visit.
+            Tell us about your project in six short steps. FourlinQ will use your answers to route the request; the team will confirm the response time and meeting format directly.
           </p>
 
           <ul className="mt-10 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
@@ -204,7 +204,7 @@ Year limited warranty.
     <Section id="showrooms" tone="soft" size="lg" className="scroll-mt-28">
       <div className="grid lg:grid-cols-[1fr,auto] items-end gap-8 mb-12 lg:mb-16">
         <EyebrowHeading eyebrow="Where to find us" level={2}>
-          Three showrooms across the Philippines.
+          Three published locations.
         </EyebrowHeading>
       </div>
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">

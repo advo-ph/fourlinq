@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-07-10** (post-meeting production/Marvin realignment; the July 5 four-card build shipped and is now superseded as the final taxonomy by Tita's By type + By material direction.)
+**Last updated: 2026-07-18** (full Marvin parity audit and local remediation checkpoints; no deployment is implied.)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -14,6 +14,20 @@ For a record of what has actually changed and when, see [CHANGELOG.md](./CHANGEL
 - **Deploy:** push to `main` auto-deploys to the advo VPS via GitHub Actions (`.github/workflows/deploy.yml`, pm2-managed). `./deploy.sh` is the underlying rsync helper. All branches were consolidated into `main` on 2026-06-21 (the old `cms-rag-multiuser` / `supafinal` / `codex/tesla-marvin-design` deploy/work branches were merged and deleted).
 - **Vercel:** `vercel.json` was removed from the repo, but the **Vercel GitHub integration is still active** — it auto-deploys a preview on every PR (two projects: `fourlinq` and `fourlinq2` on a separate account). Not the production path (that's the VPS), but it should be reconciled or disconnected. *(The earlier "removed entirely" note was inaccurate.)*
 - **Client status:** Hero remains *"Built to Last. Designed to Inspire."* The requested meeting occurred. The immediate direction is to fix website organization before new proposals: put categories before benefits, separate browsing By type from By material, make uPVC/Aluminium/Glass discoverable, and stop publishing unverified product/options/resource claims. See the 2026-07-10 refresh below.
+- **Parity remediation:** The 2026-07-18 Figma build reference reconciles all 33 audited route/state rows. Checkpoints 1–6 are green locally: critical routing/CMS/gallery behavior is repaired; buyer-decision and trust-content lanes are source-bounded; custom dialogs have a complete focus contract; fail-closed QA covers public states; all 33 approved rows resolve on mobile and desktop; and the Design Tool embed is isolated, compact, responsive, and actionable. This is outcome parity with explicit FourlinQ adaptations, not a Marvin skin clone. Production remains unchanged until review and deployment.
+
+---
+
+## 2026-07-18 parity remediation status
+
+| Checkpoint | Local status | Evidence | Production status |
+|---|---|---|---|
+| Project detail and CMS fallback | Green | `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` all exit 0; 56/56 tests | Not deployed |
+| Brand, FAQ, chooser, and configurator | Green | Full gate exits 0; 61/61 tests; failed save cannot produce a reference | Not deployed |
+| Trust content, public catalog, and knowledge boundary | Green locally | Full gate exits 0; 89/89 tests; migration 013 and safe seeder authored but not applied | Production catalog remains pre-remediation |
+| QA infrastructure and interaction-state proof | Green locally | 20 states × 7 widths; 20 × 2 a11y; 280 screenshots; infra negative control exits 2 | Not deployed |
+| Exact comparison-matrix closure | Green locally | `npm run qa:parity`: 33 rows × mobile/desktop | Not deployed |
+| Design Tool embed and final-action polish | Green locally | Cookie/nav/footer/chat isolation; grouped family controls; responsive preview; visible final review action | Not deployed |
 
 ---
 
@@ -121,7 +135,7 @@ Four full-bleed **photo-cards** in a row, each a real project photo + name + ite
 | **RM2 — Orthogonal catalog taxonomy** | Current Window/Door/Specialist/Aluminium peer set mixes type/family with material and has no proper Glass placement | ~1–2d after RM1 | **RM2** | Blocked on RM1 + Glass decision |
 | **RM3 — Category-first homepage** | Products begin only after the hero and a 500vh benefits sequence, directly contradicting the meeting | ~0.5–1d | **RM3** | Planned after RM2 |
 | **RM4 — One taxonomy across nav/home/products/footer** | Five public discovery surfaces currently disagree | ~0.5–1d after RM2 | **RM4** | Planned after RM2 |
-| **RM5 — Public viewport containment** | FAQ expands to 919px at phone/tablet; Design Tool expands to 404px at 390px | ~0.5–1d | **RM5** | Planned |
+| **RM5 — Public viewport containment** | FAQ expands to 919px at phone/tablet; Design Tool expands to 404px at 390px | ~0.5–1d | **RM5** | Green locally 2026-07-18; deployment proof pending |
 | **RM6 — Consent-enforced analytics** | Analytics fires before Accept/Decline and ignores Decline, contradicting the legal promise | ~0.5–1d | **RM6** | Planned |
 | **RM7 — Claim/warranty/finish/resource source registry** | Conflicting finish counts plus unsourced span, dB, storm, UV life, certification, warranty, brochure, CAD, and BIM language | ~1–2d + client sources | **RM7** | Blocked on source pack/client approval |
 | **RM8 — Documentation reality sync** | README, DESIGN_SYSTEM, old roadmap phases, and source reality disagree on deploy, fonts, routes, and shipped work | ~0.5–1d | **RM8** | Planned |
@@ -143,7 +157,7 @@ Four full-bleed **photo-cards** in a row, each a real project photo + name + ite
 | Item | What it closes | Effort | Benchmark | Status |
 |---|---|---:|---|---|
 | **RM16 — Product navigation + guided browse** | Text-only mixed-axis mega-menu lacks task-led By type / By material hierarchy | ~1–2d after RM2/RM4 | **RM16** | Blocked on RM2/RM4 |
-| **RM17 — Accessibility + fixed-layer QA** | Empty-alt animation layers and always-visible chat/banner layers obscure active controls | ~1–2d | **RM17** | Planned |
+| **RM17 — Accessibility + fixed-layer QA** | Empty-alt animation layers and always-visible chat/banner layers obscure active controls | ~1–2d | **RM17** | Green locally 2026-07-18; deployment/manual AT proof pending |
 | **RM18 — Disclosed, source-grounded LinQ assistance** | “Best uPVC” and bias/objectivity behavior cannot be trusted while its catalog sources are risky | ~1–2d after RM1/RM7 | **RM18** | Blocked on RM1/RM7 + policy decision |
 
 ### Release order
@@ -180,12 +194,12 @@ These are real product/backend issues, not just taste.
 
 | Item | What it closes | Effort | Benchmark | Status |
 |---|---|---|---|---|
-| **Product detail API parity** (`GET /api/products/:slug` respects editable `finish_labels`, `glass_labels`, `spec_labels`) | List endpoint honors CMS edits, single-product endpoint still reads join tables; product drawer/detail can show stale specs after admin edits | ~0.5 day | **B6** | Planned |
-| **Hardcoded internal route audit** for chat/page-map/knowledge links | Runtime content references `/window-systems`, `/door-systems`, `/specialist-systems`, but the router does not define them | ~0.5 day | **B7** | Planned |
-| **Design Tool save failure state** | The UI can imply a quote request was saved even if `/api/save-configuration` fails | ~0.5 day | **B8** | Planned |
+| **Product detail API parity** (`GET /api/products/:slug` respects editable `finish_labels`, `glass_labels`, `spec_labels`) | List endpoint honors CMS edits, single-product endpoint still reads join tables; product drawer/detail can show stale specs after admin edits | ~0.5 day | **B6** | Resolved locally 2026-07-18; deployment proof pending |
+| **Hardcoded internal route audit** for chat/page-map/knowledge links | Runtime content references `/window-systems`, `/door-systems`, `/specialist-systems`, but the router does not define them | ~0.5 day | **B7** | Resolved locally 2026-07-18; deployment proof pending |
+| **Design Tool save failure state** | The UI can imply a quote request was saved even if `/api/save-configuration` fails | ~0.5 day | **B8** | Resolved locally 2026-07-18; deployment proof pending |
 | **CMS page-field clarity** | Admin Pages expose hero fields that public pages currently ignore, inviting edits that appear to do nothing | ~0.5 day | **B9** | Planned |
-| **Finish-count consistency** | Copy and data drift between 11 and 12 finishes; this is exactly the kind of small product-detail mismatch clients notice | ~0.5 day | **B10** | Planned |
-| **Unverified numeric-claim sweep** on `/why-upvc` and benefit data | Past restraint pass removed unsupported stats, but numeric claims reappear in copy/data without source labels | ~0.5 day | **B11** | Planned |
+| **Finish-count consistency** | Copy and data drift between 11 and 12 finishes; this is exactly the kind of small product-detail mismatch clients notice | ~0.5 day | **B10** | Resolved locally 2026-07-18; deployment proof pending |
+| **Unverified numeric-claim sweep** on `/why-upvc` and benefit data | Past restraint pass removed unsupported stats, but numeric claims reappear in copy/data without source labels | ~0.5 day | **B11** | Resolved locally 2026-07-18; client-source/deployment proof pending |
 
 ### P2 — Design polish with measurable acceptance
 
@@ -196,7 +210,7 @@ These are the current design objections translated into pass/fail checks.
 | **Hero first-paint and CTA decision** | Current hero has no poster/caption, preloads a large video, and still uses two button CTAs. It can look too centered/tall depending on slide/video and viewport | ~0.5-1 day | **B12** | Planned |
 | **Tablet nav and mega-menu keyboard support** | Desktop nav starts at 992px, a historically weak range; Systems dropdown is hover-driven and not keyboard-complete | ~1 day | **B13** | Planned |
 | **Reduced-motion and data-budget path for frame-heavy home** | Home can load hero video plus scroll/system frame sequences; reduced-motion currently needs a proof path, not hope | ~1 day | **B14** | Planned |
-| **Home Design Tool preview restraint pass** | The preview uses rounded/shadowed card chrome that clashes with the editorial restraint rules | ~0.5 day | **B15** | Planned |
+| **Home Design Tool preview restraint pass** | The preview uses rounded/shadowed card chrome that clashes with the editorial restraint rules | ~0.5 day | **B15** | Resolved locally 2026-07-18; deployment proof pending |
 | **Homepage What's New rule** | Home intentionally filters to event/press, which can omit the latest product/project updates Tita asked for | ~0.5 day | **B16** | Planned |
 
 ### P3 — Product/content depth once assets exist

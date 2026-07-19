@@ -15,7 +15,7 @@ const BrandCTA = () => (
         Our Story
       </EditorialButton>
       <EditorialButton to="/brand#showrooms" variant="ghost" size="md" className="w-auto text-white hover:text-white">
-        Visit a Showroom
+        View locations
       </EditorialButton>
     </div>
   </div>

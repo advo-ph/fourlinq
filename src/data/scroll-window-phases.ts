@@ -29,8 +29,8 @@ export const SCROLL_PHASES: ScrollPhase[] = [
     mode: "auto-play",
     text: {
       eyebrow: "Weather Resistance",
-      headline: "Zero leaks through the frame.",
-      body: "Each joint uses EPDM rubber gaskets and built-in drainage channels that route water out before it reaches the interior. Tested against Signal No. 3 conditions.",
+      headline: "Brochure-listed weather features.",
+      body: "The verified brochure lists EPDM gaskets for air and water tightness plus drainage holes. This site does not publish a system-specific wind or rain test rating.",
     },
   },
   {
@@ -40,8 +40,8 @@ export const SCROLL_PHASES: ScrollPhase[] = [
     mode: "auto-play",
     text: {
       eyebrow: "Thermal Insulation",
-      headline: "Keeps heat on the outside.",
-      body: "The frame has multiple air chambers inside that slow down heat transfer. In a concrete building under direct sun, that means your AC runs less to hold the same temperature.",
+      headline: "A multi-chamber profile.",
+      body: "The brochure describes a multi-chamber profile for heat insulation and energy savings. Ask for the exact proposed assembly and verified thermal value before modeling performance.",
     },
   },
   {
@@ -51,8 +51,8 @@ export const SCROLL_PHASES: ScrollPhase[] = [
     mode: "auto-play",
     text: {
       eyebrow: "Sound Reduction",
-      headline: "You hear less of what's outside.",
-      body: "Sealed uPVC frames paired with thick glass reduce noise by up to 40 dB. Street traffic, construction, neighbors. Enough difference that you notice it the first time you close the window.",
+      headline: "Brochure-listed sound insulation.",
+      body: "The brochure lists sound insulation and 6–12 mm glazing options. This site does not publish a tested decibel reduction for a specific profile, glass, hardware, and installation.",
     },
   },
 ];
@@ -85,8 +85,8 @@ export const THERMAL_SYSTEMS: ThermalSystem[] = [
     label: "uPVC System",
     text: {
       eyebrow: "Thermal Insulation",
-      headline: "Keeps heat on the outside.",
-      body: "The frame has multiple air chambers inside that slow down heat transfer. In a concrete building under direct sun, that means your AC runs less to hold the same temperature.",
+      headline: "A multi-chamber profile.",
+      body: "The brochure describes a multi-chamber uPVC profile for heat insulation. Ask for the exact proposed assembly and verified thermal value before comparing systems.",
     },
     image: null,
   },
@@ -95,8 +95,8 @@ export const THERMAL_SYSTEMS: ThermalSystem[] = [
     label: "Aluminium Thermal Break System",
     text: {
       eyebrow: "Thermal Break Technology",
-      headline: "Keeps heat on the outside.",
-      body: "The system uses internal and external aluminium profiles divided by a polyamide thermal break. This barrier reduces direct heat transfer, so the inner side of the frame stays cooler even when the outside surface is exposed to sun.",
+      headline: "A client-supplied system name.",
+      body: "FourlinQ lists a Thermal Break aluminium system. The public source does not include its exact section, separator material, thermal value, compatibility, or test report; request those for the proposed profile.",
     },
     image: "/images/thermal-alu-break.webp",
   },

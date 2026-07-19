@@ -17,9 +17,9 @@ const Finishes = () => (
   <Layout>
     <PageHeader
       eyebrow="The catalog"
-      title="Twelve finishes. One window."
+      title="Twelve finishes in the uPVC library."
       breadcrumbLabel="Finishes"
-      subtitle="Each FourlinQ system is available in twelve brochure-verified finishes — seven wood-grain laminates and five solid colors."
+      subtitle="The verified physical-sample data contains seven wood-grain and five solid uPVC finishes. This page does not promise that every finish is available on every profile, product, or order."
     />
 
     {/* The twelve finishes — static grid. No interaction. */}
@@ -65,13 +65,13 @@ const Finishes = () => (
         </div>
         <div className="space-y-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.7] max-w-[40rem]">
           <p>
-            Other brands offer hundreds of swatches and call it choice. We chose twelve, selected against European fenestration standards for colorfastness and grain quality, then validated against tropical sun and salt-air conditions.
+            These twelve entries come from FourlinQ's recorded physical uPVC sample bars. The source set supports the names, categories, and sample appearance; it does not include a published colorfastness test, salt-air validation, or universal compatibility matrix.
           </p>
           <p>
-            The seven wood-grain laminates are heat-fused (not painted or printed), so they don't peel, chip, or fade. The five solid finishes use UV-stabilized pigments that hold their color through 25 years of tropical sun.
+            On-screen swatches and texture photos vary by display, lighting, crop, and source image. Confirm a current physical sample, coating or laminate identifier, profile compatibility, and availability before approving a finish.
           </p>
           <p>
-            Every finish is brochure-verified. If you see it here, you can order it.
+            Aluminium uses a separate four-color powder-coat list on the Aluminium page. Do not carry a uPVC finish selection across to aluminium without FourlinQ's written confirmation.
           </p>
         </div>
       </div>
@@ -92,7 +92,7 @@ const Finishes = () => (
           </li>
           <li>
             <Link to="/brand#showrooms" className="group flex items-center justify-between gap-4 py-4 text-white hover:text-[color:var(--accent)] transition-colors duration-300">
-              <span className="text-body-lg font-medium">Visit a showroom for physical samples</span>
+              <span className="text-body-lg font-medium">Ask to view current physical samples</span>
               <ArrowRight size={18} strokeWidth={1.5} className="group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
           </li>

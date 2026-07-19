@@ -24,7 +24,7 @@ const stats = [
   },
   {
     value: locationCount,
-    label: "Showrooms across Metro Manila and Cebu",
+    label: "Published FourlinQ locations",
   },
   {
     value: 10,
@@ -38,10 +38,10 @@ const AuthorityStrip = () => (
       <div>
         <p className="eyebrow mb-5">Made for the climate</p>
         <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
-          European engineering, fabricated for tropical climate.
+          A source-bounded uPVC summary.
         </h2>
         <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-[34rem]">
-          Multi-chamber uPVC profiles built to European fenestration standards, then custom-fabricated in our Manila workshop to your architect's drawings. Twelve finishes. Installed by our own team.
+          FourlinQ's verified brochure lists multi-chamber profiles, custom fabrication, twelve uPVC finishes, and a 10-year limited-warranty summary. Exact product evidence and terms require confirmation.
         </p>
         <Link
           to="/why-upvc"

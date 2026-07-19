@@ -54,7 +54,7 @@ const projectEntity: EntityConfig = {
     { column: "quote_attribution", label: "Quote attribution", type: "text" },
     { column: "display_order", label: "Display order", type: "number", default: 999 },
     { column: "is_featured", label: "Featured", type: "boolean" },
-    { column: "is_published", label: "Published", type: "boolean", default: true },
+    { column: "is_published", label: "Published", type: "boolean", default: false },
   ],
 };
 

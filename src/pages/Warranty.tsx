@@ -17,9 +17,9 @@ const Warranty = () => (
   <Layout>
     <PageHeader
       eyebrow="The promise"
-      title="A 10-year limited warranty, written down."
+      title="The brochure states a 10-year limited warranty."
       breadcrumbLabel="Warranty"
-      subtitle="Every FourlinQ window and door is backed by a 10-year limited warranty covering the system's structural performance, weather resistance, and finish integrity."
+      subtitle="This page summarizes the four scope labels in FourlinQ's verified brochure. It is not the full warranty, and it does not add coverage, exclusions, remedies, or service timelines that are absent from the source."
     />
 
     <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
@@ -28,7 +28,7 @@ const Warranty = () => (
         <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-20 lg:mb-28">
           <div className="lg:col-span-7">
             <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
-              A FourlinQ system is engineered to last decades. The 10-year limited warranty is our way of putting that engineering in writing. And we stand behind it long after the install crew has gone home.
+              FourlinQ's brochure names a 10-year limited warranty and four scope areas. Before ordering, ask for the current written terms for your exact system and compare them with the quotation. Those documents—not this web summary—define the warranty.
             </p>
           </div>
           <div className="lg:col-span-4 lg:col-start-9">
@@ -59,7 +59,7 @@ const Warranty = () => (
         <div className="border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 mb-24 lg:mb-32">
           <p className="eyebrow mb-5">What's covered</p>
           <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)] mb-12 lg:mb-16 max-w-3xl">
-            Four areas, no surprises.
+            Four brochure-listed areas.
           </h2>
 
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-14 lg:gap-y-20">
@@ -85,7 +85,7 @@ const Warranty = () => (
                     {scope}
                   </h3>
                   <p className="text-body-sm text-[color:var(--ink-secondary)] leading-[1.65] max-w-md">
-                    {scopeDescriptions[scope] || "Covered for the full 10-year limited warranty term."}
+                    {scopeDescription[scope] || "Listed in the brochure warranty summary. Ask for the current written definition and conditions."}
                   </p>
                 </li>
               );
@@ -97,32 +97,32 @@ const Warranty = () => (
         <div className="border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 mb-24 lg:mb-32">
           <div className="grid lg:grid-cols-12 gap-x-8 gap-y-8">
             <div className="lg:col-span-4">
-              <p className="eyebrow mb-3">The honest part</p>
+              <p className="eyebrow mb-3">What is not published here</p>
               <h2 className="font-serif text-h3 lg:text-h2 leading-[1.1] tracking-tight text-[color:var(--ink-primary)]">
-                What the warranty doesn't cover.
+                The full terms and exclusions.
               </h2>
             </div>
             <div className="lg:col-span-7 lg:col-start-6">
               <ul className="space-y-5 text-body text-[color:var(--ink-secondary)] leading-[1.65]">
                 <li className="flex gap-4">
                   <span className="text-[color:var(--ink-faint)] font-serif shrink-0 w-8">—</span>
-                  <span>Damage from impact, modification, or installation by anyone other than a FourlinQ-authorized team.</span>
+                  <span>Which products, components, finishes, glass, hardware, labor, and project conditions are eligible.</span>
                 </li>
                 <li className="flex gap-4">
                   <span className="text-[color:var(--ink-faint)] font-serif shrink-0 w-8">—</span>
-                  <span>Cosmetic wear that doesn't affect structural performance, like minor surface scuffs from cleaning equipment or hardware patina from repeated use.</span>
+                  <span>When coverage begins, whether registration is required, whether it can transfer, and what records must be kept.</span>
                 </li>
                 <li className="flex gap-4">
                   <span className="text-[color:var(--ink-faint)] font-serif shrink-0 w-8">—</span>
-                  <span>Failures caused by structural movement of the building itself, or by glazing replaced with third-party glass.</span>
+                  <span>The exclusions, limits, required maintenance, claim evidence, inspection process, remedy, and who pays associated costs.</span>
                 </li>
                 <li className="flex gap-4">
                   <span className="text-[color:var(--ink-faint)] font-serif shrink-0 w-8">—</span>
-                  <span>Damage from natural events that exceed engineered design loads (typhoon Category 5 sustained winds, direct seismic foundation movement).</span>
+                  <span>Any system-specific performance rating or warranty condition that may differ from the brochure summary.</span>
                 </li>
               </ul>
               <p className="mt-8 text-body-sm text-[color:var(--ink-muted)] italic leading-[1.65]">
-                Full terms ship with every order. Printed, signed, and dated. We'll walk you through them at the showroom.
+                This site does not currently host a verified warranty document. Request the current copy and keep the version that accompanies your signed order.
               </p>
             </div>
           </div>
@@ -132,11 +132,11 @@ const Warranty = () => (
         <div className="border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 mb-24 lg:mb-32">
           <p className="eyebrow mb-3">How it works</p>
           <h2 className="font-serif text-h3 lg:text-h2 leading-[1.1] tracking-tight text-[color:var(--ink-primary)] mb-10 lg:mb-14">
-            Three steps. No paperwork burden.
+            Three steps before you rely on it.
           </h2>
 
           <ol className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
-            {STEPS.map(({ step, title, body, photo }) => (
+            {warrantyStep.map(({ step, title, body, photo }) => (
               <li key={step}>
                 {photo && (
                   <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)] mb-6">
@@ -167,27 +167,27 @@ const Warranty = () => (
         <div className="border-t border-[color:var(--rule-soft)] pt-16 lg:pt-20 mb-24 lg:mb-32">
           <div className="grid lg:grid-cols-12 gap-x-8 gap-y-8 items-end">
             <div className="lg:col-span-7">
-              <p className="eyebrow mb-3">Why we can stand behind it</p>
+              <p className="eyebrow mb-3">What this page can verify</p>
               <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
-                European-spec systems, fabricated for Philippine conditions.
+                A bounded public summary.
               </h2>
               <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] max-w-xl">
-                The warranty isn't a marketing decision. It's the number that matches what we've seen across FourlinQ installations in Metro Manila, Cebu, Tagaytay, and the coast. Profiles that look the same after a decade of sun. Hardware that still operates smoothly after a thousand monsoons.
+                The public source supports the 10-year label and four scope names. It does not support a universal performance promise, a service deadline, or a complete legal interpretation. FourlinQ should confirm those details in writing for the selected system.
               </p>
             </div>
             <div className="lg:col-span-4 lg:col-start-9">
               <ul className="space-y-6">
                 <li>
-                  <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">11</p>
-                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Brochure-verified finishes</p>
+                  <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">12</p>
+                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">uPVC finishes in the verified library</p>
                 </li>
                 <li className="border-t border-[color:var(--rule-soft)] pt-6">
-                  <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">4</p>
-                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Showrooms across Metro Manila and Cebu</p>
+                  <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">3</p>
+                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Published FourlinQ locations</p>
                 </li>
                 <li className="border-t border-[color:var(--rule-soft)] pt-6">
                   <p className="font-serif text-h2 lg:text-h1 leading-none text-[color:var(--ink-primary)] tracking-tight">10</p>
-                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Year standard system warranty</p>
+                  <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] uppercase tracking-[0.1em]">Year limited-warranty brochure label</p>
                 </li>
               </ul>
             </div>
@@ -200,14 +200,14 @@ const Warranty = () => (
             <div className="lg:col-span-7">
               <p className="eyebrow mb-4">Next</p>
               <h2 className="font-serif text-h2 lg:text-h1 tracking-tight text-[color:var(--ink-primary)] leading-[1.05] mb-6">
-                Walk into a showroom. See the warranty in person.
+                Ask to review the current terms.
               </h2>
               <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] mb-10">
-                The fastest way to feel confident about a 10-year promise is to feel a 10-year-old FourlinQ window in your hands. There's one at every showroom, installed back when we were founding the company.
+                Contact FourlinQ before ordering and ask for the exact warranty document tied to the proposed system. A visit to a confirmed location can help you inspect available systems and samples, but it does not replace written terms.
               </p>
               <div className="flex flex-wrap gap-x-8 gap-y-3 items-center">
                 <EditorialButton to="/brand#showrooms" variant="primary" size="lg">
-                  Visit a Showroom
+                  View locations
                 </EditorialButton>
                 <Link to="/why-upvc" className="text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin underline-offset-4 hover:underline">
                   Why uPVC →
@@ -236,40 +236,41 @@ const Warranty = () => (
 const scopePhoto: Record<string, { src: string; alt: string }> = {
   "Corrosion resistance": {
     src: "/images/wp-export/Corrosion-Resistance.jpg",
-    alt: "uPVC profile demonstrating corrosion resistance",
+    alt: "Brochure image associated with corrosion resistance",
   },
   "Long lasting performance": {
     src: "/images/wp-export/Stainless-Mechanism-e1568775693636.jpg",
-    alt: "FourlinQ stainless steel operating hardware",
+    alt: "Close-up of operating hardware from the FourlinQ image library",
   },
   "Weather resistance": {
     src: "/images/wp-export/Air-Water-Tight.jpg",
-    alt: "Air and water tight EPDM gasket assembly on FourlinQ profile",
+    alt: "Brochure image of a gasket and profile assembly",
   },
   "Sound insulation": {
     src: "/images/wp-export/Sound-Insulation.jpg",
-    alt: "Sound-insulating multi-chamber uPVC profile assembly",
+    alt: "Brochure image associated with sound insulation",
   },
 };
 
-// Short descriptions per warranty scope, sourced from BRAND.warrantyScope semantics.
-const scopeDescriptions: Record<string, string> = {
+// The brochure supplies only these scope labels. The descriptions below keep
+// that boundary visible and do not infer legal coverage.
+const scopeDescription: Record<string, string> = {
   "Corrosion resistance":
-    "uPVC profiles never rust or corrode. Multi-chamber design, galvanized-steel reinforcement, and EPDM gaskets are warranted against material degradation through the full term.",
+    "Listed in the brochure warranty summary. Ask which material, component, environment, and remedy the current written terms cover.",
   "Long lasting performance":
-    "Operating hardware (hinges, rollers, locks, handles) engineered for decades of daily use. Covered against mechanical failure under normal residential operation.",
+    "Listed in the brochure warranty summary. Ask how performance is measured and which profile, hardware, glass, finish, labor, and maintenance conditions apply.",
   "Weather resistance":
-    "Sealed against monsoon rain, salt-air corrosion, and the daily thermal cycling of the Philippine climate. Covered against air-water-wind penetration that arises from the system itself, not from building movement.",
+    "Listed in the brochure warranty summary. Ask for the tested system rating, installation conditions, exclusions, and claim evidence for the proposed opening.",
   "Sound insulation":
-    "Multi-chamber profiles plus 6–12 mm glazing options reduce exterior noise. Covered against acoustic degradation of the seal assembly through the warranty term.",
+    "Listed in the brochure warranty summary. It is not a published decibel guarantee; ask for the exact glazing and system evidence before relying on an acoustic target.",
 };
 
-// Three steps with contextual photos
-const STEPS = [
+// Three verification steps with contextual photos.
+const warrantyStep = [
   {
     step: "01",
-    title: "Installed",
-    body: "When the FourlinQ team finishes your install, the warranty period begins automatically. Your project file is logged in our database; you don't need to do anything.",
+    title: "Request the terms",
+    body: "Ask FourlinQ for the current warranty document before you approve the order. Confirm the version date and the legal or business name issuing it.",
     photo: {
       src: "/images/wp-export/Casement-Window.jpg",
       alt: "A finished FourlinQ casement window installation",
@@ -277,8 +278,8 @@ const STEPS = [
   },
   {
     step: "02",
-    title: "Recorded",
-    body: "We send you a signed warranty certificate by email and post within fourteen days. Keep it with your house papers. Or call us if you can't find it. We have the record.",
+    title: "Match the system",
+    body: "Check that the quoted profile, glass, hardware, finish, installation scope, project location, and any registration requirement match the written terms.",
     photo: {
       src: "/images/wp-export/Black-Profile.jpg",
       alt: "FourlinQ profile finish detail",
@@ -286,8 +287,8 @@ const STEPS = [
   },
   {
     step: "03",
-    title: "Honored",
-    body: `If anything covered by the warranty fails within ten years, call ${CONTACT.mobileAssist} or email ${CONTACT.email}. We'll schedule a site visit within a week and resolve it at no cost.`,
+    title: "Keep the record",
+    body: `Keep the signed order, warranty version, invoices, and handover records. For a possible claim, contact ${CONTACT.mobileAssist} or ${CONTACT.email} and ask for the current process before arranging repair work.`,
     photo: {
       src: "/images/wp-export/Stainless-Mechanisms.jpg",
       alt: "FourlinQ stainless steel mechanism close-up",

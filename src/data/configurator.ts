@@ -1,7 +1,6 @@
-// Configurator data — derived from verified fourlinq-data.ts
-// Glass options are kept locally (not in brochure data)
-import { FRAME_FINISHES, DIMENSION_CONSTRAINTS } from "./fourlinq-data";
-import type { WindowType } from "./fourlinq-data";
+// Configurator data — derived from verified fourlinq-data.ts.
+// No product-specific glass matrix is published, so glass stays confirmation-only.
+import { FRAME_FINISHES } from "./fourlinq-data";
 
 export interface ProductType {
   id: string;
@@ -49,7 +48,7 @@ export const productTypes: ProductType[] = [
   { id: "custom-shapes", name: "Custom Shapes", icon: "custom-shapes", category: "specialist" },
 ];
 
-// 11 verified finishes from physical uPVC profile sample bars
+// 12 verified entries from physical uPVC profile sample bars
 // Mapped from FRAME_FINISHES canonical source
 export const finishOptions: FinishOption[] = FRAME_FINISHES.map((f) => ({
   id: f.id,
@@ -60,18 +59,13 @@ export const finishOptions: FinishOption[] = FRAME_FINISHES.map((f) => ({
 }));
 
 export const glassOptions: GlassOption[] = [
-  { id: "clear-float", name: "Clear Float", opacity: 0.1, tint: "rgba(200,220,240,0.1)" },
-  { id: "low-e-coated", name: "Low-E Coated", opacity: 0.15, tint: "rgba(180,210,240,0.15)" },
-  { id: "frosted-privacy", name: "Frosted Privacy", opacity: 0.5, tint: "rgba(255,255,255,0.6)" },
-  { id: "tinted-bronze", name: "Tinted Bronze", opacity: 0.35, tint: "rgba(80,70,50,0.35)" },
-  { id: "tinted-grey", name: "Tinted Grey", opacity: 0.3, tint: "rgba(100,100,100,0.3)" },
-  { id: "laminated-safety", name: "Laminated Safety", opacity: 0.12, tint: "rgba(200,220,240,0.12)" },
+  { id: "confirm-with-fourlinq", name: "Glass to be confirmed", opacity: 0.1, tint: "rgba(200,220,240,0.1)" },
 ];
 
 export const defaultConfig = {
   type: "casement",
   finish: "white",
-  glass: "clear-float",
+  glass: "confirm-with-fourlinq",
   width: 1200,
   height: 1400,
 };
@@ -81,6 +75,3 @@ export const sizeConstraints = {
   width: { min: 400, max: 3000, step: 50 },
   height: { min: 400, max: 3000, step: 50 },
 };
-
-export { DIMENSION_CONSTRAINTS };
-export type { WindowType };

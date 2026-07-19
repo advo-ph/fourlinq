@@ -6,23 +6,15 @@ import type { Branch } from "./fourlinq-data";
 export { BRAND, CONTACT, BRANCHES, phoneHref };
 export type { Branch };
 
-// Warranty scope items used as "certification-style" badges on the Brand page
-export interface Certification {
+// Brochure-stated warranty scope shown on the Brand page. These are not
+// third-party certifications or engineering standards.
+export interface BrandEvidence {
   name: string;
-  icon: string;
 }
 
-export const certifications: Certification[] = [
-  { name: BRAND.warranty, icon: "shield-check" },
-  ...BRAND.warrantyScope.map((scope) => {
-    const iconMap: Record<string, string> = {
-      "Corrosion resistance": "shield",
-      "Long lasting performance": "clock",
-      "Weather resistance": "cloud-rain",
-      "Sound insulation": "volume-x",
-    };
-    return { name: scope, icon: iconMap[scope] || "badge-check" };
-  }),
+export const brandEvidence: BrandEvidence[] = [
+  { name: BRAND.warranty },
+  ...BRAND.warrantyScope.map((scope) => ({ name: scope })),
 ];
 
 export const brandStory = {

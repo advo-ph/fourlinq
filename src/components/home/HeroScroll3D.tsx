@@ -34,8 +34,8 @@ const SCENES: Scene[] = [
   },
   {
     eyebrow: "Engineered to move",
-    headline: "Open. Close. Ten years.",
-    body: "EPDM gaskets, galvanized steel reinforcement, and hardware tested through twenty monsoon seasons.",
+    headline: "Open. Close. Confirm the assembly.",
+    body: "The brochure lists EPDM gaskets and galvanized steel reinforcement. Exact hardware, ratings, and warranty terms require system-specific confirmation.",
     imageSrc: "/images/wp-export/Slide-and-Fold.jpg",
     imageAlt: "FourlinQ slide-and-fold door system, panels mid-fold",
   },

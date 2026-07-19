@@ -28,7 +28,7 @@ const columns: Record<string, FooterLink[]> = {
     { label: "Care guide", to: "/care" },
   ],
   Visit: [
-    { label: "Visit a Showroom", to: "/brand#showrooms" },
+    { label: "View locations", to: "/brand#showrooms" },
     { label: "Book a Consultation", to: "/brand#contact" },
     { label: "Our Story", to: "/brand" },
   ],

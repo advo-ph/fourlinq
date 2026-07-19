@@ -1,6 +1,19 @@
 # Session Handoff
 
-Last updated: **2026-05-29 ~14:30 GMT+8** (backlog-close + deploy-hardening session)
+## Current checkpoint — 2026-07-18
+
+- Branch: `feat/rm17-a11y-fixed-layer`; starting HEAD `31e485038aafec791d45f95c249a218df24860b4`.
+- Scope: Marvin parity remediation from the 33-row Figma build reference plus a final Design Tool embed/UI pass. No commit, push, migration application, or deployment has been performed.
+- Green checkpoints: (1) San Lorenzo `aluminium`/`aluminum` canonical route, CMS-over-fallback project merge, settled unknown-slug redirect, accessible variable-count gallery, and unpublished/incomplete CMS-only project safeguards; (2) truthful Brand/FAQ/chooser/configurator behavior, including server-confirmed-only configuration success, confirmation-only glass, illustrative-dimension caveats, accessible dialog/preview/disclosure state, corrected finish counts, and explicit compatibility/source caveats; (3) source-bounded warranty/care/architect/material/finish/legal/news/project/product/quote/404 content, empty-until-verified product option matrices, fail-closed transactional knowledge seeding, and truthful reel controls/posters; (4) fail-closed viewport/visual/a11y infrastructure plus stacked modal/drawer focus and shared scroll-lock behavior; (5) exact 33-row local parity closure at mobile and desktop; (6) isolated Design Tool embed without global cookie/nav/footer/chat layers, grouped product-family controls, compact responsive preview, honest glass state, and an explicit final review action.
+- Verification: `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` (89/89), `npm run qa:viewport`, `npm run qa:a11y`, `npm run qa:visual` (280 screenshots plus a zero-finding `report.json` in `.visual-qa/run-2026-07-18T18-01-02-334Z`), `npm run qa:parity` (33 × 2), and `git diff --check` all exit 0. Unreachable-server and blank/incomplete-shell controls for all three browser runners exit 2; an intentionally drifted rendered-app assertion and an intentionally drifted parity-row contract exit 1.
+- Data boundary: production `/api/products` still exposes the pre-remediation catalog. Migration `013_source_bound_public_content.sql` and the bounded knowledge seeder are authored but have not been applied or run. The local list and detail routes ignore historical join rows, which remain recoverable; the seeder deactivates old retrieval before transactionally reconciling the replacement corpus and reactivates only after success.
+- Next: independent review, then a separately authorized migration/reseed/deploy sequence with live API, assistant, route-status, and served-bundle proof. Production still has the original defects until that reviewed deployment occurs.
+
+---
+
+## Historical checkpoint — 2026-05-29
+
+The historical record below was last updated at **~14:30 GMT+8** during the backlog-close and deploy-hardening session. The 2026-07-18 checkpoint above supersedes its current-state claims.
 
 ---
 

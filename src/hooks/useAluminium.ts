@@ -27,22 +27,22 @@ export const ALUMINIUM_FALLBACK: AluminiumSystem[] = [
     slug: "thermal-break",
     name: "Thermal Break",
     summary:
-      "Aluminium profile with a non-conductive polyamide strip between the inner and outer halves of the frame. Cuts heat transfer from outside in (and condensation in air-conditioned interiors). The default choice for high-end residential and any space that's cooled year-round.",
-    best_for: "Air-conditioned interiors, west-facing facades, climate-controlled commercial.",
+      "Thermal Break is a client-supplied aluminium system name. The public source does not include a verified section, thermal value, compatibility table, or project limit; request the exact proposed profile and current technical evidence.",
+    best_for: "Confirm against the opening schedule, required performance, and proposed profile.",
   },
   {
     slug: "non-thermal-break",
     name: "Non-Thermal Break",
     summary:
-      "Solid aluminium profile without the thermal isolator. Slimmer sightlines, lower cost, simpler fabrication. Standard for projects where conducted heat is not the primary concern.",
-    best_for: "Naturally ventilated spaces, covered lanais, secondary structures.",
+      "Non-Thermal Break is a client-supplied aluminium system name. The public source does not include a verified section, performance rating, compatibility table, or price comparison.",
+    best_for: "Confirm against the opening schedule, required performance, and proposed profile.",
   },
   {
     slug: "alu-slim",
     name: "Alu Slim",
     summary:
-      "Minimum-sightline aluminium system engineered for maximum glass area. The frame nearly disappears against the glazing. For projects where the architecture is the view and the window should not be.",
-    best_for: "Floor-to-ceiling glazing, panoramic openings, contemporary residential.",
+      "Alu Slim is a client-supplied minimum-sightline system name. The public source does not publish the exact sightline, maximum panel, glass load, test result, or compatible hardware.",
+    best_for: "Confirm the intended sightline, panel size, glass, hardware, and tested assembly in writing.",
   },
 ];
 

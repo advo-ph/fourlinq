@@ -21,6 +21,9 @@ export interface FAQEntry {
   category: FAQCategory;
 }
 
+export const faqAnchor = (question: string) =>
+  `faq-${question.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
+
 export const FAQ_CATEGORIES: { id: FAQCategory; label: string }[] = [
   { id: "products", label: "Products & Systems" },
   { id: "material", label: "uPVC & Materials" },
@@ -35,101 +38,101 @@ export const FAQ: FAQEntry[] = [
   {
     category: "products",
     q: "What systems do you offer?",
-    a: "Five system types, each custom-made to your specifications: Casement, Sliding, Awning, Special Shapes, and Slide & Fold. All are available in uPVC, with Aluminium as an alternate material for certain frames. Detailed specs live on the Products page (/products).",
+    a: "The current catalog groups window, door, and specialist systems, with uPVC and aluminium shown as profile-material options. Not every product, material, glass, finish, or size combination is automatically compatible. Browse /products, then ask FourlinQ to confirm the exact combination for your opening.",
   },
   {
     category: "products",
     q: "What's the difference between Casement, Awning, and Sliding?",
-    a: "Casement windows hinge on one side and open outward — maximum ventilation, easy cleaning. Awnings hinge at the top and open outward, so they let in light and air even during rain. Sliding windows move horizontally along a track — ideal where outward clearance is tight, like balconies or above kitchen counters.",
+    a: "Casement windows hinge on one side and open outward. Awning windows hinge at the top and open outward. Sliding windows move horizontally on a track. Those operation names do not establish a specific profile, opening limit, water rating, glass, hardware, or project suitability; ask FourlinQ to confirm the proposed assembly.",
   },
   {
     category: "products",
     q: "Can you do custom shapes — arches, trapezoids?",
-    a: "Yes. Our Special Shapes system supports fully custom geometry, including arch-tops, circles, trapezoids, and triangles. Often combined with other system types to create a dramatic feature wall of glass. Send us your architectural drawings via 0925-848-8888 or sales@fourlinq.com and we'll quote against them.",
+    a: "The catalog includes special-shape geometries such as arches, circles, trapezoids, and triangles. Send architectural drawings to 0925-848-8888 or sales@fourlinq.com so FourlinQ can confirm whether the requested geometry can be fabricated.",
   },
   {
     category: "products",
     q: "How many finishes are available?",
-    a: "12 finishes total — 7 wood-grain (Oak Light, Oak Malt, Black Wood, Gray Wood, Dark Oak, Walnut, Golden Oak) and 5 solid colors (White, Jet Black, Charcoal Gray, Matte Quartz, Silica Cream). Browse the full set on /finishes or in the Design Tool (/design-tool).",
+    a: "The verified uPVC sample library contains 12 entries: 7 wood-grain (Oak Light, Oak Malt, Black Wood, Gray Wood, Dark Oak, Walnut, Golden Oak) and 5 solid colors (White, Jet Black, Charcoal Gray, Matte Quartz, Silica Cream). Browse /finishes, then confirm physical sample, profile compatibility, and current availability.",
   },
 
   // ── uPVC & Materials ──────────────────────────────
   {
     category: "material",
     q: "What is uPVC and why is it better for the Philippines?",
-    a: "uPVC is unplasticized polyvinyl chloride — a rigid polymer profile that won't rust, rot, warp, or corrode. Our profiles are fire retardant, thermally efficient (multi-chamber design), corrosion resistant, and sound insulating — well-suited to the Philippine climate.",
+    a: "uPVC means unplasticized polyvinyl chloride. FourlinQ's brochure lists multi-chamber construction, galvanized-steel reinforcement, internal glazing beads, EPDM gaskets, drainage holes, and 6–12 mm glass among its profile notes. Those general brochure statements are not a system-specific fire, thermal, acoustic, wind, or water rating.",
   },
   {
     category: "material",
     q: "Will uPVC fade in the tropical sun?",
-    a: "Our uPVC profiles are engineered for tropical use and are corrosion resistant. The 10-Year Limited Warranty covers long lasting performance and weather resistance. For specific color-stability questions about a particular finish, contact our sales team — 0925-848-8888 or sales@fourlinq.com.",
+    a: "The brochure describes the uPVC profile as corrosion resistant and lists long-lasting performance and weather resistance in its 10-Year Limited Warranty summary. It does not state a finish-specific fade threshold here. Ask sales about the exact finish and request the current warranty terms before ordering.",
   },
   {
     category: "material",
     q: "How does FourlinQ handle storm conditions?",
-    a: "Our profiles use galvanized steel reinforcement where structural strength is needed, EPDM gaskets for air and water tightness, and drainage holes for proper drainage. Weather resistance is one of the four areas covered by our 10-Year Limited Warranty.",
+    a: "The brochure lists galvanized-steel reinforcement, EPDM gaskets for air and water tightness, drainage holes, and weather resistance in its limited-warranty summary. It does not publish a system-specific storm, wind, or water rating here. Ask for evidence tied to the exact proposed profile, glass, hardware, size, and installation.",
   },
   {
     category: "material",
     q: "uPVC vs Aluminium — which should I choose?",
-    a: "We offer both. uPVC is the better thermal insulator (cooler interiors), sound insulator, and is fire retardant. Aluminium has slimmer sightlines for a more minimal look and suits very large spans. Use the Design Tool (/design-tool) to compare configurations, or visit any of our three showrooms for a hands-on look.",
+    a: "FourlinQ lists Veka and Skyframe uPVC profile names, plus Regular, Thermal Break, Non-Thermal Break, and Alu Slim aluminium names across its client-supplied material records. The Design Tool is a visual starting point, not a compatibility or performance check. FourlinQ must identify the exact profile and evidence for your opening.",
   },
 
   // ── Ordering ──────────────────────────────────────
   {
     category: "ordering",
     q: "How do I get a quote?",
-    a: "Three ways. (1) Use the Design Tool (/design-tool) to configure a system — we reply with a tailored quote. (2) Request a Quote from any system's detail page. (3) Visit a showroom (Pasig, Alabang, or Cebu) and we'll measure and quote on site. You can also reach sales directly at 0925-848-8888 or sales@fourlinq.com.",
+    a: "Use /design-tool to send a visual brief, request a quote from a system page, or contact sales at 0925-848-8888 or sales@fourlinq.com. A submitted configuration is not itself a quotation; FourlinQ reviews the project before confirming price and feasibility.",
   },
   {
     category: "ordering",
     q: "How much do FourlinQ systems cost?",
-    a: "Pricing is custom per project — every order is made to your specifications. We don't publish list prices. Request a free quote and we'll get back to you with a number. Contact sales: 0925-848-8888 or sales@fourlinq.com.",
+    a: "Pricing is custom per project, and the site does not publish a list price. Send the opening details through a quote request or contact sales at 0925-848-8888 or sales@fourlinq.com for a project-specific response.",
   },
   {
     category: "ordering",
     q: "Where can I see your products in person?",
-    a: "We have three showrooms: Ortigas (CW Home Depot, Pasig), Alabang (CW Home Depot, Westgate Alabang), and Cebu (Centro Fortuna Building, Banilad, Mandaue). Call the assistance line at 0925-896-5978 to schedule a visit.",
+    a: "The verified location list includes Ortigas at CW Home Depot in Pasig, Alabang at CW Home Depot in Westgate Alabang, and the Cebu branch at Centro Fortuna Building in Mandaue. Call 0925-896-5978 to confirm visiting arrangements before you travel.",
   },
   {
     category: "ordering",
     q: "Can you do projects outside Metro Manila and Cebu?",
-    a: "Our showrooms are in Metro Manila and Cebu. For projects outside those regions, contact sales to confirm coverage: 0925-848-8888 or sales@fourlinq.com.",
+    a: "The published location list contains Ortigas, Alabang, and Cebu. It does not establish a national delivery or installation network. For any project location, contact sales to confirm current coverage: 0925-848-8888 or sales@fourlinq.com.",
   },
 
   // ── Installation ───────────────────────────────────
   {
     category: "install",
     q: "Do you handle installation?",
-    a: "Yes. Installation is part of the FourlinQ service. Contact sales at 0925-848-8888 or sales@fourlinq.com to scope the work for your project.",
+    a: "Installation scope is project-specific. Ask sales at 0925-848-8888 or sales@fourlinq.com to confirm what is included in your written quotation.",
   },
   {
     category: "install",
     q: "What's the install process?",
-    a: "Typically: site visit and measurement → detailed quote → fabrication of your custom units → on-site installation → final walk-through. Timelines depend on the system, quantity, and any custom shapes; we confirm specifics as part of your quote.",
+    a: "The site does not publish one guaranteed project sequence or lead time. FourlinQ should document measurement, approval, fabrication, delivery, installation, and handover responsibilities in the quotation for your specific project.",
   },
 
   // ── Warranty ───────────────────────────────────────
   {
     category: "warranty",
     q: "What does the warranty cover?",
-    a: "FourlinQ provides a 10-Year Limited Warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation. The full warranty document goes out with every order — read it before signing.",
+    a: "The verified brochure states a 10-Year Limited Warranty and lists corrosion resistance, long-lasting performance, weather resistance, and sound insulation. That summary is not the complete legal warranty. Ask for the current written terms and read them before ordering.",
   },
   {
     category: "warranty",
     q: "What's not covered?",
-    a: "Cosmetic damage from impact, deliberate misuse, or improper cleaning chemicals are not covered. Acts of nature beyond rated wind-load require a separate claim assessment. For specific exclusions, refer to the warranty document or contact sales: 0925-848-8888.",
+    a: "The brochure summary available to this site does not list the full exclusions. Only the current written warranty can answer this accurately. Request it from FourlinQ and confirm any project-specific conditions before ordering.",
   },
 
   // ── Care & Maintenance ─────────────────────────────
   {
     category: "care",
     q: "How do I clean uPVC frames?",
-    a: "Warm soapy water and a soft cloth, every few months. Avoid abrasive scrubbers, solvents, bleach, or paint thinner — those can damage the surface finish. Wood-grain finishes wipe down the same way and don't need oiling or refinishing.",
+    a: "Use a soft cloth and mild soapy water for routine surface cleaning, then ask FourlinQ for the current finish-specific care instructions before using stronger cleaners. Do not assume a solvent or abrasive is safe for a particular finish.",
   },
   {
     category: "care",
     q: "How do I maintain the hardware?",
-    a: "A drop of light machine oil on hinge pins and lock cylinders every 6 months keeps them smooth. Rollers on sliding systems benefit from the same treatment plus occasional brushing-out of any dust in the track. See /care for the full routine.",
+    a: "Keep tracks clear of loose debris, but ask FourlinQ for the hardware maker's current service guidance before applying lubricant or adjusting a mechanism. The required interval and product can vary by installed hardware.",
   },
 ];

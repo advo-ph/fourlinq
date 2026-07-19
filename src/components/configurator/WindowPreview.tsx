@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useId } from "react";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
 
 interface PreviewProps {
@@ -9,6 +9,8 @@ interface PreviewProps {
   glassOpacity: number;
   width: number;
   height: number;
+  label: string;
+  compact?: boolean;
 }
 
 const darken = (hex: string, amount: number) => {
@@ -86,7 +88,9 @@ const woodGrainConfig: Record<string, {
   },
 };
 
-const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacity, width, height }: PreviewProps) => {
+const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacity, width, height, label, compact = false }: PreviewProps) => {
+  const titleId = useId();
+  const descriptionId = useId();
   const aspectRatio = height / width;
   const svgW = 300;
   const svgH = svgW * Math.min(Math.max(aspectRatio, 0.4), 1.6);
@@ -596,14 +600,21 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
 
   return (
     <div className="flex flex-col items-center">
-      <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full max-w-[320px]">
+      <svg
+        viewBox={`0 0 ${svgW} ${svgH}`}
+        className={`w-full ${compact ? "max-w-[250px]" : "max-w-[320px]"}`}
+        role="img"
+        aria-labelledby={`${titleId} ${descriptionId}`}
+      >
+        <title id={titleId}>{label}</title>
+        <desc id={descriptionId}>Illustrative preview only. Final proportions, glazing, finish, and fabrication details require FourlinQ confirmation.</desc>
         {renderDefs()}
         {/* Skip the rectangular outer frame for shaped windows — each shaped
             case draws its own frame contour. */}
         {type !== "arch-shapes" && type !== "custom-shapes" && outerFrame()}
         {renderContent()}
       </svg>
-      <p className="text-sm text-muted-foreground mt-4">{width} mm &times; {height} mm</p>
+      <p className={`${compact ? "mt-2 text-xs" : "mt-4 text-sm"} text-muted-foreground`}>{width} mm &times; {height} mm</p>
     </div>
   );
 });

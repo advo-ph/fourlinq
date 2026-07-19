@@ -26,13 +26,15 @@ const ChatBubble = () => {
         data-chat-bubble
         className={cn(
           "fixed right-6 z-[61] transition-[bottom] duration-300 ease-marvin",
-          cookieVisible ? "bottom-[13rem] sm:bottom-[11.5rem] md:bottom-[10rem] lg:bottom-6" : "bottom-6",
+          cookieVisible ? "bottom-[15rem] sm:bottom-[12rem] md:bottom-[11rem] lg:bottom-6" : "bottom-6",
         )}
       >
         <button
           onClick={() => { if (!isOpen) trackChatOpen(); setIsOpen(!isOpen); }}
           className="relative flex h-12 w-12 items-center justify-center rounded-sm border border-white/80 bg-white text-[color:var(--ink-primary)] shadow-depth-6 transition-[background-color,color,border-color] duration-300 ease-marvin hover:border-[color:var(--accent)] hover:bg-[color:var(--accent)] hover:text-white group"
           aria-label={isOpen ? "Close chat" : "Open chat"}
+          aria-expanded={isOpen}
+          aria-controls="linq-dialog"
         >
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[color:var(--accent)] ring-2 ring-white transition-colors duration-300 ease-marvin group-hover:bg-white group-hover:ring-[color:var(--accent)]" />
           {isOpen ? <X size={20} strokeWidth={1.75} /> : <MessageCircle size={20} strokeWidth={1.75} />}

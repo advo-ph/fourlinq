@@ -10,7 +10,7 @@ A production website for FourlinQ, a windows-and-doors fabricator in the Philipp
 - **Backend:** Express 5 (`server/`) — same server in dev and production
 - **Database:** Neon Postgres (PostgreSQL 15+)
 - **AI Chat:** Google Gemini API (server-side streaming, "LinQ" assistant)
-- **Deployment:** VPS + pm2, via GitHub Actions on push to `main` (mirrors `./deploy.sh`: build on the runner → rsync to the VPS → pm2 restart). No Vercel.
+- **Deployment:** VPS + pm2, via GitHub Actions on push to `main` (mirrors `./deploy.sh`: build on the runner → rsync to the VPS → pm2 restart). Vercel PR previews may exist, but Vercel is not the production path.
 
 ## Design System
 
@@ -45,8 +45,10 @@ DATABASE_URL=your_neon_postgres_connection_string
 | `build` / `preview` | Production build / preview |
 | `typecheck` / `lint` / `test` | `tsc --build` / eslint / vitest |
 | `qa:visual` | Playwright visual-QA capture (`scripts/visual-qa.mjs`) |
-| `qa:a11y` | RM17 accessibility + fixed-layer scan (alt, control names, chat/banner overlap) |
+| `qa:a11y` | RM17 accessibility + fixed-layer scan (alt, names, dialog focus, cookie/chat coordination, isolated Design Tool embed) |
 | `qa:viewport` | RM5 viewport-containment scan (no horizontal document overflow) |
+| `qa:cp4` | Complete viewport + accessibility + 280-artifact visual gate |
+| `qa:parity` | Exact 33-row Marvin/FourlinQ outcome-closure gate at mobile and desktop |
 | `audit:prod-surface` | Read-only production-surface audit harness |
 | `deploy` / `deploy:status` / `deploy:log` | VPS deploy helpers (`deploy.sh`) |
 

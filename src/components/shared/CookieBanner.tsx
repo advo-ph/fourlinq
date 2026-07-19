@@ -17,6 +17,12 @@ const CookieBanner = () => {
   }, []);
 
   useEffect(() => {
+    const showPreference = () => setVisible(true);
+    window.addEventListener("fourlinq:consent-reset", showPreference);
+    return () => window.removeEventListener("fourlinq:consent-reset", showPreference);
+  }, []);
+
+  useEffect(() => {
     window.dispatchEvent(new CustomEvent("fourlinq:cookie-visibility", { detail: { visible } }));
   }, [visible]);
 
@@ -45,19 +51,21 @@ const CookieBanner = () => {
         >
           <div className="bg-white border border-[color:var(--rule-soft)] shadow-depth-6 p-5 lg:p-6">
             <p className="text-body-sm text-[color:var(--ink-secondary)] leading-relaxed mb-4">
-              We use cookies to improve your experience. By continuing to browse, you agree to our{" "}
+              Optional first-party analytics stay off unless you select Accept. Decline keeps them off. Your choice is stored in this browser. Read the{" "}
               <Link to="/legal?page=cookies" className="text-[color:var(--ink-primary)] underline underline-offset-2 hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                 Cookie Policy
-              </Link>.
+              </Link> for the data fields sent after opt-in.
             </p>
             <div className="flex gap-3">
               <button
+                type="button"
                 onClick={decline}
                 className="flex-1 min-h-[44px] px-4 text-body-sm font-medium border border-[color:var(--rule-soft)] text-[color:var(--ink-primary)] hover:border-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin"
               >
                 Decline
               </button>
               <button
+                type="button"
                 onClick={accept}
                 className="flex-1 min-h-[44px] px-4 text-body-sm font-medium bg-[color:var(--ink-primary)] text-white hover:bg-[color:var(--ink-secondary)] transition-colors duration-300 ease-marvin"
               >

@@ -10,6 +10,16 @@ This contract grounds the 2026-07-10 roadmap refresh in the meeting transcript, 
 - `npm run audit:prod-surface` is a read-only Tier 2 evidence harness. It blocks analytics/tracker writes and records the attempted requests.
 - Tier 1 means deterministic automated test; Tier 2 means repeatable live/browser observation with a named protocol; Tier 3 means acceptance requiring client/source judgment.
 
+## 2026-07-18 remediation checkpoint
+
+- Project critical lane: green locally. Both San Lorenzo slug spellings share one canonical project, fallback-only projects survive empty/partial CMS responses, redirects wait for request settlement, and 1/2/3/5-photo states are covered.
+- Buyer-decision lane: green locally. Configuration submission requires a server-confirmed success/reference; network, HTTP, and malformed-success paths stay visibly unsent. Brand warranty scope is not represented as certification, finish counts match the canonical 12-row set, and FAQ/chooser/configurator state has explicit ARIA/focus behavior and non-authoritative compatibility language.
+- Trust-content lane: green locally. Public product matrices are empty until verified, news/project/legal/service language is bounded, quote/404 responses are truthful, and generated knowledge fails closed pending a reviewed safe reseed. Source-derived reel posters and motion controls are in place, while RM13 rights/provenance approval remains open.
+- QA/closure lane: green locally. Viewport, a11y, and visual runners cover 20 rendered states, all three product aliases, seven widths, two interaction viewports, nested dialog focus, cookie/chat coordination, fresh-session Design Tool embed isolation, and 280 screenshot artifacts. `qa:parity` independently closes the exact 33-row matrix on mobile and desktop. Infra/incomplete runs exit 2; negative unreachable-server and parity-contract controls proved those boundaries.
+- Design Tool lane: green locally. Embedded mode omits FourlinQ's cookie, navigation, footer, and chat layers; family tabs reduce the first-step scan; the preview compacts responsively; the glass step remains confirmation-only; and the final step exposes a review action plus an escape to the full tool.
+- Fresh command evidence: `npm run build` exit 0; `npm run typecheck` exit 0; `npm run lint` exit 0; `npm test` exit 0 (89/89); `npm run qa:viewport` exit 0; `npm run qa:a11y` exit 0; `npm run qa:visual` exit 0; `npm run qa:parity` exit 0; `git diff --check` exit 0.
+- Deployment/manual acceptance: still open. Migration 013 and the bounded knowledge seeder are authored only; they were not applied or run. These results describe the local working tree only.
+
 ## Benchmarks
 
 ### RM1 — Client-approved product master and glossary (Tier 3)
@@ -69,6 +79,8 @@ Pass iff:
 - the FAQ topic rail scrolls inside its own bounded region without widening the document;
 - FAQ accordion, Design Tool controls, footer, and fixed layers stay fully operable;
 - `npm run audit:prod-surface` reports no horizontal-overflow row.
+
+**Status (2026-07-18):** Green locally. `npm run qa:viewport` checks 20 rendered public states at 375, 560, 768, 992, 1100, 1199, and 1440px plus all three product aliases. It rejects server errors, missing app shells, blank 200 responses, route-heading drift, filter-state drift, and horizontal overflow. The former swallowed-navigation fallback is removed; an unreachable-server negative control exits 2. Production proof remains pending deployment.
 
 ### RM6 — Consent-enforced analytics (Tier 1 + Tier 2)
 
@@ -217,7 +229,7 @@ Pass iff:
 - chat follows the documented delay/scroll reveal and never covers the active control;
 - reduced-motion and focus-visible behavior is verified on all interaction states.
 
-**Status (2026-07-18):** Tier-1 harness `scripts/rm17-a11y-scan.mjs` (`npm run qa:a11y`) lands and passes: 15 routes × mobile/desktop, asserting no `<img>` missing alt, no unnamed button/link, no fixed overlay winning the hit-test over a control, and the chat bubble not colliding with the cookie banner on a fresh visit. Red→green proven — strip the aluminium hero alt or pin the chat bubble's `bottom` and the scan fails; restore and it passes. Infra failures (server unreachable / app shell absent) exit 2, never masquerading as an a11y finding. The focus-visible ring (`src/index.css` global `*:focus-visible`) and blanket `prefers-reduced-motion: reduce` reset were already in place and verified; keyboard-trap and per-state focus review remain the Tier-2 manual portion.
+**Status (2026-07-18):** Green locally. `npm run qa:a11y` covers 20 routes × mobile/desktop for missing alt, unnamed controls/dialogs, duplicate IDs, fixed-layer hit tests, and fresh cookie/chat coordination. It also opens chat, mobile navigation, product detail, and nested quote dialogs to prove initial focus, Tab containment, topmost-only Escape, parent preservation, and focus return. The focus-visible ring and reduced-motion reset remain in place. Production and manual assistive-technology proof remain pending deployment.
 
 ### RM18 — Disclosed, source-grounded LinQ buyer assistance (Tier 1 + Tier 3)
 

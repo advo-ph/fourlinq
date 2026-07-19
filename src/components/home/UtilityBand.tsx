@@ -25,22 +25,22 @@ const CARD: UtilityCard[] = [
   {
     key: "showrooms",
     eyebrow: "Visit",
-    title: "Showrooms",
-    line: "Walk through full-scale systems with our consultants. Frames you can open, finishes you can touch.",
-    to: "/brand",
+    title: "Published locations",
+    line: "Use the three published location records, then confirm access, appointment time, and relevant samples before visiting.",
+    to: "/brand#showrooms",
   },
   {
     key: "architects",
     eyebrow: "For professionals",
     title: "For Architects",
-    line: "Technical drawings, BIM families, finish catalogs, and direct access to the engineering team.",
+    line: "Open the public catalog and finish library, or send a bounded request for technical files that FourlinQ must confirm.",
     to: "/for-architects",
   },
   {
     key: "inspiration",
     eyebrow: "Gallery",
     title: "Inspiration",
-    line: "Real projects, real homes — across Metro Manila, Cebu, and the resort coast.",
+    line: "Browse the current project archive and its available photos, locations, captions, and project notes.",
     to: "/inspiration",
   },
 ];

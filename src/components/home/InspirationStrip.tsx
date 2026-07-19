@@ -4,15 +4,6 @@ import FeatureLink from "@/components/primitives/FeatureLink";
 import ScrollReveal from "@/components/primitives/ScrollReveal";
 import { projects } from "@/data/projects";
 
-const categoryLabel: Record<string, string> = {
-  casement: "Casement + Sliding",
-  sliding: "Sliding",
-  specialist: "Special shapes",
-  interior: "Casement + Fixed",
-  exterior: "Casement + Sliding",
-  doors: "Slide & Fold",
-};
-
 const ProjectCard = ({
   project,
   aspect = "aspect-[4/3]",
@@ -41,7 +32,7 @@ const ProjectCard = ({
     </ScrollReveal>
     <div className="mt-4">
       <p className="eyebrow text-[color:var(--ink-muted)] mb-2">
-        {categoryLabel[project.category] ?? "Project"}
+        Published project
       </p>
       <p className="font-serif text-h6 lg:text-h5 text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
         {project.location}
@@ -58,7 +49,7 @@ const InspirationStrip = () => {
       <div className="container-editorial">
         <div className="grid lg:grid-cols-[1fr,auto] items-end gap-8 mb-12 lg:mb-16">
           <EyebrowHeading eyebrow="Our Projects" level={2}>
-            Custom-fabricated to architect specifications.
+            Projects from FourlinQ's published archive.
           </EyebrowHeading>
           <FeatureLink to="/inspiration">View full gallery</FeatureLink>
         </div>

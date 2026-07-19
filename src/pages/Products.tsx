@@ -13,6 +13,7 @@ import { trackProductView } from "@/hooks/useAnalytics";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowUpRight } from "lucide-react";
 import EditorialButton from "@/components/primitives/Button";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 
 type ProductCategory = "windows" | "doors" | "specialist" | "systems";
 type Filter = "all" | ProductCategory;
@@ -52,16 +53,7 @@ const MATERIAL_CARD: SystemCategory[] = PROFILE_MATERIAL.map((m) => ({
 
 const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => void }) => {
   const [quoteOpen, setQuoteOpen] = useState(false);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [onClose]);
+  const dialogRef = useDialogFocus<HTMLElement>({ isOpen: true, onClose });
 
   return (
     <>
@@ -74,11 +66,18 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
         onClick={onClose}
       />
       <motion.aside
+        ref={dialogRef}
+        data-product-drawer
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ duration: 0.4, ease: [0.68, 0, 0.33, 1] }}
         className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white z-[60] overflow-y-auto shadow-depth-8 flex flex-col"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="product-drawer-title"
+        aria-describedby="product-drawer-description"
+        tabIndex={-1}
       >
         {/* Accent stripe */}
         <div className="h-[3px] bg-[color:var(--accent)] shrink-0" />
@@ -89,7 +88,7 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
             <p className="text-[11px] tracking-[0.14em] uppercase text-[color:var(--ink-muted)] font-medium">
               {product.category}
             </p>
-            <h2 className="font-serif text-h4 lg:text-h3 mt-2 leading-[1.1] text-[color:var(--ink-primary)] tracking-tight">
+            <h2 id="product-drawer-title" className="font-serif text-h4 lg:text-h3 mt-2 leading-[1.1] text-[color:var(--ink-primary)] tracking-tight">
               {product.name}
             </h2>
           </div>
@@ -115,22 +114,30 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
             />
           </div>
 
+          <p id="product-drawer-description" className="mb-6 border-l-2 border-[color:var(--accent)] pl-4 text-body-sm text-[color:var(--ink-secondary)] leading-[1.65]">
+            Catalog and CMS entries are orientation only. FourlinQ must confirm the exact material, profile, operation, dimensions, finish, glass, hardware, ratings, availability, and price for this opening.
+          </p>
+
           <p className="text-body text-[color:var(--ink-secondary)] leading-[1.7] mb-10">
             {product.description}
           </p>
 
           {/* Specifications */}
-          <p className="eyebrow mb-4">Specifications</p>
-          <ul className="flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)] mb-10">
-            {product.specs.map((spec) => (
-              <li key={spec} className="py-3 text-body-sm text-[color:var(--ink-primary)]">
-                {spec}
-              </li>
-            ))}
-          </ul>
+          <p className="eyebrow mb-4">Current catalog notes · confirm</p>
+          {product.specs.length > 0 ? (
+            <ul className="flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)] mb-10">
+              {product.specs.map((spec) => (
+                <li key={spec} className="py-3 text-body-sm text-[color:var(--ink-primary)]">
+                  {spec}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mb-10 text-body-sm text-[color:var(--ink-secondary)]">No product-specific specification list is published here. Request the exact proposed assembly and evidence.</p>
+          )}
 
           {/* Finishes */}
-          <p className="eyebrow mb-4">Available Finishes</p>
+          <p className="eyebrow mb-4">Listed finish entries · confirm</p>
           {product.finishes.some((f) => FRAME_FINISHES.find((v) => v.label === f.name)?.category === "wood-grain") && (
             <>
               <p className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--ink-muted)] mb-3">Wood grain</p>
@@ -173,16 +180,23 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
               </div>
             </>
           )}
+          {product.finishes.length === 0 && (
+            <p className="mb-10 text-body-sm text-[color:var(--ink-secondary)]">No product-specific finish matrix is published here. Confirm material, profile, physical sample, compatibility, and availability.</p>
+          )}
 
           {/* Glass */}
-          <p className="eyebrow mb-4">Glass Options</p>
-          <div className="flex gap-2 flex-wrap mb-10">
-            {product.glassOptions.map((glass) => (
-              <span key={glass} className="px-3 py-1.5 text-[12px] border border-[color:var(--rule-soft)] text-[color:var(--ink-primary)]">
-                {glass}
-              </span>
-            ))}
-          </div>
+          <p className="eyebrow mb-4">Listed glass entries · confirm</p>
+          {product.glassOptions.length > 0 ? (
+            <div className="flex gap-2 flex-wrap mb-10">
+              {product.glassOptions.map((glass) => (
+                <span key={glass} className="px-3 py-1.5 text-[12px] border border-[color:var(--rule-soft)] text-[color:var(--ink-primary)]">
+                  {glass}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="mb-10 text-body-sm text-[color:var(--ink-secondary)]">No product-specific glass matrix is published here. Confirm glass type, thickness, safety requirement, coating, compatibility, and availability.</p>
+          )}
 
           <EditorialButton onClick={() => setQuoteOpen(true)} variant="primary" size="md" fullWidth>
             Request a Quote
@@ -224,7 +238,7 @@ const Products = () => {
   const activeType = findTypeByFilter(activeFilter);
   const subtitle = isLanding
     ? "Browse two ways. By type — window, door, or specialist. By material — the uPVC or aluminium profile system it is fabricated from. The two are separate choices, not one list."
-    : "Custom-made uPVC and aluminium windows and doors — quiet, thermally efficient, corrosion-resistant. Each profile tested for the heat, humidity, salt air, and storms that test what a home is made of.";
+    : "Browse the current catalog names and operation summaries. Exact material, profile, glass, finish, hardware, dimensions, ratings, availability, and project compatibility require FourlinQ confirmation.";
 
   return (
     <Layout>
@@ -282,6 +296,7 @@ const Products = () => {
                         <button
                           key={f.value}
                           onClick={() => setActiveFilter(f.value)}
+                          aria-pressed={active}
                           className={`pb-4 text-body-sm font-medium transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end ${
                             active
                               ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
@@ -320,6 +335,7 @@ const Products = () => {
                     {filtered.map((product) => (
                   <motion.button
                     key={product.id}
+                    data-product-card
                     layout
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}

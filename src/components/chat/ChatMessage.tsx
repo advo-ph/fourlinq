@@ -17,9 +17,9 @@ interface ActionItem {
 const PAGE_TITLES: Record<string, string> = {
   "/": "Home",
   "/products": "Products",
-  "/window-systems": "Window Systems",
-  "/door-systems": "Door Systems",
-  "/specialist-systems": "Specialist Systems",
+  "/products?filter=windows": "Window Systems",
+  "/products?filter=doors": "Door Systems",
+  "/products?filter=specialist": "Specialist Systems",
   "/why-upvc": "Why uPVC",
   "/finishes": "Finishes",
   "/how-to-choose": "How to Choose",
@@ -34,7 +34,7 @@ const PAGE_TITLES: Record<string, string> = {
 };
 
 // Match either bare paths (/finishes, /projects/foo) or markdown links to them
-const INTERNAL_PATH_RE = /(?:^|[\s(])(\/(?:design-tool|finishes|products|whats-new|inspiration|projects\/[a-z0-9-]+|window-systems|door-systems|specialist-systems|why-upvc|how-to-choose|faq|for-architects|brand|care|warranty)(?![a-zA-Z0-9_/-]))/g;
+const INTERNAL_PATH_RE = /(?:^|[\s(])(\/(?:design-tool|finishes|products(?:\?filter=(?:windows|doors|specialist))?|whats-new|inspiration|projects\/[a-z0-9-]+|why-upvc|how-to-choose|faq|for-architects|brand|care|warranty)(?![a-zA-Z0-9_/?&=-]))/g;
 
 interface FollowUp {
   label: string;

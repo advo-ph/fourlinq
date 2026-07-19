@@ -11,6 +11,7 @@ export type WhatsNewCategory = "project" | "product" | "event" | "press";
 export interface WhatsNewEntry {
   id: string;
   date: string;       // ISO date
+  dateVerified?: boolean;
   category: WhatsNewCategory;
   title: string;
   excerpt: string;
@@ -25,8 +26,9 @@ export const whatsNew: WhatsNewEntry[] = [
     id: "worldbex-2026",
     date: "2026-03-12",
     category: "event",
-    title: "FourlinQ at WORLDBEX 2026",
-    excerpt: "Join us at the Philippine World Building and Construction Exposition. March 12-15, 2026 at World Trade Center Metro Manila.",
+    dateVerified: true,
+    title: "Archive: FourlinQ at WORLDBEX 2026",
+    excerpt: "Archived event post for the March 12–15, 2026 Philippine World Building and Construction Exposition.",
     image: `${FB}/6ezPWg1k.jpg`,
   },
   {
@@ -34,7 +36,7 @@ export const whatsNew: WhatsNewEntry[] = [
     date: "2026-02-20",
     category: "project",
     title: "Las Piñas residence completed",
-    excerpt: "Another home ready to be enjoyed. Modern window and door installations built for durability, style, and everyday comfort.",
+    excerpt: "Archived FourlinQ project-completion post for a Las Piñas residence. The fallback archive does not contain a verified publication date.",
     image: `${FB}/DOuJGHUl.jpg`,
     link: "/projects/las-pinas-residence",
   },
@@ -43,7 +45,7 @@ export const whatsNew: WhatsNewEntry[] = [
     date: "2026-02-05",
     category: "project",
     title: "Tagaytay City residence turnover",
-    excerpt: "Windows and doors turnover in Tagaytay City, Cavite. Style meets function, every breathtaking view framed with perfection.",
+    excerpt: "Archived FourlinQ turnover post for a Tagaytay City residence. The fallback archive does not contain a verified publication date.",
     image: `${FB}/ZzCSzF_o.jpg`,
     link: "/projects/tagaytay-cavite-residence",
   },
@@ -52,7 +54,7 @@ export const whatsNew: WhatsNewEntry[] = [
     date: "2026-01-20",
     category: "product",
     title: "First aluminium installation at San Lorenzo, Makati",
-    excerpt: "Proud to unveil our first aluminium windows and doors installation. A remarkable milestone for the FourlinQ team.",
+    excerpt: "Archived FourlinQ post identifying this as the team's first aluminium windows-and-doors installation. The fallback archive date is unverified.",
     image: `${FB}/P7DLic-T.jpg`,
     link: "/projects/san-lorenzo-makati-aluminium",
   },
@@ -61,7 +63,7 @@ export const whatsNew: WhatsNewEntry[] = [
     date: "2026-01-08",
     category: "project",
     title: "Nuvali residence turnover",
-    excerpt: "Another milestone achieved. The new windows and doors became the new face of the home — better efficiency, more natural light, a boost to curb appeal.",
+    excerpt: "Archived FourlinQ project post for a Nuvali residence. The fallback archive does not contain a verified publication date or performance measurement.",
     image: `${FB}/mbArIDA5.jpg`,
     link: "/projects/nuvali-laguna-residence",
   },
@@ -69,8 +71,8 @@ export const whatsNew: WhatsNewEntry[] = [
     id: "showroom-invite",
     date: "2025-12-15",
     category: "event",
-    title: "Visit our showrooms in Alabang, Ortigas, and Cebu",
-    excerpt: "See and feel the quality of uPVC frames in multiple color options and finishes at our three FourlinQ showrooms.",
+    title: "Visit our published locations in Alabang, Ortigas, and Cebu",
+    excerpt: "Archived invitation to the published Ortigas, Alabang, and Cebu locations. Contact FourlinQ to confirm access and current samples before visiting.",
     image: `${FB}/c3JgQoz6.jpg`,
     link: "/brand#showrooms",
   },
@@ -79,7 +81,7 @@ export const whatsNew: WhatsNewEntry[] = [
     date: "2025-11-22",
     category: "project",
     title: "Taytay, Rizal residence completed",
-    excerpt: "Standard is never enough. We officially turned over the keys to this gorgeous Taytay project — better security, better insulation, better views.",
+    excerpt: "Archived FourlinQ completion post for a Taytay residence. The fallback archive does not contain a verified publication date or security/insulation test result.",
     image: `${FB}/pndqSKzg.jpg`,
     link: "/projects/taytay-rizal-residence",
   },
@@ -87,8 +89,8 @@ export const whatsNew: WhatsNewEntry[] = [
     id: "12-finishes",
     date: "2025-10-15",
     category: "product",
-    title: "Twelve finish options across every system",
-    excerpt: "From classic White to Wood Gray, Walnut, and Golden Oak — every FourlinQ system available in twelve brochure-verified finishes.",
+    title: "Twelve finishes in the uPVC library",
+    excerpt: "The verified uPVC sample set contains five solid and seven wood-grain entries. Confirm profile compatibility, physical sample, and current availability.",
     image: "/images/wp-export/Walnut-Profile.jpg",
     link: "/finishes",
   },

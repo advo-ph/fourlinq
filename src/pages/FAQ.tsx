@@ -1,19 +1,43 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
-import { FAQ, FAQ_CATEGORIES, type FAQCategory } from "@/data/faq";
+import { FAQ, FAQ_CATEGORIES, faqAnchor, type FAQCategory } from "@/data/faq";
 import { Plus, Minus } from "lucide-react";
 
 const FAQPage = () => {
   const [active, setActive] = useState<FAQCategory | "all">("all");
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return window.location.hash.startsWith("#faq-")
+      ? window.location.hash.slice(1)
+      : null;
+  });
 
   const filtered = useMemo(() => {
     if (active === "all") return FAQ;
     return FAQ.filter((f) => f.category === active);
   }, [active]);
+
+  useEffect(() => {
+    if (!open) return;
+    const target = document.getElementById(open);
+    target?.scrollIntoView({ block: "start" });
+  }, [open]);
+
+  const toggleEntry = (entryId: string) => {
+    const nextOpen = open === entryId ? null : entryId;
+    setOpen(nextOpen);
+    const nextHash = nextOpen ? `#${nextOpen}` : window.location.pathname + window.location.search;
+    window.history.replaceState(null, "", nextHash);
+  };
+
+  const selectCategory = (category: FAQCategory | "all") => {
+    setActive(category);
+    setOpen(null);
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  };
 
   return (
     <Layout>
@@ -35,7 +59,9 @@ const FAQPage = () => {
             <ul className="flex lg:flex-col gap-1 lg:gap-0 min-w-0 overflow-x-auto lg:overflow-visible no-scrollbar lg:border-y lg:border-[color:var(--rule-soft)]">
               <li className="lg:border-b lg:border-[color:var(--rule-soft)] shrink-0">
                 <button
-                  onClick={() => { setActive("all"); setOpen(null); }}
+                  type="button"
+                  onClick={() => selectCategory("all")}
+                  aria-pressed={active === "all"}
                   className={`whitespace-nowrap lg:w-full text-left px-4 lg:px-0 py-3 lg:py-3.5 text-body-sm font-medium transition-colors duration-300 ease-marvin ${
                     active === "all"
                       ? "text-[color:var(--ink-primary)] border-b lg:border-b-0 lg:border-l-2 border-[color:var(--accent)] lg:pl-3 lg:-ml-3"
@@ -48,7 +74,9 @@ const FAQPage = () => {
               {FAQ_CATEGORIES.map((c) => (
                 <li key={c.id} className="lg:border-b lg:border-[color:var(--rule-soft)] shrink-0">
                   <button
-                    onClick={() => { setActive(c.id); setOpen(null); }}
+                    type="button"
+                    onClick={() => selectCategory(c.id)}
+                    aria-pressed={active === c.id}
                     className={`whitespace-nowrap lg:w-full text-left px-4 lg:px-0 py-3 lg:py-3.5 text-body-sm font-medium transition-colors duration-300 ease-marvin ${
                       active === c.id
                         ? "text-[color:var(--ink-primary)] border-b lg:border-b-0 lg:border-l-2 border-[color:var(--accent)] lg:pl-3 lg:-ml-3"
@@ -65,14 +93,20 @@ const FAQPage = () => {
           {/* Accordion list */}
           <div>
             <ul className="flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
-              {filtered.map((entry, i) => {
-                const isOpen = open === i;
+              {filtered.map((entry) => {
+                const entryId = faqAnchor(entry.q);
+                const buttonId = `${entryId}-button`;
+                const panelId = `${entryId}-panel`;
+                const isOpen = open === entryId;
                 return (
-                  <li key={i}>
+                  <li key={entryId} id={entryId} className="scroll-mt-28">
                     <button
-                      onClick={() => setOpen(isOpen ? null : i)}
+                      id={buttonId}
+                      type="button"
+                      onClick={() => toggleEntry(entryId)}
                       className="w-full text-left py-6 lg:py-7 flex items-start justify-between gap-6 group min-h-[44px]"
                       aria-expanded={isOpen}
+                      aria-controls={panelId}
                     >
                       <span className="font-serif text-h6 lg:text-h5 text-[color:var(--ink-primary)] tracking-tight pr-4 leading-snug group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                         {entry.q}
@@ -82,7 +116,12 @@ const FAQPage = () => {
                       </span>
                     </button>
                     {isOpen && (
-                      <div className="pb-7 lg:pb-8 max-w-[40rem]">
+                      <div
+                        id={panelId}
+                        role="region"
+                        aria-labelledby={buttonId}
+                        className="pb-7 lg:pb-8 max-w-[40rem]"
+                      >
                         <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.7]">
                           {entry.a}
                         </p>

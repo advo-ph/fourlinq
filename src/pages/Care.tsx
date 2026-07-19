@@ -3,62 +3,56 @@ import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
-import { Droplets, Wrench, ShieldCheck, Sparkles, AlertTriangle, Calendar } from "lucide-react";
+import { AlertTriangle, Droplets, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 
 const routines = [
   {
     icon: <Droplets size={20} strokeWidth={1.5} />,
-    label: "Every few months",
-    title: "Clean the frames.",
-    body: "Warm soapy water and a soft cloth. Wipe down both sides of the frame and the sash. The wood-grain finishes wipe down the same way as solids. No oiling, no refinishing required.",
+    label: "Start gently",
+    title: "Wipe the frame.",
+    body: "Use a soft cloth with mild soapy water for routine surface cleaning. Test a small area first, rinse away residue, and ask FourlinQ for finish-specific guidance before using anything stronger.",
   },
   {
     icon: <Wrench size={20} strokeWidth={1.5} />,
-    label: "Every 6 months",
-    title: "Lubricate the hardware.",
-    body: "A single drop of light machine oil on hinge pins, lock cylinders, and roller bearings keeps everything smooth. Don't over-apply. Excess oil collects dust.",
+    label: "Before applying a product",
+    title: "Confirm the hardware guidance.",
+    body: "Do not assume one lubricant suits every hinge, lock, or roller. Ask FourlinQ for the installed hardware maker's current instructions before lubricating, adjusting, or removing a part.",
   },
   {
     icon: <Sparkles size={20} strokeWidth={1.5} />,
-    label: "Every 6 months",
+    label: "As debris appears",
     title: "Clear the tracks.",
-    body: "On Sliding and Slide & Fold systems, brush or vacuum out the track. Dust and grit build up there and over time wear down the rollers faster than anything else.",
+    body: "Remove loose dry debris from an accessible track with a soft brush or low-suction vacuum. Stop if a panel binds, a drain path is unclear, or cleaning would require disassembly.",
   },
   {
     icon: <ShieldCheck size={20} strokeWidth={1.5} />,
-    label: "Once a year",
-    title: "Inspect the weatherseals.",
-    body: "Run a finger along the rubber gasket inside the frame. It should be soft, continuous, and seated in its channel. If you find a gap or a flattened section, take a photo and send it to us. We replace gaskets under warranty.",
-  },
-  {
-    icon: <Calendar size={20} strokeWidth={1.5} />,
-    label: "After a major storm",
-    title: "Walk the perimeter.",
-    body: "After a signal-3 or stronger typhoon, check that all locks still engage smoothly, all panels still close flush, and there's no debris lodged in tracks or hinges. Report anything that doesn't feel right. Most post-storm checks turn up nothing, but it's the right time to spot small issues before they become big ones.",
+    label: "When something changes",
+    title: "Document, then ask.",
+    body: "Photograph a loose seal, new leak, unusual noise, binding panel, damaged finish, or hardware change before attempting a repair. Send the photo with the project reference so FourlinQ can advise the next step.",
   },
 ];
 
 const avoid = [
   "Abrasive scrubbers, steel wool, or scouring pads.",
   "Solvents: paint thinner, acetone, methylated spirits, lacquer cleaners.",
-  "Bleach or chlorine-based cleaners. They can yellow uPVC over time.",
-  "Pressure washers at high settings. Can force water past weatherseals.",
-  "DIY mechanical adjustments to hardware (call us, the warranty covers it).",
+  "Bleach or chlorine-based cleaners unless the current finish guide explicitly permits them.",
+  "Pressure washing directly at joints, drainage paths, gaskets, or hardware.",
+  "Mechanical adjustment, glazing removal, gasket replacement, or disassembly without system-specific instructions.",
 ];
 
 const Care = () => (
   <Layout>
     <PageHeader
       eyebrow="Care guide"
-      title="Designed to outlast you. With a little help."
+      title="Start with gentle, system-specific care."
       breadcrumbLabel="Care"
-      subtitle="FourlinQ uPVC systems need almost no maintenance. No painting, no rust-proofing, no annual sanding. But a small routine extends the life of the seals and hardware. Here's what we recommend."
+      subtitle="This is a conservative public checklist, not a manufacturer service manual. The exact cleaner, lubricant, interval, adjustment, and warranty condition depend on the installed profile, finish, glass, and hardware."
     />
 
     {/* The routine */}
     <Section tone="canvas" size="lg" className="!pt-0">
       <EyebrowHeading eyebrow="The routine" level={2}>
-        Five small habits.
+        Four careful habits.
       </EyebrowHeading>
 
       <ol className="mt-12 lg:mt-16 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
@@ -94,7 +88,7 @@ const Care = () => (
             </EyebrowHeading>
           </div>
           <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[28rem] leading-relaxed">
-            uPVC is forgiving but not indestructible. These are the products and habits that will void the warranty or shorten the life of the finish.
+            Until FourlinQ supplies the current instructions for your installed system, avoid methods that can scratch a finish, force water into joints, or alter hardware. This list does not define warranty exclusions.
           </p>
         </div>
         <ul className="flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
@@ -113,10 +107,10 @@ const Care = () => (
       <div className="border-l-2 border-[color:var(--accent)] pl-6 lg:pl-8 max-w-[42rem]">
         <p className="eyebrow mb-3">Warranty note</p>
         <p className="font-serif text-h5 lg:text-h4 text-[color:var(--ink-primary)] tracking-tight leading-snug">
-          Following this routine isn't required to keep your warranty valid.
+          This page does not define warranty validity.
         </p>
         <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-relaxed">
-          The 10-year limited warranty on profiles and 5-year limited warranty on hardware cover normal use and weather exposure. The routine above is about <em>maximizing</em> the life of the seals and rollers beyond the warranty period. Not preserving the warranty itself. If anything goes wrong before then, we cover it.
+          FourlinQ's brochure states a 10-year limited warranty, but the public source does not provide a separate hardware term or the complete maintenance conditions. Request the current written warranty and care guidance for your order before relying on either.
         </p>
       </div>
     </Section>
@@ -125,7 +119,7 @@ const Care = () => (
     <Section tone="dark" size="md">
       <div className="grid lg:grid-cols-[1fr,1fr] gap-12 lg:gap-24 items-center">
         <EyebrowHeading eyebrow="Something wrong?" level={2} toneInverse>
-          We'll come take a look.
+          Ask before you adjust or repair it.
         </EyebrowHeading>
         <div className="flex flex-wrap items-center gap-5">
           <EditorialButton to="/brand#contact" variant="primary" size="md">

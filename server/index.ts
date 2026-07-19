@@ -11,6 +11,7 @@ import analyticsRouter from "./routes/analytics.js";
 import productsRouter from "./routes/products.js";
 import { cmsPublic, cmsAdmin, uploadRouter, usersRouter, auditMiddleware } from "./cms-config.js";
 import { loginHandler, logoutHandler, checkAuthHandler, requireAdmin, requireRole } from "./auth.js";
+import { spaStatusForPath } from "./spa-route.js";
 
 dotenv.config({ path: ".env.development.local" });
 dotenv.config();
@@ -77,8 +78,8 @@ app.use("/api", (_req, res) => {
 if (isProd) {
   const distPath = path.resolve(import.meta.dirname, "../dist");
   app.use(express.static(distPath));
-  app.use((_req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
+  app.use((req, res) => {
+    res.status(spaStatusForPath(req.path)).sendFile(path.join(distPath, "index.html"));
   });
 }
 

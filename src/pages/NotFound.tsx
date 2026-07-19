@@ -21,11 +21,13 @@ const NotFound = () => {
             This page is somewhere else.
           </h1>
           <p className="mt-7 lg:mt-9 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.55]">
-            The address you tried doesn't match any page on the site. Head back to the start or explore the catalog.
+            The address you tried doesn't match a published page. Use one of the verified paths below, or contact FourlinQ if a link in a quotation or message brought you here.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <EditorialButton to="/" variant="primary" size="md">Return home</EditorialButton>
             <EditorialButton to="/products" variant="ghost" size="md">Browse systems →</EditorialButton>
+            <EditorialButton to="/inspiration" variant="ghost" size="md">View projects →</EditorialButton>
+            <EditorialButton to="/brand#contact" variant="ghost" size="md">Contact FourlinQ →</EditorialButton>
           </div>
         </div>
       </section>

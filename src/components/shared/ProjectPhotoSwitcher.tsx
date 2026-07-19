@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -31,23 +31,29 @@ const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [pinnedIdx, setPinnedIdx] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const photo = useMemo(
+    () => photos.filter((entry, index) =>
+      Boolean(entry.src) && photos.findIndex((candidate) => candidate.src === entry.src) === index
+    ),
+    [photos],
+  );
 
-  const activeIdx = hoveredIdx ?? pinnedIdx;
-  const active = photos[activeIdx] ?? photos[0];
+  const activeIdx = Math.min(hoveredIdx ?? pinnedIdx, Math.max(0, photo.length - 1));
+  const activePhoto = photo[activeIdx] ?? photo[0];
 
   const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!heroRef.current || photos.length <= 1) return;
+    if (!heroRef.current || photo.length <= 1) return;
     const rect = heroRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    const zone = Math.min(photos.length - 1, Math.max(0, Math.floor((x / rect.width) * photos.length)));
+    const zone = Math.min(photo.length - 1, Math.max(0, Math.floor((x / rect.width) * photo.length)));
     setHoveredIdx(zone);
-  }, [photos.length]);
+  }, [photo.length]);
 
   const handleLeave = useCallback(() => {
     setHoveredIdx(null);
   }, []);
 
-  if (photos.length === 0) return null;
+  if (photo.length === 0) return null;
 
   return (
     <div className={cn("relative w-full", className)}>
@@ -60,13 +66,17 @@ const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }
         ref={heroRef}
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
+        role="group"
+        aria-roledescription="carousel"
+        aria-label={eyebrow || "Project gallery"}
         className="relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden bg-[color:var(--canvas-soft)]"
       >
-        {photos.map((photo, i) => (
+        {photo.map((entry, i) => (
           <img
-            key={photo.src}
-            src={photo.src}
-            alt={photo.alt}
+            key={`${entry.src}-${i}`}
+            src={entry.src}
+            alt={i === activeIdx ? entry.alt : ""}
+            aria-hidden={i !== activeIdx}
             loading={i === 0 ? "eager" : "lazy"}
             decoding="async"
             className={cn(
@@ -77,9 +87,9 @@ const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }
         ))}
 
         {/* Hover-zone indicators — invisible UI affordance */}
-        {photos.length > 1 && (
+        {photo.length > 1 && (
           <div className="absolute inset-x-0 bottom-0 h-[3px] flex pointer-events-none">
-            {photos.map((_, i) => (
+            {photo.map((_, i) => (
               <span
                 key={i}
                 className={cn(
@@ -92,24 +102,30 @@ const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }
         )}
 
         {/* Caption */}
-        {active.caption && (
+        {activePhoto.caption && (
           <div className="absolute bottom-6 left-6 right-6 pointer-events-none">
             <p className="inline-block text-[11px] tracking-[0.12em] uppercase font-medium text-white bg-[color:var(--ink-primary)]/80 backdrop-blur-sm px-3 py-2">
-              {active.caption}
+              Photo {activeIdx + 1} of {photo.length} · {activePhoto.caption}
             </p>
           </div>
         )}
       </div>
 
       {/* Thumbnail rail — click-to-pin + tab strip on touch */}
-      {photos.length > 1 && (
-        <ul className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
-          {photos.map((photo, i) => (
-            <li key={photo.src}>
+      {photo.length > 1 && (
+        <ul aria-label="Choose a project photo" className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+          {photo.map((entry, i) => (
+            <li key={`${entry.src}-${i}`}>
               <button
-                onClick={() => setPinnedIdx(i)}
+                type="button"
+                onClick={() => {
+                  setPinnedIdx(i);
+                  setHoveredIdx(null);
+                }}
                 onMouseEnter={() => setHoveredIdx(i)}
-                aria-label={`Show ${photo.caption || photo.alt}`}
+                onFocus={() => setHoveredIdx(i)}
+                onBlur={() => setHoveredIdx(null)}
+                aria-label={`Show photo ${i + 1} of ${photo.length}: ${entry.caption || entry.alt}`}
                 aria-pressed={i === activeIdx}
                 className={cn(
                   "block w-full aspect-[5/4] overflow-hidden bg-[color:var(--canvas-soft)] transition-all duration-300 ease-marvin",
@@ -119,7 +135,7 @@ const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }
                 )}
               >
                 <img
-                  src={photo.src}
+                  src={entry.src}
                   alt=""
                   loading="lazy"
                   decoding="async"

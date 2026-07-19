@@ -18,23 +18,6 @@ import ProfileSystems from "@/components/shared/ProfileSystems";
  * eyebrows, no decorative hairlines, no custom keyframes.
  */
 
-const elaboration: Record<string, string> = {
-  "attractive-appearance":
-    "Twelve finishes in total. Six solid colors and six wood grains, heat-fused into the profile. The wood-grain ones have actual depth to them, so they hold up to being looked at closely.",
-  "fire-retardant":
-    "uPVC is self-extinguishing. Take the flame away and it stops burning. It's a property of the polymer itself, not a treatment applied at the surface.",
-  "thermal-efficiency":
-    "The profile is hollow and divided into chambers. The air trapped in those chambers slows heat transfer through the frame, which keeps the interior face of the window closer to room temperature and means less work for the AC.",
-  "corrosion-resistant":
-    "uPVC doesn't oxidize, so coastal projects don't behave any differently from inland ones. We've installed frames a few hundred meters from the shoreline that still look unchanged years later.",
-  "long-lasting-performance":
-    "Ten-year limited warranty on the profile, the weather seal, and the finish. The finish is fused into the surface, so the frame looks the same in year ten as it did the day it was installed. You don't paint it or sand it down at any point.",
-  "weather-resistance":
-    "EPDM gaskets seal where the sash closes against the frame. If any water gets past the seal, drainage slots at the bottom let it run back out instead of sitting inside the profile. Tested against horizontal rain.",
-  "sound-insulation":
-    "With the right glazing, the chambered profile typically gives 24–32 dB of attenuation. That isn't silence, but a bedroom on a main road becomes usable as a bedroom again.",
-};
-
 const photo: Record<string, { src: string; alt: string }> = {
   "attractive-appearance":     { src: "/images/finishes/textures/walnut.jpeg",                  alt: "Walnut wood-grain finish texture" },
   "fire-retardant":            { src: "/images/wp-export/Fire-Retardant.jpg",                  alt: "uPVC fire-retardant material test" },
@@ -48,8 +31,8 @@ const photo: Record<string, { src: string; alt: string }> = {
 const find = (id: string) => benefits.find((b) => b.id === id)!;
 const featured = "attractive-appearance";
 
-// Five wood-grain finishes that cycle through the pinned-scroll featured block.
-const SCROLL_TEXTURES = [
+// Five real texture assets that cycle through the pinned-scroll featured block.
+const SCROLL_TEXTURE = [
   { id: "walnut",      label: "Walnut",      src: "/images/finishes/textures/walnut.jpeg" },
   { id: "dark-oak",    label: "Dark Oak",    src: "/images/finishes/textures/dark-oak.jpeg" },
   { id: "golden-oak",  label: "Golden Oak",  src: "/images/finishes/textures/golden-oak.jpg" },
@@ -69,7 +52,7 @@ const FeaturedTextureScroll = () => {
       const scrollable = el.offsetHeight - window.innerHeight;
       if (scrollable <= 0) return;
       const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
-      const idx = Math.min(SCROLL_TEXTURES.length - 1, Math.floor(progress * SCROLL_TEXTURES.length));
+      const idx = Math.min(SCROLL_TEXTURE.length - 1, Math.floor(progress * SCROLL_TEXTURE.length));
       setActiveIdx(idx);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -77,18 +60,18 @@ const FeaturedTextureScroll = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const current = SCROLL_TEXTURES[activeIdx];
+  const current = SCROLL_TEXTURE[activeIdx];
 
   return (
     <div
       ref={containerRef}
       className="relative bg-[color:var(--canvas-soft)]"
-      style={{ height: `${SCROLL_TEXTURES.length * 100}vh` }}
+      style={{ height: `${SCROLL_TEXTURE.length * 100}vh` }}
     >
       <div className="sticky top-0 h-screen flex items-center overflow-hidden">
         <div className="container-editorial w-full">
           <div className="relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden bg-[color:var(--canvas)]">
-            {SCROLL_TEXTURES.map((t, i) => (
+            {SCROLL_TEXTURE.map((t, i) => (
               <img
                 key={t.id}
                 src={t.src}
@@ -109,11 +92,11 @@ const FeaturedTextureScroll = () => {
                 key={current.id}
                 className="mt-3 text-[11px] tracking-[0.16em] uppercase text-[color:var(--ink-muted)] transition-opacity duration-500"
               >
-                {current.label} · {activeIdx + 1} of {SCROLL_TEXTURES.length}
+                {current.label} · {activeIdx + 1} of {SCROLL_TEXTURE.length}
               </p>
             </div>
             <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] max-w-[36rem]">
-              {elaboration[featured]}
+              The verified uPVC library contains twelve entries: five solid and seven wood-grain. Screen color and texture are approximate; confirm the physical sample and current availability for the proposed profile.
             </p>
           </div>
         </div>
@@ -159,7 +142,7 @@ const WhyUpvc = () => (
               Why uPVC.
             </h1>
             <p className="mt-8 lg:mt-10 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.55]">
-              We use uPVC because of what this country does to a window. The heat, the humidity, the salt air along the coast, the storms. The rest of this page is what that actually means for the frame in your wall.
+              FourlinQ's brochure describes the uPVC profile, its component features, and seven material advantages. This page shows those statements while keeping project-specific ratings, compatibility, and warranty terms separate.
             </p>
           </div>
           <div className="lg:col-span-7">
@@ -187,7 +170,7 @@ const WhyUpvc = () => (
           What's actually in the frame.
         </h2>
         <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
-          Seven things engineered into every FourlinQ uPVC profile — and what each one means once the window is in your wall.
+          Seven feature statements transcribed from the verified brochure source. Exact profile construction and performance still need confirmation for the system proposed in your quotation.
         </p>
       </div>
 
@@ -207,9 +190,7 @@ const WhyUpvc = () => (
               <p className="text-body text-[color:var(--ink-primary)] leading-[1.6]">
                 {f.descriptionVerbatim}
               </p>
-              <p className="mt-2 text-body-sm text-[color:var(--ink-secondary)] leading-[1.6]">
-                {f.benefitPlain}
-              </p>
+              <p className="mt-2 text-body-sm text-[color:var(--ink-secondary)] leading-[1.6]">Brochure wording; not a project-specific tested rating.</p>
             </div>
           </li>
         ))}
@@ -250,7 +231,7 @@ const WhyUpvc = () => (
                 {b.title}
               </h3>
               <p className="text-body text-[color:var(--ink-secondary)] leading-[1.6]">
-                {elaboration[id]}
+              {b.shortDescription}
               </p>
             </article>
           );
@@ -265,7 +246,7 @@ const WhyUpvc = () => (
           uPVC. Aluminium. Timber.
         </h2>
         <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
-          We carry uPVC and aluminium. Most houses end up with uPVC; bigger openings or thinner sightlines go to aluminium. Timber sits in the third column for comparison — we don't sell it.
+          FourlinQ publishes uPVC and aluminium paths. This comparison shows only the names and libraries supported by current source data; it does not rank performance or replace a system-specific review. Timber is included only to mark that FourlinQ does not sell it.
         </p>
       </div>
 
@@ -326,7 +307,7 @@ uPV<span className="text-[color:var(--accent)]">C</span>
         </h2>
         <div className="lg:col-span-6 lg:col-start-7 space-y-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
           <p>
-            And if what you really want is hardwood, just buy hardwood. The wood-grain finish is good, but it's a finish. We'll tell you that before you order.
+            The site does not publish verified per-system span, wind, water, acoustic, thermal, fire, or security ratings. Ask FourlinQ to identify the exact profile, reinforcement, glass, hardware, finish, and installation detail, then provide the evidence required for your project. Wood-grain is a finish—not timber—and screen appearance is not a physical sample.
           </p>
         </div>
       </div>
@@ -344,7 +325,7 @@ uPV<span className="text-[color:var(--accent)]">C</span>
         <div className="flex flex-wrap items-center gap-5">
           <EditorialButton to="/products" variant="primary" size="md">Browse Systems</EditorialButton>
           <EditorialButton to="/brand#showrooms" variant="ghost" size="md" className="text-white hover:text-white">
-            Visit a Showroom
+            View locations
           </EditorialButton>
         </div>
       </div>

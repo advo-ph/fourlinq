@@ -72,8 +72,8 @@ const aluminiumFinishData: FinishOption[] = ALUMINIUM_FINISHES.map((f) => ({
 // both profile systems"). Material is the axis that decides the finish set:
 // uPVC carries the 12 frame finishes, aluminium the powder-coat colours.
 const materialData: MaterialItem[] = [
-  { id: "upvc", name: "uPVC", description: "Multi-chamber profile, steel-reinforced, corrosion-free. The default for most residential openings." },
-  { id: "aluminium", name: "Aluminium", description: "For bigger spans, thinner sightlines, and thermal control where uPVC is not enough." },
+  { id: "upvc", name: "uPVC", description: "Brochure-listed profile-system path." },
+  { id: "aluminium", name: "Aluminium", description: "Published aluminium profile-system path." },
 ];
 
 const finishByMaterial: Record<MaterialId, FinishOption[]> = {

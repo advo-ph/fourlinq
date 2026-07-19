@@ -42,11 +42,10 @@ const TIMELINES: { value: Timeline; label: string; description: string }[] = [
 const PRODUCT_INTERESTS = [
   "uPVC",
   "Aluminium",
-  "Screen Products",
-  "Window Coverings",
-  "Glass Products",
-  "Glass Railing",
-  "Shower Enclosure",
+  "Window systems",
+  "Door systems",
+  "Specialist shapes",
+  "Not sure yet",
 ];
 
 const PH_REGIONS = [
@@ -67,7 +66,7 @@ const PH_REGIONS = [
 
 const PRESENTATION_MODES: { value: PresentationMode; label: string; description: string }[] = [
   { value: "zoom", label: "Zoom", description: "A live video walkthrough — no travel needed." },
-  { value: "onsite", label: "Onsite", description: "We come to your site or project location." },
+  { value: "onsite", label: "Project / site meeting", description: "Ask the team to confirm whether an on-site meeting is available." },
   { value: "other", label: "Other location", description: "Somewhere else that works for you." },
 ];
 
@@ -175,7 +174,7 @@ const ConsultationForm = () => {
         }),
       });
       const data = await res.json().catch(() => ({}));
-      setResult({ success: res.ok, message: data.message || (res.ok ? "We'll be in touch within one business day." : "Couldn't send. Please try again or call 0925-848-8888.") });
+      setResult({ success: res.ok, message: data.message || (res.ok ? "Your request was recorded." : "Couldn't send. Please try again or call 0925-848-8888.") });
     } catch {
       setResult({ success: false, message: "Network error. Please try again or call 0925-848-8888." });
     } finally {
@@ -191,7 +190,7 @@ const ConsultationForm = () => {
           Consultation request received.
         </h3>
         <p className="text-body text-[color:var(--ink-secondary)] mb-8 max-w-[32rem] mx-auto leading-[1.65]">
-          {result.message} A FourlinQ engineer will reach out within one business day to schedule your showroom visit or presentation. Bring your floor plan, or just your questions.
+          {result.message} FourlinQ will confirm the response time, available meeting format, and next step directly. Keep a copy of the details you submitted.
         </p>
         <EditorialButton onClick={() => { setResult(null); setStep(0); setForm({ productInterests: [], city: "", presentationLocation: "", preferredCallback: "", preferredPresentation: "", name: "", email: "", phone: "", notes: "" }); }} variant="secondary" size="sm">
           Start another request
@@ -268,7 +267,7 @@ const ConsultationForm = () => {
           </Step>
         )}
         {step === 3 && (
-          <Step eyebrow="Project location" title="Where is the project?" subtitle="So we know which showroom and which engineer is closest.">
+          <Step eyebrow="Project location" title="Where is the project?" subtitle="So FourlinQ can confirm the relevant contact path and current coverage.">
             <div className="grid sm:grid-cols-2 gap-7 max-w-2xl">
               <div>
                 <label className={labelClass}>City / Municipality</label>
@@ -326,7 +325,7 @@ const ConsultationForm = () => {
           </Step>
         )}
         {step === 5 && (
-          <Step eyebrow="Your details" title="How do we reach you?" subtitle="We'll respond within one business day.">
+          <Step eyebrow="Your details" title="How do we reach you?" subtitle="FourlinQ will use these details to respond and confirm timing.">
             <div className="grid sm:grid-cols-2 gap-7 max-w-2xl">
               <div>
                 <label className={labelClass}>Name *</label>

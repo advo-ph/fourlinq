@@ -2,12 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import CookieBanner from "@/components/shared/CookieBanner";
 import ScrollToTop from "@/components/shared/ScrollToTop";
+import { isEmbeddedDesignTool } from "@/lib/embed";
 
 const Products = lazy(() => import("./pages/Products"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
@@ -33,6 +34,11 @@ const Loading = () => (
     <div className="text-muted-foreground text-sm">Loading…</div>
   </div>
 );
+
+const RouteCookieBanner = () => {
+  const location = useLocation();
+  return isEmbeddedDesignTool(location.pathname, location.search) ? null : <CookieBanner />;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -66,7 +72,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-        <CookieBanner />
+        <RouteCookieBanner />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -11,8 +11,8 @@ interface CTABannerProps {
 
 const CTABanner = ({
   headline = "Start with a conversation.",
-  subtext = "Ninety minutes with a FourlinQ engineer at one of our three showrooms across Metro Manila and Cebu. Bring your floor plan, or just your questions.",
-  primaryLabel = "Visit a Showroom",
+  subtext = "Use the published location list, then contact FourlinQ to confirm access, the relevant sample, meeting format, and appointment time.",
+  primaryLabel = "View locations",
   primaryTo = "/brand#showrooms",
   secondaryLabel = "Browse Products",
   secondaryTo = "/products",

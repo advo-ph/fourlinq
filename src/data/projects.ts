@@ -5,8 +5,8 @@
 // at /var/www/advo/uploads/fb-scrapes/FourlinQofficial/[hash].jpg. We pulled
 // 37 unique images from 8 project-attributed posts on 2026-05-24.
 //
-// Captions below quote FourlinQ's own Facebook posts (cleaned of CTA
-// boilerplate + hashtags). Locations are Tita's own — not invented.
+// Captions below are deliberately bounded archive summaries. Project metadata
+// remains under verification and must not be treated as a technical record.
 // Gallery photos for each project are the exact set of images attached to
 // the matching Facebook post — verified pairings, not guesses.
 //
@@ -32,7 +32,7 @@ export interface Project {
   /** Additional photos from the same Facebook post — VERIFIED pairings
    *  (these images were posted together by FourlinQ themselves). */
   gallery?: string[];
-  category: ProjectCategory;
+  category?: ProjectCategory;
   caption?: string;
   description?: string;
   year?: number;
@@ -56,9 +56,8 @@ export const projects: Project[] = [
       `${FB}/x63pl_14.jpg`,
     ],
     category: "interior",
-    caption: "Modern window and door installations built for durability, style, and everyday comfort.",
-    description:
-      "FourlinQ proudly completes this Las Piñas project. Modern window and door installations built for durability, style, and everyday comfort. Every detail counts, from initial measurement to installation.",
+    caption: "FourlinQ published this as a completed Las Piñas windows-and-doors project.",
+    description: "Published FourlinQ project record for a completed residence in Las Piñas.",
   },
   {
     id: "taytay-rizal-residence",
@@ -72,9 +71,8 @@ export const projects: Project[] = [
       `${FB}/K6n763QM.jpg`,
     ],
     category: "casement",
-    caption: "Premium windows and doors turned over for this Taytay home.",
-    description:
-      "Standard is never enough when it comes to your dream home. We officially turned over the keys to this gorgeous project in Taytay, Rizal, featuring our premium windows and doors. Better security. Better insulation. Better views.",
+    caption: "FourlinQ published this as a completed Taytay windows-and-doors project.",
+    description: "Published FourlinQ project record for a completed residence in Taytay, Rizal.",
   },
   {
     id: "nuvali-laguna-residence",
@@ -88,9 +86,8 @@ export const projects: Project[] = [
       `${FB}/gjR_DEfu.jpg`,
     ],
     category: "exterior",
-    caption: "Windows and doors turnover in Nuvali, Laguna.",
-    description:
-      "Another milestone achieved. We successfully completed the turnover for the new windows and doors on this project. These installations were more than just openings; they became the new face of the home, immediately providing better efficiency, more natural light, and a boost to curb appeal.",
+    caption: "FourlinQ published this as a windows-and-doors turnover in Nuvali, Laguna.",
+    description: "Published FourlinQ project record for a residence in Nuvali, Laguna.",
   },
   {
     id: "tagaytay-cavite-residence",
@@ -104,9 +101,8 @@ export const projects: Project[] = [
       `${FB}/9OqANnRg.jpg`,
     ],
     category: "exterior",
-    caption: "Style meets function. Every breathtaking view framed with perfection.",
-    description:
-      "Fresh views, new beginnings. We've just completed our windows and doors turnover in the breathtaking Tagaytay City, Cavite. Style meets function, and every view is framed with perfection.",
+    caption: "FourlinQ published this as a windows-and-doors turnover in Tagaytay City, Cavite.",
+    description: "Published FourlinQ project record for a completed residence in Tagaytay City, Cavite.",
   },
   {
     id: "san-lorenzo-makati-aluminium",
@@ -131,40 +127,40 @@ export const projects: Project[] = [
   {
     id: "cebu-s-residences",
     name: "Cebu — S. Residences",
-    location: "Alta Vista Subdivision, Pardo, Cebu City",
+    location: "Cebu",
     image: `${FB}/SISsEiUz.jpg`,
     gallery: [`${FB}/roGKW8A5.jpg`],
     category: "doors",
-    caption: "Sliding door installation at the S. Residences project.",
-    description: "S. Residences in Alta Vista Subdivision, Pardo, Cebu City. Sliding doors and modern window installations.",
+    caption: "FourlinQ published this as ‘Cebu Project: S. Residences.’",
+    description: "Published FourlinQ archive record for S. Residences in Cebu.",
   },
   {
     id: "cebu-g-residences",
     name: "Cebu — G. Residences",
-    location: "Vista Grande Subdivision, Talisay City",
+    location: "Cebu",
     image: `${FB}/bmZ6fgTu.jpg`,
     gallery: [`${FB}/GNCqPBUr.jpg`],
     category: "doors",
-    caption: "Modern window and door installation at the G. Residences project.",
-    description: "G. Residences in Vista Grande Subdivision, Talisay City. Premium windows and doors tailored to the home's design.",
+    caption: "FourlinQ published this as ‘Cebu Project: G. Residences.’",
+    description: "Published FourlinQ archive record for G. Residences in Cebu.",
   },
   {
     id: "cebu-r-residences",
     name: "Cebu — R. Residences",
-    location: "Monterrazas de Cebu, Guadalupe, Cebu City",
+    location: "Cebu",
     image: `${FB}/1BZGuW8L.jpg`,
     category: "interior",
-    caption: "Window and door installation at the R. Residences project.",
-    description: "R. Residences in Monterrazas de Cebu, Guadalupe, Cebu City. Window and door installation in a hillside residence.",
+    caption: "FourlinQ published this as ‘Cebu Project: R. Residences.’",
+    description: "Published FourlinQ archive record for R. Residences in Cebu.",
   },
   {
     id: "cebu-a-residences",
     name: "Cebu — A. Residences",
-    location: "Oslob, Cebu",
+    location: "Cebu",
     image: `${FB}/hRCCxHm4.jpg`,
     category: "exterior",
-    caption: "Modernist hillside residence in Oslob, Cebu.",
-    description: "A. Residences in Oslob, Cebu. Modernist hillside home with white-frame elevator tower.",
+    caption: "FourlinQ published this as ‘Cebu Project: A. Residences.’",
+    description: "Published FourlinQ archive record for A. Residences in Cebu.",
   },
   {
     id: "batangas-c-residences",
@@ -178,8 +174,8 @@ export const projects: Project[] = [
       `${FB}/mw3WVp7m.jpg`,
     ],
     category: "exterior",
-    caption: "Window and door installation at the C. Residences project in Batangas.",
-    description: "Batangas Project: C. Residences. Premium windows and doors specified throughout the home.",
+    caption: "FourlinQ published this as ‘Batangas Project: C. Residences.’",
+    description: "Published FourlinQ archive record for C. Residences in Batangas.",
   },
   {
     id: "bulacan-n-residence",
@@ -191,8 +187,8 @@ export const projects: Project[] = [
       `${FB}/-pFxhSkE.jpg`,
     ],
     category: "interior",
-    caption: "Modern, high-quality windows and doors at the N. Residence in Bulacan.",
-    description: "N. Residence Project Site: Bulacan. Durable, stylish windows and doors tailored to the home's design.",
+    caption: "FourlinQ published this as ‘N. Residence Project Site: Bulacan.’",
+    description: "Published FourlinQ archive record for N. Residence in Bulacan.",
   },
   {
     id: "taguig-g-residence",
@@ -204,8 +200,8 @@ export const projects: Project[] = [
       `${FB}/UdQMQaA-.jpg`,
     ],
     category: "interior",
-    caption: "Window and door installation at the G. Residence in Taguig City.",
-    description: "G. Residence Project Site: Taguig City. Upgrade your view. Elevate your living.",
+    caption: "FourlinQ published this as ‘G. Residence Project Site: Taguig City.’",
+    description: "Published FourlinQ archive record for G. Residence in Taguig City.",
   },
   // NOTE: Bataan project was dropped on 2026-05-24 — its only photo
   // (I5J0-ATK.jpg, 14 KB) was a pure black frame with just the FourlinQ

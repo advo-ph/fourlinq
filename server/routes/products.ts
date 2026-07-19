@@ -11,6 +11,38 @@ const router = Router();
  */
 const STATIC_BY_SLUG = new Map(staticProducts.map((p) => [p.id, p]));
 
+interface ProductOptionRow {
+  id: string;
+  spec_labels?: string[] | null;
+  finish_labels?: string[] | null;
+  glass_labels?: string[] | null;
+}
+
+async function resolveProductOption(product: ProductOptionRow) {
+  const fallback = STATIC_BY_SLUG.get(product.id);
+  const specs = Array.isArray(product.spec_labels) ? product.spec_labels : (fallback?.specs ?? []);
+  const glassOptions = Array.isArray(product.glass_labels) ? product.glass_labels : (fallback?.glassOptions ?? []);
+  const finishName = Array.isArray(product.finish_labels)
+    ? product.finish_labels
+    : (fallback?.finishes.map((finish) => finish.name) ?? []);
+
+  let finishes: { name: string; color: string }[] = [];
+  if (finishName.length > 0) {
+    const { rows: finishRow } = await pool.query(
+      `SELECT name, hex_color AS color FROM finish WHERE name = ANY($1::text[])`,
+      [finishName],
+    );
+    const colorByName = new Map(finishRow.map((finish) => [finish.name, finish.color]));
+    const staticColorByName = new Map(fallback?.finishes.map((finish) => [finish.name, finish.color]) ?? []);
+    finishes = finishName.map((name) => ({
+      name,
+      color: colorByName.get(name) ?? staticColorByName.get(name) ?? "#cccccc",
+    }));
+  }
+
+  return { specs, finishes, glassOptions };
+}
+
 /**
  * GET /api/products
  * Optional query: ?category=windows|doors|systems
@@ -56,72 +88,12 @@ router.get("/", async (req, res) => {
       params
     );
 
-    // Prefer the editable text[] columns (filled by CMS or seed-products.ts).
-    // Fall back to join-table lookups if the columns are unset — keeps the
-    // route working in the gap between migration 011 and the next seed run.
+    // Editable arrays are the only public option source. When they are null,
+    // use the source-bounded bundled entry; never resurrect the retained legacy
+    // join rows, which remain in the database for audit/recovery only.
     const enriched = await Promise.all(
       products.map(async (product) => {
-        const hasEditableLists =
-          Array.isArray(product.spec_labels) ||
-          Array.isArray(product.finish_labels) ||
-          Array.isArray(product.glass_labels);
-
-        let specs: string[] = [];
-        let finishes: { name: string; color: string }[] = [];
-        let glassOptions: string[] = [];
-
-        if (hasEditableLists) {
-          const fallback = STATIC_BY_SLUG.get(product.id);
-          specs = product.spec_labels?.length ? product.spec_labels : (fallback?.specs ?? []);
-          glassOptions = product.glass_labels?.length ? product.glass_labels : (fallback?.glassOptions ?? []);
-
-          const finishNames =
-            product.finish_labels?.length
-              ? product.finish_labels
-              : (fallback?.finishes.map((f) => f.name) ?? []);
-          // Hydrate finish labels with their hex colors from the finish table.
-          if (finishNames.length) {
-            const { rows: finishRows } = await pool.query(
-              `SELECT name, hex_color AS color FROM finish WHERE name = ANY($1::text[])`,
-              [finishNames],
-            );
-            const byName = new Map(finishRows.map((r) => [r.name, r.color]));
-            // Also pull static colors as a second fallback (handles labels
-            // Tita typed that don't match a finish row but DO match the static
-            // catalog — rare but possible).
-            const staticByName = new Map(fallback?.finishes.map((f) => [f.name, f.color]) ?? []);
-            finishes = finishNames.map((name: string) => ({
-              name,
-              color: byName.get(name) ?? staticByName.get(name) ?? "#cccccc",
-            }));
-          }
-        } else {
-          const [specsResult, finishesResult, glassResult] = await Promise.all([
-            pool.query(
-              `SELECT label AS value FROM product_feature WHERE product_id = $1 ORDER BY sort_order`,
-              [product.product_id]
-            ),
-            pool.query(
-              `SELECT f.name, f.hex_color AS color
-               FROM product_finish pf
-               JOIN finish f ON pf.finish_id = f.finish_id
-               WHERE pf.product_id = $1
-               ORDER BY f.sort_order`,
-              [product.product_id]
-            ),
-            pool.query(
-              `SELECT gt.name
-               FROM product_glass pg
-               JOIN glass_type gt ON pg.glass_type_id = gt.glass_type_id
-               WHERE pg.product_id = $1
-               ORDER BY gt.sort_order`,
-              [product.product_id]
-            ),
-          ]);
-          specs = specsResult.rows.map((r) => r.value);
-          finishes = finishesResult.rows;
-          glassOptions = glassResult.rows.map((r) => r.name);
-        }
+        const { specs, finishes, glassOptions } = await resolveProductOption(product);
 
         return {
           id: product.id,
@@ -168,6 +140,9 @@ router.get("/:slug", async (req, res) => {
         p.short_description AS "shortDescription",
         p.thumbnail_url AS image,
         p.youtube_id AS "youtubeId",
+        p.finish_labels,
+        p.glass_labels,
+        p.spec_labels,
         pt.name AS "typeName",
         pt.icon_key AS "iconKey"
       FROM product p
@@ -184,28 +159,7 @@ router.get("/:slug", async (req, res) => {
 
     const product = rows[0];
 
-    const [specsResult, finishesResult, glassResult] = await Promise.all([
-      pool.query(
-        `SELECT label AS value, feature_type FROM product_feature WHERE product_id = $1 ORDER BY sort_order`,
-        [product.product_id]
-      ),
-      pool.query(
-        `SELECT f.name, f.hex_color AS color
-         FROM product_finish pf
-         JOIN finish f ON pf.finish_id = f.finish_id
-         WHERE pf.product_id = $1
-         ORDER BY f.sort_order`,
-        [product.product_id]
-      ),
-      pool.query(
-        `SELECT gt.name
-         FROM product_glass pg
-         JOIN glass_type gt ON pg.glass_type_id = gt.glass_type_id
-         WHERE pg.product_id = $1
-         ORDER BY gt.sort_order`,
-        [product.product_id]
-      ),
-    ]);
+    const { specs, finishes, glassOptions } = await resolveProductOption(product);
 
     res.json({
       id: product.id,
@@ -214,9 +168,9 @@ router.get("/:slug", async (req, res) => {
       description: product.description,
       shortDescription: product.shortDescription,
       image: product.image,
-      specs: specsResult.rows.map((r) => r.value),
-      finishes: finishesResult.rows,
-      glassOptions: glassResult.rows.map((r) => r.name),
+      specs,
+      finishes,
+      glassOptions,
       typeName: product.typeName,
       iconKey: product.iconKey,
       youtubeId: product.youtubeId || undefined,

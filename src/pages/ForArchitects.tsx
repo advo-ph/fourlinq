@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import EditorialButton from "@/components/primitives/Button";
-import { FileText, Hammer, Phone, MapPin, ArrowUpRight, Mail } from "lucide-react";
-import { CONTACT, BRAND, phoneHref } from "@/data/fourlinq-data";
+import { ArrowUpRight, Mail, MapPin } from "lucide-react";
+import { CONTACT, phoneHref } from "@/data/fourlinq-data";
 
 /**
  * /for-architects — single-page architect's corner.
@@ -22,82 +22,58 @@ import { CONTACT, BRAND, phoneHref } from "@/data/fourlinq-data";
 
 interface Resource {
   title: string;
-  type: "PDF" | "DWG" | "RFA" | "ZIP" | "DOC";
+  type: "PAGE" | "TERMS" | "DRAWING" | "BIM";
   description: string;
-  /** Honest status: ready to download, or available on request? */
-  status: "available" | "request" | "in-progress";
-  /** Direct download URL when available */
+  /** Honest status: public page, or a file whose existence must be confirmed. */
+  status: "public" | "confirm";
   href?: string;
 }
 
 const technicalResources: Resource[] = [
   {
-    title: "FourlinQ System Catalog",
-    type: "PDF",
-    description: "Complete brochure of all window and door systems with profile cross-sections, available finishes, and engineering specifications.",
-    status: "request",
+    title: "Public system catalog",
+    type: "PAGE",
+    description: "The current public window, door, and specialist-system index. It is a browsing surface, not a stamped specification or complete technical catalog.",
+    status: "public",
+    href: "/products",
   },
   {
-    title: "Casement Window — Technical Drawings",
-    type: "DWG",
-    description: "2D AutoCAD blocks with profile sections, glazing options, and standard configurations for the Casement system.",
-    status: "request",
-  },
-  {
-    title: "Sliding Door — Technical Drawings",
-    type: "DWG",
-    description: "2D AutoCAD blocks for Sliding Door, Lift & Slide, and Slide & Fold systems with track details.",
-    status: "request",
-  },
-  {
-    title: "Large Panel Door — Engineering Data",
-    type: "PDF",
-    description: "Maximum spans, glazing weight limits, reinforcement requirements for door openings up to 6 metres wide.",
-    status: "request",
-  },
-  {
-    title: "Curtain Wall — System Manual",
-    type: "PDF",
-    description: "Full curtain wall system specifications, structural calculations, and installation methodology.",
-    status: "request",
-  },
-  {
-    title: "Revit Family Library",
-    type: "RFA",
-    description: "BIM family files for FourlinQ window and door systems, ready to drop into your Revit project.",
-    status: "in-progress",
-  },
-  {
-    title: "Finish Color Palette",
-    type: "PDF",
-    description: "All twelve brochure-verified finishes with hex values, swatches, and recommended pairings for residential and commercial use.",
-    status: "available",
+    title: "uPVC finish library",
+    type: "PAGE",
+    description: "Twelve entries from the verified physical-sample library: five solid and seven wood-grain. Screen colors are approximate; confirm a physical sample and current availability.",
+    status: "public",
     href: "/finishes",
   },
   {
-    title: "Care & Maintenance Specification",
-    type: "PDF",
-    description: "Standard cleaning protocols, recommended hardware service intervals, and warranty registration requirements for client handover packages.",
-    status: "available",
-    href: "/care",
+    title: "Current warranty terms",
+    type: "TERMS",
+    description: "The website carries only a brochure summary. Ask FourlinQ to confirm the current written terms for the exact proposed system and order.",
+    status: "confirm",
+  },
+  {
+    title: "Project-specific drawings and profile sections",
+    type: "DRAWING",
+    description: "No verified public DWG/PDF library is hosted here. Send the opening schedule and ask which current drawings, sections, and test documents exist for the proposed profile.",
+    status: "confirm",
+  },
+  {
+    title: "CAD and BIM assets",
+    type: "BIM",
+    description: "The repository does not contain a verified Revit family or CAD-block library. Ask whether a current supplier or project-specific file is available; do not specify from a placeholder entry.",
+    status: "confirm",
   },
 ];
 
-const statusLabel = (s: Resource["status"]) => {
-  switch (s) {
-    case "available": return "Available now";
-    case "request": return "Available on request";
-    case "in-progress": return "In progress — Q3 2026";
-  }
-};
+const statusLabel = (status: Resource["status"]) =>
+  status === "public" ? "Public page" : "Confirm with FourlinQ";
 
 const ForArchitects = () => (
   <Layout>
     <PageHeader
       eyebrow="For architects + specifiers"
-      title="The resources to specify a FourlinQ system."
+      title="Start a technical request with verified inputs."
       breadcrumbLabel="For Architects"
-      subtitle="Technical drawings, BIM families, finish catalogs, and direct access to the FourlinQ engineering team. No bot. Just an email to the people who size the profile and stamp the spec."
+      subtitle="The site publishes a product index and finish library. It does not currently host a verified CAD, BIM, specification, test-report, or warranty-document library, so those files must be confirmed for each proposed system."
     />
 
     {/* Intro */}
@@ -106,14 +82,14 @@ const ForArchitects = () => (
         <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-20 lg:mb-28">
           <div className="lg:col-span-7">
             <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
-              FourlinQ is a single-brand uPVC system. The spec is consistent across every project. Same profile, same hardware, same finish library, same {BRAND.warranty.toLowerCase()}. What changes from project to project is the geometry of the opening and the architect's intent.
+              FourlinQ publishes both uPVC and aluminium profile paths, with multiple named profile families. The exact profile, reinforcement, glass, hardware, finish, fabrication limit, installation scope, and evidence package must be matched to the opening rather than assumed from a generic web page.
             </p>
           </div>
           <div className="lg:col-span-4 lg:col-start-9">
             <p className="eyebrow mb-4">Direct line</p>
             <ul className="space-y-5 text-body-sm">
               <li className="border-t border-[color:var(--rule-soft)] pt-4">
-                <p className="text-[color:var(--ink-muted)] mb-1">FourlinQ Engineering</p>
+                <p className="text-[color:var(--ink-muted)] mb-1">Technical request</p>
                 <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`} target="_blank" rel="noopener noreferrer" className="text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin inline-flex items-center gap-1.5">
                   {CONTACT.email}
                   <ArrowUpRight size={14} strokeWidth={1.5} />
@@ -141,11 +117,11 @@ const ForArchitects = () => (
             <div className="lg:col-span-5">
               <p className="eyebrow mb-4">Technical library</p>
               <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
-                The spec sheet, the drawing, the BIM file.
+                Public now, or confirm first.
               </h2>
             </div>
             <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
-              We hand-deliver these by email rather than maintain a public download portal. Keeps the file versions current. Lets us know which firms are using us. And it means you have a real human to ask the follow-up question. Email {CONTACT.email} with the title from the list below.
+              The labels below distinguish pages that exist today from technical files whose existence and revision must be confirmed. Email {CONTACT.email} with the project, proposed system, opening schedule, and the exact evidence or file format you need.
             </p>
           </div>
 
@@ -157,17 +133,15 @@ const ForArchitects = () => (
                     {r.type}
                   </span>
                   <span className={`text-[10px] tracking-[0.14em] uppercase font-medium px-2 py-1 ${
-                    r.status === "available"
+                    r.status === "public"
                       ? "bg-[color:var(--ink-primary)] text-white"
-                      : r.status === "in-progress"
-                      ? "text-[color:var(--ink-muted)] border border-[color:var(--rule-soft)]"
                       : "text-[color:var(--ink-secondary)] border border-[color:var(--rule-strong)]"
                   }`}>
                     {statusLabel(r.status)}
                   </span>
                 </div>
                 <h3 className="font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight mb-3 leading-snug">
-                  {r.status === "available" && r.href ? (
+                  {r.status === "public" && r.href ? (
                     <Link to={r.href} className="hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin inline-flex items-center gap-2">
                       {r.title}
                       <ArrowUpRight size={16} strokeWidth={1.5} />
@@ -186,32 +160,32 @@ const ForArchitects = () => (
 
         {/* What we do for your project */}
         <div className="border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16 mb-24 lg:mb-32">
-          <p className="eyebrow mb-3">Project support</p>
+          <p className="eyebrow mb-3">Prepare the request</p>
           <h2 className="font-serif text-h2 lg:text-h1 leading-[1.05] tracking-tight text-[color:var(--ink-primary)] mb-10 lg:mb-14 max-w-3xl">
-            How we work with a specifying architect.
+            Four inputs that make the technical reply useful.
           </h2>
 
           <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
             {[
               {
                 step: "01",
-                title: "Drawing review",
-                body: "Send us your elevations and we'll review fenestration geometry, flag any spans that need aluminium-reinforced systems, and propose alternates where uPVC isn't the right answer.",
+                title: "Opening schedule",
+                body: "Send the opening code, width, height, quantity, operation, sill/head condition, and the latest elevation or detail revision.",
               },
               {
                 step: "02",
-                title: "Spec call",
-                body: "A FourlinQ engineer reviews the brief with you over Zoom or at the showroom. We talk profile choice, finish strategy, glass specification, and hardware schedule.",
+                title: "Required performance",
+                body: "State the project-specific wind, water, acoustic, thermal, safety, egress, accessibility, and code criteria that the selected assembly must satisfy.",
               },
               {
                 step: "03",
-                title: "Sample delivery",
-                body: "Physical finish samples and small profile cuts couriered to your studio. Standard turnaround in Metro Manila is 3-5 working days.",
+                title: "Evidence request",
+                body: "Name the exact deliverable needed—profile section, test report, calculation, sample, warranty, method statement, CAD, or BIM—and the decision date.",
               },
               {
                 step: "04",
-                title: "Site coordination",
-                body: "Our install team coordinates with your contractor on shop-drawing review, site survey, and the install schedule. We do not subcontract installation.",
+                title: "Written confirmation",
+                body: "Do not treat a call, web visualization, or marketing image as approval. Ask FourlinQ to identify the proposed system and confirm availability, compatibility, responsibilities, and document revision in writing.",
               },
             ].map(({ step, title, body }) => (
               <li key={step}>
@@ -238,7 +212,7 @@ const ForArchitects = () => (
                 Email the engineering team.
               </h2>
               <p className="text-body text-[color:var(--ink-secondary)] leading-[1.65] mb-8">
-                Send the project brief and we'll respond within one business day with the drawings, samples, or budget guidance you need.
+                Send the project brief and list the exact file or decision needed. FourlinQ will confirm what is available and the expected response time.
               </p>
               <EditorialButton href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`} variant="primary" size="md">
                 <Mail size={16} strokeWidth={1.5} className="mr-2" />
@@ -248,14 +222,14 @@ const ForArchitects = () => (
             <div>
               <p className="eyebrow mb-3">Just exploring</p>
               <h2 className="font-serif text-h3 lg:text-h2 tracking-tight text-[color:var(--ink-primary)] leading-[1.1] mb-5">
-                Walk through a showroom.
+                Inspect a published location.
               </h2>
               <p className="text-body text-[color:var(--ink-secondary)] leading-[1.65] mb-8">
-                Bring a junior architect, bring a client, bring nothing. Ninety minutes with the FourlinQ team at one of our three showrooms across Metro Manila and Cebu.
+                Use the published location list to inspect systems and finish samples. Contact FourlinQ first to confirm access, the relevant sample, and an appointment time.
               </p>
               <EditorialButton to="/brand#showrooms" variant="secondary" size="md">
                 <MapPin size={16} strokeWidth={1.5} className="mr-2" />
-                Find a showroom
+                View locations
               </EditorialButton>
             </div>
           </div>

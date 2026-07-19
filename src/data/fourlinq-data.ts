@@ -64,7 +64,7 @@ export function phoneHref(phone: string): string {
 
 // ─────────────────────────────────────────────
 // BRANCHES
-// Source: Brochure footer — all 5 locations verified
+// Source: Brochure footer — 3 currently published locations in this dataset
 // ─────────────────────────────────────────────
 
 export interface Branch {
@@ -133,49 +133,49 @@ export const ADVANTAGES: Advantage[] = [
     id: "attractive-appearance",
     label: "Attractive Appearance",
     description:
-      "Clean, modern profiles available in 12 finishes — from classic white to rich wood grains — designed to complement any architectural style.",
+      "The brochure lists Attractive Appearance. The verified uPVC sample library contains 12 entries; confirm a physical sample, profile compatibility, and current availability.",
     icon: "sparkles",
   },
   {
     id: "fire-retardant",
     label: "Fire Retardant",
     description:
-      "uPVC material is inherently fire retardant, slowing the spread of flames and adding a critical layer of protection to your home.",
+      "The brochure lists Fire Retardant. It does not publish a product-specific fire classification, test standard, assembly detail, or code approval here.",
     icon: "flame",
   },
   {
     id: "thermal-efficiency",
     label: "Thermal Efficiency",
     description:
-      "Multi-chamber profile design traps air to reduce heat transfer, keeping interiors cooler and lowering energy consumption.",
+      "The brochure lists Thermal Efficiency and a multi-chamber profile. Ask for the exact proposed assembly and verified thermal value before modeling performance.",
     icon: "sun",
   },
   {
     id: "corrosion-resistant",
     label: "Corrosion Resistant",
     description:
-      "Unlike steel, uPVC never rusts — ideal for the Philippine climate with its humidity, salt air, and heavy rainfall.",
+      "The brochure lists Corrosion Resistant. Ask what material, component, environment, test evidence, maintenance, and warranty term apply to the proposed system.",
     icon: "shield",
   },
   {
     id: "long-lasting-performance",
     label: "Long Lasting Performance",
     description:
-      "Engineered for durability with a 10-year limited warranty. uPVC does not warp, rot, or require repainting over its lifetime.",
+      "The brochure lists Long Lasting Performance and a 10-year limited-warranty label. Request the current written definition, conditions, exclusions, and remedy.",
     icon: "clock",
   },
   {
     id: "weather-resistance",
     label: "Weather Resistance",
     description:
-      "EPDM gaskets and drainage holes ensure a tight seal against rain, wind, and storm conditions — built for tropical weather.",
+      "The brochure lists EPDM gaskets, drainage holes, and Weather Resistance. It does not publish a system-specific wind, water, or storm rating here.",
     icon: "cloud-rain",
   },
   {
     id: "sound-insulation",
     label: "Sound Insulation",
     description:
-      "Multi-chamber profiles and thick glass (6mm–12mm) significantly reduce outside noise for a quieter, more comfortable home.",
+      "The brochure lists Sound Insulation, a multi-chamber profile, and 6–12 mm glass. It does not publish a tested decibel reduction for a complete assembly here.",
     icon: "volume-x",
   },
 ];

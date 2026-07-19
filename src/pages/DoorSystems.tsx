@@ -8,9 +8,9 @@ const DoorSystems = () => (
       title: "Doors that change how a home opens.",
       breadcrumbLabel: "Door Systems",
       intro:
-        "Where a home stops being indoors and starts being outdoors. The lanai door that opens to the garden. The wall that disappears for a party. The threshold that closes against a typhoon and seals back to weather-tight when the wind passes. Custom-fabricated, project-specified, built to operate smoothly for decades.",
+        "Browse the current sliding, folding, hinged, and large-panel door names. FourlinQ must confirm the exact operation, profile, glass, hardware, dimensions, ratings, and fabrication limits for each opening.",
       subSystemList:
-        "Slide & Fold, Large Panel Doors (up to 6 metres), Lift & Slide, and the 90 Series. Plus Casement Door, French Sliding Door, and Sliding Door configurations.",
+        "Slide & Fold, Large Panel Doors, Lift & Slide, 90 Series, Casement Door, French Sliding Door, and Sliding Door are catalog names. Confirm every exact assembly and fabrication limit.",
       filterCategory: "doors",
     }}
   />

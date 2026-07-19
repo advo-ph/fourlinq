@@ -77,7 +77,7 @@ router.post("/contact", contactLimiter, async (req, res) => {
       refId, name, email, phone, subject, message,
       source: req.get("referer") || req.originalUrl,
     });
-    res.json({ success: true, refId, message: "Thank you! We'll get back to you within 24 hours." });
+    res.json({ success: true, refId, message: "Thank you. Your request has been recorded." });
   } catch (err) {
     console.error("Contact save error:", err);
     res.status(500).json({ error: "Failed to save. Please call 0925-848-8888 or email sales@fourlinq.com." });
@@ -113,7 +113,7 @@ router.post("/quote-request", quoteLimiter, async (req, res) => {
       extra: { product: productName, finish, dimensions, quantity, budget, timeline },
       source: req.get("referer") || req.originalUrl,
     });
-    res.json({ success: true, refId, message: `Quote request ${refId} received! We'll send you a detailed quotation within 48 hours.` });
+    res.json({ success: true, refId, message: `Quote request ${refId} was recorded. FourlinQ will confirm timing and next steps directly.` });
   } catch (err) {
     console.error("Quote save error:", err);
     res.status(500).json({ error: "Failed to save. Please call 0925-848-8888 or email sales@fourlinq.com." });

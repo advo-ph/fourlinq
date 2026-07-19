@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
@@ -114,9 +114,19 @@ const QUESTIONS: Question[] = [
 const HowToChoose = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>([null, null, null]);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const mountedRef = useRef(false);
 
   const allAnswered = answers.every((a) => a !== null);
   const showingResult = step >= QUESTIONS.length;
+
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    headingRef.current?.focus();
+  }, [step]);
 
   const recommendations: SystemSummary[] = useMemo(() => {
     if (!allAnswered) return [];
@@ -159,12 +169,12 @@ const HowToChoose = () => {
         eyebrow="Help me choose"
         title="Three questions. One recommendation."
         breadcrumbLabel="Help me choose"
-        subtitle="If you're not sure which window or door system fits your project, answer three quick questions. We'll point you at the one or two systems most likely to work. Then you can dive into the catalog from there."
+        subtitle="If you're not sure where to start, answer three quick questions. This preference guide suggests one or two catalog directions; it does not check structural limits, product compatibility, or site conditions."
       />
 
       <Section tone="canvas" size="lg" className="!pt-0">
         {/* Progress rail */}
-        <div className="flex items-center gap-3 mb-12 lg:mb-16">
+        <div className="flex items-center gap-3 mb-12 lg:mb-16" role="progressbar" aria-valuemin={1} aria-valuemax={QUESTIONS.length + 1} aria-valuenow={Math.min(step + 1, QUESTIONS.length + 1)} aria-valuetext={showingResult ? "Recommendation ready" : `Question ${step + 1} of ${QUESTIONS.length}`}>
           {QUESTIONS.map((_, i) => {
             const done = answers[i] !== null;
             const active = step === i;
@@ -188,7 +198,7 @@ const HowToChoose = () => {
         {!showingResult ? (
           <div className="max-w-[44rem]">
             <p className="eyebrow mb-5">Question {step + 1}</p>
-            <h2 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1]">
+            <h2 ref={headingRef} tabIndex={-1} className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] focus:outline-none">
               {QUESTIONS[step].q}
             </h2>
             {QUESTIONS[step].helper && (
@@ -203,7 +213,9 @@ const HowToChoose = () => {
                 return (
                   <li key={ci}>
                     <button
+                      type="button"
                       onClick={() => handleChoice(step, ci)}
+                      aria-pressed={selected}
                       className={`w-full text-left py-5 lg:py-6 flex items-center justify-between gap-4 group min-h-[44px] transition-colors duration-300 ease-marvin ${
                         selected
                           ? "text-[color:var(--accent)]"
@@ -229,6 +241,7 @@ const HowToChoose = () => {
             {step > 0 && (
               <div className="mt-10">
                 <button
+                  type="button"
                   onClick={() => setStep(step - 1)}
                   className="inline-flex items-center gap-2 text-body-sm font-medium text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin"
                 >
@@ -244,13 +257,13 @@ const HowToChoose = () => {
             <p className="eyebrow mb-5">
               Recommendation
             </p>
-            <h2 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] mb-8">
+            <h2 ref={headingRef} tabIndex={-1} className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] mb-8 focus:outline-none">
               {recommendations.length === 1
                 ? `Start with ${recommendations[0].label}.`
                 : `Start with ${recommendations[0].label} or ${recommendations[1].label}.`}
             </h2>
             <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[40rem] leading-relaxed mb-12">
-              Based on what you described, here's what we'd point you at first. Click through to the catalog for full specs, or get in touch and we'll talk through the project.
+              Based on your preferences, these are useful catalog starting points. They are not a technical recommendation. FourlinQ still needs to confirm the opening, material, glass, hardware, dimensions, and site conditions.
             </p>
 
             <ul className="grid md:grid-cols-2 gap-6 lg:gap-8 mb-12">
@@ -279,6 +292,7 @@ const HowToChoose = () => {
                 Talk to our team
               </EditorialButton>
               <button
+                type="button"
                 onClick={reset}
                 className="inline-flex items-center gap-2 text-body-sm font-medium text-[color:var(--ink-muted)] hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin min-h-[44px] px-2"
               >
