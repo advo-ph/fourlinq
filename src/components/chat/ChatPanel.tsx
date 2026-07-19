@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { X, Send, Loader2, ImagePlus } from "lucide-react";
 import ChatMessage from "./ChatMessage";
 import { streamChat, resetChat } from "@/lib/gemini-chat";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 
 interface Message {
   role: "user" | "assistant";
@@ -111,16 +112,6 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
     // cycle when users browse to another route with the panel closed).
     try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages)); } catch { /* quota */ }
   }, [messages]);
-  useEffect(() => { if (isOpen && inputRef.current) inputRef.current.focus(); }, [isOpen]);
-  // Escape to close
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
   const handleClose = () => {
     // Closing the panel no longer wipes history — user can scroll back when
     // they reopen. Use the explicit "Reset" button to clear.
@@ -128,6 +119,7 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
     setImageError(null);
     onClose();
   };
+  const dialogRef = useDialogFocus<HTMLDivElement>({ isOpen, onClose: handleClose, initialFocusRef: inputRef });
 
   const handleReset = () => {
     resetChat();
@@ -205,7 +197,15 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-24 right-6 z-[60] w-[400px] max-w-[calc(100vw-32px)] h-[600px] max-h-[calc(100vh-140px)] flex flex-col overflow-hidden bg-white shadow-depth-8 border border-[color:var(--rule-soft)] animate-in slide-in-from-bottom-4 fade-in duration-300 ease-marvin rounded-sm">
+    <div
+      id="linq-dialog"
+      ref={dialogRef}
+      className="fixed bottom-24 right-6 z-[60] w-[400px] max-w-[calc(100vw-32px)] h-[600px] max-h-[calc(100vh-140px)] flex flex-col overflow-hidden bg-white shadow-depth-8 border border-[color:var(--rule-soft)] animate-in slide-in-from-bottom-4 fade-in duration-300 ease-marvin rounded-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="linq-dialog-title"
+      tabIndex={-1}
+    >
       {/* Accent stripe */}
       <div className="h-[3px] bg-[color:var(--accent)] shrink-0" />
 
@@ -216,7 +216,7 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
             L
           </div>
           <div className="leading-tight">
-            <p className="text-[13px] font-semibold text-[color:var(--ink-primary)]">LinQ</p>
+            <p id="linq-dialog-title" className="text-[13px] font-semibold text-[color:var(--ink-primary)]">LinQ</p>
             <p className="text-[10px] tracking-[0.08em] uppercase text-[color:var(--ink-muted)] mt-0.5">FourlinQ Assistant</p>
           </div>
         </div>
@@ -242,7 +242,7 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[color:var(--canvas-soft)]">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[color:var(--canvas-soft)]" role="log" aria-live="polite" aria-label="Conversation with LinQ">
         {messages.length === 0 && (
           <div className="px-1 pt-2">
             <p className="text-[14px] font-semibold text-[color:var(--ink-primary)] mb-1">
@@ -338,6 +338,7 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={pendingImage ? "Add a note (optional)…" : "Ask about our systems…"}
+            aria-label="Message LinQ"
             disabled={isStreaming}
             className="flex-1 bg-transparent text-[13px] text-[color:var(--ink-primary)] outline-none placeholder:text-[color:var(--ink-faint)] disabled:opacity-50 py-1.5"
           />
