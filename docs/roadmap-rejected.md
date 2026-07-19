@@ -1,6 +1,6 @@
 # Roadmap rejected and triage log
 
-Last updated: 2026-07-10.
+Last updated: 2026-07-18.
 
 This file keeps rejected, stale, or blocked ideas from re-entering the roadmap as vague "maybe we should" work. Reopen an item only if the trigger changes.
 
@@ -30,6 +30,17 @@ This file keeps rejected, stale, or blocked ideas from re-entering the roadmap a
 | Upload-a-home visualization, enterprise planner, or heavier 3D program now | These depend on accurate geometry, compatibility, assets, and mature product data that FourlinQ does not yet have. | RM1, RM2, RM7, RM12, and RM13 pass; a buyer need and asset budget are approved. |
 | Empty Collections, Solutions, downloads, or content volume created only to match Marvin | Navigation labels without real differentiated content make the site less trustworthy, not more premium. | The corresponding hold entry's evidence gate passes. |
 | Merge CRM, fabrication tracking, attendance, payroll, Moodle, social, YouTube, or life-coaching work into website remediation | These were exploratory or separate-proposal discussions and have different owners, privacy/security needs, budgets, and acceptance criteria. | A separate written scope, owner, budget, and discovery/acceptance plan is approved. |
+
+### Unmerged branch disposition — recorded 2026-07-18
+
+Four branches sat unmerged with no written record of why. Auditing them produced these rulings, so the next person does not have to re-derive them or merge something already ruled against.
+
+| Branch | Disposition | Reasoning | Reopen trigger |
+|---|---|---|---|
+| `codex/marvin-alignment-controls` | **Rejected** | Restyles every control to 1px hairlines/squares and **removes accent red from link hovers and category-card rules**. That is the already-rejected "clone Marvin's visual skin" item above, arriving as code: the entry reserves red `#C8102E` as FourlinQ's identity and treats Marvin as *layout/quality* reference only. It also contradicts what main documents as shipped — `DESIGN_SYSTEM.md` (RM8, `3d9ff5c`) says "squared, **heavier border**", this says 1px hairline. Its `src/test/marvin-alignment.test.tsx` is the only test that ever asserted Marvin contracts and is worth salvaging **separately** from the red removal. | Client explicitly asks to adopt Marvin's exact control styling, or a design ruling supersedes RM8's documented borders. Salvaging the test alone needs no trigger. |
+| `codex/marvin-alignment-motion` | **Superseded** | Not wrong — it is a strict ancestor of `product-proof` (`git branch -r --contains c18f5ac` returns both). Merging it separately just replays the same commit. Its intent survives as **RM15**. | Only if `product-proof` is abandoned and the motion budget is still wanted on its own. |
+| `codex/marvin-alignment-product-proof` | **Blocked on client sign-off** — not rejected | Genuine architectural simplification: deletes the 500vh scroll-window centrepiece and frame engine (−997 lines) for one static studio photo, with brochure-verbatim proof points from `UPVC_PROFILE_FEATURES`. Verified safe to delete (nothing else on main imports those modules) and test-backed. But removing the homepage centrepiece is a **product decision**, not a cleanup. Note it is **mutually exclusive with `controls`**: one deletes `ThermalSystemToggle.tsx`, the other restyles it, and controls' test imports a type this branch removes. | Imie sees the static treatment and approves replacing the scroll sequence. |
+| `codex/parity-remediation-2026-07-18` (copy half) | **Blocked on client review** | The technical half shipped separately (PR #36). What remains is the truth-bounding copy sweep: hedged headlines ("The brochure states a 10-year limited warranty."), the `/inspiration` category filters removed, Design Tool glass swatches replaced by a confirm-note, 8 architect resources cut to 5, and migration `013`. Defensible as honesty; may read to the client as the site losing confidence and warmth right after a run of revisions meant to show momentum. Not a call to make silently. | Imie reviews the reworded pages and the removals, and approves or amends them. |
 
 ## Triage or blocked
 
