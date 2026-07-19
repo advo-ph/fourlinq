@@ -4,6 +4,8 @@
  * small mapping layers.
  */
 
+import type { Project } from "@/data/projects";
+
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
 export interface CmsProject {
@@ -36,6 +38,68 @@ export interface CmsNewsPost {
   external_link: string | null;
   internal_link: string | null;
   published_at: string;
+}
+
+export const PROJECT_SLUG_ALIAS: Readonly<Record<string, string>> = Object.freeze({
+  "san-lorenzo-makati-aluminum": "san-lorenzo-makati-aluminium",
+});
+
+export function canonicalProjectSlug(slug: string): string {
+  return PROJECT_SLUG_ALIAS[slug] ?? slug;
+}
+
+function textValue(value: string | null | undefined, fallback = ""): string {
+  const normalizedValue = value?.trim();
+  return normalizedValue || fallback;
+}
+
+export function projectFromCms(row: CmsProject, fallback?: Project): Project {
+  const projectId = canonicalProjectSlug(row.slug);
+  const gallery = (row.gallery_paths ?? []).filter(Boolean);
+  const system = (row.systems_used ?? []).filter(Boolean);
+  const quoteText = textValue(row.quote_text);
+
+  return {
+    id: projectId,
+    name: textValue(row.title, fallback?.name ?? projectId),
+    location: textValue(row.location, fallback?.location),
+    image: textValue(row.cover_path, fallback?.image),
+    gallery: gallery.length > 0 ? gallery : fallback?.gallery,
+    category: (textValue(row.category, fallback?.category) || undefined) as Project["category"],
+    caption: textValue(row.caption, fallback?.caption) || undefined,
+    description: textValue(row.description, fallback?.description) || undefined,
+    architect: textValue(row.architect, fallback?.architect) || undefined,
+    year: row.project_year ?? fallback?.year,
+    systemsUsed: system.length > 0 ? system : fallback?.systemsUsed,
+    quote: quoteText
+      ? {
+          text: quoteText,
+          attribution: textValue(row.quote_attribution, fallback?.quote?.attribution),
+        }
+      : fallback?.quote,
+  };
+}
+
+export function mergeProject(
+  fallbackProject: readonly Project[],
+  cmsProject: readonly CmsProject[],
+): Project[] {
+  const projectMap = new Map<string, Project>();
+
+  for (const fallback of fallbackProject) {
+    const projectId = canonicalProjectSlug(fallback.id);
+    projectMap.set(projectId, { ...fallback, id: projectId });
+  }
+
+  for (const row of cmsProject) {
+    const projectId = canonicalProjectSlug(row.slug);
+    const fallback = projectMap.get(projectId);
+    const project = projectFromCms(row, fallback);
+    if (!fallback && (!project.image || !project.location)) continue;
+    projectMap.set(projectId, project);
+  }
+
+  return [...projectMap.values()];
 }
 
 async function get<T>(path: string): Promise<T> {
