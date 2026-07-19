@@ -1,0 +1,39 @@
+{
+  "_": "FROZEN structural reference for the Marvin likeness gate. Do not regenerate casually.",
+  "_source": "docs/references/design-systems/marvin.md — extracted from 156 production CSS bundles + 14 page templates.",
+  "_captured": "2026-06-21",
+  "_why_frozen": "A gate must be idempotent. Re-reading the prose doc (YAML + markdown, already unparseable as one document) or re-scraping marvin.com would make the score move for reasons unrelated to our code.",
+  "_deliberately_excluded": {
+    "colors": "docs/roadmap-rejected.md forbids converging on Marvin's skin. FourlinQ red #C8102E is the brand's identity; scoring colour would reward destroying it.",
+    "fontFamily": "Same reason — Nationale/TabacG1 are licensed Marvin identity. FourlinQ uses Manrope/Fraunces by decision, not by accident.",
+    "note": "This gate measures STRUCTURE ONLY. A rising score must never come from adopting Marvin's brand."
+  },
+
+  "typeScale": [10, 12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 56, 64, 88],
+
+  "layout": {
+    "containerMaxPx": 1400,
+    "readingMaxPx": 1000,
+    "headerHeightDesktopPx": 72,
+    "headerHeightMobilePx": 64,
+    "lgBreakpointPx": 992
+  },
+
+  "rhythm": {
+    "sectionPaddingDesktopPx": 120,
+    "gridGutterPx": 20,
+    "spaceScale": [0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64]
+  },
+
+  "motion": {
+    "signatureEase": "cubic-bezier(0.68, 0, 0.33, 1)",
+    "durationsMs": [100, 200, 300, 400, 500],
+    "hoverDefaultMs": 300
+  },
+
+  "elevation": {
+    "_note": "Premium feel comes from LOW elevation. Marvin's deepest common shadow blurs only 9px.",
+    "maxCommonBlurPx": 9,
+    "shallowBlurPx": 3
+  }
+}
