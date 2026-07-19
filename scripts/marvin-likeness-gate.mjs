@@ -83,15 +83,32 @@ function probe() {
     return part.map((p) => p.trim());
   };
 
+  // Image durations are collected separately: Marvin runs image MOVEMENT
+  // deliberately slower than UI ("image scales 1.03 over 700ms", 8000ms
+  // ken-burns), so scoring those against the 100–500ms control ladder is a
+  // false regression.
+  //
+  // Bucket by what is ANIMATING, not by element tag. A 300ms opacity fade on
+  // an image is ordinary UI-speed and belongs on the control ladder; only a
+  // transform on an image is the slow image tier. Classifying by tag alone
+  // mis-flagged exactly that fade.
   const easing = {};
   const duration = new Set();
+  const imageDuration = new Set();
   for (const el of [...document.querySelectorAll("a,button,img,div")].slice(0, 400)) {
     const s = getComputedStyle(el);
     if (s.transitionDuration && s.transitionDuration !== "0s") {
-      for (const d of splitTop(s.transitionDuration)) {
+      const isImage = el.tagName === "IMG";
+      const property = splitTop(s.transitionProperty);
+      const durationList = splitTop(s.transitionDuration);
+      durationList.forEach((d, i) => {
         const ms = Math.round(parseFloat(d) * 1000);
-        if (ms > 0) duration.add(ms);
-      }
+        if (ms <= 0) return;
+        // transitionProperty may be shorter than the duration list; CSS repeats it.
+        const prop = property[i % Math.max(property.length, 1)] ?? "all";
+        const isMovement = prop === "transform" || prop === "all";
+        (isImage && isMovement ? imageDuration : duration).add(ms);
+      });
       for (const fn of splitTop(s.transitionTimingFunction)) {
         easing[fn] = (easing[fn] ?? 0) + 1;
       }
@@ -116,6 +133,7 @@ function probe() {
     containerMax: container ? Math.round(container.getBoundingClientRect().width) : 0,
     headerHeight: nav ? Math.round(nav.getBoundingClientRect().height) : 0,
     durations: [...duration].sort((a, b) => a - b),
+    imageDurations: [...imageDuration].sort((a, b) => a - b),
     dominantEase: Object.entries(easing).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "none",
     maxShadowBlur: Math.round(maxBlur),
   };
@@ -183,12 +201,15 @@ axis.push({
   detail: easeMatch ? m.dominantEase : `${m.dominantEase} vs ${REF.motion.signatureEase}`,
 });
 
-// 6. Durations on Marvin's ladder (±50ms)
+// 6. Durations on Marvin's ladder (±50ms). UI controls score against the
+// 100–500ms ladder; images against Marvin's slower image tier (700/8000ms).
 const onLadder = m.durations.filter((d) => REF.motion.durationsMs.some((r) => near(d, r, 50)));
+const imgOnLadder = m.imageDurations.filter((d) => REF.motion.imageDurationsMs.some((r) => near(d, r, 100)));
+const totalDur = m.durations.length + m.imageDurations.length;
 axis.push({
   name: "motion durations",
-  score: m.durations.length ? onLadder.length / m.durations.length : 0,
-  detail: `${onLadder.length}/${m.durations.length} durations on the 100–500ms ladder`,
+  score: totalDur ? (onLadder.length + imgOnLadder.length) / totalDur : 0,
+  detail: `${onLadder.length}/${m.durations.length} UI on the 100–500ms ladder, ${imgOnLadder.length}/${m.imageDurations.length} image on the 700/8000ms tier`,
 });
 
 // 7. Elevation restraint — going deeper than Marvin loses the premium feel.
