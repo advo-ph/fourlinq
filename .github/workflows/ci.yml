@@ -33,3 +33,22 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Structural-likeness drift gate. Marvin's structure is the reference
+      # FourlinQ chose, and until now nothing enforced it — the only test that
+      # ever asserted a Marvin contract lives on an unmerged branch, so the
+      # alignment could rot silently. This runs against the PRODUCTION BUILD
+      # (same score as dev, verified) and fails only on regression against the
+      # committed baseline, never for being under 100%.
+      - name: Install Chromium for the likeness gate
+        run: npx playwright install --with-deps chromium
+
+      - name: Marvin structural-likeness gate
+        run: |
+          set -euo pipefail
+          npm run preview -- --port 8080 > /tmp/preview.log 2>&1 &
+          for _ in $(seq 1 30); do
+            if curl -fsS -o /dev/null http://127.0.0.1:8080/; then break; fi
+            sleep 1
+          done
+          node scripts/marvin-likeness-gate.mjs http://127.0.0.1:8080
