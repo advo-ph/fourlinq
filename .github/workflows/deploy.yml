@@ -59,8 +59,14 @@ jobs:
           # Absolute key path ($HOME, not ~) so rsync's -e shell expands it.
           SSH="ssh -i $HOME/.ssh/id_ed25519 -o StrictHostKeyChecking=yes"
 
-          echo "::group::Prepare remote + stop process"
-          $SSH "$VPS" "mkdir -p $REMOTE_DIR/logs && pm2 stop fourlinq 2>/dev/null || true"
+          echo "::group::Prepare remote"
+          # NOTE: this used to `pm2 stop fourlinq` here. That single line was
+          # the real source of deploy downtime — the app stayed stopped for the
+          # whole rsync + install (measured: ~40s of 502s), and if any later
+          # step failed the site simply never came back, which is how earlier
+          # deploys left pm2 `stopped` with 0 restarts and an empty error log.
+          # Cluster reload swaps the worker at the end; nothing needs stopping.
+          $SSH "$VPS" "mkdir -p $REMOTE_DIR/logs"
           echo "::endgroup::"
 
           echo "::group::Sync artifacts (mirrors deploy.sh)"
