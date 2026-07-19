@@ -34,3 +34,6 @@ dist-ssr
 .visual-qa/
 .prod-surface-audit/
 tsconfig.*.tsbuildinfo
+
+# Built server bundle (pm2 cluster entry) — produced by npm run build:server
+server/index.bundle.cjs

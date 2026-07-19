@@ -83,8 +83,24 @@ if (isProd) {
   });
 }
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`FourlinQ ${isProd ? "production" : "dev"} server on http://localhost:${PORT}`);
+  // pm2 runs this in cluster mode with wait_ready: it keeps the OLD worker
+  // serving until the new one says it is listening, which is what makes a
+  // reload zero-downtime. Without this signal pm2 falls back to a timeout and
+  // deploys go back to dropping requests. No-op outside pm2 (plain `node`).
+  process.send?.("ready");
 });
+
+// Drain in-flight requests (including SSE streams) before exiting, so a reload
+// never severs a response mid-write.
+const shutdownServer = (signal: string) => {
+  console.log(`${signal} received — closing server to new connections`);
+  server.close(() => process.exit(0));
+  // Backstop: pm2's kill_timeout is 5s, so never outlive it.
+  setTimeout(() => process.exit(0), 4500).unref();
+};
+process.on("SIGINT", () => shutdownServer("SIGINT"));
+process.on("SIGTERM", () => shutdownServer("SIGTERM"));
 
 export default app;

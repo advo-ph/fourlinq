@@ -8,7 +8,7 @@ export default tseslint.config(
   // shadcn/ui components are vendored verbatim — don't lint them. Their style
   // (empty interfaces extending a supertype, mixed component + hook exports)
   // is intentional upstream convention and we don't maintain them.
-  { ignores: ["dist", "src/components/ui/**", "packages/cms-rag/**"] },
+  { ignores: ["dist", "src/components/ui/**", "packages/cms-rag/**", "server/index.bundle.cjs"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
