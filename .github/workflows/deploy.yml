@@ -75,6 +75,9 @@ jobs:
           rsync -az -e "$SSH" --delete --exclude='node_modules' packages/ "$VPS:$REMOTE_DIR/packages/"
           # src/data imported at runtime (tsx) for KB seeding.
           rsync -az -e "$SSH" --delete src/data/ "$VPS:$REMOTE_DIR/src/data/"
+          # Snapshot the CURRENT lockfile hash before the rsync overwrites it,
+          # so the install step below can tell whether dependencies changed.
+          $SSH "$VPS" "md5sum $REMOTE_DIR/package-lock.json 2>/dev/null | cut -d' ' -f1" > /tmp/lock-before.md5 || echo none > /tmp/lock-before.md5
           # Manifests needed for the live-side npm ci.
           rsync -az -e "$SSH" package.json package-lock.json tsconfig.json ecosystem.config.cjs "$VPS:$REMOTE_DIR/"
           echo "::endgroup::"
@@ -102,7 +105,20 @@ jobs:
           # re-install could land half-written — the tsx directory present but
           # dist/cli.mjs missing — so the app crash-looped on ERR_MODULE_NOT_FOUND
           # and the site served 502 while every step here reported success.
-          $SSH "$VPS" "cd $REMOTE_DIR && npm ci --omit=dev --no-audit --no-fund"
+          # Only reinstall when the lockfile actually changed. `npm ci` DELETES
+          # node_modules and rebuilds it (582 packages, ~15s), and the app is
+          # still serving out of that directory the whole time — measured on
+          # production, that window alone dropped requests even though the pm2
+          # reload itself was clean. Most deploys change no dependencies, so
+          # most deploys should not touch node_modules at all.
+          LOCK_BEFORE=$(cat /tmp/lock-before.md5 2>/dev/null || echo none)
+          LOCK_AFTER=$($SSH "$VPS" "md5sum $REMOTE_DIR/package-lock.json 2>/dev/null | cut -d' ' -f1" || echo unknown)
+          if [ "$LOCK_BEFORE" = "$LOCK_AFTER" ] && $SSH "$VPS" "test -d $REMOTE_DIR/node_modules/express"; then
+            echo "lockfile unchanged and node_modules intact — skipping npm ci"
+          else
+            echo "lockfile changed (or node_modules missing) — installing"
+            $SSH "$VPS" "cd $REMOTE_DIR && npm ci --omit=dev --no-audit --no-fund"
+          fi
           # Assert the boot entrypoint actually exists before restarting onto it.
           # A present directory is NOT proof — check the file pm2 will execute.
           $SSH "$VPS" "test -s $REMOTE_DIR/server/index.bundle.cjs || { echo 'FATAL: server bundle missing — refusing to restart'; exit 1; }"
