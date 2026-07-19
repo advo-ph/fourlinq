@@ -89,7 +89,14 @@ DATABASE_URL=your_neon_postgres_connection_string
 
 ## Deployment
 
-Production runs on the advo VPS under pm2. A push to `main` triggers `.github/workflows/deploy.yml`, which builds on the runner, rsyncs artifacts to the VPS, and restarts pm2 — the same flow as `./deploy.sh`. Check status with `npm run deploy:status`.
+Production runs on the advo VPS under pm2. A push to `main` triggers `.github/workflows/deploy.yml`, which builds on the runner, rsyncs artifacts to the VPS, and **reloads** pm2 — the same flow as `./deploy.sh`. Check status with `npm run deploy:status`.
+
+**Deploys are zero-downtime.** pm2 runs the app in cluster mode: a reload starts the replacement worker, waits for it to signal `ready` (`process.send("ready")` in `server/index.ts`), and only then stops the old one. Measured on the VPS under a 10/s poll, a fork-mode restart dropped 6 requests; a cluster reload drops 0.
+
+Two consequences worth knowing before changing the deploy:
+
+- **The cluster entry is a built bundle, not the TypeScript.** pm2's cluster container is CommonJS and cannot load an ESM/TS entry — it dies before any app code runs and writes nothing to the logs. `npm run build:server` bundles `server/index.ts` to `server/index.bundle.cjs` (gitignored; built on the runner). It must stay in `server/` so its `../uploads` and `../dist` paths resolve as they did under tsx.
+- **`tsx` and `typescript` are runtime `dependencies`, not devDependencies.** `npm ci --omit=dev` previously deleted them and a follow-up install could land half-written, crash-looping the app while every deploy step still reported success. The deploy also verifies the boot entrypoint exists before reloading, and `scripts/verify-deploy.sh` requires consecutive health responses plus a stable pm2 restart count so a boot loop fails the deploy instead of hiding in it.
 
 ## License
 
