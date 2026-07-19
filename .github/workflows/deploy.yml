@@ -37,6 +37,12 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      # The pm2 cluster entry. Built here on the runner (not committed — it is
+      # a 4MB artifact) and picked up by the server/ rsync below, which is why
+      # this must run BEFORE the deploy step.
+      - name: Build server bundle
+        run: npm run build:server
+
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
@@ -99,8 +105,25 @@ jobs:
           $SSH "$VPS" "cd $REMOTE_DIR && npm ci --omit=dev --no-audit --no-fund"
           # Assert the boot entrypoint actually exists before restarting onto it.
           # A present directory is NOT proof — check the file pm2 will execute.
-          $SSH "$VPS" "test -s $REMOTE_DIR/node_modules/tsx/dist/cli.mjs || { echo 'FATAL: tsx runtime incomplete — refusing to restart'; exit 1; }"
-          $SSH "$VPS" "cd $REMOTE_DIR && pm2 startOrRestart ecosystem.config.cjs && pm2 save"
+          $SSH "$VPS" "test -s $REMOTE_DIR/server/index.bundle.cjs || { echo 'FATAL: server bundle missing — refusing to restart'; exit 1; }"
+
+          # RELOAD, not restart: cluster mode brings the replacement worker up
+          # and waits for its `ready` signal before stopping the old one, so no
+          # request is dropped. Measured on this VPS: fork restart dropped 6
+          # requests under a 10/s poll, cluster reload dropped 0.
+          #
+          # pm2 cannot change exec_mode in place, so the first deploy after the
+          # fork->cluster switch (and only that one) has to delete and start.
+          $SSH "$VPS" "cd $REMOTE_DIR && \
+            MODE=\$(pm2 jlist 2>/dev/null | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{let l=[];try{l=JSON.parse(s||\"[]\")}catch{};const a=l.find(p=>p.name===\"fourlinq\");console.log(a?a.pm2_env.exec_mode:\"none\")})') && \
+            echo \"current exec_mode: \$MODE\" && \
+            if [ \"\$MODE\" = 'cluster_mode' ]; then \
+              pm2 reload ecosystem.config.cjs --update-env; \
+            else \
+              echo 'switching to cluster mode (one-time restart)'; \
+              pm2 delete fourlinq >/dev/null 2>&1 || true; \
+              pm2 start ecosystem.config.cjs; \
+            fi && pm2 save"
           echo "::endgroup::"
 
           echo "::group::Health check"
