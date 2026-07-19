@@ -1,45 +1,75 @@
 #!/usr/bin/env node
 /**
- * RM5 — public viewport containment scan (Tier 2, live browser).
+ * RM5 — public viewport containment scan.
  *
- * Loads every public route at every RM5 breakpoint and asserts
- * documentElement.scrollWidth <= innerWidth + 1 (no horizontal document scroll).
- *
- * Grounds: the 2026-07-10 capture found FAQ 919px at 390/768 and the Design
- * Tool 404px at 390. This is the reproducible harness for that finding.
- *
- * Usage: start the app, then `node scripts/rm5-viewport-scan.mjs [baseURL]`.
- * Exit 0 = contained everywhere; exit 1 = one or more overflow rows (printed).
+ * Exit 0: every public state is contained and aliases canonicalize.
+ * Exit 1: app regression.
+ * Exit 2: QA infrastructure, server, or app-shell failure.
  */
-import { chromium } from "playwright-core";
+import {
+  ALIAS_ROUTE,
+  PUBLIC_ROUTE,
+  QaInfraError,
+  RM5_VIEWPORT,
+  checkAlias,
+  consentContext,
+  launchQaBrowser,
+  routeFinding,
+  visitPublicRoute,
+} from "./qa-contract.mjs";
 
-const BASE = process.argv[2] || "http://localhost:8080";
-const ROUTES = [
-  "/", "/products", "/products?filter=doors", "/why-upvc", "/aluminium",
-  "/inspiration", "/for-architects", "/design-tool", "/brand", "/faq",
-  "/finishes", "/warranty", "/care", "/whats-new", "/help-me-choose", "/legal",
-];
-const WIDTHS = [375, 390, 560, 768, 992, 1199, 1440];
+let browser;
+const finding = [];
 
-const browser = await chromium.launch({ channel: "chrome", headless: true });
-const overflow = [];
-for (const route of ROUTES) {
-  const page = await browser.newPage();
-  await page.goto(BASE + route, { waitUntil: "networkidle", timeout: 30000 }).catch(() => {});
-  for (const w of WIDTHS) {
-    await page.setViewportSize({ width: w, height: 900 });
-    await page.waitForTimeout(300);
-    const m = await page
-      .evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth }))
-      .catch(() => ({ sw: 0, iw: 1 }));
-    if (m.sw > m.iw + 1) overflow.push(`${route} @${w}: scrollWidth=${m.sw} > ${m.iw}`);
+try {
+  browser = await launchQaBrowser();
+
+  for (const viewport of RM5_VIEWPORT) {
+    const context = await consentContext(browser, viewport);
+    try {
+      const page = await context.newPage();
+      for (const route of PUBLIC_ROUTE) {
+        await visitPublicRoute(page, route, 200);
+        finding.push(...(await routeFinding(page, route)).map((entry) => `${viewport.name}: ${entry}`));
+        const metric = await page.evaluate(() => ({
+          documentWidth: document.documentElement.scrollWidth,
+          bodyWidth: document.body.scrollWidth,
+          innerWidth: window.innerWidth,
+        }));
+        const widest = Math.max(metric.documentWidth, metric.bodyWidth);
+        if (widest > metric.innerWidth + 1) {
+          finding.push(`${viewport.name} ${route.name}: horizontal overflow ${widest}px > ${metric.innerWidth}px`);
+        }
+      }
+    } finally {
+      await context.close();
+    }
   }
-  await page.close();
-}
-await browser.close();
 
-if (overflow.length) {
-  console.error("RM5 FAIL — horizontal overflow:\n" + overflow.map((r) => "  " + r).join("\n"));
-  process.exit(1);
+  const context = await consentContext(browser, RM5_VIEWPORT[0]);
+  try {
+    const page = await context.newPage();
+    for (const route of ALIAS_ROUTE) {
+      const aliasFinding = await checkAlias(page, route);
+      if (aliasFinding) finding.push(aliasFinding);
+    }
+  } finally {
+    await context.close();
+  }
+} catch (cause) {
+  const message = cause instanceof Error ? cause.message : String(cause);
+  console.error(`RM5 INFRA — ${message}`);
+  process.exitCode = 2;
+} finally {
+  await browser?.close().catch(() => {});
 }
-console.log(`RM5 PASS — ${ROUTES.length} routes × ${WIDTHS.length} widths, no horizontal overflow.`);
+
+if (process.exitCode !== 2) {
+  if (finding.length > 0) {
+    console.error("RM5 FAIL — viewport or route-state finding:");
+    finding.forEach((entry) => console.error(`- ${entry}`));
+    process.exitCode = 1;
+  } else {
+    console.log(`RM5 PASS — ${PUBLIC_ROUTE.length} public states × ${RM5_VIEWPORT.length} widths plus ${ALIAS_ROUTE.length} canonical aliases.`);
+  }
+}

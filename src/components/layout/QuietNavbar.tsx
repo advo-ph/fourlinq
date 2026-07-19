@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 
 interface NavChild {
   label: string;
@@ -61,6 +62,10 @@ const QuietNavbar = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const transparent = isHome && !scrolled && !mobileOpen;
+  const mobileDialogRef = useDialogFocus<HTMLDivElement>({
+    isOpen: mobileOpen,
+    onClose: () => setMobileOpen(false),
+  });
 
   // Close mobile drawer on route change
   useEffect(() => { setMobileOpen(false); }, [location]);
@@ -71,12 +76,6 @@ const QuietNavbar = () => {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // Lock body scroll when mobile drawer open
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [mobileOpen]);
 
   return (
     <>
@@ -201,6 +200,8 @@ const QuietNavbar = () => {
               onClick={() => setMobileOpen(!mobileOpen)}
               className={cn("lg:hidden p-2 -mr-2", transparent ? "text-white" : "text-[color:var(--ink-primary)]")}
               aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation-dialog"
             >
               {mobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -211,7 +212,15 @@ const QuietNavbar = () => {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden bg-white pt-[72px] animate-fade-in flex flex-col">
+        <div
+          id="mobile-navigation-dialog"
+          ref={mobileDialogRef}
+          className="fixed inset-0 z-40 lg:hidden bg-white pt-[72px] animate-fade-in flex flex-col"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site navigation"
+          tabIndex={-1}
+        >
           {/* Top: primary CTA — red box, prominent, at top so it's the first thing
               the visitor sees when they open the menu. */}
           <div className="container-editorial pt-6 pb-2">
