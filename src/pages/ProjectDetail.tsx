@@ -4,26 +4,9 @@ import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import ProjectPhotoSwitcher, { type ProjectPhoto } from "@/components/shared/ProjectPhotoSwitcher";
 import EditorialButton from "@/components/primitives/Button";
-import { projects as fallbackProjects, type Project } from "@/data/projects";
+import { projects as fallbackProject, type Project } from "@/data/projects";
 import { products } from "@/data/products";
-import { fetchProjects, type CmsProject } from "@/lib/cms-api";
-
-function fromCms(p: CmsProject): Project {
-  return {
-    id: p.slug,
-    name: p.title,
-    location: p.location ?? "",
-    image: p.cover_path ?? "",
-    gallery: p.gallery_paths,
-    category: (p.category ?? "interior") as Project["category"],
-    caption: p.caption ?? undefined,
-    description: p.description ?? undefined,
-    architect: p.architect ?? undefined,
-    year: p.project_year ?? undefined,
-    systemsUsed: p.systems_used,
-    quote: p.quote_text ? { text: p.quote_text, attribution: p.quote_attribution ?? "" } : undefined,
-  };
-}
+import { fetchProjects, mergeProject, canonicalProjectSlug } from "@/lib/cms-api";
 
 /**
  * /projects/:slug — individual project detail page.
@@ -46,48 +29,74 @@ const categoryLabel: Record<string, string> = {
 
 const ProjectDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [projects, setProjects] = useState<Project[]>(fallbackProjects);
+  const [project, setProject] = useState<Project[]>(fallbackProject);
+  // The CMS response must not decide "not found" before it has arrived. The
+  // page used to redirect on the very first render, which made any project
+  // that exists ONLY in the CMS unreachable by direct URL or refresh.
+  const [cmsSettled, setCmsSettled] = useState(false);
 
   useEffect(() => {
+    let active = true;
     fetchProjects()
-      .then((rows) => setProjects(rows.map(fromCms)))
-      .catch(() => { /* keep fallback */ });
+      // Merge over the verified fallback rather than replacing it: a CMS
+      // response that omits a project (or blanks a field) must not delete
+      // what we already know. Replacing is what made San Lorenzo vanish.
+      .then((row) => { if (active) setProject(mergeProject(fallbackProject, row)); })
+      .catch(() => { /* keep fallback */ })
+      .finally(() => { if (active) setCmsSettled(true); });
+    return () => { active = false; };
   }, []);
 
-  const project = projects.find((p) => p.id === slug);
+  // The published URL uses the British spelling; the CMS row uses the
+  // American one. Canonicalize so both reach the same project.
+  const canonicalSlug = slug ? canonicalProjectSlug(slug) : undefined;
+  const selectedProject = project.find((p) => p.id === canonicalSlug);
 
   const otherProjects = useMemo(
-    () => projects.filter((p) => p.id !== slug).slice(0, 3),
-    [slug, projects]
+    () => project.filter((p) => p.id !== canonicalSlug).slice(0, 3),
+    [canonicalSlug, project]
   );
 
   // Map systemsUsed slugs to product entries for cross-links
   const linkedProducts = useMemo(
     () =>
-      (project?.systemsUsed ?? [])
+      (selectedProject?.systemsUsed ?? [])
         .map((id) => products.find((p) => p.id === id))
         .filter(Boolean) as (typeof products[number])[],
-    [project]
+    [selectedProject]
   );
 
-  if (!project) return <Navigate to="/inspiration" replace />;
+  // Only the settled CMS response may declare a slug missing. Redirecting
+  // while the request is still in flight is what made a CMS-only project
+  // unreachable by direct URL. A slug already in the verified fallback still
+  // renders on the first paint, so this costs no perceived latency.
+  if (!selectedProject) {
+    if (!cmsSettled) {
+      return (
+        <Layout>
+          <section className="min-h-[60vh]" aria-busy="true" aria-label="Loading project" />
+        </Layout>
+      );
+    }
+    return <Navigate to="/inspiration" replace />;
+  }
 
   const galleryPhotos: ProjectPhoto[] = [
-    { src: project.image, alt: project.name, caption: project.location },
-    ...(project.gallery ?? []).map((src, i) => ({
+    { src: selectedProject.image, alt: selectedProject.name, caption: selectedProject.location },
+    ...(selectedProject.gallery ?? []).map((src, i) => ({
       src,
-      alt: `${project.name} — detail ${i + 1}`,
-      caption: project.location,
+      alt: `${selectedProject.name} — detail ${i + 1}`,
+      caption: selectedProject.location,
     })),
   ];
 
   return (
     <Layout>
       <PageHeader
-        eyebrow={categoryLabel[project.category] ?? "Project"}
-        title={project.name}
-        breadcrumbLabel={project.name}
-        subtitle={project.caption ?? project.location}
+        eyebrow={categoryLabel[selectedProject.category] ?? "Project"}
+        title={selectedProject.name}
+        breadcrumbLabel={selectedProject.name}
+        subtitle={selectedProject.caption ?? selectedProject.location}
       />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
@@ -102,31 +111,31 @@ const ProjectDetail = () => {
             <div className="lg:col-span-7">
               <p className="eyebrow mb-5">About this project</p>
               <p className="font-serif text-h4 lg:text-h3 leading-[1.35] text-[color:var(--ink-primary)] tracking-tight">
-                {project.description ?? project.caption}
+                {selectedProject.description ?? selectedProject.caption}
               </p>
             </div>
             <div className="lg:col-span-4 lg:col-start-9">
               <dl className="space-y-6">
                 <div>
                   <dt className="eyebrow mb-2">Location</dt>
-                  <dd className="text-body text-[color:var(--ink-primary)]">{project.location}</dd>
+                  <dd className="text-body text-[color:var(--ink-primary)]">{selectedProject.location}</dd>
                 </div>
-                {project.year && (
+                {selectedProject.year && (
                   <div className="border-t border-[color:var(--rule-soft)] pt-6">
                     <dt className="eyebrow mb-2">Completed</dt>
-                    <dd className="text-body text-[color:var(--ink-primary)]">{project.year}</dd>
+                    <dd className="text-body text-[color:var(--ink-primary)]">{selectedProject.year}</dd>
                   </div>
                 )}
-                {project.architect && (
+                {selectedProject.architect && (
                   <div className="border-t border-[color:var(--rule-soft)] pt-6">
                     <dt className="eyebrow mb-2">Architect</dt>
-                    <dd className="text-body text-[color:var(--ink-primary)]">{project.architect}</dd>
+                    <dd className="text-body text-[color:var(--ink-primary)]">{selectedProject.architect}</dd>
                   </div>
                 )}
                 <div className="border-t border-[color:var(--rule-soft)] pt-6">
                   <dt className="eyebrow mb-2">Category</dt>
                   <dd className="text-body text-[color:var(--ink-primary)]">
-                    {categoryLabel[project.category] ?? project.category}
+                    {categoryLabel[selectedProject.category] ?? selectedProject.category}
                   </dd>
                 </div>
               </dl>
@@ -167,14 +176,14 @@ const ProjectDetail = () => {
           )}
 
           {/* Owner / architect quote — only if populated */}
-          {project.quote && (
+          {selectedProject.quote && (
             <div className="mb-20 lg:mb-28 border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16">
               <blockquote className="max-w-3xl">
                 <p className="font-serif text-h3 lg:text-h2 leading-[1.2] tracking-tight text-[color:var(--ink-primary)]">
-                  "{project.quote.text}"
+                  "{selectedProject.quote.text}"
                 </p>
                 <footer className="mt-8 eyebrow text-[color:var(--ink-muted)]">
-                  — {project.quote.attribution}
+                  — {selectedProject.quote.attribution}
                 </footer>
               </blockquote>
             </div>

@@ -2,22 +2,25 @@ import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
-import { projects as fallbackProjects, type ProjectCategory } from "@/data/projects";
-import { fetchProjects, type CmsProject } from "@/lib/cms-api";
+import { projects as fallbackProject, type ProjectCategory, type Project } from "@/data/projects";
+import { fetchProjects, mergeProject } from "@/lib/cms-api";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | ProjectCategory;
 
-// Normalize API row (DB shape) to the view shape used by this page
+// Normalize a merged Project to the view shape used by this page. The merge
+// (not a replace) happens in mergeProject so a CMS response that omits a
+// project cannot delete it from the gallery, and so every card links to the
+// canonical slug rather than whichever spelling the CMS happens to store.
 type ViewProject = { id: string; name: string; location: string; image: string; caption?: string; category: string };
-function normalize(p: CmsProject): ViewProject {
+function toView(p: Project): ViewProject {
   return {
-    id: p.slug,
-    name: p.title,
-    location: p.location ?? "",
-    image: p.cover_path ?? "",
-    caption: p.caption ?? undefined,
-    category: p.category ?? "interior",
+    id: p.id,
+    name: p.name,
+    location: p.location,
+    image: p.image,
+    caption: p.caption,
+    category: p.category,
   };
 }
 
@@ -33,14 +36,14 @@ const filters: { label: string; value: Filter }[] = [
 
 const Inspiration = () => {
   const [active, setActive] = useState<Filter>("all");
-  const [items, setItems] = useState<ViewProject[]>(() =>
-    fallbackProjects.map((p) => ({ id: p.id, name: p.name, location: p.location, image: p.image, caption: p.caption, category: p.category }))
-  );
+  const [items, setItems] = useState<ViewProject[]>(() => fallbackProject.map(toView));
 
   useEffect(() => {
+    let active = true;
     fetchProjects()
-      .then((rows) => setItems(rows.map(normalize)))
+      .then((row) => { if (active) setItems(mergeProject(fallbackProject, row).map(toView)); })
       .catch(() => { /* keep fallback */ });
+    return () => { active = false; };
   }, []);
 
   const filtered = useMemo(
