@@ -35,7 +35,9 @@ export default {
         "lead":      ["1.25rem",  { lineHeight: "1.55" }],
         "h6":        ["1.25rem",  { lineHeight: "1.4", letterSpacing: "-0.005em" }],
         "h5":        ["1.5rem",   { lineHeight: "1.35", letterSpacing: "-0.01em" }],
-        "h4":        ["1.875rem", { lineHeight: "1.25", letterSpacing: "-0.01em" }],
+        // 2rem/32px, not 1.875rem/30px: Marvin's scale steps 28 -> 32 and has
+        // no 30. This was the only step in the ramp sitting off that ladder.
+        "h4":        ["2rem",     { lineHeight: "1.25", letterSpacing: "-0.01em" }],
         "h3":        ["2.5rem",   { lineHeight: "1.15", letterSpacing: "-0.015em" }],
         "h2":        ["3.5rem",   { lineHeight: "1.1",  letterSpacing: "-0.02em" }],
         "h1":        ["4rem",     { lineHeight: "1.05", letterSpacing: "-0.02em" }],

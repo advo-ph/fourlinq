@@ -28,7 +28,9 @@
   "motion": {
     "signatureEase": "cubic-bezier(0.68, 0, 0.33, 1)",
     "durationsMs": [100, 200, 300, 400, 500],
-    "hoverDefaultMs": 300
+    "hoverDefaultMs": 300,
+    "_imageNote": "Image transitions legitimately sit OUTSIDE the UI ladder. Marvin's own spec: 'image scales 1.03 over 700ms with the signature ease' plus an 8000ms ken-burns. The first version of this gate scored image durations against the 100-500ms ladder and reported a FALSE regression on a value that was correctly matching Marvin — and that our own DESIGN_SYSTEM.md documents as '300ms hover / 700ms image'. Images are scored against this tier instead.",
+    "imageDurationsMs": [700, 8000]
   },
 
   "elevation": {
