@@ -120,7 +120,7 @@ const NavSearch = ({ open, onClose }: NavSearchProps) => {
       ref={panelRef}
       id="site-search-flyout"
       role="search"
-      className="fixed left-0 right-0 top-[72px] z-50 bg-white text-[color:var(--ink-primary)] border-b border-[color:var(--rule-soft)] shadow-[0_24px_48px_-24px_rgba(0,0,0,0.25)]"
+      className="fixed left-0 right-0 top-[72px] z-50 bg-white text-[color:var(--ink-primary)] border-b border-[color:var(--rule-soft)]"
     >
       <div className="container-editorial py-8 lg:py-10 max-h-[calc(100vh-72px)] overflow-y-auto">
         {/* Input row */}
@@ -242,7 +242,7 @@ const NavSearch = ({ open, onClose }: NavSearchProps) => {
                               src={p.image}
                               alt={p.name}
                               loading="lazy"
-                              className="w-full h-full object-cover transition-transform duration-500 ease-marvin group-hover:scale-[1.04]"
+                              className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.04]"
                             />
                           </div>
                           <p className="mt-2.5 text-body-sm font-medium group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
@@ -275,7 +275,7 @@ const NavSearch = ({ open, onClose }: NavSearchProps) => {
                               src={p.image}
                               alt={p.name}
                               loading="lazy"
-                              className="w-full h-full object-cover transition-transform duration-500 ease-marvin group-hover:scale-[1.04]"
+                              className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.04]"
                             />
                           </div>
                           <p className="mt-2.5 text-body-sm font-medium group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">

@@ -94,7 +94,7 @@ const NavFrameTile = ({ label, description, to, framePath, active, onNavigate }:
         <canvas
           ref={canvasRef}
           className={cn(
-            "w-full h-full object-cover transition-opacity duration-500",
+            "w-full h-full object-cover transition-opacity duration-700",
             isLoaded ? "opacity-100" : "opacity-0",
           )}
         />

@@ -106,7 +106,7 @@ const NavImageCard = ({ card, onNavigate }: { card: NavCard; onNavigate: () => v
         alt={card.label}
         loading="lazy"
         decoding="async"
-        className="w-full h-full object-cover transition-transform duration-500 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.05]"
+        className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.05]"
       />
     </div>
     <div className="mt-4 flex items-start justify-between gap-3">
@@ -235,7 +235,7 @@ const QuietNavbar = () => {
                           "transition-[opacity,visibility] duration-300 ease-marvin"
                         )}
                       >
-                        <div className="bg-white text-[color:var(--ink-primary)] border-b border-[color:var(--rule-soft)] shadow-[0_24px_48px_-24px_rgba(0,0,0,0.25)]">
+                        <div className="bg-white text-[color:var(--ink-primary)] border-b border-[color:var(--rule-soft)]">
                           <div className="container-editorial py-9 max-h-[calc(100vh-72px)] overflow-y-auto">
                             <div
                               className={cn(
