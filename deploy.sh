@@ -62,6 +62,9 @@ ssh "${VPS_SSH}" "pm2 stop fourlinq 2>/dev/null" || true
 
 log "Syncing files → ${REMOTE_DIR}"
 # Excludes mirror kent's: never touch .env, node_modules, build caches, dev artifacts.
+# NOTE: no 'docs'/'scripts' excludes on the dist/ sync — the repo folders by
+# those names can never appear inside dist/, but public/docs/ (the downloadable
+# system catalog) legitimately builds into dist/docs/ and must ship.
 rsync -az --delete \
   --exclude='node_modules' \
   --exclude='.env' \
@@ -69,8 +72,6 @@ rsync -az --delete \
   --exclude='.env.local' \
   --exclude='.git' \
   --exclude='.tmp' \
-  --exclude='docs' \
-  --exclude='scripts' \
   --exclude='.eslintcache' \
   dist/ \
   "${VPS_SSH}:${REMOTE_DIR}/dist/"

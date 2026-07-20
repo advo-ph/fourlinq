@@ -76,10 +76,13 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Sync artifacts (mirrors deploy.sh)"
-          # Frontend build output.
+          # Frontend build output. No 'docs'/'scripts' excludes here — the
+          # repo folders by those names can never appear inside dist/, but
+          # public/docs/ (the downloadable system catalog) legitimately
+          # builds into dist/docs/ and must ship.
           rsync -az -e "$SSH" --delete \
             --exclude='node_modules' --exclude='.env' --exclude='.env.local' \
-            --exclude='.git' --exclude='docs' --exclude='scripts' \
+            --exclude='.git' \
             dist/ "$VPS:$REMOTE_DIR/dist/"
           # Server runtime.
           rsync -az -e "$SSH" --delete --exclude='node_modules' server/ "$VPS:$REMOTE_DIR/server/"
