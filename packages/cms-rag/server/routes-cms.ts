@@ -12,7 +12,7 @@ import type { KbSync } from "./kb-sync.js";
 
 export type FieldType =
   | "text" | "textarea" | "markdown" | "number" | "boolean"
-  | "select" | "image" | "string_array" | "json";
+  | "select" | "image" | "file" | "string_array" | "json";
 
 export interface EntityField {
   /** DB column name (snake_case). */

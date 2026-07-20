@@ -254,6 +254,62 @@ const productAdapter: EntityKbAdapter = {
   }),
 };
 
+const aluminiumAdapter: EntityKbAdapter = {
+  kind: "aluminium",
+  loadById: async (pool, id) => {
+    const { rows } = await pool.query(
+      `SELECT slug, name, summary, best_for, spec_sheet_url, is_published, deleted_at
+       FROM cms_aluminium_system WHERE cms_aluminium_system_id = $1`, [id]);
+    return rows[0] ?? null;
+  },
+  isInactive: (r: any) => !!r.deleted_at || !r.is_published,
+  toChunk: (r: any) => ({
+    title: `Aluminium system — ${r.name}`,
+    content: [
+      `${r.name} aluminium system.`,
+      r.summary,
+      r.best_for ? `Best for: ${r.best_for}` : null,
+      r.spec_sheet_url ? `Spec sheet: ${r.spec_sheet_url}.` : null,
+      "See /aluminium on the site.",
+    ].filter(Boolean).join(" "),
+    contentType: "product",
+    tags: ["aluminium", r.slug].filter(Boolean),
+    sourceUrl: "",
+  }),
+};
+
+const documentAdapter: EntityKbAdapter = {
+  kind: "document",
+  loadById: async (pool, id) => {
+    const { rows } = await pool.query(
+      `SELECT slug, title, doc_type, description, file_path, link_url, note,
+              is_published, deleted_at
+       FROM cms_document WHERE cms_document_id = $1`, [id]);
+    return rows[0] ?? null;
+  },
+  isInactive: (r: any) => !!r.deleted_at || !r.is_published,
+  toChunk: (r: any) => {
+    // Mirror the page's derived status so the chatbot gives the same answer
+    // the technical library shows.
+    const availability = r.file_path
+      ? `Downloadable now from the technical library on /for-architects (${r.file_path}).`
+      : r.link_url
+        ? `Available now at ${r.link_url} on the site.`
+        : `${r.note ?? "Available on request"} — email sales@fourlinq.com with the document title.`;
+    return {
+      title: `Technical document — ${r.title}`,
+      content: [
+        `${r.title} (${r.doc_type}).`,
+        r.description,
+        availability,
+      ].filter(Boolean).join(" "),
+      contentType: "page",
+      tags: ["document", "architects", r.slug].filter(Boolean),
+      sourceUrl: "",
+    };
+  },
+};
+
 // ─────────────────────────────────────────────
 // Build the wiring
 // ─────────────────────────────────────────────
@@ -295,7 +351,35 @@ const aluminiumEntity: EntityConfig = {
   syncKb: true,
 };
 
-const entities = [projectEntity, newsEntity, pageEntity, productEntity, aluminiumEntity, mediaEntity];
+const documentEntity: EntityConfig = {
+  kind: "document",
+  label: "Document",
+  labelPlural: "Documents",
+  table: "cms_document",
+  pk: "cms_document_id",
+  slugColumn: "slug",
+  orderBy: "display_order ASC, title ASC",
+  fields: [
+    { column: "slug", label: "Slug", type: "text", required: true },
+    { column: "title", label: "Title", type: "text", required: true },
+    { column: "doc_type", label: "File type badge", type: "select", default: "PDF", options: [
+      { value: "PDF", label: "PDF" },
+      { value: "DWG", label: "DWG (AutoCAD)" },
+      { value: "RFA", label: "RFA (Revit)" },
+      { value: "ZIP", label: "ZIP" },
+      { value: "DOC", label: "DOC" },
+    ]},
+    { column: "description", label: "Description", type: "textarea" },
+    { column: "file_path", label: "File (PDF, DWG, RFA, ZIP, or DOC)", type: "file" },
+    { column: "link_url", label: "Link (site route like /finishes, or external URL — used when there is no PDF)", type: "text" },
+    { column: "note", label: "Status note when there is no PDF and no link (blank = \"On request\")", type: "text" },
+    { column: "display_order", label: "Display order", type: "number", default: 999 },
+    { column: "is_published", label: "Published", type: "boolean", default: true },
+  ],
+  syncKb: true,
+};
+
+const entities = [projectEntity, newsEntity, pageEntity, productEntity, aluminiumEntity, documentEntity, mediaEntity];
 
 const kb = createKbSync({
   pool,
@@ -308,6 +392,8 @@ const kb = createKbSync({
     news: newsAdapter,
     pages: pageAdapter,
     products: productAdapter,
+    aluminium: aluminiumAdapter,
+    document: documentAdapter,
   },
 });
 
@@ -339,7 +425,23 @@ const uploadRouter = createUploadRouter({
   aspectRatioRange: [0.5, 3.0],
 });
 
+// Second upload mount for technical-library files. No sharp post-processing —
+// resize/aspect checks are image concerns. The row still lands in
+// cms_media_asset for byte-size auditing; the admin media grid filters
+// document extensions out of its thumbnail view.
+const docsUploadRouter = createUploadRouter({
+  pool,
+  organizationId: ORG_ID,
+  uploadDir: path.resolve(import.meta.dirname, "../uploads/docs"),
+  publicPrefix: "/uploads/docs",
+  // 50 MB — a Revit family or zipped CAD block set is heavier than a web image.
+  maxSizeBytes: 50 * 1024 * 1024,
+  // Extension check, not mime: browsers report DWG/RFA as octet-stream.
+  // Matches the doc_type badges the library offers (PDF, DWG, RFA, ZIP, DOC).
+  allowedExtension: /\.(pdf|dwg|rfa|zip|doc|docx)$/i,
+});
+
 const usersRouter = createUsersRouter({ pool, organizationId: ORG_ID });
 const auditMiddleware = createAuditMiddleware({ pool, defaultOrgId: ORG_ID });
 
-export { cmsPublic, cmsAdmin, uploadRouter, usersRouter, auditMiddleware, entities };
+export { cmsPublic, cmsAdmin, uploadRouter, docsUploadRouter, usersRouter, auditMiddleware, entities, kb };

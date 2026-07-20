@@ -27,6 +27,21 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+### Session: 2026-07-20 — /for-architects technical library goes CMS-backed with real downloads
+
+The technical library on /for-architects was a hardcoded list where nearly every row said "Available on request". It now renders from a new `cms_document` table, ships with an actual downloadable System Catalog PDF, and every slot is uploadable from the admin — no code change needed when the real DWGs/manuals arrive.
+
+#### Added
+
+- **`cms_document` table + `document` CMS kind** — migration 013 creates the table (`slug`, `title`, `doc_type` badge, `description`, `file_path`, `link_url`, `note`, `display_order`, `is_published`) and seeds the eight previously hardcoded library rows. Status is derived on the page, not stored: `file_path` → Download, `link_url` → Available now, else `note` ?? "Available on request". Editable via `/admin → Content → Documents`. [server/migrations/013_cms_document.sql](../server/migrations/013_cms_document.sql) (new), [server/cms-config.ts](../server/cms-config.ts). Note: migration already applied to the shared DB on 2026-07-20.
+- **Generated System Catalog PDF** — `scripts/generate-system-catalog.ts` renders a 7-page on-brand catalog (Fraunces/red editorial) via Playwright, strictly from the brochure-verified `fourlinq-data.ts` (advantages, profile cut-section features, product types, materials, profile systems, all 12 finishes + aluminium powder-coats, warranty, branches; `DIMENSION_CONSTRAINTS` deliberately excluded as unverified). Output lands in `public/docs/` so it deploys with dist. [scripts/generate-system-catalog.ts](../scripts/generate-system-catalog.ts) (new), [public/docs/fourlinq-system-catalog.pdf](../public/docs/fourlinq-system-catalog.pdf) (new).
+- **Document upload pipeline** — new `file` field type in the cms-rag package with a `FilePicker` (drop-zone, extension-validated: PDF, DWG, RFA, ZIP, DOC, 50 MB cap) posting to a second upload mount `/api/admin/cms/docs` → `uploads/docs/`. The upload router factory gained `allowedExtension` (extension check instead of mime — browsers report DWG/RFA as octet-stream). Media grid filters document extensions out of its thumbnail view. [packages/cms-rag/client/FilePicker.tsx](../packages/cms-rag/client/FilePicker.tsx) (new), [packages/cms-rag/server/routes-upload.ts](../packages/cms-rag/server/routes-upload.ts), [server/index.ts](../server/index.ts).
+- **`useDocument` hook + test** — React Query with the migration-seed mirrored as static fallback so the page never renders empty. [src/hooks/useDocument.ts](../src/hooks/useDocument.ts) (new), [src/test/useDocument.test.ts](../src/test/useDocument.test.ts) (new).
+
+#### Changed
+
+- **/for-architects technical library renders from the CMS** — same card design (type badge, status chip, serif title, description), but rows come from `/api/cms/document`; a row with an uploaded file links it with a download arrow and a dark "Download" chip. [src/pages/ForArchitects.tsx](../src/pages/ForArchitects.tsx).
+
 ### Session: 2026-05-29 — Phase-1-through-7 backlog close, CMS safeguards, deploy hardening
 
 Three-batch session under the rolling deploy chain (`cms-rag-multiuser` → `supafinal` → `main`, with `./deploy.sh` rsync to advo VPS at https://fourlinq.ph). Roadmap reconciled with code reality: Phases 4 + 7 were quietly already-shipped via the `cms-rag` package and just undocumented; Phase 1 + Phase 5 got pipes-wired + cutover. Closing trailing CMS editability gaps so Tita can edit products / aluminium / page body copy without breaking the art-directed homepage hero, scroll-frame animation, or Brand house-photo hero — those stay code-controlled.

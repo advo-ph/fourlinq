@@ -9,7 +9,7 @@ import adminChatRouter from "./routes/admin-chat.js";
 import inquiriesRouter from "./routes/inquiries.js";
 import analyticsRouter from "./routes/analytics.js";
 import productsRouter from "./routes/products.js";
-import { cmsPublic, cmsAdmin, uploadRouter, usersRouter, auditMiddleware } from "./cms-config.js";
+import { cmsPublic, cmsAdmin, uploadRouter, docsUploadRouter, usersRouter, auditMiddleware } from "./cms-config.js";
 import { loginHandler, logoutHandler, checkAuthHandler, requireAdmin, requireRole } from "./auth.js";
 import { spaStatusForPath } from "./spa-route.js";
 
@@ -55,6 +55,8 @@ app.use("/api/admin/analytics", requireAdmin, analyticsRouter);
 // CMS — admin + editor can manage all content; media role limited to /media only
 app.use("/api/admin/cms/media",
   ...requireRole(["admin", "editor", "media"]), auditMiddleware, uploadRouter);
+app.use("/api/admin/cms/docs",
+  ...requireRole(["admin", "editor", "media"]), auditMiddleware, docsUploadRouter);
 app.use("/api/admin/cms",
   ...requireRole(["admin", "editor"]), auditMiddleware, cmsAdmin);
 

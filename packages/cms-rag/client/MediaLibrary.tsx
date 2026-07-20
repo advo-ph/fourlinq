@@ -34,7 +34,9 @@ export function MediaLibrary({ api }: { api: CmsRagApi }) {
     setLoading(true);
     try {
       const rows = await api.list<MediaRow>("media");
-      setItems(rows);
+      // Document uploads (PDF/DWG/RFA/ZIP/DOC) also register a media row for
+      // auditing; this grid renders image thumbnails, so keep it images-only.
+      setItems(rows.filter((r) => !/\.(pdf|dwg|rfa|zip|docx?)$/i.test(r.file_path ?? "")));
     } finally { setLoading(false); }
   }, [api]);
   useEffect(() => { load(); }, [load]);

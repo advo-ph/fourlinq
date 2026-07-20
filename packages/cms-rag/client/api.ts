@@ -9,7 +9,7 @@ export interface EntityFieldDescriptor {
   label?: string;
   type:
     | "text" | "textarea" | "markdown" | "number" | "boolean"
-    | "select" | "image" | "string_array" | "json";
+    | "select" | "image" | "file" | "string_array" | "json";
   options?: Array<{ value: string; label: string }>;
   required?: boolean;
   public?: boolean;
@@ -60,11 +60,16 @@ export class CmsRagApi {
     await this.json(`/${kind}/${id}`, { method: "DELETE" });
   }
 
-  async upload(file: File, altText?: string): Promise<{ cms_media_asset_id: number; file_path: string }> {
+  async upload(
+    file: File,
+    altText?: string,
+    /** Upload mount under basePath: "media" (images, default) or "docs" (PDFs). */
+    mount: "media" | "docs" = "media",
+  ): Promise<{ cms_media_asset_id: number; file_path: string }> {
     const form = new FormData();
     form.append("file", file);
     if (altText) form.append("alt_text", altText);
-    const res = await fetch(`${this.basePath}/media/upload`, {
+    const res = await fetch(`${this.basePath}/${mount}/upload`, {
       method: "POST",
       credentials: "include",
       body: form,

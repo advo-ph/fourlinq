@@ -47,6 +47,12 @@ export interface UploadRouterConfig {
   maxSizeBytes?: number;
   /** Mime regex. Default images only. */
   allowedMime?: RegExp;
+  /**
+   * Filename-extension regex (e.g. /\.(pdf|dwg)$/i). When set, it replaces
+   * the mime check — browsers report unreliable mimetypes for CAD/BIM
+   * formats (DWG, RFA often arrive as application/octet-stream).
+   */
+  allowedExtension?: RegExp;
   /** Enable sharp-based downscale + thumbnail generation. Off by default. */
   resize?: UploadResizeConfig;
   /** [minRatio, maxRatio] = width / height. Outside this range → reject. */
@@ -59,6 +65,7 @@ export function createUploadRouter(config: UploadRouterConfig): Router {
     table = "cms_media_asset",
     maxSizeBytes = 15 * 1024 * 1024,
     allowedMime = /^image\/(jpe?g|png|webp|gif|avif|svg\+xml)$/,
+    allowedExtension,
     resize,
     aspectRatioRange,
   } = config;
@@ -79,7 +86,13 @@ export function createUploadRouter(config: UploadRouterConfig): Router {
     storage,
     limits: { fileSize: maxSizeBytes },
     fileFilter: (_req, file, cb) => {
-      if (!allowedMime.test(file.mimetype)) return cb(new Error(`Unsupported mime: ${file.mimetype}`));
+      if (allowedExtension) {
+        if (!allowedExtension.test(file.originalname)) {
+          return cb(new Error(`Unsupported file type: ${path.extname(file.originalname) || "(none)"}`));
+        }
+      } else if (!allowedMime.test(file.mimetype)) {
+        return cb(new Error(`Unsupported mime: ${file.mimetype}`));
+      }
       cb(null, true);
     },
   });

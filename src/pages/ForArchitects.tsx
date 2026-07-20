@@ -7,8 +7,9 @@ import EditorialSplit from "@/components/primitives/EditorialSplit";
 import FullBleed from "@/components/primitives/FullBleed";
 import Statement from "@/components/primitives/Statement";
 import { Reveal, Stagger, StaggerItem } from "@/components/primitives/Reveal";
-import { Mail, MapPin, ArrowUpRight } from "lucide-react";
+import { Mail, MapPin, ArrowUpRight, ArrowDownToLine } from "lucide-react";
 import { CONTACT, phoneHref } from "@/data/fourlinq-data";
+import { useDocument, type SiteDocument } from "@/hooks/useDocument";
 
 /**
  * /for-architects. The architect's corner, rebuilt editorial.
@@ -17,6 +18,10 @@ import { CONTACT, phoneHref } from "@/data/fourlinq-data";
  * single-brand uPVC system, resources delivered by email rather than a
  * public portal, two live pages (finishes, care), a four-step support
  * flow, and a direct line to the engineering team. Nothing invented.
+ *
+ * The technical library renders from cms_document (via useDocument); the
+ * team uploads the actual PDFs / CAD files from /admin > Content >
+ * Documents and a row flips from "On request" to a real download.
  */
 
 const mailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT.email}`;
@@ -56,18 +61,54 @@ const support = [
   },
 ];
 
-const library: { title: string; note: string; to?: string }[] = [
-  { title: "System catalog", note: "On request" },
-  { title: "Casement drawings", note: "On request" },
-  { title: "Sliding drawings", note: "On request" },
-  { title: "Large-panel engineering data", note: "On request" },
-  { title: "Curtain wall manual", note: "On request" },
-  { title: "Revit family library", note: "In progress" },
-  { title: "Finish palette", note: "Live now", to: "/finishes" },
-  { title: "Care specification", note: "Live now", to: "/care" },
-];
+const libraryLinkCls =
+  "font-serif text-h4 text-white leading-tight tracking-tight inline-flex items-center gap-2 hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin";
 
-const ForArchitects = () => (
+/** One library row. Derived status: uploaded file → download, live page → link, else the note. */
+const LibraryRow = ({ doc }: { doc: SiteDocument }) => {
+  if (doc.file_path) {
+    return (
+      <div className="flex items-center justify-between gap-5 py-5">
+        <a href={doc.file_path} target="_blank" rel="noopener noreferrer" className={libraryLinkCls}>
+          {doc.title}
+          <ArrowDownToLine size={18} strokeWidth={1.5} />
+        </a>
+        <span className="eyebrow-s text-white/50 shrink-0">Download PDF</span>
+      </div>
+    );
+  }
+  if (doc.link_url) {
+    const isInternal = doc.link_url.startsWith("/");
+    return (
+      <div className="flex items-center justify-between gap-5 py-5">
+        {isInternal ? (
+          <Link to={doc.link_url} className={libraryLinkCls}>
+            {doc.title}
+            <ArrowUpRight size={18} strokeWidth={1.5} />
+          </Link>
+        ) : (
+          <a href={doc.link_url} target="_blank" rel="noopener noreferrer" className={libraryLinkCls}>
+            {doc.title}
+            <ArrowUpRight size={18} strokeWidth={1.5} />
+          </a>
+        )}
+        <span className="eyebrow-s text-white/50 shrink-0">Live now</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center justify-between gap-5 py-5">
+      <span className="font-serif text-h4 text-white/90 leading-tight tracking-tight">
+        {doc.title}
+      </span>
+      <span className="eyebrow-s text-white/50 shrink-0">{doc.note ?? "On request"}</span>
+    </div>
+  );
+};
+
+const ForArchitects = () => {
+  const { document } = useDocument();
+  return (
   <Layout>
     {/* Cinematic hero */}
     <section className="relative h-[82vh] min-h-[560px] overflow-hidden">
@@ -159,24 +200,9 @@ const ForArchitects = () => (
           </p>
         </Reveal>
         <Stagger className="flex flex-col divide-y divide-white/12 border-y border-white/12">
-          {library.map((r) => (
-            <StaggerItem key={r.title}>
-              <div className="flex items-center justify-between gap-5 py-5">
-                {r.to ? (
-                  <Link
-                    to={r.to}
-                    className="font-serif text-h4 text-white leading-tight tracking-tight inline-flex items-center gap-2 hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
-                  >
-                    {r.title}
-                    <ArrowUpRight size={18} strokeWidth={1.5} />
-                  </Link>
-                ) : (
-                  <span className="font-serif text-h4 text-white/90 leading-tight tracking-tight">
-                    {r.title}
-                  </span>
-                )}
-                <span className="eyebrow-s text-white/50 shrink-0">{r.note}</span>
-              </div>
+          {document.map((doc) => (
+            <StaggerItem key={doc.slug}>
+              <LibraryRow doc={doc} />
             </StaggerItem>
           ))}
         </Stagger>
@@ -247,7 +273,8 @@ const ForArchitects = () => (
         </Reveal>
       </div>
     </Section>
-  </Layout>
-);
+    </Layout>
+  );
+};
 
 export default ForArchitects;

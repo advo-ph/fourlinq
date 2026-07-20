@@ -9,6 +9,7 @@ import { Loader2, Plus, Save, Trash2, X, ExternalLink, Inbox } from "lucide-reac
 import type { CmsRagApi, EntityDescriptor, EntityFieldDescriptor } from "./api.js";
 import { MarkdownEditor } from "./MarkdownEditor.js";
 import { MediaPicker } from "./MediaPicker.js";
+import { FilePicker } from "./FilePicker.js";
 
 function slugify(s: string): string {
   return s
@@ -227,7 +228,7 @@ function DefaultRow({ row, entity }: { row: Record<string, unknown>; entity: Ent
 
 function FieldEditor({ api, field, value, onChange }: { api: CmsRagApi; field: EntityFieldDescriptor; value: unknown; onChange: (v: unknown) => void }) {
   const label = field.label ?? field.column;
-  const wide = ["textarea", "markdown", "image", "string_array"].includes(field.type) ? "col-span-2" : "";
+  const wide = ["textarea", "markdown", "image", "file", "string_array"].includes(field.type) ? "col-span-2" : "";
 
   if (field.type === "boolean") {
     return (
@@ -277,6 +278,9 @@ function FieldEditor({ api, field, value, onChange }: { api: CmsRagApi; field: E
       )}
       {field.type === "image" && (
         <MediaPicker api={api} value={(value as string) ?? ""} onChange={onChange as (s: string) => void} />
+      )}
+      {field.type === "file" && (
+        <FilePicker api={api} value={(value as string) ?? ""} onChange={onChange as (s: string) => void} />
       )}
       {field.type === "json" && (
         <textarea
