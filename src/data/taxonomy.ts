@@ -1,12 +1,12 @@
 /**
- * The catalog taxonomy — the single model behind every navigation surface.
+ * The catalog taxonomy: the single model behind every navigation surface.
  *
  * FourlinQ browses on TWO ORTHOGONAL AXES. They are not one list.
  *
- *   By type      — what the opening IS:   Window / Door / Specialist
- *   By material  — what it is MADE FROM:  uPVC / Aluminium profile system
+ *   By type      is what the opening IS:   Window / Door / Specialist
+ *   By material  is what it is MADE FROM:  uPVC / Aluminium profile system
  *
- * Imie, 2026-07-02: "Aluminium is like uPVC — they are both profile systems.
+ * Imie, 2026-07-02: "Aluminium is like uPVC, they are both profile systems.
  * Windows and doors can be fabricated using the following materials:
  * 1. uPVC profile system  2. Aluminium profile system (a. non-thermal or
  * regular aluminium system  b. thermal break aluminium system)."
@@ -16,8 +16,8 @@
  * fourth peer beside Window/Door/Specialist, which reads as a fourth TYPE.
  * Aluminium is not a type. It is the other axis.
  *
- * Every surface — desktop nav, mobile nav, homepage gateway, /products, and
- * the footer — imports from here. Before this module those four surfaces
+ * Every surface (desktop nav, mobile nav, homepage gateway, /products, and
+ * the footer) imports from here. Before this module those four surfaces
  * showed three different models (nav had 4 mixed peers, homepage had 3 types
  * and no material at all, footer had 3 types under different labels).
  * src/test/taxonomy.test.ts fails on drift.
@@ -59,7 +59,7 @@ export interface ProfileMaterial {
 }
 
 // ─────────────────────────────────────────────
-// AXIS 1 — BY TYPE
+// AXIS 1: BY TYPE
 // Source: Imie's 2026-07-02 diagram (attachments/photo_2026-07-02_14-20-32.jpg),
 // minus the "Aluminium Line" card, which belongs to axis 2.
 // ─────────────────────────────────────────────
@@ -69,7 +69,7 @@ export const SYSTEM_TYPE: SystemType[] = [
     type_code: "window",
     label: "Window Systems",
     description:
-      "uPVC and aluminium windows engineered for tropical performance — quiet, thermally efficient, corrosion-free.",
+      "uPVC and aluminium windows engineered for tropical performance: quiet, thermally efficient, corrosion-free.",
     item: ["Casement", "Sliding", "Awning", "Special Shapes"],
     filter: "windows",
     to: "/products?filter=windows",
@@ -79,12 +79,12 @@ export const SYSTEM_TYPE: SystemType[] = [
     type_code: "door",
     label: "Door Systems",
     description:
-      "From folding walls to large-span panels — doors that open a room to the outside.",
+      "From folding walls to large-span panels: doors that open a room to the outside.",
     item: ["Slide & Fold", "Large Panel", "Lift & Slide", "90 Series"],
     filter: "doors",
     to: "/products?filter=doors",
     // Real FourlinQ install, client-supplied 2026-07-17. A corner sliding-door
-    // set with the panels visibly offset on their track — it reads as sliding
+    // set with the panels visibly offset on their track. It reads as sliding
     // at a glance, which is what Imie said the synthetic render never did
     // ("this is your sliding door but it looks like a two-panel fixed",
     // 2026-05-28). Safe here: category cards carry no frame animation, and the
@@ -104,13 +104,13 @@ export const SYSTEM_TYPE: SystemType[] = [
 ];
 
 // ─────────────────────────────────────────────
-// AXIS 2 — BY MATERIAL
+// AXIS 2: BY MATERIAL
 // Source: Imie 2026-05-31 (uPVC brands + aluminium wall thickness) and
 // 2026-07-02 (the non-thermal / thermal-break split).
 //
-// TERMINOLOGY NOTE — unresolved, do not paper over:
+// TERMINOLOGY NOTE, unresolved, do not paper over:
 // Imie named the same aluminium system twice. On 05-31 it was "Standard /
-// Regular Systems (wall thickness 1.2mm–3.0mm)"; on 07-02 and in her diagram
+// Regular Systems (wall thickness 1.2mm to 3.0mm)"; on 07-02 and in her diagram
 // it was "Non-Thermal Break". We publish "Non-Thermal Break" (her latest and
 // the diagram's word) and carry "Regular" as the stated synonym, so a client
 // searching either term lands in the right place. Confirming this pairing is
@@ -123,7 +123,7 @@ export const PROFILE_MATERIAL: ProfileMaterial[] = [
     label: "uPVC profile system",
     description:
       "The default for most residential openings. Multi-chamber profile, steel-reinforced, corrosion-free.",
-    item: ["Veka — German profile", "Skyframe — Chinese profile"],
+    item: ["Veka: German profile", "Skyframe: Chinese profile"],
     to: "/why-upvc",
     image: "/images/wp-export/FourlinQ-Project-7.jpg",
   },

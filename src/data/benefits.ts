@@ -1,6 +1,6 @@
 // Benefits data for the Why uPVC page
 // Descriptions sourced from verified ADVANTAGES in fourlinq-data.ts
-// ⚠️ Stats removed — brochure does not include specific numerical claims
+// ⚠️ Stats removed: brochure does not include specific numerical claims
 import { ADVANTAGES } from "./fourlinq-data";
 
 export interface Benefit {
@@ -27,7 +27,7 @@ export interface ComparisonRow {
 
 // Comparison framing: we sell BOTH uPVC and aluminium at FourlinQ. The table
 // describes where each material genuinely fits rather than ranking them. Most
-// rows show real differences without calling any material "bad" — the
+// rows show real differences without calling any material "bad". The
 // architect/owner chooses based on the project's actual constraints.
 export const comparisonData: ComparisonRow[] = [
   { feature: "Maintenance", upvc: "No painting or recoating", aluminium: "Powder-coat refresh every 8-10 years", timber: "Regular painting and sealing" },

@@ -21,12 +21,12 @@ const FAQPage = () => {
         eyebrow="Frequently asked"
         title="Answers, organized."
         breadcrumbLabel="FAQ"
-        subtitle="The questions we hear most often — about our systems, the uPVC material, ordering, installation, warranty, and ongoing care. Filter by topic or scan the full list."
+        subtitle="The questions we hear most often, about our systems, the uPVC material, ordering, installation, warranty, and ongoing care. Filter by topic or scan the full list."
       />
 
       <Section tone="canvas" size="lg" className="!pt-0">
         <div className="grid lg:grid-cols-[18rem,1fr] gap-12 lg:gap-20 min-w-0">
-          {/* Category rail — a horizontal scroll strip on mobile, a sidebar at lg.
+          {/* Category rail: a horizontal scroll strip on mobile, a sidebar at lg.
               min-w-0 all the way down so the grid item can shrink below the
               intrinsic width of the nowrap topic list and let overflow-x scroll
               (a grid/flex item defaults to min-width:auto and won't). */}

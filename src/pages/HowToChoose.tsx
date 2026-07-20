@@ -1,13 +1,15 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import PageHeader from "@/components/shared/PageHeader";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
+import EditorialImage from "@/components/primitives/EditorialImage";
+import Statement from "@/components/primitives/Statement";
+import { Reveal, Stagger, StaggerItem } from "@/components/primitives/Reveal";
 import { ArrowRight, ArrowLeft, RotateCcw } from "lucide-react";
 
 /**
- * Help-me-choose flow — 3 questions that recommend 1-2 systems from the
+ * Help-me-choose flow: 3 questions that recommend 1-2 systems from the
  * brochure-verified catalog (Casement, Sliding, Awning, Special Shapes, Slide & Fold).
  *
  * Scoring approach: each answer adds points to system candidates; the top 1-2
@@ -76,7 +78,7 @@ interface Question {
 const QUESTIONS: Question[] = [
   {
     q: "Where will it go?",
-    helper: "Pick the option that best matches the room or wall.",
+    helper: "Pick the room or wall that fits best.",
     choices: [
       { label: "Bedroom or living room, facing outside",                                scores: { casement: 3, awning: 1, sliding: 1 } },
       { label: "Kitchen, with a counter or sink below the window",                       scores: { sliding: 3, awning: 2, casement: 0 } },
@@ -88,19 +90,19 @@ const QUESTIONS: Question[] = [
   },
   {
     q: "What matters most?",
-    helper: "Pick the property you'd most prioritize.",
+    helper: "Pick the one you would prioritize.",
     choices: [
       { label: "Maximum airflow when open",                                              scores: { casement: 3, "slide-and-fold": 3, sliding: 1 } },
       { label: "Letting in air even during heavy rain",                                  scores: { awning: 4 } },
       { label: "Saving space (nothing protruding inward or outward)",                    scores: { sliding: 4, "slide-and-fold": 1 } },
       { label: "Architectural drama or unusual geometry",                                scores: { "special-shapes": 4 } },
-      { label: "Seamless indoor–outdoor connection",                                     scores: { "slide-and-fold": 5 } },
+      { label: "A seamless indoor to outdoor connection",                                scores: { "slide-and-fold": 5 } },
       { label: "Easy to clean from inside",                                              scores: { casement: 3, sliding: 2 } },
     ],
   },
   {
-    q: "Roughly how wide is the opening?",
-    helper: "Estimate is fine. We measure on site.",
+    q: "How wide is the opening?",
+    helper: "An estimate is fine. We measure on site.",
     choices: [
       { label: "Under 1 m (small window)",                                               scores: { casement: 2, awning: 2 } },
       { label: "1 to 2 m (standard window)",                                             scores: { casement: 3, sliding: 3, awning: 1 } },
@@ -155,14 +157,37 @@ const HowToChoose = () => {
 
   return (
     <Layout>
-      <PageHeader
-        eyebrow="Help me choose"
-        title="Three questions. One recommendation."
-        breadcrumbLabel="Help me choose"
-        subtitle="If you're not sure which window or door system fits your project, answer three quick questions. We'll point you at the one or two systems most likely to work. Then you can dive into the catalog from there."
-      />
+      {/* Cinematic hero: one photograph, one confident line */}
+      <section className="relative h-[72vh] min-h-[520px] overflow-hidden">
+        <EditorialImage
+          src="/images/projects/real/sliding-doors-lanai.webp"
+          alt="Sliding lanai doors on a FourlinQ home, open to a garden"
+          ratio="h-full"
+          eager
+          scrim
+        />
+        <div className="absolute inset-0 flex items-end">
+          <div className="container-editorial pb-12 lg:pb-20">
+            <Stagger gap={0.1}>
+              <StaggerItem>
+                <p className="eyebrow text-white/80 mb-5">Help me choose</p>
+              </StaggerItem>
+              <StaggerItem>
+                <h1 className="font-serif font-normal text-white text-display leading-[0.98] tracking-tight max-w-[16ch]">
+                  Three questions. One answer.
+                </h1>
+              </StaggerItem>
+              <StaggerItem>
+                <p className="mt-6 text-body-lg lg:text-lead text-white/85 leading-[1.5] max-w-[38rem]">
+                  Not sure which system fits? Answer three quick prompts. We point you at the one or two most likely to work.
+                </p>
+              </StaggerItem>
+            </Stagger>
+          </div>
+        </div>
+      </section>
 
-      <Section tone="canvas" size="lg" className="!pt-0">
+      <Section tone="canvas" size="lg">
         {/* Progress rail */}
         <div className="flex items-center gap-3 mb-12 lg:mb-16">
           {QUESTIONS.map((_, i) => {
@@ -179,29 +204,35 @@ const HowToChoose = () => {
               />
             );
           })}
-          <span className="text-[11px] tracking-[0.1em] uppercase text-[color:var(--ink-muted)] font-medium ml-3 shrink-0">
+          <span className="text-eyebrow tracking-[0.1em] uppercase text-[color:var(--ink-muted)] font-medium ml-3 shrink-0">
             {showingResult ? "Done" : `${step + 1} / ${QUESTIONS.length}`}
           </span>
         </div>
 
         {/* Question or result */}
         {!showingResult ? (
-          <div className="max-w-[44rem]">
-            <p className="eyebrow mb-5">Question {step + 1}</p>
-            <h2 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1]">
-              {QUESTIONS[step].q}
-            </h2>
-            {QUESTIONS[step].helper && (
-              <p className="mt-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-relaxed">
-                {QUESTIONS[step].helper}
-              </p>
-            )}
+          <div key={step} className="max-w-[46rem]">
+            <Reveal>
+              <p className="eyebrow mb-6">Question {step + 1}</p>
+              <h2 className="font-serif font-normal text-h2 lg:text-h1 text-[color:var(--ink-primary)] tracking-tight leading-[1.04]">
+                {QUESTIONS[step].q}
+              </h2>
+              {QUESTIONS[step].helper && (
+                <p className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-relaxed">
+                  {QUESTIONS[step].helper}
+                </p>
+              )}
+            </Reveal>
 
-            <ul className="mt-10 lg:mt-14 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
+            <Stagger
+              gap={0.05}
+              delay={0.15}
+              className="mt-10 lg:mt-14 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]"
+            >
               {QUESTIONS[step].choices.map((c, ci) => {
                 const selected = answers[step] === ci;
                 return (
-                  <li key={ci}>
+                  <StaggerItem key={ci}>
                     <button
                       onClick={() => handleChoice(step, ci)}
                       className={`w-full text-left py-5 lg:py-6 flex items-center justify-between gap-4 group min-h-[44px] transition-colors duration-300 ease-marvin ${
@@ -210,9 +241,9 @@ const HowToChoose = () => {
                           : "text-[color:var(--ink-primary)] hover:text-[color:var(--accent)]"
                       }`}
                     >
-                      <span className="text-body lg:text-body-lg leading-snug">{c.label}</span>
+                      <span className="font-serif text-h5 lg:text-h4 leading-snug tracking-tight">{c.label}</span>
                       <ArrowRight
-                        size={18}
+                        size={20}
                         strokeWidth={1.5}
                         className={`shrink-0 transition-all duration-300 ease-marvin ${
                           selected
@@ -221,10 +252,10 @@ const HowToChoose = () => {
                         }`}
                       />
                     </button>
-                  </li>
+                  </StaggerItem>
                 );
               })}
-            </ul>
+            </Stagger>
 
             {step > 0 && (
               <div className="mt-10">
@@ -240,41 +271,48 @@ const HowToChoose = () => {
           </div>
         ) : (
           /* Results */
-          <div className="max-w-[60rem]">
-            <p className="eyebrow mb-5">
-              Recommendation
-            </p>
-            <h2 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.1] mb-8">
-              {recommendations.length === 1
-                ? `Start with ${recommendations[0].label}.`
-                : `Start with ${recommendations[0].label} or ${recommendations[1].label}.`}
-            </h2>
-            <p className="text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[40rem] leading-relaxed mb-12">
-              Based on what you described, here's what we'd point you at first. Click through to the catalog for full specs, or get in touch and we'll talk through the project.
-            </p>
+          <div className="max-w-[62rem]">
+            <Reveal>
+              <p className="eyebrow mb-6">Your recommendation</p>
+              <Statement
+                lines={
+                  recommendations.length === 1
+                    ? [`Start with`, `${recommendations[0].label}.`]
+                    : [`Start with`, `${recommendations[0].label} or ${recommendations[1].label}.`]
+                }
+                dimFrom={0}
+              />
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="mt-8 text-body-lg text-[color:var(--ink-secondary)] max-w-[38rem] leading-[1.6] mb-12">
+                Based on what you described, here is where we would start. Open the catalog for full specs, or talk it through with us.
+              </p>
+            </Reveal>
 
-            <ul className="grid md:grid-cols-2 gap-6 lg:gap-8 mb-12">
+            <Stagger gap={0.1} className="grid md:grid-cols-2 gap-6 lg:gap-8 mb-14">
               {recommendations.map((rec) => (
-                <li key={rec.id} className="border border-[color:var(--rule-soft)] p-6 lg:p-8">
-                  <p className="eyebrow mb-3">{rec.tagline}</p>
-                  <h3 className="font-serif text-h4 text-[color:var(--ink-primary)] tracking-tight mb-4">
-                    {rec.label}
-                  </h3>
-                  <p className="text-body text-[color:var(--ink-secondary)] leading-[1.65] mb-6">
-                    {rec.why}
-                  </p>
-                  <Link
-                    to={rec.link}
-                    className="group inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
-                  >
-                    See in the catalog
-                    <ArrowRight size={14} strokeWidth={1.5} className="group-hover:translate-x-1 transition-transform duration-300 ease-marvin" />
-                  </Link>
-                </li>
+                <StaggerItem key={rec.id}>
+                  <div className="h-full border border-[color:var(--rule-soft)] p-7 lg:p-9">
+                    <p className="eyebrow mb-3">{rec.tagline}</p>
+                    <h3 className="font-serif text-h3 text-[color:var(--ink-primary)] tracking-tight mb-4">
+                      {rec.label}
+                    </h3>
+                    <p className="text-body text-[color:var(--ink-secondary)] leading-[1.65] mb-6">
+                      {rec.why}
+                    </p>
+                    <Link
+                      to={rec.link}
+                      className="group inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+                    >
+                      See in the catalog
+                      <ArrowRight size={14} strokeWidth={1.5} className="group-hover:translate-x-1 transition-transform duration-300 ease-marvin" />
+                    </Link>
+                  </div>
+                </StaggerItem>
               ))}
-            </ul>
+            </Stagger>
 
-            <div className="flex flex-wrap items-center gap-5">
+            <Reveal from="up" delay={0.1} className="flex flex-wrap items-center gap-5">
               <EditorialButton to="/brand#contact" variant="primary" size="md">
                 Talk to our team
               </EditorialButton>
@@ -285,35 +323,35 @@ const HowToChoose = () => {
                 <RotateCcw size={14} strokeWidth={1.5} />
                 Start over
               </button>
-            </div>
+            </Reveal>
           </div>
         )}
       </Section>
 
-      {/* Direct paths if quiz isn't your style */}
+      {/* Direct paths if the quiz isn't your style */}
       {!showingResult && (
         <Section tone="soft" size="md">
           <div className="grid lg:grid-cols-[1fr,1fr] gap-10 items-start">
-            <div>
-              <p className="eyebrow mb-3">Rather skip the quiz?</p>
-              <h2 className="font-serif text-h4 lg:text-h3 text-[color:var(--ink-primary)] tracking-tight leading-[1.1]">
+            <Reveal>
+              <p className="eyebrow mb-4">Rather skip the quiz?</p>
+              <h2 className="font-serif text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.04]">
                 Two faster paths.
               </h2>
-            </div>
-            <ul className="flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
-              <li>
-                <Link to="/products" className="group flex items-center justify-between gap-4 py-4 text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                  <span className="text-body-sm font-medium">Browse the full catalog</span>
-                  <ArrowRight size={14} strokeWidth={1.5} className="group-hover:translate-x-1 transition-transform duration-300 ease-marvin" />
+            </Reveal>
+            <Stagger className="flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
+              <StaggerItem>
+                <Link to="/products" className="group flex items-center justify-between gap-4 py-5 text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+                  <span className="font-serif text-h5 tracking-tight">Browse the full catalog</span>
+                  <ArrowRight size={16} strokeWidth={1.5} className="group-hover:translate-x-1 transition-transform duration-300 ease-marvin" />
                 </Link>
-              </li>
-              <li>
-                <Link to="/design-tool" className="group flex items-center justify-between gap-4 py-4 text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                  <span className="text-body-sm font-medium">Configure your own with the Design Tool</span>
-                  <ArrowRight size={14} strokeWidth={1.5} className="group-hover:translate-x-1 transition-transform duration-300 ease-marvin" />
+              </StaggerItem>
+              <StaggerItem>
+                <Link to="/design-tool" className="group flex items-center justify-between gap-4 py-5 text-[color:var(--ink-primary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+                  <span className="font-serif text-h5 tracking-tight">Configure your own in the Design Tool</span>
+                  <ArrowRight size={16} strokeWidth={1.5} className="group-hover:translate-x-1 transition-transform duration-300 ease-marvin" />
                 </Link>
-              </li>
-            </ul>
+              </StaggerItem>
+            </Stagger>
           </div>
         </Section>
       )}

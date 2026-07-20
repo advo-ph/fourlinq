@@ -47,7 +47,7 @@ const legalContent: Record<string, { title: string; lastUpdated: string; section
       },
       {
         heading: "Intellectual Property",
-        body: "All content on this website — including text, images, logos, and design tool software — is the property of FourlinQ and is protected by applicable intellectual property laws.",
+        body: "All content on this website, including text, images, logos, and design tool software, is the property of FourlinQ and is protected by applicable intellectual property laws.",
       },
       {
         heading: "Limitation of Liability",

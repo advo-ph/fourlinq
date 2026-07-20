@@ -1,4 +1,4 @@
-// Project catalog — for /inspiration and individual /projects/:slug pages.
+// Project catalog for /inspiration and individual /projects/:slug pages.
 //
 // SOURCE: facebook.com/FourlinQofficial, scraped via advo-api
 // (/opt/advo-api/src/routes/fb-scrape.routes.ts on the advo VPS) and stored
@@ -6,9 +6,9 @@
 // 37 unique images from 8 project-attributed posts on 2026-05-24.
 //
 // Captions below quote FourlinQ's own Facebook posts (cleaned of CTA
-// boilerplate + hashtags). Locations are Tita's own — not invented.
+// boilerplate + hashtags). Locations are Tita's own, not invented.
 // Gallery photos for each project are the exact set of images attached to
-// the matching Facebook post — verified pairings, not guesses.
+// the matching Facebook post: verified pairings, not guesses.
 //
 // To add more projects: re-scrape the FourlinQ FB page, download the
 // referenced images, append a new entry here.
@@ -29,7 +29,7 @@ export interface Project {
   location: string;
   /** Primary hero image, pulled from the FB scrape. */
   image: string;
-  /** Additional photos from the same Facebook post — VERIFIED pairings
+  /** Additional photos from the same Facebook post, VERIFIED pairings
    *  (these images were posted together by FourlinQ themselves). */
   gallery?: string[];
   category: ProjectCategory;
@@ -130,7 +130,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-s-residences",
-    name: "Cebu — S. Residences",
+    name: "Cebu: S. Residences",
     location: "Alta Vista Subdivision, Pardo, Cebu City",
     image: `${FB}/SISsEiUz.jpg`,
     gallery: [`${FB}/roGKW8A5.jpg`],
@@ -140,7 +140,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-g-residences",
-    name: "Cebu — G. Residences",
+    name: "Cebu: G. Residences",
     location: "Vista Grande Subdivision, Talisay City",
     image: `${FB}/bmZ6fgTu.jpg`,
     gallery: [`${FB}/GNCqPBUr.jpg`],
@@ -150,7 +150,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-r-residences",
-    name: "Cebu — R. Residences",
+    name: "Cebu: R. Residences",
     location: "Monterrazas de Cebu, Guadalupe, Cebu City",
     image: `${FB}/1BZGuW8L.jpg`,
     category: "interior",
@@ -159,7 +159,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-a-residences",
-    name: "Cebu — A. Residences",
+    name: "Cebu: A. Residences",
     location: "Oslob, Cebu",
     image: `${FB}/hRCCxHm4.jpg`,
     category: "exterior",
@@ -168,7 +168,7 @@ export const projects: Project[] = [
   },
   {
     id: "batangas-c-residences",
-    name: "Batangas — C. Residences",
+    name: "Batangas: C. Residences",
     location: "Batangas",
     image: `${FB}/ohQTuBNz.jpg`,
     gallery: [
@@ -207,7 +207,7 @@ export const projects: Project[] = [
     caption: "Window and door installation at the G. Residence in Taguig City.",
     description: "G. Residence Project Site: Taguig City. Upgrade your view. Elevate your living.",
   },
-  // NOTE: Bataan project was dropped on 2026-05-24 — its only photo
+  // NOTE: Bataan project was dropped on 2026-05-24. Its only photo
   // (I5J0-ATK.jpg, 14 KB) was a pure black frame with just the FourlinQ
   // watermark. Unusable as a hero. When Tita supplies a real Bataan
   // install photo, restore the entry.

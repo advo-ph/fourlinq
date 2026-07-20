@@ -1,6 +1,6 @@
 // Product catalog for the Products page
 // Descriptions and taglines sourced from verified PRODUCT_TYPES in fourlinq-data.ts
-// ⚠️ Specs (mm profile sizes, Uw values) are NOT in brochure — marked as indicative
+// ⚠️ Specs (mm profile sizes, Uw values) are NOT in brochure, marked as indicative
 import { PRODUCT_TYPES, FRAME_FINISHES } from "./fourlinq-data";
 
 export type ProductCategory = "windows" | "doors" | "specialist" | "systems";
@@ -20,7 +20,7 @@ export interface Product {
   specs: string[];
   finishes: ProductFinish[];
   glassOptions: string[];
-  /** Optional YouTube video ID — renders an embed in the product detail panel. */
+  /** Optional YouTube video ID. Renders an embed in the product detail panel. */
   youtubeId?: string;
 }
 
@@ -42,7 +42,7 @@ export const products: Product[] = [
     image: "/images/wp-export/casement.webp",
     specs: [
       "Multi-chamber uPVC profile",
-      "6mm–12mm glass options",
+      "6mm to 12mm glass options",
       "Galvanized steel reinforcement",
       "EPDM gaskets, weatherproof seal",
     ],
@@ -59,7 +59,7 @@ export const products: Product[] = [
     specs: [
       "Multi-chamber uPVC profile",
       "Smooth horizontal track operation",
-      "6mm–12mm glass options",
+      "6mm to 12mm glass options",
       "Internal glazing beads for security",
     ],
     finishes: productFinishes,
@@ -75,7 +75,7 @@ export const products: Product[] = [
     specs: [
       "Custom geometry, arches, circles, triangles",
       "Combinable with other window types",
-      "6mm–12mm glass options",
+      "6mm to 12mm glass options",
       "Multi-chamber profile",
     ],
     finishes: productFinishes,
@@ -106,7 +106,7 @@ export const products: Product[] = [
     // NOTE: do not swap this to a real photo in isolation. This card has a
     // 28-frame hover animation (systemAnimations.ts) rendered from the same
     // synthetic white-bg master, and the animation is what actually answers
-    // Imie's 2026-05-28 "looks like a two-panel fixed" — it plays closed→open,
+    // Imie's 2026-05-28 "looks like a two-panel fixed". It plays closed→open,
     // and she approved it at meeting 00:17:07. A real resting photo would jump
     // to a synthetic render on hover. Replace the resting image only together
     // with a re-rendered frame set.
@@ -114,7 +114,7 @@ export const products: Product[] = [
     specs: [
       "Multi-chamber uPVC profile",
       "Space-saving horizontal slide",
-      "6mm–12mm glass options",
+      "6mm to 12mm glass options",
       "Galvanized steel reinforcement",
     ],
     finishes: productFinishes,
@@ -175,7 +175,7 @@ export const products: Product[] = [
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Frosted Privacy", "Laminated Safety"],
   },
-  // ─── Tita-requested Door Systems (consultation-only — no fabricated specs) ───
+  // ─── Tita-requested Door Systems (consultation-only, no fabricated specs) ───
   {
     id: "large-panel-doors",
     name: "Large Panel Doors",

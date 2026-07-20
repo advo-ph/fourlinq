@@ -1,5 +1,5 @@
 // Re-exports verified brand data from the canonical source
-// Source: Official FourlinQ brochures — see fourlinq-data.ts
+// Source: Official FourlinQ brochures. See fourlinq-data.ts
 import { BRAND, CONTACT, BRANCHES, phoneHref } from "./fourlinq-data";
 import type { Branch } from "./fourlinq-data";
 

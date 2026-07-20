@@ -1,5 +1,5 @@
 /**
- * Windows-and-doors glossary — the terminology reference.
+ * Windows-and-doors glossary: the terminology reference.
  *
  * Imie's most-repeated instruction across the whole thread is that terminology
  * must be right: "operation and terminology must be correct" (meeting 00:04:40),
@@ -10,8 +10,8 @@
  * (client-approved):
  *   - Every definition is a general, verifiable fenestration fact or a term
  *     FourlinQ already publishes (operations, materials, glass in the repo).
- *   - Industry synonyms are named under `also_called` — e.g. a muntin is a
- *     "divided lite", the term Marvin uses — so a client reading either word
+ *   - Industry synonyms are named under `also_called`, e.g. a muntin is a
+ *     "divided lite", the term Marvin uses, so a client reading either word
  *     lands in the same place.
  *   - DELIBERATELY EXCLUDED, because FourlinQ has not confirmed it offers them:
  *     automation / smart sensors, window-opening control devices, insect
@@ -34,9 +34,9 @@ export interface GlossaryTerm {
 }
 
 export const GLOSSARY_GROUP: { category: GlossaryCategory; label: string; blurb: string }[] = [
-  { category: "operation", label: "How it opens", blurb: "The operation is how a window or door moves. Getting this word right matters most — it decides the hardware, the swing space, and how you live with it." },
+  { category: "operation", label: "How it opens", blurb: "The operation is how a window or door moves. Getting this word right matters most: it decides the hardware, the swing space, and how you live with it." },
   { category: "anatomy", label: "Parts of a window", blurb: "The pieces every window and door is built from. Useful when you are reading a quote or pointing at a drawing." },
-  { category: "material", label: "Material and profile", blurb: "What the frame is made from. FourlinQ builds in two profile systems — uPVC and aluminium." },
+  { category: "material", label: "Material and profile", blurb: "What the frame is made from. FourlinQ builds in two profile systems: uPVC and aluminium." },
   { category: "glass", label: "Glass and glazing", blurb: "The glass options and what they do. Glazing is chosen for heat, noise, privacy, and safety." },
 ];
 
@@ -74,7 +74,7 @@ export const GLOSSARY_TERM: GlossaryTerm[] = [
     definition: "The slim bars that divide a single pane into a grid of smaller panes, or 'lites'. Today usually a design choice rather than structural. Often called divided lites or grilles.",
     also_called: "Divided lite / Grille" },
   { term: "Sightline", category: "anatomy",
-    definition: "The visible width of frame and sash around the glass. A 'slim sightline' means more glass and less frame — the reason aluminium is chosen for big, minimal openings." },
+    definition: "The visible width of frame and sash around the glass. A 'slim sightline' means more glass and less frame: the reason aluminium is chosen for big, minimal openings." },
   { term: "Weatherseal", category: "anatomy", is_fourlinq_offering: true,
     definition: "The rubber gasket seated inside the frame that presses against the sash to keep out air, water, and dust. FourlinQ uses EPDM gaskets.",
     also_called: "Gasket" },
@@ -83,14 +83,14 @@ export const GLOSSARY_TERM: GlossaryTerm[] = [
 
   // ── Material ──
   { term: "uPVC", category: "material", is_fourlinq_offering: true,
-    definition: "Unplasticised PVC — a rigid, weatherproof polymer. FourlinQ's uPVC frames are multi-chamber and steel-reinforced. They never rust, need no repainting, and hold up in tropical heat and salt air.",
+    definition: "Unplasticised PVC, a rigid, weatherproof polymer. FourlinQ's uPVC frames are multi-chamber and steel-reinforced. They never rust, need no repainting, and hold up in tropical heat and salt air.",
     also_called: "PVC-U" },
   { term: "Aluminium", category: "material", is_fourlinq_offering: true,
     definition: "A metal profile that is stronger than uPVC for large spans and gives slimmer sightlines. FourlinQ reaches for it when an opening is too big for uPVC or the design calls for minimal frame." },
   { term: "Thermal Break", category: "material", is_fourlinq_offering: true,
     definition: "A non-conductive strip set between the inner and outer halves of an aluminium profile. It slows heat passing through the metal, which matters for air-conditioned rooms and west-facing walls." },
   { term: "Profile System", category: "material", is_fourlinq_offering: true,
-    definition: "The extruded shape — in uPVC or aluminium — that forms the frame and sash. It is the starting choice: windows and doors of the same type can be built in either system." },
+    definition: "The extruded shape, in uPVC or aluminium, that forms the frame and sash. It is the starting choice: windows and doors of the same type can be built in either system." },
 
   // ── Glass ──
   { term: "Glazing", category: "glass",
@@ -101,7 +101,7 @@ export const GLOSSARY_TERM: GlossaryTerm[] = [
   { term: "Laminated Safety Glass", category: "glass", is_fourlinq_offering: true,
     definition: "Two glass layers bonded to a clear plastic interlayer. If it breaks, the pieces hold to the interlayer instead of falling, and it also dampens noise." },
   { term: "Tinted Glass", category: "glass", is_fourlinq_offering: true,
-    definition: "Glass coloured through its body — bronze or grey — to cut glare and solar heat while keeping the view." },
+    definition: "Glass coloured through its body, bronze or grey, to cut glare and solar heat while keeping the view." },
   { term: "Frosted Glass", category: "glass", is_fourlinq_offering: true,
     definition: "Translucent glass that passes daylight but blocks the view, for bathrooms and any room that wants privacy.",
     also_called: "Obscure glass" },

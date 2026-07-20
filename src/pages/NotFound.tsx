@@ -15,7 +15,7 @@ const NotFound = () => {
       <section className="min-h-[70vh] flex items-center">
         <div className="container-editorial">
           <p className="eyebrow mb-5">
-            404 — Page not found
+            404. Page not found
           </p>
           <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-h1 lg:text-display leading-[1.04] max-w-[18ch]">
             This page is somewhere else.

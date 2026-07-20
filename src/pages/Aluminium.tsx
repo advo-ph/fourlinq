@@ -7,7 +7,7 @@ import { ALUMINIUM_FINISHES } from "@/data/fourlinq-data";
 import ProfileSystems from "@/components/shared/ProfileSystems";
 
 /**
- * /aluminium — FourlinQ's aluminium product line (the deep-dive page).
+ * /aluminium. FourlinQ's aluminium product line (the deep-dive page).
  *
  * Shares its data with the /products material toggle via useAluminium so the
  * two surfaces never drift. Tita edits these from /admin > Content > Aluminium.
@@ -25,7 +25,7 @@ const Aluminium = () => {
         subtitle="FourlinQ carries two material lines. uPVC for most residential openings, aluminium for the projects that need bigger spans, thinner sightlines, or a different aesthetic. Three aluminium systems, each suited to a different brief."
       />
 
-      {/* Hero image — the page was text-only and read as unfinished next to the
+      {/* Hero image. The page was text-only and read as unfinished next to the
           photo-led /why-upvc. A real FourlinQ install with the slim dark-frame
           aluminium look the page describes (bigger glass, thinner sightlines). */}
       <div className="container-editorial">
@@ -40,7 +40,7 @@ const Aluminium = () => {
         </div>
       </div>
 
-      {/* Sub-systems — content editable from /admin > Content > Aluminium */}
+      {/* Sub-systems. Content editable from /admin > Content > Aluminium */}
       <Section tone="canvas" size="lg">
         <div className="border-t border-[color:var(--rule-strong)]">
           {systems.map((sys) => (
@@ -94,7 +94,7 @@ const Aluminium = () => {
         </div>
       </Section>
 
-      {/* Profile systems — Standard / Regular and Alu Slim, supplied by Imie
+      {/* Profile systems. Standard / Regular and Alu Slim, supplied by Imie
           2026-05-31. Data existed in PROFILE_SYSTEMS but rendered nowhere. */}
       <Section tone="canvas" size="lg">
         <div className="grid lg:grid-cols-12 gap-x-12 mb-12">
@@ -102,13 +102,13 @@ const Aluminium = () => {
             The aluminium profiles.
           </h2>
           <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
-            Two profile families sit under the systems above — the choice is wall thickness against sightline.
+            Two profile families sit under the systems above. The choice is wall thickness against sightline.
           </p>
         </div>
         <ProfileSystems material="aluminium" />
       </Section>
 
-      {/* Powder-coat finishes — client-supplied. The systems above come from the
+      {/* Powder-coat finishes, client-supplied. The systems above come from the
           CMS via useAluminium; these swatches have no CMS table yet. */}
       <Section tone="soft" size="lg">
         <div className="grid lg:grid-cols-12 gap-x-12 gap-y-10">
@@ -132,7 +132,7 @@ const Aluminium = () => {
         </div>
       </Section>
 
-      {/* When aluminium vs uPVC — static framing copy */}
+      {/* When aluminium vs uPVC. Static framing copy */}
       <Section tone="soft" size="lg">
         <div className="grid lg:grid-cols-12 gap-x-12 gap-y-8">
           <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">

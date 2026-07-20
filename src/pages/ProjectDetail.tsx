@@ -9,9 +9,9 @@ import { products } from "@/data/products";
 import { fetchProjects, mergeProject, canonicalProjectSlug } from "@/lib/cms-api";
 
 /**
- * /projects/:slug — individual project detail page.
+ * /projects/:slug. Individual project detail page.
  *
- * K&M has ZERO of these — their gallery is image-only tabs with no project
+ * K&M has ZERO of these. Their gallery is image-only tabs with no project
  * detail (audit §3.3). Going deep here is the single highest-leverage move
  * on the project side. Page gracefully renders only fields present in the
  * Project data; absent fields are omitted (Vitrocsa-style restraint) rather
@@ -85,7 +85,7 @@ const ProjectDetail = () => {
     { src: selectedProject.image, alt: selectedProject.name, caption: selectedProject.location },
     ...(selectedProject.gallery ?? []).map((src, i) => ({
       src,
-      alt: `${selectedProject.name} — detail ${i + 1}`,
+      alt: `${selectedProject.name} detail ${i + 1}`,
       caption: selectedProject.location,
     })),
   ];
@@ -101,7 +101,7 @@ const ProjectDetail = () => {
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
-          {/* Photo gallery — uses the cursor-switching component */}
+          {/* Photo gallery. Uses the cursor-switching component */}
           <div className="mb-20 lg:mb-28">
             <ProjectPhotoSwitcher photos={galleryPhotos} eyebrow="The project" />
           </div>
@@ -142,7 +142,7 @@ const ProjectDetail = () => {
             </div>
           </div>
 
-          {/* Systems used — only if populated */}
+          {/* Systems used, only if populated */}
           {linkedProducts.length > 0 && (
             <div className="mb-20 lg:mb-28 border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16">
               <p className="eyebrow mb-3">Systems specified</p>
@@ -175,7 +175,7 @@ const ProjectDetail = () => {
             </div>
           )}
 
-          {/* Owner / architect quote — only if populated */}
+          {/* Owner / architect quote, only if populated */}
           {selectedProject.quote && (
             <div className="mb-20 lg:mb-28 border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16">
               <blockquote className="max-w-3xl">
@@ -183,7 +183,7 @@ const ProjectDetail = () => {
                   "{selectedProject.quote.text}"
                 </p>
                 <footer className="mt-8 eyebrow text-[color:var(--ink-muted)]">
-                  — {selectedProject.quote.attribution}
+                  {selectedProject.quote.attribution}
                 </footer>
               </blockquote>
             </div>

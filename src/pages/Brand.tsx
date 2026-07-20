@@ -1,148 +1,149 @@
-import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import PageBody from "@/components/shared/PageBody";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
+import EditorialImage from "@/components/primitives/EditorialImage";
+import EditorialSplit from "@/components/primitives/EditorialSplit";
+import FullBleed from "@/components/primitives/FullBleed";
+import Statement from "@/components/primitives/Statement";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import ConsultationForm from "@/components/shared/ConsultationForm";
+import { Reveal, Stagger, StaggerItem } from "@/components/primitives/Reveal";
 import { certifications, CONTACT, BRANCHES, BRAND, phoneHref } from "@/data/brand";
 import { Phone, Mail, ArrowUpRight } from "lucide-react";
 
 const Brand = () => (
   <Layout>
-    {/* ── Full-viewport house hero ── image fills the screen, title overlays. ── */}
-    <header className="relative h-[calc(100vh-72px)] overflow-hidden">
-      <img
-        src="/images/wp-export/Our_Brand.jpg"
-        alt="A modern Philippine residence outfitted with FourlinQ systems"
-        loading="eager"
-        decoding="async"
-        className="absolute inset-0 w-full h-full object-cover"
+    {/* Cinematic hero one photograph, one line */}
+    <section className="relative h-[82vh] min-h-[560px] overflow-hidden">
+      <EditorialImage
+        src="/images/brand-story.jpg"
+        alt="A modern Philippine residence outfitted with FourlinQ windows and doors"
+        ratio="h-full"
+        eager
+        scrim
       />
-      {/* Dark gradient overlay so the text reads clearly over the photo. */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" aria-hidden="true" />
-
-      <div className="relative h-full container-editorial flex flex-col">
-        <nav aria-label="Breadcrumb" className="pt-8 lg:pt-12">
-          <ol className="flex items-center gap-2 text-[12px] tracking-[0.08em] uppercase text-white/70">
-            <li>
-              <Link to="/" className="hover:text-white transition-colors duration-300 ease-marvin">
-                FourlinQ
-              </Link>
-            </li>
-            <li aria-hidden="true"><ChevronRight size={12} strokeWidth={1.5} /></li>
-            <li className="text-white font-medium">Brand</li>
-          </ol>
-        </nav>
-
-        <div className="mt-auto pb-16 lg:pb-24 max-w-[58rem]">
-          <p className="eyebrow !text-white/70 mb-5">
-            Our brand
-          </p>
-          <h1 className="font-serif font-normal tracking-tight text-white text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02]">
-            European engineering.
-          </h1>
-          <p className="mt-7 lg:mt-9 text-body-lg lg:text-lead text-white/80 max-w-[40rem] leading-[1.55]">
-            {BRAND.promise}
-          </p>
-          {/* Answers Imie 2026-07-15: "what is the purpose of Brand? what does
-              it show for you?" The page never said what it was for. This states
-              the job in the visitor's terms, using only what the page holds. */}
-          <p className="mt-5 text-body text-white/60 max-w-[38rem] leading-[1.6]">
-            What we promise, what the warranty actually covers, and where you can put your hands on a full-scale system before you commit to one.
-          </p>
+      <div className="absolute inset-0 flex items-end">
+        <div className="container-editorial pb-12 lg:pb-20">
+          <Stagger gap={0.1}>
+            <StaggerItem>
+              <p className="eyebrow text-white/80 mb-5">Our brand</p>
+            </StaggerItem>
+            <StaggerItem>
+              <h1 className="font-serif font-normal text-white text-display leading-[0.98] tracking-tight max-w-[14ch]">
+                Built for a lifetime.
+              </h1>
+            </StaggerItem>
+            <StaggerItem>
+              <p className="mt-6 text-body-lg lg:text-lead text-white/80 max-w-[38ch] leading-snug">
+                What we promise, what the warranty covers, where to put your hands on it.
+              </p>
+            </StaggerItem>
+          </Stagger>
         </div>
       </div>
-    </header>
+    </section>
 
-    {/* Story — asymmetric bento grid of hairline cards. One featured card
-        anchors the section; three smaller cards orbit around it. No numbers,
-        no shadows, just thin rules and typography. */}
-    <Section tone="canvas" size="lg">
-      <div className="mb-12 lg:mb-16 flex items-end justify-between gap-8 flex-wrap">
-        <p className="eyebrow">
-          Our story
+    {/* Statement moment the promise in three phrases */}
+    <Section tone="canvas" size="xl">
+      <Statement lines={["Custom-made.", "Built to last.", "Yours alone."]} dimFrom={2} />
+      <Reveal delay={0.2}>
+        <p className="mt-10 lg:mt-14 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] leading-[1.55] max-w-[40rem]">
+          Every window and door is cut to the architect's spec and fitted to your
+          walls. No standard sizes off the shelf. That is the whole promise.
         </p>
-        <span className="eyebrow text-[color:var(--ink-muted)]">FourlinQ / 2026</span>
-      </div>
+      </Reveal>
+    </Section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-2 gap-px bg-[color:var(--rule-soft)] border border-[color:var(--rule-soft)]">
-        {/* Featured card — spans 2 rows on lg */}
-        <article className="lg:col-span-7 lg:row-span-2 bg-[color:var(--canvas)] p-8 lg:p-14 flex flex-col justify-between min-h-[28rem]">
-          <p className="eyebrow text-[color:var(--ink-muted)]">The promise</p>
-          <div>
-            <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[2rem] sm:text-[2.5rem] lg:text-[3.25rem] xl:text-[3.75rem] leading-[1.02] max-w-[18ch]">
-              {BRAND.heroQuote}
-            </h3>
-            <p className="mt-8 lg:mt-10 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] max-w-[34rem]">
-              {BRAND.promiseSupport} Every system is fabricated to the architect's specifications. No standard sizes off the shelf.
-            </p>
+    {/* Story editorial splits, alternating */}
+    <Section tone="canvas" size="md" className="!pt-0">
+      <div className="flex flex-col gap-24 lg:gap-36">
+        <EditorialSplit
+          image="/images/projects/real/residence-wood-grain-corner.webp"
+          alt="A two-storey FourlinQ residence with full-height corner glazing"
+          ratio="aspect-[4/3]"
+          index="01"
+        >
+          <p className="eyebrow mb-3">The promise</p>
+          <h2 className="font-serif text-h2 lg:text-h1 text-[color:var(--ink-primary)] leading-[1.04] tracking-tight">
+            A lifetime of peace of mind.
+          </h2>
+          <p className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
+            Windows and doors built to last. Made to your specification, backed
+            for ten years, and engineered to stay true long after the keys change
+            hands.
+          </p>
+        </EditorialSplit>
+
+        <EditorialSplit
+          image="/images/projects/real/resort-multi-unit.webp"
+          alt="A multi-unit resort building fitted with FourlinQ systems"
+          flip
+          ratio="aspect-[4/3]"
+          index="02"
+        >
+          <p className="eyebrow mb-3">Any project</p>
+          <h2 className="font-serif text-h2 lg:text-h1 text-[color:var(--ink-primary)] leading-[1.04] tracking-tight">
+            Homes and resorts alike.
+          </h2>
+          <p className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
+            A single residence or a multi-unit development. The same standard
+            holds, whether the job is a private home or a commercial fitout.
+          </p>
+        </EditorialSplit>
+
+        <EditorialSplit
+          image="/images/projects/real/french-doors-conservatory.webp"
+          alt="French doors opening onto a FourlinQ conservatory"
+          ratio="aspect-[4/3]"
+          index="03"
+        >
+          <p className="eyebrow mb-3">Finishes</p>
+          <h2 className="font-serif text-h2 lg:text-h1 text-[color:var(--ink-primary)] leading-[1.04] tracking-tight">
+            Twelve, heat-fused.
+          </h2>
+          <p className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
+            Six solid colors, six wood-grain laminates, fused into the profile.
+            Wipe-clean, never repainted.
+          </p>
+          <div className="mt-8">
+            <EditorialButton to="/finishes" variant="ghost" size="md">
+              See all twelve
+            </EditorialButton>
           </div>
-        </article>
-
-        {/* Top-right card — routes to the finishes page rather than dead-ending
-            on a fact the visitor can't act on. */}
-        <Link
-          to="/finishes"
-          className="group lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
-        >
-          <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Finishes</p>
-          <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1] transition-colors duration-300 ease-marvin group-hover:text-[color:var(--accent)]">
-            Twelve total.
-          </h3>
-          <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
-            Six solid colors and six wood-grain laminates, heat-fused into the profile.
-          </p>
-          <span className="mt-6 inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)]">
-            See all twelve
-            <ArrowUpRight size={16} strokeWidth={1.5} className="transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </span>
-        </Link>
-
-        {/* Bottom-right card — jumps to the showroom addresses further down. */}
-        <a
-          href="#contact"
-          className="group lg:col-span-5 bg-[color:var(--canvas)] p-8 lg:p-10 flex flex-col transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
-        >
-          <p className="eyebrow mb-5 text-[color:var(--ink-muted)]">Showrooms</p>
-          <h3 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.75rem] lg:text-[2rem] leading-[1.1] transition-colors duration-300 ease-marvin group-hover:text-[color:var(--accent)]">
-            Manila and Cebu.
-          </h3>
-          <p className="mt-4 text-body text-[color:var(--ink-secondary)] leading-[1.6]">
-            Walk through full-scale systems with our consultants. Frames you can open, finishes you can touch, hardware that's already in your wall.
-          </p>
-          <span className="mt-6 inline-flex items-center gap-1.5 text-body-sm font-medium text-[color:var(--ink-primary)]">
-            Get the addresses
-            <ArrowUpRight size={16} strokeWidth={1.5} className="transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </span>
-        </a>
+        </EditorialSplit>
       </div>
     </Section>
 
-    {/* Warranty — thin dark band. Inline 10 + YEAR WARRANTY is the hero;
-        promise prose is small detail beneath; marquee runs flush. */}
+    {/* Full-bleed breather */}
+    <FullBleed
+      src="/images/projects/real/sliding-doors-interior.webp"
+      alt="Interior view through FourlinQ sliding doors"
+      ratio="aspect-[21/9]"
+      caption="Open it, close it, ten thousand times. It still runs true."
+    />
+
+    {/* Warranty dark band. The 10-year mark owns the room */}
     <Section tone="dark" size="sm">
       <div className="grid lg:grid-cols-12 gap-x-12 gap-y-6 items-end">
         <div className="lg:col-span-7 flex items-baseline gap-5 lg:gap-7">
-          <p className="font-serif font-normal text-white leading-none tracking-tight text-[5rem] lg:text-[7.5rem] xl:text-[9rem]">
+          <p className="font-serif font-normal text-white leading-none tracking-tight text-display">
             10
           </p>
-          <p className="text-[15px] lg:text-[18px] uppercase tracking-[0.18em] text-[color:var(--accent)] font-medium">
-Year limited warranty.
+          <p className="eyebrow text-[color:var(--accent)]">
+            Year limited warranty.
           </p>
         </div>
-
         <p className="lg:col-span-5 text-body-sm lg:text-body text-white/65 leading-[1.55] max-w-[32rem]">
-          {BRAND.promise}
+          {BRAND.promise} That is what the warranty is for.
         </p>
       </div>
 
-      {/* Marquee scope band — flush to bottom of section */}
+      {/* Marquee scope band flush to bottom of section */}
       <div className="mt-8 lg:mt-10 -mx-5 lg:-mx-12 border-t border-white/10 overflow-hidden">
         <div className="animate-marquee flex whitespace-nowrap py-3">
           {[...Array(2)].map((_, dup) => (
-            <span key={dup} className="flex shrink-0 items-center text-[11px] lg:text-body-sm uppercase tracking-[0.18em] text-white/70">
+            <span key={dup} className="flex shrink-0 items-center text-eyebrow text-white/70">
               {BRAND.warrantyScope.map((scope) => (
                 <span key={`${dup}-${scope}`} className="flex items-center">
                   <span className="px-6 lg:px-10">{scope}</span>
@@ -160,22 +161,26 @@ Year limited warranty.
       <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-12 lg:mb-16">
         <div className="lg:col-span-5">
           <EyebrowHeading eyebrow="Trust" level={2} align="left">
-            Certifications & standards.
+            Certifications and standards.
           </EyebrowHeading>
         </div>
         <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
-          Every FourlinQ system is engineered, fabricated, and installed against the standards listed below. The certifications hold whether your project is a private residence or a commercial fitout.
+          Every FourlinQ system is engineered, fabricated, and installed against
+          the standards below. They hold whether your project is a private
+          residence or a commercial fitout.
         </p>
       </div>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
+      <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
         {certifications.map((cert) => (
-          <li key={cert.name} className="border-t border-[color:var(--rule-soft)] pt-5">
-            <p className="text-body-sm font-medium text-[color:var(--ink-primary)] leading-snug">
-              {cert.name}
-            </p>
-          </li>
+          <StaggerItem key={cert.name}>
+            <div className="border-t border-[color:var(--rule-soft)] pt-5">
+              <p className="text-body-sm font-medium text-[color:var(--ink-primary)] leading-snug">
+                {cert.name}
+              </p>
+            </div>
+          </StaggerItem>
         ))}
-      </ul>
+      </Stagger>
     </Section>
 
     {/* Contact */}
@@ -186,7 +191,8 @@ Year limited warranty.
             Start with a conversation.
           </EyebrowHeading>
           <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[28rem] leading-[1.65]">
-            Tell us about your project in four quick questions. A FourlinQ engineer will respond within one business day to schedule your ninety-minute showroom visit.
+            Four quick questions about your project. A FourlinQ engineer replies
+            within one business day to book your ninety-minute showroom visit.
           </p>
 
           <ul className="mt-10 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
@@ -211,7 +217,7 @@ Year limited warranty.
         {BRANCHES.map((branch) => (
           <li key={branch.id} className="bg-white border border-[color:var(--rule-soft)] overflow-hidden flex flex-col">
             <iframe
-              title={`Map — ${branch.label}`}
+              title={`Map ${branch.label}`}
               src={`https://www.openstreetmap.org/export/embed.html?bbox=${branch.lng - 0.005},${branch.lat - 0.003},${branch.lng + 0.005},${branch.lat + 0.003}&layer=mapnik&marker=${branch.lat},${branch.lng}`}
               className="w-full h-44 border-0"
               loading="lazy"
@@ -235,7 +241,7 @@ Year limited warranty.
       </ul>
     </Section>
 
-    {/* Editable CMS body — empty by default, renders nothing if Tita hasn't added content */}
+    {/* Editable CMS body empty by default, renders nothing if Tita hasn't added content */}
     <PageBody route="/brand" />
 
     {/* CTA */}
@@ -265,7 +271,7 @@ const ContactRow = ({ icon, label, value, href, external }: { icon: React.ReactN
     >
       <div className="text-[color:var(--ink-muted)] shrink-0">{icon}</div>
       <div className="min-w-0 flex-1">
-        <p className="text-[10px] uppercase tracking-[0.12em] text-[color:var(--ink-muted)] mb-0.5">{label}</p>
+        <p className="text-eyebrow text-[color:var(--ink-muted)] mb-0.5">{label}</p>
         <p className="text-body-sm text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">{value}</p>
       </div>
       <ArrowUpRight size={14} strokeWidth={1.5} className="text-[color:var(--ink-muted)] group-hover:text-[color:var(--accent)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 ease-marvin" />

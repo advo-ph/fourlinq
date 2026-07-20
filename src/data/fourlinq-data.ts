@@ -24,7 +24,7 @@ export const BRAND = {
 
 // ─────────────────────────────────────────────
 // CONTACT INFO
-// Source: FourlinQ brochure — assistance card and footer
+// Source: FourlinQ brochure: assistance card and footer
 // ─────────────────────────────────────────────
 
 export const CONTACT = {
@@ -35,7 +35,7 @@ export const CONTACT = {
 };
 
 /**
- * A local PH mobile number in E.164 — "0925-848-8888" becomes "+639258488888".
+ * A local PH mobile number in E.164: "0925-848-8888" becomes "+639258488888".
  * Returns null for anything that is not an 09xx mobile (a landline has no Viber).
  */
 export function toE164(phone: string): string | null {
@@ -64,7 +64,7 @@ export function phoneHref(phone: string): string {
 
 // ─────────────────────────────────────────────
 // BRANCHES
-// Source: Brochure footer — all 5 locations verified
+// Source: Brochure footer: all 5 locations verified
 // ─────────────────────────────────────────────
 
 export interface Branch {
@@ -82,7 +82,7 @@ export interface Branch {
 export const BRANCHES: Branch[] = [
   {
     id: "ortigas",
-    label: "Ortigas — CW Home Depot",
+    label: "Ortigas: CW Home Depot",
     type: "depot",
     address: "Unit 41 Doña Julia Vargas Ave., cor. Meralco Avenue, Brgy. Ugong, Pasig City",
     city: "Pasig City",
@@ -93,9 +93,9 @@ export const BRANCHES: Branch[] = [
   },
   {
     id: "alabang",
-    label: "Alabang — CW Home Depot",
+    label: "Alabang: CW Home Depot",
     type: "depot",
-    address: "Alabang Showroom G/F – Unit B-22 / Alabang Showroom 2/F – Unit A-44, Alabang Zapote Road cor. Filinvest Ave., Westgate Alabang, Muntinlupa",
+    address: "Alabang Showroom G/F Unit B-22 / Alabang Showroom 2/F Unit A-44, Alabang Zapote Road cor. Filinvest Ave., Westgate Alabang, Muntinlupa",
     city: "Muntinlupa",
     region: "NCR",
     lat: 14.4233,
@@ -117,7 +117,7 @@ export const BRANCHES: Branch[] = [
 
 // ─────────────────────────────────────────────
 // FOURLINQ ADVANTAGES
-// Source: "FourlinQ Advantages" panel — official brochure
+// Source: "FourlinQ Advantages" panel: official brochure
 // Exactly 7 verified claims. Do not expand without client sign-off.
 // ─────────────────────────────────────────────
 
@@ -133,7 +133,7 @@ export const ADVANTAGES: Advantage[] = [
     id: "attractive-appearance",
     label: "Attractive Appearance",
     description:
-      "Clean, modern profiles available in 12 finishes — from classic white to rich wood grains — designed to complement any architectural style.",
+      "Clean, modern profiles available in 12 finishes, from classic white to rich wood grains, designed to complement any architectural style.",
     icon: "sparkles",
   },
   {
@@ -154,7 +154,7 @@ export const ADVANTAGES: Advantage[] = [
     id: "corrosion-resistant",
     label: "Corrosion Resistant",
     description:
-      "Unlike steel, uPVC never rusts — ideal for the Philippine climate with its humidity, salt air, and heavy rainfall.",
+      "Unlike steel, uPVC never rusts, ideal for the Philippine climate with its humidity, salt air, and heavy rainfall.",
     icon: "shield",
   },
   {
@@ -168,21 +168,21 @@ export const ADVANTAGES: Advantage[] = [
     id: "weather-resistance",
     label: "Weather Resistance",
     description:
-      "EPDM gaskets and drainage holes ensure a tight seal against rain, wind, and storm conditions — built for tropical weather.",
+      "EPDM gaskets and drainage holes ensure a tight seal against rain, wind, and storm conditions, built for tropical weather.",
     icon: "cloud-rain",
   },
   {
     id: "sound-insulation",
     label: "Sound Insulation",
     description:
-      "Multi-chamber profiles and thick glass (6mm–12mm) significantly reduce outside noise for a quieter, more comfortable home.",
+      "Multi-chamber profiles and thick glass (6mm to 12mm) significantly reduce outside noise for a quieter, more comfortable home.",
     icon: "volume-x",
   },
 ];
 
 // ─────────────────────────────────────────────
-// uPVC PROFILE CUT SECTION — 7 Engineering Features
-// Source: Brochure diagram — "uPVC Profile Cut Section"
+// uPVC PROFILE CUT SECTION: 7 Engineering Features
+// Source: Brochure diagram: "uPVC Profile Cut Section"
 // Numbers match the diagram callouts exactly.
 // Ideal use: interactive SVG cross-section on the website
 // ─────────────────────────────────────────────
@@ -198,14 +198,14 @@ export const UPVC_PROFILE_FEATURES: ProfileFeature[] = [
   {
     number: 1,
     label: "Thick Glass",
-    descriptionVerbatim: "6mm – 12mm thick glass.",
+    descriptionVerbatim: "6mm to 12mm thick glass.",
     benefitPlain: "Better insulation, soundproofing, and impact resistance.",
   },
   {
     number: 2,
     label: "Smooth Homogenous Profile",
     descriptionVerbatim: "Smooth homogenous profile enables easy cleaning.",
-    benefitPlain: "No grooves or gaps where dirt accumulates — wipe clean in seconds.",
+    benefitPlain: "No grooves or gaps where dirt accumulates. Wipe clean in seconds.",
   },
   {
     number: 3,
@@ -217,31 +217,31 @@ export const UPVC_PROFILE_FEATURES: ProfileFeature[] = [
     number: 4,
     label: "Multi-Chamber Profile",
     descriptionVerbatim: "Multi-chamber designed profile for excellent heat insulation and energy savings.",
-    benefitPlain: "Trapped air chambers act as thermal barriers — cooler rooms, lower electricity bills.",
+    benefitPlain: "Trapped air chambers act as thermal barriers: cooler rooms, lower electricity bills.",
   },
   {
     number: 5,
     label: "Internal Glazing Beads",
     descriptionVerbatim: "Internal glazing beads for added security.",
-    benefitPlain: "Glass is secured from the inside — cannot be removed from outside the home.",
+    benefitPlain: "Glass is secured from the inside, so it cannot be removed from outside the home.",
   },
   {
     number: 6,
     label: "EPDM Gaskets",
     descriptionVerbatim: "EPDM gaskets for air and water tightness.",
-    benefitPlain: "Creates a weatherproof seal — keeps out rain, wind, dust, and insects.",
+    benefitPlain: "Creates a weatherproof seal that keeps out rain, wind, dust, and insects.",
   },
   {
     number: 7,
     label: "Drainage Holes",
     descriptionVerbatim: "Drainage holes for proper drainage.",
-    benefitPlain: "Prevents water pooling inside the frame — no leaks, no water damage.",
+    benefitPlain: "Prevents water pooling inside the frame: no leaks, no water damage.",
   },
 ];
 
 // ─────────────────────────────────────────────
 // PRODUCT TYPES
-// Source: FourlinQ brochure — 5 confirmed types
+// Source: FourlinQ brochure: 5 confirmed types
 // ─────────────────────────────────────────────
 
 export type WindowType =
@@ -347,12 +347,12 @@ export const MATERIALS: MaterialOption[] = [
     label: "uPVC",
     highlights: [
       "Fire retardant",
-      "Thermally efficient — multi-chamber design",
+      "Thermally efficient, multi-chamber design",
       "Never rusts or corrodes",
       "No painting or maintenance required",
       "Galvanized steel reinforced for security",
-      "EPDM gaskets — fully weatherproof",
-      "6mm–12mm glass options",
+      "EPDM gaskets, fully weatherproof",
+      "6mm to 12mm glass options",
       "Sound insulating",
       "10-Year Limited Warranty",
     ],
@@ -372,14 +372,14 @@ export const MATERIALS: MaterialOption[] = [
       "Suitable for large-span openings",
       "Corrosion-resistant",
     ],
-    // Aluminium has its own powder-coat finish set — see ALUMINIUM_FINISHES below.
+    // Aluminium has its own powder-coat finish set. See ALUMINIUM_FINISHES below.
     // These uPVC finish ids are the swatches the configurator can preview today.
     compatibleFinishIds: ["oak-light", "silica-cream", "white", "jet-black", "charcoal-gray", "matte-quartz"],
   },
 ];
 
 // ─────────────────────────────────────────────
-// ALUMINIUM FINISHES — popular powder-coat colours
+// ALUMINIUM FINISHES: popular powder-coat colours
 // Source: client (2026-05-31). Distinct from the 12 uPVC FRAME_FINISHES.
 // ─────────────────────────────────────────────
 
@@ -397,7 +397,7 @@ export const ALUMINIUM_FINISHES: AluminiumFinish[] = [
 ];
 
 // ─────────────────────────────────────────────
-// PROFILE SYSTEMS — the extrusion brands / lines we fabricate from
+// PROFILE SYSTEMS: the extrusion brands / lines we fabricate from
 // Source: client (2026-05-31).
 // ─────────────────────────────────────────────
 
@@ -411,12 +411,12 @@ export interface ProfileSystem {
 export const PROFILE_SYSTEMS: ProfileSystem[] = [
   { material: "upvc",     name: "Veka",                      origin: "German brand" },
   { material: "upvc",     name: "Skyframe",                  origin: "Chinese brand" },
-  { material: "aluminium", name: "Standard / Regular Systems", note: "Wall thickness 1.2mm – 3.0mm." },
+  { material: "aluminium", name: "Standard / Regular Systems", note: "Wall thickness 1.2mm to 3.0mm." },
   { material: "aluminium", name: "Alu Slim Systems",           note: "Minimum-sightline aluminium profile." },
 ];
 
 // ─────────────────────────────────────────────
-// FRAME FINISHES — 12 Confirmed Options
+// FRAME FINISHES: 12 Confirmed Options
 // Source: Physical uPVC profile sample bars
 // ─────────────────────────────────────────────
 
@@ -429,7 +429,7 @@ export interface FrameFinish {
   swatchHex: string;
   description: string;
   hasTexture: boolean;
-  textureImagePath?: string; // e.g. "/textures/walnut.jpg" — for 3D viewer material maps
+  textureImagePath?: string; // e.g. "/textures/walnut.jpg", for 3D viewer material maps
   /** Real brochure photo of the finish applied to a uPVC profile. Used on
    *  the /finishes swatch grid in place of the synthetic hex + stripe
    *  overlay. Falls back to swatchHex when undefined. */
@@ -443,7 +443,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "wood-grain",
     swatchHex: "#C9A96E",
     description:
-      "Pale golden blonde with soft, fine grain. The lightest wood option — airy and natural. Works well in Scandinavian-inspired and minimalist interiors.",
+      "Pale golden blonde with soft, fine grain. The lightest wood option, airy and natural. Works well in Scandinavian-inspired and minimalist interiors.",
     hasTexture: true,
     textureImagePath: "/images/finishes/textures/oak-light.png",
   },
@@ -453,7 +453,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "wood-grain",
     swatchHex: "#B89A6A",
     description:
-      "Warm medium-blonde with golden-amber tones and slightly pronounced grain. Natural and unpretentious — like raw, unfinished timber. Pairs well with earth-tone interiors.",
+      "Warm medium-blonde with golden-amber tones and slightly pronounced grain. Natural and unpretentious, like raw, unfinished timber. Pairs well with earth-tone interiors.",
     hasTexture: true,
     textureImagePath: "/images/finishes/textures/oak-malt.jpeg",
   },
@@ -463,7 +463,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "solid",
     swatchHex: "#1A1A1A",
     description:
-      "Deep, near-total black with a smooth matte-to-satin surface. Completely uniform — no grain. High contrast and architectural. The darkest and most dramatic option.",
+      "Deep, near-total black with a smooth matte-to-satin surface. Completely uniform, no grain. High contrast and architectural. The darkest and most dramatic option.",
     hasTexture: false,
   },
   {
@@ -472,7 +472,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "solid",
     swatchHex: "#4A4A4A",
     description:
-      "Mid-dark gray, softer than Jet Black with a slightly cooler tone. Sits between anthracite and concrete in character — industrial but not aggressive. Very popular on contemporary facades.",
+      "Mid-dark gray, softer than Jet Black with a slightly cooler tone. Sits between anthracite and concrete in character, industrial but not aggressive. Very popular on contemporary facades.",
     hasTexture: false,
   },
   {
@@ -481,7 +481,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "solid",
     swatchHex: "#9E9E9E",
     description:
-      "Flat medium gray with almost no sheen — stone-like and understated. Lighter and warmer than Charcoal. Closest visually to polished concrete or a quartz countertop.",
+      "Flat medium gray with almost no sheen, stone-like and understated. Lighter and warmer than Charcoal. Closest visually to polished concrete or a quartz countertop.",
     hasTexture: false,
   },
   {
@@ -490,7 +490,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "solid",
     swatchHex: "#d4ccc1",
     description:
-      "Warm off-white with sandy undertones. Softer than pure white — blends naturally with concrete, stone, and tropical-palette walls.",
+      "Warm off-white with sandy undertones. Softer than pure white, blends naturally with concrete, stone, and tropical-palette walls.",
     hasTexture: false,
   },
   {
@@ -499,7 +499,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "wood-grain",
     swatchHex: "#2E2A27",
     description:
-      "Deep espresso brown-black where wood grain is still perceptible in raking light. Moody and rich — like ebonized oak or dark wenge.",
+      "Deep espresso brown-black where wood grain is still perceptible in raking light. Moody and rich, like ebonized oak or dark wenge.",
     hasTexture: true,
     textureImagePath: "/images/finishes/textures/black-wood.jpeg",
   },
@@ -509,7 +509,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "wood-grain",
     swatchHex: "#8C8680",
     description:
-      "Cool gray base with subtle brown-taupe grain lines — like driftwood or weathered timber. A crossover finish that is neither fully wood nor fully solid.",
+      "Cool gray base with subtle brown-taupe grain lines, like driftwood or weathered timber. A crossover finish that is neither fully wood nor fully solid.",
     hasTexture: true,
     textureImagePath: "/images/finishes/textures/gray-wood.jpeg",
   },
@@ -519,7 +519,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "wood-grain",
     swatchHex: "#5C3A1E",
     description:
-      "Medium-dark reddish-brown with clearly defined, flowing grain lines in deep amber and brown. Classic and warm — reminiscent of mahogany-adjacent hardwoods.",
+      "Medium-dark reddish-brown with clearly defined, flowing grain lines in deep amber and brown. Classic and warm, reminiscent of mahogany-adjacent hardwoods.",
     hasTexture: true,
     textureImagePath: "/images/finishes/textures/dark-oak.jpeg",
   },
@@ -539,7 +539,7 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "wood-grain",
     swatchHex: "#C8820A",
     description:
-      "Bright honey-amber with a strong open-grain pattern — almost orange-gold in direct light. The most vivid wood finish. Suits traditional Filipino and Spanish colonial interiors.",
+      "Bright honey-amber with a strong open-grain pattern, almost orange-gold in direct light. The most vivid wood finish. Suits traditional Filipino and Spanish colonial interiors.",
     hasTexture: true,
     textureImagePath: "/images/finishes/textures/golden-oak.jpg",
   },
@@ -549,14 +549,14 @@ export const FRAME_FINISHES: FrameFinish[] = [
     category: "solid",
     swatchHex: "#F5F5F5",
     description:
-      "Clean, bright white with a smooth uniform surface. The most versatile option — matches any wall color, reads as modern or classic depending on context.",
+      "Clean, bright white with a smooth uniform surface. The most versatile option: it matches any wall color and reads as modern or classic depending on context.",
     hasTexture: false,
   },
 ];
 
 // ─────────────────────────────────────────────
 // DIMENSION CONSTRAINTS (in mm)
-// ⚠️ Industry defaults — confirm actual limits with client
+// ⚠️ Industry defaults: confirm actual limits with client
 // ─────────────────────────────────────────────
 
 export const DIMENSION_CONSTRAINTS: Record<

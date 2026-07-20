@@ -55,7 +55,7 @@ const sizeConstraints = {
 };
 
 // Type → Material → Finish → Glass → Size. The Material step was added to match
-// the meeting's "like Apple selection" flow (00:11:11–00:11:28) and the site's
+// the meeting's "like Apple selection" flow (00:11:11 to 00:11:28) and the site's
 // type-vs-material axes: material decides which finishes are offered next.
 const stepLabels = ["Type", "Material", "Finish", "Glass", "Size"];
 const LAST_STEP = stepLabels.length - 1;
@@ -176,7 +176,7 @@ const DesignTool = () => {
   };
 
   // Switching material re-scopes the finish set, so snap the finish to the first
-  // valid one for the new material — otherwise a uPVC finish id would linger on
+  // valid one for the new material, otherwise a uPVC finish id would linger on
   // an aluminium config and the preview/summary would show a finish that isn't
   // offered for that material.
   const selectMaterial = (materialId: string) => {
@@ -235,7 +235,7 @@ const DesignTool = () => {
           eyebrow="Configurator"
           title="Build your window. Save it. Share it."
           breadcrumbLabel="Design Tool"
-          subtitle="Choose a type and material, pick a finish and glass, set the size — then save your spec or send it to our team for a tailored quote."
+          subtitle="Choose a type and material, pick a finish and glass, set the size, then save your spec or send it to our team for a tailored quote."
         />
       )}
 

@@ -5,7 +5,7 @@
 // On card hover the frames play forward once; on un-hover they play in reverse
 // back to the closed state. See SystemCardMedia.tsx for the player.
 //
-// Systems WITHOUT a video are intentionally absent here — their cards stay
+// Systems WITHOUT a video are intentionally absent here. Their cards stay
 // fully static (nothing happens on hover).
 
 const FRAME_COUNT = 28;

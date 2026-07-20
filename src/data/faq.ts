@@ -40,29 +40,29 @@ export const FAQ: FAQEntry[] = [
   {
     category: "products",
     q: "What's the difference between Casement, Awning, and Sliding?",
-    a: "Casement windows hinge on one side and open outward — maximum ventilation, easy cleaning. Awnings hinge at the top and open outward, so they let in light and air even during rain. Sliding windows move horizontally along a track — ideal where outward clearance is tight, like balconies or above kitchen counters.",
+    a: "Casement windows hinge on one side and open outward for maximum ventilation and easy cleaning. Awnings hinge at the top and open outward, so they let in light and air even during rain. Sliding windows move horizontally along a track, ideal where outward clearance is tight, like balconies or above kitchen counters.",
   },
   {
     category: "products",
-    q: "Can you do custom shapes — arches, trapezoids?",
+    q: "Can you do custom shapes like arches or trapezoids?",
     a: "Yes. Our Special Shapes system supports fully custom geometry, including arch-tops, circles, trapezoids, and triangles. Often combined with other system types to create a dramatic feature wall of glass. Send us your architectural drawings via 0925-848-8888 or sales@fourlinq.com and we'll quote against them.",
   },
   {
     category: "products",
     q: "How many finishes are available?",
-    a: "12 finishes total — 7 wood-grain (Oak Light, Oak Malt, Black Wood, Gray Wood, Dark Oak, Walnut, Golden Oak) and 5 solid colors (White, Jet Black, Charcoal Gray, Matte Quartz, Silica Cream). Browse the full set on /finishes or in the Design Tool (/design-tool).",
+    a: "12 finishes total: 7 wood-grain (Oak Light, Oak Malt, Black Wood, Gray Wood, Dark Oak, Walnut, Golden Oak) and 5 solid colors (White, Jet Black, Charcoal Gray, Matte Quartz, Silica Cream). Browse the full set on /finishes or in the Design Tool (/design-tool).",
   },
 
   // ── uPVC & Materials ──────────────────────────────
   {
     category: "material",
     q: "What is uPVC and why is it better for the Philippines?",
-    a: "uPVC is unplasticized polyvinyl chloride — a rigid polymer profile that won't rust, rot, warp, or corrode. Our profiles are fire retardant, thermally efficient (multi-chamber design), corrosion resistant, and sound insulating — well-suited to the Philippine climate.",
+    a: "uPVC is unplasticized polyvinyl chloride, a rigid polymer profile that won't rust, rot, warp, or corrode. Our profiles are fire retardant, thermally efficient (multi-chamber design), corrosion resistant, and sound insulating, well-suited to the Philippine climate.",
   },
   {
     category: "material",
     q: "Will uPVC fade in the tropical sun?",
-    a: "Our uPVC profiles are engineered for tropical use and are corrosion resistant. The 10-Year Limited Warranty covers long lasting performance and weather resistance. For specific color-stability questions about a particular finish, contact our sales team — 0925-848-8888 or sales@fourlinq.com.",
+    a: "Our uPVC profiles are engineered for tropical use and are corrosion resistant. The 10-Year Limited Warranty covers long lasting performance and weather resistance. For specific color-stability questions about a particular finish, contact our sales team at 0925-848-8888 or sales@fourlinq.com.",
   },
   {
     category: "material",
@@ -71,7 +71,7 @@ export const FAQ: FAQEntry[] = [
   },
   {
     category: "material",
-    q: "uPVC vs Aluminium — which should I choose?",
+    q: "uPVC vs Aluminium: which should I choose?",
     a: "We offer both. uPVC is the better thermal insulator (cooler interiors), sound insulator, and is fire retardant. Aluminium has slimmer sightlines for a more minimal look and suits very large spans. Use the Design Tool (/design-tool) to compare configurations, or visit any of our three showrooms for a hands-on look.",
   },
 
@@ -79,12 +79,12 @@ export const FAQ: FAQEntry[] = [
   {
     category: "ordering",
     q: "How do I get a quote?",
-    a: "Three ways. (1) Use the Design Tool (/design-tool) to configure a system — we reply with a tailored quote. (2) Request a Quote from any system's detail page. (3) Visit a showroom (Pasig, Alabang, or Cebu) and we'll measure and quote on site. You can also reach sales directly at 0925-848-8888 or sales@fourlinq.com.",
+    a: "Three ways. (1) Use the Design Tool (/design-tool) to configure a system and we reply with a tailored quote. (2) Request a Quote from any system's detail page. (3) Visit a showroom (Pasig, Alabang, or Cebu) and we'll measure and quote on site. You can also reach sales directly at 0925-848-8888 or sales@fourlinq.com.",
   },
   {
     category: "ordering",
     q: "How much do FourlinQ systems cost?",
-    a: "Pricing is custom per project — every order is made to your specifications. We don't publish list prices. Request a free quote and we'll get back to you with a number. Contact sales: 0925-848-8888 or sales@fourlinq.com.",
+    a: "Pricing is custom per project. Every order is made to your specifications. We don't publish list prices. Request a free quote and we'll get back to you with a number. Contact sales: 0925-848-8888 or sales@fourlinq.com.",
   },
   {
     category: "ordering",
@@ -113,7 +113,7 @@ export const FAQ: FAQEntry[] = [
   {
     category: "warranty",
     q: "What does the warranty cover?",
-    a: "FourlinQ provides a 10-Year Limited Warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation. The full warranty document goes out with every order — read it before signing.",
+    a: "FourlinQ provides a 10-Year Limited Warranty covering corrosion resistance, long lasting performance, weather resistance, and sound insulation. The full warranty document goes out with every order. Read it before signing.",
   },
   {
     category: "warranty",
@@ -125,7 +125,7 @@ export const FAQ: FAQEntry[] = [
   {
     category: "care",
     q: "How do I clean uPVC frames?",
-    a: "Warm soapy water and a soft cloth, every few months. Avoid abrasive scrubbers, solvents, bleach, or paint thinner — those can damage the surface finish. Wood-grain finishes wipe down the same way and don't need oiling or refinishing.",
+    a: "Warm soapy water and a soft cloth, every few months. Avoid abrasive scrubbers, solvents, bleach, or paint thinner, which can damage the surface finish. Wood-grain finishes wipe down the same way and don't need oiling or refinishing.",
   },
   {
     category: "care",

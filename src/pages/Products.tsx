@@ -25,11 +25,11 @@ const filters: { label: string; value: Filter }[] = [
 ];
 
 // The /products landing renders the two axes from src/data/taxonomy.ts as two
-// LABELLED GROUPS — never one mixed row.
+// LABELLED GROUPS, never one mixed row.
 //
 // The 2026-07-05 build put an "Aluminium Line" card fourth in a row beside
 // Window/Door/Specialist, which reads as a fourth type. Imie rejected it, then
-// restated why on 07-02: "Aluminium is like uPVC — they are both profile
+// restated why on 07-02: "Aluminium is like uPVC, they are both profile
 // systems." Material is the other axis, so it gets its own heading.
 const TYPE_CARD: SystemCategory[] = SYSTEM_TYPE.map((t) => ({
   key: t.type_code,
@@ -233,7 +233,7 @@ const Products = () => {
 
   const activeType = findTypeByFilter(activeFilter);
   const subtitle = isLanding
-    ? "Browse two ways. By type — window, door, or specialist. By material — the uPVC or aluminium profile system it is fabricated from. The two are separate choices, not one list."
+    ? "Browse two ways. By type: window, door, or specialist. By material: the uPVC or aluminium profile system it is fabricated from. The two are separate choices, not one list."
     : "Browse the current catalog names and operation summaries. Exact material, profile, glass, finish, hardware, dimensions, ratings, availability, and project compatibility require FourlinQ confirmation.";
 
   return (
@@ -248,14 +248,14 @@ const Products = () => {
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
           {isLanding ? (
-            /* Landing — the two axes, as two labelled groups. Never one mixed row. */
+            /* Landing: the two axes, as two labelled groups. Never one mixed row. */
             <>
               <div>
                 <h2 className="font-serif font-normal tracking-tight text-h4 lg:text-h3 text-[color:var(--ink-primary)]">
                   Browse by type.
                 </h2>
                 <p className="mt-3 text-body text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.6]">
-                  What the opening is — a window, a door, or a custom shape.
+                  What the opening is: a window, a door, or a custom shape.
                 </p>
                 <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14">
                   {TYPE_CARD.map((c) => (
@@ -270,7 +270,7 @@ const Products = () => {
                 </h2>
                 <p className="mt-3 text-body text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.6]">
                   What it is fabricated from. Windows and doors are built in either
-                  profile system — the material is a separate choice from the type.
+                  profile system. The material is a separate choice from the type.
                 </p>
                 <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-14 lg:max-w-[52rem]">
                   {MATERIAL_CARD.map((c) => (
