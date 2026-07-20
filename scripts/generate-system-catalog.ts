@@ -86,7 +86,7 @@ const buildHtml = () => `<!doctype html>
 <meta charset="utf-8" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@500&display=swap" rel="stylesheet" />
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -156,7 +156,13 @@ const buildHtml = () => `<!doctype html>
   <img src="${img("/images/projects/real/residence-wood-grain-corner.webp")}"
        style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.42;" />
   <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(13,11,10,0.94), rgba(13,11,10,0.55) 55%, rgba(13,11,10,0.35));"></div>
-  <div class="mark" style="position:relative;">${esc(BRAND.name)}<span>.</span> <span style="color:rgba(255,255,255,0.55); font-size:9pt; letter-spacing:0.16em; text-transform:uppercase; font-family:Manrope,sans-serif;">${esc(BRAND.tagline)}</span></div>
+  <!-- The real FourlinQ wordmark, mirroring src/components/shared/Logo.tsx:
+       Times serif "Fourlin" + red Playfair Q over a baseline rule, with the
+       "Windows & Doors" subtitle beneath. -->
+  <div style="position:relative; align-self:flex-start; width:fit-content; text-align:center;">
+    <div style="font-family:'Times New Roman','Times',serif; font-size:22pt; font-weight:400; line-height:1; color:#fff; padding-bottom:1.2mm; border-bottom:0.35pt solid #fff;">Fourlin<span style="font-family:'Playfair Display',serif; font-weight:500; color:#DC2626;">Q</span></div>
+    <div style="font-family:'Times New Roman','Times',serif; font-size:11.5pt; letter-spacing:0.03em; color:#fff; margin-top:1.2mm;">Windows &amp; Doors</div>
+  </div>
   <div style="position:relative;">
     <h1>System Catalog</h1>
     <p class="promise">“${esc(BRAND.promise)}”</p>
