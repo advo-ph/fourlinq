@@ -91,10 +91,20 @@ const NavFrameTile = ({ label, description, to, framePath, active, onNavigate }:
       className="group block"
     >
       <div className="relative aspect-video overflow-hidden bg-[color:var(--canvas-soft)]">
+        {/* Instant poster: the sequence's first frame as a plain image, so the
+            tile is never blank while the 53-frame preload runs over the wire.
+            The canvas overlays it once frames are ready. */}
+        <img
+          src={framePath.replace("{index}", "0001")}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <canvas
           ref={canvasRef}
           className={cn(
-            "w-full h-full object-cover transition-opacity duration-700",
+            "relative w-full h-full object-cover transition-opacity duration-700",
             isLoaded ? "opacity-100" : "opacity-0",
           )}
         />
