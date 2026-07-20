@@ -42,7 +42,7 @@ const WhatsNew = () => {
       .catch(() => { /* keep fallback */ });
   }, []);
 
-  /** Only surface filter tabs that have at least one entry — empty filters
+  /** Only surface filter tabs that have at least one entry. Empty filters
    *  make the filter look broken. */
   const filters = useMemo(
     () => ALL_FILTERS.filter((f) => f.value === "all" || items.some((e) => e.category === f.value)),

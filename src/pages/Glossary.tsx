@@ -5,12 +5,12 @@ import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import { GLOSSARY_GROUP, termByCategory } from "@/data/glossary";
 
 /**
- * /glossary — the plain-English terminology reference.
+ * /glossary. The plain-English terminology reference.
  *
  * Answers Imie's most-repeated note ("terminology must be correct", meeting
  * 00:04:40; "check internet for the meaning of each design", 2026-05-28) and
  * is the public half of RM1. Content is confined to verifiable, general terms
- * and FourlinQ's already-published operations, materials, and glass — see
+ * and FourlinQ's already-published operations, materials, and glass. See
  * src/data/glossary.ts for the editorial boundary.
  */
 const Glossary = () => (
@@ -19,7 +19,7 @@ const Glossary = () => (
       eyebrow="Reference"
       title="The language of windows and doors."
       breadcrumbLabel="Glossary"
-      subtitle="Windows and doors carry their own vocabulary — operation, sightline, glazing, mullion. Here is what the terms mean, in plain language, so you can read a quote and specify a project with confidence."
+      subtitle="Windows and doors carry their own vocabulary: operation, sightline, glazing, mullion. Here is what the terms mean, in plain language, so you can read a quote and specify a project with confidence."
     />
 
     {GLOSSARY_GROUP.map((group, gi) => (

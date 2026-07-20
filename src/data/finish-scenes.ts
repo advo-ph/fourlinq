@@ -17,14 +17,14 @@ export interface FinishScene {
   id: string;
   label: string;
   description: string;
-  /** Path template — the finish ID is interpolated as `{finishId}`. */
+  /** Path template. The finish ID is interpolated as `{finishId}`. */
   variantPathTemplate: string;
   /** Aspect ratio for the hero crop. */
   aspect: string;
   /** Whether the scene's variants actually exist on disk. Set true only
    *  when assets have been generated and committed. */
   hasAssets: boolean;
-  /** Fallback used when hasAssets is false — the base scene without finish swap. */
+  /** Fallback used when hasAssets is false: the base scene without finish swap. */
   fallbackSrc: string;
 }
 

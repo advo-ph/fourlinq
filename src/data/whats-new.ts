@@ -1,4 +1,4 @@
-// "What's New" feed entries — sourced from the FourlinQ Facebook page via
+// "What's New" feed entries, sourced from the FourlinQ Facebook page via
 // the advo-api FB scrape on 2026-04-12.
 //
 // Dates: the FB scrape captured post bodies + images but not timestamps.
@@ -61,7 +61,7 @@ export const whatsNew: WhatsNewEntry[] = [
     date: "2026-01-08",
     category: "project",
     title: "Nuvali residence turnover",
-    excerpt: "Another milestone achieved. The new windows and doors became the new face of the home — better efficiency, more natural light, a boost to curb appeal.",
+    excerpt: "Another milestone achieved. The new windows and doors became the new face of the home: better efficiency, more natural light, a boost to curb appeal.",
     image: `${FB}/mbArIDA5.jpg`,
     link: "/projects/nuvali-laguna-residence",
   },
@@ -79,7 +79,7 @@ export const whatsNew: WhatsNewEntry[] = [
     date: "2025-11-22",
     category: "project",
     title: "Taytay, Rizal residence completed",
-    excerpt: "Standard is never enough. We officially turned over the keys to this gorgeous Taytay project — better security, better insulation, better views.",
+    excerpt: "Standard is never enough. We officially turned over the keys to this gorgeous Taytay project: better security, better insulation, better views.",
     image: `${FB}/pndqSKzg.jpg`,
     link: "/projects/taytay-rizal-residence",
   },
@@ -88,7 +88,7 @@ export const whatsNew: WhatsNewEntry[] = [
     date: "2025-10-15",
     category: "product",
     title: "Twelve finish options across every system",
-    excerpt: "From classic White to Wood Gray, Walnut, and Golden Oak — every FourlinQ system available in twelve brochure-verified finishes.",
+    excerpt: "From classic White to Wood Gray, Walnut, and Golden Oak, every FourlinQ system available in twelve brochure-verified finishes.",
     image: "/images/wp-export/Walnut-Profile.jpg",
     link: "/finishes",
   },

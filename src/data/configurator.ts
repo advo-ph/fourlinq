@@ -1,4 +1,4 @@
-// Configurator data — derived from verified fourlinq-data.ts
+// Configurator data, derived from verified fourlinq-data.ts
 // Glass options are kept locally (not in brochure data)
 import { FRAME_FINISHES, DIMENSION_CONSTRAINTS } from "./fourlinq-data";
 import type { WindowType } from "./fourlinq-data";
@@ -35,7 +35,7 @@ export const productTypes: ProductType[] = [
   { id: "fixed", name: "Fixed", icon: "fixed", category: "windows" },
   { id: "tilt-turn", name: "Tilt & Turn", icon: "tilt-turn", category: "windows" },
   { id: "special-shapes", name: "Special Shapes", icon: "special-shapes", category: "windows" },
-  // Doors — featured order: Slide & Fold → Large Panel → 90 Series → Lift & Slide
+  // Doors. Featured order: Slide & Fold → Large Panel → 90 Series → Lift & Slide
   { id: "bifold", name: "Slide & Fold", icon: "bifold", category: "doors" },
   { id: "large-panel-doors", name: "Large Panel Doors", icon: "large-panel", category: "doors" },
   { id: "90-series", name: "90 Series", icon: "90-series", category: "doors" },
@@ -43,7 +43,7 @@ export const productTypes: ProductType[] = [
   { id: "sliding-door", name: "Sliding Door", icon: "sliding-door", category: "doors" },
   { id: "french-door", name: "French Sliding Door", icon: "french-door", category: "doors" },
   { id: "entrance", name: "Casement Door", icon: "entrance", category: "doors" },
-  // Specialist — custom-fabricated geometries
+  // Specialist. Custom-fabricated geometries
   { id: "arch-shapes", name: "Arch Shapes", icon: "arch", category: "specialist" },
   { id: "curtain-wall", name: "Curtain Wall", icon: "curtain-wall", category: "specialist" },
   { id: "custom-shapes", name: "Custom Shapes", icon: "custom-shapes", category: "specialist" },

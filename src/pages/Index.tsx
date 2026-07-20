@@ -27,7 +27,7 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero headline approved by Tita 2026-05-25. Lede acknowledges both
-          FourlinQ product lines (uPVC + aluminium). No warranty mention —
+          FourlinQ product lines (uPVC + aluminium). No warranty mention:
           per Tita, some customers opt out of the 10-yr warranty so it's
           not a universal homepage anchor. */}
       <VideoHero
@@ -42,7 +42,7 @@ const Index = () => {
       />
 
       {/* Categories before benefits. Imie, meeting 2026-07-10 (00:35:06):
-          "categorize muna" — the site was reaching the benefit story before it
+          "categorize muna". The site was reaching the benefit story before it
           ever showed what we sell. The product gateway used to sit below the
           500vh ScrollWindow sequence, starting around y=5400 on desktop. It now
           comes first, within one viewport of the hero; the benefit sequence
@@ -71,7 +71,7 @@ const Index = () => {
         <BrandCTA />
       </Section>
 
-      {/* Three-card utility band — the one Marvin homepage module we lacked
+      {/* Three-card utility band, the one Marvin homepage module we lacked
           (Find a Dealer / Professional Resources / Photo Gallery → Showrooms /
           For Architects / Inspiration). Closes the completeness gap Imie
           flagged without cloning Marvin's collection architecture. */}

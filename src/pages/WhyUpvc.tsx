@@ -10,7 +10,7 @@ import { UPVC_PROFILE_FEATURES } from "@/data/fourlinq-data";
 import ProfileSystems from "@/components/shared/ProfileSystems";
 
 /**
- * /why-upvc — restrained rewrite (2026-05-24, round 3).
+ * /why-upvc. Restrained rewrite (2026-05-24, round 3).
  *
  * Calibrated against RESTRAINT.md. One hero, one feature block, one
  * 2x3 photo grid, one comparison table, one quiet limits section, one CTA.
@@ -32,7 +32,7 @@ const elaboration: Record<string, string> = {
   "weather-resistance":
     "EPDM gaskets seal where the sash closes against the frame. If any water gets past the seal, drainage slots at the bottom let it run back out instead of sitting inside the profile. Tested against horizontal rain.",
   "sound-insulation":
-    "With the right glazing, the chambered profile typically gives 24–32 dB of attenuation. That isn't silence, but a bedroom on a main road becomes usable as a bedroom again.",
+    "With the right glazing, the chambered profile typically gives 24 to 32 dB of attenuation. That isn't silence, but a bedroom on a main road becomes usable as a bedroom again.",
 };
 
 const photo: Record<string, { src: string; alt: string }> = {
@@ -177,7 +177,7 @@ const WhyUpvc = () => (
 
     {/* ── What's in the frame ── the brochure's 7 cut-section features ──
         Answers Imie 2026-07-15: "lacking so much information as to why you
-        should choose uPVC — it just indicated the color?" The engineering case
+        should choose uPVC. It just indicated the color?" The engineering case
         now runs BEFORE the finish/texture scroll, so the page argues the
         material first and shows colour second. Copy is brochure-verbatim
         (descriptionVerbatim) with a plain-language benefit under each. */}
@@ -187,7 +187,7 @@ const WhyUpvc = () => (
           What's actually in the frame.
         </h2>
         <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
-          Seven things engineered into every FourlinQ uPVC profile — and what each one means once the window is in your wall.
+          Seven things engineered into every FourlinQ uPVC profile, and what each one means once the window is in your wall.
         </p>
       </div>
 
@@ -265,11 +265,11 @@ const WhyUpvc = () => (
           uPVC. Aluminium. Timber.
         </h2>
         <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
-          We carry uPVC and aluminium. Most houses end up with uPVC; bigger openings or thinner sightlines go to aluminium. Timber sits in the third column for comparison — we don't sell it.
+          We carry uPVC and aluminium. Most houses end up with uPVC; bigger openings or thinner sightlines go to aluminium. Timber sits in the third column for comparison. We don't sell it.
         </p>
       </div>
 
-      {/* Table — uPVC column gets a tinted background + bold text */}
+      {/* Table. uPVC column gets a tinted background + bold text */}
       <div className="overflow-x-auto">
         <div className="min-w-[720px]">
           {/* Header */}
@@ -332,7 +332,7 @@ uPV<span className="text-[color:var(--accent)]">C</span>
       </div>
     </Section>
 
-    {/* Editable CMS body — empty by default */}
+    {/* Editable CMS body, empty by default */}
     <PageBody route="/why-upvc" />
 
     {/* ── CTA ── single dark section, two buttons ── */}
