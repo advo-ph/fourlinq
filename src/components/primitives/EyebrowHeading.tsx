@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
+import AccentStripe from "@/components/primitives/AccentStripe";
 
 interface EyebrowHeadingProps {
   eyebrow?: string;
@@ -42,12 +43,21 @@ const EyebrowHeading = ({
   return (
     <div className={cn(alignClass, "max-w-[60rem]", className)}>
       {eyebrow && (
-        <p className={cn(
-          "eyebrow mb-v400",
-          eyebrowInkClass,
-        )}>
-          {eyebrow}
-        </p>
+        <>
+          {/* Marvin-signature 5px accent stripe above the section label.
+              Center-aligned headings get the stripe centered too via mx-auto. */}
+          <AccentStripe
+            width="sm"
+            color={toneInverse ? "muted" : "accent"}
+            className={cn("mb-3", align === "center" && "mx-auto")}
+          />
+          <p className={cn(
+            "eyebrow mb-v400",
+            eyebrowInkClass,
+          )}>
+            {eyebrow}
+          </p>
+        </>
       )}
       <HeadingTag className={cn("font-serif font-normal tracking-tight", headingSizeClass(level, display), inkClass)}>
         {children}
