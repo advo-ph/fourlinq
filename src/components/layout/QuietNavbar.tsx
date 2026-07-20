@@ -1,74 +1,169 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, X, ArrowUpRight } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
+import NavFrameTile from "@/components/layout/NavFrameTile";
+import NavSearch from "@/components/layout/NavSearch";
 
-interface NavChild {
+/**
+ * Header with Marvin-style mega-panels: every dropdown item carries imagery
+ * (the Systems tiles replay the 53-frame opening animation on hover), panels
+ * are state-driven with a close-grace timer so the pointer can travel from
+ * the trigger into the panel without it vanishing, and a site search flyout
+ * hangs off the magnifier at the right.
+ */
+
+interface NavCard {
   label: string;
   to: string;
   description?: string;
+  /** Static preview image. */
+  image?: string;
+  /** Frame-sequence path — renders as a hover-animated NavFrameTile instead. */
+  framePath?: string;
 }
 
 interface NavGroup {
-  title: string;
-  child: NavChild[];
+  title?: string;
+  card: NavCard[];
 }
 
 interface NavLink {
   label: string;
   to: string;
-  /** Optional dropdown, surfaced on hover (desktop) and as a nested list (mobile). */
   group?: NavGroup[];
 }
 
-// The Systems menu is the site's real product navigator, so it carries both
-// axes as SEPARATE GROUPS — not one flat row of four. It used to list
-// "Aluminium Line" as a fourth peer beside the three types, which reads as a
-// fourth type; aluminium is a material (Imie, 2026-07-02). Labels and
-// destinations come from src/data/taxonomy.ts.
+const FRAME_PATH: Record<string, string> = {
+  window: "/images/systems/window/frame_{index}.jpg",
+  door: "/images/systems/door/frame_{index}.jpg",
+  specialist: "/images/systems/specialist/frame_{index}.jpg",
+};
+
+// Systems keeps both taxonomy axes: the three types as animated tiles, the
+// two profile systems as a labelled side column (aluminium is a material,
+// not a fourth type — Imie, 2026-07-02).
 const SYSTEM_GROUP: NavGroup[] = [
   {
-    title: "By type",
-    child: SYSTEM_TYPE.map((t) => ({
+    card: SYSTEM_TYPE.map((t) => ({
       label: t.label,
       to: t.to,
       description: t.item.join(", "),
+      framePath: FRAME_PATH[t.type_code],
     })),
   },
   {
     title: "By material",
-    child: PROFILE_MATERIAL.map((m) => ({
+    card: PROFILE_MATERIAL.map((m) => ({
       label: m.label,
       to: m.to,
       description: m.item.join(", "),
+      image: m.image,
     })),
+  },
+];
+
+// Every image below is a photo whose content matches its label — no
+// stock-mismatch: the doors card is the verified corner sliding-door install.
+const PROJECT_GROUP: NavGroup[] = [
+  {
+    card: [
+      { label: "Windows", to: "/inspiration?filter=windows", image: "/images/wp-export/FQC-Project-17.jpg" },
+      { label: "Doors", to: "/inspiration?filter=doors", image: "/images/products/real/sliding-door.webp" },
+      { label: "Interior", to: "/inspiration?filter=interior", image: "/images/projects/real/sliding-doors-interior.webp" },
+      { label: "Exterior", to: "/inspiration?filter=exterior", image: "/images/projects/real/residence-wood-grain-corner.webp" },
+    ],
+  },
+];
+
+const WHATS_NEW_GROUP: NavGroup[] = [
+  {
+    card: [
+      { label: "Products", to: "/whats-new?filter=product", image: "/images/wp-export/Great-Profile-Colors.jpg" },
+      { label: "Projects", to: "/whats-new?filter=project", image: "/images/projects-fb/DOuJGHUl.jpg" },
+      { label: "Events", to: "/whats-new?filter=event", image: "/images/projects-fb/6ezPWg1k.jpg" },
+    ],
   },
 ];
 
 const navLinks: NavLink[] = [
   { label: "Systems", to: "/products", group: SYSTEM_GROUP },
-  { label: "Our Projects", to: "/inspiration" },
-  { label: "What's New", to: "/whats-new" },
+  { label: "Our Projects", to: "/inspiration", group: PROJECT_GROUP },
+  { label: "What's New", to: "/whats-new", group: WHATS_NEW_GROUP },
   { label: "Why uPVC", to: "/why-upvc" },
   { label: "Brand", to: "/brand" },
 ];
 
+/** Static image card used inside the mega-panels. */
+const NavImageCard = ({ card, onNavigate }: { card: NavCard; onNavigate: () => void }) => (
+  <Link to={card.to} onClick={onNavigate} className="group block">
+    <div className="relative aspect-video overflow-hidden bg-[color:var(--canvas-soft)]">
+      <img
+        src={card.image}
+        alt={card.label}
+        loading="lazy"
+        decoding="async"
+        className="w-full h-full object-cover transition-transform duration-500 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.05]"
+      />
+    </div>
+    <div className="mt-4 flex items-start justify-between gap-3">
+      <p className="text-[17px] font-medium text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+        {card.label}
+      </p>
+      <ArrowUpRight
+        size={16}
+        strokeWidth={1.5}
+        className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
+      />
+    </div>
+    {card.description && (
+      <p className="mt-1.5 text-body-sm text-[color:var(--ink-muted)] leading-snug">{card.description}</p>
+    )}
+  </Link>
+);
+
 const QuietNavbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
   const location = useLocation();
   const isHome = location.pathname === "/";
-  const transparent = isHome && !scrolled && !mobileOpen;
+  const transparent = isHome && !scrolled && !mobileOpen && !openPanel && !searchOpen;
   const mobileDialogRef = useDialogFocus<HTMLDivElement>({
     isOpen: mobileOpen,
     onClose: () => setMobileOpen(false),
   });
 
-  // Close mobile drawer on route change
-  useEffect(() => { setMobileOpen(false); }, [location]);
+  // A short grace period keeps the panel open while the pointer travels from
+  // the trigger into the panel (the bug was: any un-hover instantly hid it).
+  const holdPanel = (label: string) => {
+    clearTimeout(closeTimer.current);
+    setOpenPanel(label);
+  };
+  const releasePanel = () => {
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpenPanel(null), 160);
+  };
+
+  // Close everything on route change
+  useEffect(() => {
+    setMobileOpen(false);
+    setOpenPanel(null);
+    setSearchOpen(false);
+  }, [location]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenPanel(null);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -96,19 +191,27 @@ const QuietNavbar = () => {
               <Logo variant={transparent ? "light" : "dark"} className="h-11" />
             </Link>
 
-            {/* Desktop nav — tiny rounded nav buttons with a seamless mega-panel. */}
-            <ul className="hidden lg:flex items-center gap-1 xl:gap-2">
+            {/* Desktop nav. Each li spans the full 72px bar so there is no
+                dead hover zone between the trigger and its panel. */}
+            <ul className="hidden lg:flex items-center gap-1 xl:gap-2 h-full">
               {navLinks.map((link) => {
                 const active = location.pathname === link.to ||
                                (link.to !== "/" && location.pathname.startsWith(link.to));
+                const panelOpen = openPanel === link.label;
                 return (
-                  <li key={link.label} className="group/nav relative">
+                  <li
+                    key={link.label}
+                    className="relative h-full flex items-center"
+                    onMouseEnter={() => link.group && holdPanel(link.label)}
+                    onMouseLeave={() => link.group && releasePanel()}
+                  >
                     <Link
                       to={link.to}
+                      onFocus={() => link.group && holdPanel(link.label)}
                       className={cn(
                         "whitespace-nowrap text-body-sm font-medium transition-[background-color,color] duration-300 ease-marvin",
                         "inline-flex min-h-8 items-center rounded-sm px-4",
-                        active
+                        active || panelOpen
                           ? transparent
                             ? "bg-white/15 text-white"
                             : "bg-[color:var(--canvas-soft)] text-[color:var(--ink-primary)]"
@@ -122,43 +225,55 @@ const QuietNavbar = () => {
 
                     {link.group && (
                       <div
+                        onMouseEnter={() => holdPanel(link.label)}
+                        onMouseLeave={releasePanel}
                         className={cn(
                           "fixed left-0 right-0 top-[72px]",
-                          "pt-3",
-                          "opacity-0 invisible pointer-events-none",
-                          "group-hover/nav:opacity-100 group-hover/nav:visible group-hover/nav:pointer-events-auto",
+                          panelOpen
+                            ? "opacity-100 visible pointer-events-auto"
+                            : "opacity-0 invisible pointer-events-none",
                           "transition-[opacity,visibility] duration-300 ease-marvin"
                         )}
                       >
-                        <div className="bg-white text-[color:var(--ink-primary)]">
-                          <div className="container-editorial py-9">
-                            <div className="grid grid-cols-[3fr_2fr] gap-x-12">
-                              {link.group.map((g) => (
-                                <div key={g.title}>
-                                  <p className="eyebrow mb-5 pb-3 border-b border-[color:var(--rule-soft)]">
-                                    {g.title}
-                                  </p>
+                        <div className="bg-white text-[color:var(--ink-primary)] border-b border-[color:var(--rule-soft)] shadow-[0_24px_48px_-24px_rgba(0,0,0,0.25)]">
+                          <div className="container-editorial py-9 max-h-[calc(100vh-72px)] overflow-y-auto">
+                            <div
+                              className={cn(
+                                "grid gap-x-12 gap-y-8",
+                                link.group.length > 1 ? "grid-cols-[7fr_3fr]" : "grid-cols-1",
+                              )}
+                            >
+                              {link.group.map((g, gi) => (
+                                <div key={g.title ?? gi}>
+                                  {g.title && (
+                                    <p className="eyebrow mb-5 pb-3 border-b border-[color:var(--rule-soft)]">
+                                      {g.title}
+                                    </p>
+                                  )}
                                   <ul
                                     className={cn(
-                                      "grid gap-2",
-                                      g.child.length > 2 ? "grid-cols-3" : "grid-cols-2",
+                                      "grid gap-x-6 gap-y-8",
+                                      g.title
+                                        ? "grid-cols-1"
+                                        : g.card.length === 4
+                                          ? "grid-cols-4"
+                                          : "grid-cols-3",
                                     )}
                                   >
-                                    {g.child.map((c) => (
+                                    {g.card.map((c) => (
                                       <li key={c.to}>
-                                        <Link
-                                          to={c.to}
-                                          className="block h-full rounded-sm px-4 py-4 transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
-                                        >
-                                          <p className="text-[17px] font-medium text-[color:var(--ink-primary)]">
-                                            {c.label}
-                                          </p>
-                                          {c.description && (
-                                            <p className="mt-2 text-body-sm text-[color:var(--ink-muted)] leading-snug">
-                                              {c.description}
-                                            </p>
-                                          )}
-                                        </Link>
+                                        {c.framePath ? (
+                                          <NavFrameTile
+                                            label={c.label}
+                                            description={c.description}
+                                            to={c.to}
+                                            framePath={c.framePath}
+                                            active={panelOpen}
+                                            onNavigate={() => setOpenPanel(null)}
+                                          />
+                                        ) : (
+                                          <NavImageCard card={c} onNavigate={() => setOpenPanel(null)} />
+                                        )}
                                       </li>
                                     ))}
                                   </ul>
@@ -174,24 +289,33 @@ const QuietNavbar = () => {
               })}
             </ul>
 
-            {/* Right side: primary conversion CTA — lead capture, not a drive-to-showroom ask.
-                Showroom link stays in footer as secondary. */}
-            <div className="hidden lg:flex items-center shrink-0">
-              <Link
-                to="/brand#contact"
+            {/* Right side: search + primary conversion CTA (red, Marvin-style). */}
+            <div className="hidden lg:flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => { setSearchOpen((s) => !s); setOpenPanel(null); }}
+                aria-label="Search"
+                aria-expanded={searchOpen}
+                aria-controls="site-search-flyout"
                 className={cn(
-                  "whitespace-nowrap text-body-sm font-medium",
-                  "transition-[background-color,color] duration-300 ease-marvin",
-                  "inline-flex min-h-8 items-center rounded-sm px-4",
+                  "p-2 rounded-sm transition-[background-color,color] duration-300 ease-marvin",
                   transparent
                     ? "text-white hover:bg-white/15"
                     : "text-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)]"
                 )}
               >
+                <Search size={19} strokeWidth={1.5} />
+              </button>
+              <Link
+                to="/brand#contact"
+                className={cn(
+                  "whitespace-nowrap text-body-sm font-medium",
+                  "inline-flex min-h-9 items-center rounded-sm px-5",
+                  "bg-[color:var(--accent)] text-white hover:bg-[color:var(--accent-hover)]",
+                  "transition-colors duration-300 ease-marvin"
+                )}
+              >
                 Book a Consultation
-                <span className="inline-block pl-1">
-                  →
-                </span>
               </Link>
             </div>
 
@@ -210,12 +334,15 @@ const QuietNavbar = () => {
 
       </nav>
 
+      {/* Search flyout (desktop + tablet) */}
+      <NavSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+
       {/* Mobile drawer */}
       {mobileOpen && (
         <div
           id="mobile-navigation-dialog"
           ref={mobileDialogRef}
-          className="fixed inset-0 z-40 lg:hidden bg-white pt-[72px] animate-fade-in flex flex-col"
+          className="fixed inset-0 z-40 lg:hidden bg-white pt-[72px] animate-fade-in flex flex-col overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"
@@ -251,11 +378,11 @@ const QuietNavbar = () => {
                     </Link>
                     {link.group && (
                       <div className="pb-4 -mt-2 space-y-4">
-                        {link.group.map((g) => (
-                          <div key={g.title}>
-                            <p className="eyebrow mb-1.5">{g.title}</p>
+                        {link.group.map((g, gi) => (
+                          <div key={g.title ?? gi}>
+                            {g.title && <p className="eyebrow mb-1.5">{g.title}</p>}
                             <ul className="space-y-1">
-                              {g.child.map((c) => (
+                              {g.card.map((c) => (
                                 <li key={c.to}>
                                   <Link
                                     to={c.to}

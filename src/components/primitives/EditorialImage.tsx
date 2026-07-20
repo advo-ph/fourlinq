@@ -44,7 +44,9 @@ const EditorialImage = ({
         className="h-full w-full object-cover"
       />
       {scrim && (
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
+        /* Strong enough to hold white text over a bright photo; the via stop
+           keeps the top half of the image clean. */
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/5" />
       )}
     </div>
   );

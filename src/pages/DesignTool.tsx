@@ -156,9 +156,11 @@ const SaveModal = ({ isOpen, onClose, config, selectedType, selectedMaterial, se
   );
 };
 
-const DesignTool = () => {
+const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
   const [searchParams] = useSearchParams();
-  const isEmbed = searchParams.get("embed") === "1";
+  // Embeddable two ways: as a component (homepage renders <DesignTool embedded />)
+  // or via /design-tool?embed=1 (iframe/legacy).
+  const isEmbed = embedded || searchParams.get("embed") === "1";
   const [step, setStep] = useState(0);
   const [saveOpen, setSaveOpen] = useState(false);
   const [config, setConfig] = useState({
@@ -231,12 +233,7 @@ const DesignTool = () => {
   return (
     <Chrome>
       {!isEmbed && (
-        <PageHeader
-          eyebrow="Configurator"
-          title="Build your window. Save it. Share it."
-          breadcrumbLabel="Design Tool"
-          subtitle="Choose a type and material, pick a finish and glass, set the size, then save your spec or send it to our team for a tailored quote."
-        />
+        <PageHeader title="Design Tool" breadcrumbLabel="Design Tool" />
       )}
 
       <div className={isEmbed ? "py-6" : "pb-20"}>
@@ -388,9 +385,14 @@ const DesignTool = () => {
                   </div>
                 </div>
               )}
-              <div className="flex gap-4 mt-8">
+              <div className="flex flex-wrap gap-4 mt-8">
                 {canBack && <Button variant="outline" onClick={() => setStep(step - 1)} className="font-medium">Back</Button>}
                 {canContinue && <Button onClick={() => setStep(step + 1)} className="font-medium">Continue</Button>}
+                {embedded && (
+                  <Button asChild variant="ghost" className="font-medium">
+                    <Link to="/design-tool">Open Design Tool →</Link>
+                  </Button>
+                )}
               </div>
             </div>
 

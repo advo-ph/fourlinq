@@ -232,17 +232,12 @@ const Products = () => {
   }, [activeFilter, products]);
 
   const activeType = findTypeByFilter(activeFilter);
-  const subtitle = isLanding
-    ? "Browse two ways. By type: window, door, or specialist. By material: the uPVC or aluminium profile system it is fabricated from. The two are separate choices, not one list."
-    : "Browse the current catalog names and operation summaries. Exact material, profile, glass, finish, hardware, dimensions, ratings, availability, and project compatibility require FourlinQ confirmation.";
 
   return (
     <Layout>
       <PageHeader
-        eyebrow="The catalog"
-        title={isLanding ? "Window, door, and specialist systems." : activeType?.label ?? "Systems"}
+        title={isLanding ? "Systems" : activeType?.label ?? "Systems"}
         breadcrumbLabel="Systems"
-        subtitle={subtitle}
       />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
@@ -254,10 +249,7 @@ const Products = () => {
                 <h2 className="font-serif font-normal tracking-tight text-h4 lg:text-h3 text-[color:var(--ink-primary)]">
                   Browse by type.
                 </h2>
-                <p className="mt-3 text-body text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.6]">
-                  What the opening is: a window, a door, or a custom shape.
-                </p>
-                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14">
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14">
                   {TYPE_CARD.map((c) => (
                     <SystemCategoryCard key={c.key} category={c} />
                   ))}
@@ -268,11 +260,7 @@ const Products = () => {
                 <h2 className="font-serif font-normal tracking-tight text-h4 lg:text-h3 text-[color:var(--ink-primary)]">
                   Browse by material.
                 </h2>
-                <p className="mt-3 text-body text-[color:var(--ink-secondary)] max-w-[40rem] leading-[1.6]">
-                  What it is fabricated from. Windows and doors are built in either
-                  profile system. The material is a separate choice from the type.
-                </p>
-                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-14 lg:max-w-[52rem]">
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-14 lg:max-w-[52rem]">
                   {MATERIAL_CARD.map((c) => (
                     <SystemCategoryCard key={c.key} category={c} />
                   ))}

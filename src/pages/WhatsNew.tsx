@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import { whatsNew as fallbackNews, type WhatsNewCategory, type WhatsNewEntry } from "@/data/whats-new";
@@ -33,7 +33,15 @@ const categoryLabel = (c: WhatsNewEntry["category"]) =>
   c.charAt(0).toUpperCase() + c.slice(1);
 
 const WhatsNew = () => {
-  const [active, setActive] = useState<"all" | WhatsNewCategory>("all");
+  // Filter lives in the URL (?filter=product) so the nav can deep-link a
+  // category and the back button restores the previous view.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramFilter = searchParams.get("filter");
+  const active: "all" | WhatsNewCategory = ALL_FILTERS.some((f) => f.value === paramFilter)
+    ? (paramFilter as WhatsNewCategory)
+    : "all";
+  const setActive = (f: "all" | WhatsNewCategory) =>
+    setSearchParams(f === "all" ? {} : { filter: f });
   const [items, setItems] = useState<WhatsNewEntry[]>(fallbackNews);
 
   useEffect(() => {
@@ -57,12 +65,7 @@ const WhatsNew = () => {
 
   return (
     <Layout>
-      <PageHeader
-        eyebrow="What's New"
-        title="From the workshop."
-        breadcrumbLabel="What's New"
-        subtitle="New projects, new systems, and quiet updates from FourlinQ. Sorted by date. Most recent first."
-      />
+      <PageHeader title="What's New" breadcrumbLabel="What's New" />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">

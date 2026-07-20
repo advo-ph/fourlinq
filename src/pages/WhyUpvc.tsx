@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import PageBody from "@/components/shared/PageBody";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
 import { benefits, comparisonData } from "@/data/benefits";
-import { UPVC_PROFILE_FEATURES } from "@/data/fourlinq-data";
+import { UPVC_PROFILE_FEATURES, FRAME_FINISHES } from "@/data/fourlinq-data";
 import ProfileSystems from "@/components/shared/ProfileSystems";
 
 /**
@@ -48,79 +47,47 @@ const photo: Record<string, { src: string; alt: string }> = {
 const find = (id: string) => benefits.find((b) => b.id === id)!;
 const featured = "attractive-appearance";
 
-// Five wood-grain finishes that cycle through the pinned-scroll featured block.
-const SCROLL_TEXTURES = [
-  { id: "walnut",      label: "Walnut",      src: "/images/finishes/textures/walnut.jpeg" },
-  { id: "dark-oak",    label: "Dark Oak",    src: "/images/finishes/textures/dark-oak.jpeg" },
-  { id: "golden-oak",  label: "Golden Oak",  src: "/images/finishes/textures/golden-oak.jpg" },
-  { id: "oak-malt",    label: "Oak Malt",    src: "/images/finishes/textures/oak-malt.jpeg" },
-  { id: "oak-light",   label: "Oak Light",   src: "/images/finishes/textures/oak-light.png" },
-];
-
-const FeaturedTextureScroll = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [activeIdx, setActiveIdx] = useState(0);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const el = containerRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const scrollable = el.offsetHeight - window.innerHeight;
-      if (scrollable <= 0) return;
-      const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
-      const idx = Math.min(SCROLL_TEXTURES.length - 1, Math.floor(progress * SCROLL_TEXTURES.length));
-      setActiveIdx(idx);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const current = SCROLL_TEXTURES[activeIdx];
-
-  return (
-    <div
-      ref={containerRef}
-      className="relative bg-[color:var(--canvas-soft)]"
-      style={{ height: `${SCROLL_TEXTURES.length * 100}vh` }}
-    >
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-        <div className="container-editorial w-full">
-          <div className="relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden bg-[color:var(--canvas)]">
-            {SCROLL_TEXTURES.map((t, i) => (
-              <img
-                key={t.id}
-                src={t.src}
-                alt={`${t.label} wood-grain finish`}
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding="async"
-                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out"
-                style={{ opacity: i === activeIdx ? 1 : 0 }}
-              />
-            ))}
-          </div>
-          <div className="mt-8 lg:mt-10 grid lg:grid-cols-12 gap-x-12 items-baseline">
-            <div className="lg:col-span-5">
-              <h2 className="font-serif font-normal tracking-tight text-[2.5rem] lg:text-h3 leading-[1.1] text-[color:var(--ink-primary)]">
-                {find(featured).title}
-              </h2>
-              <p
-                key={current.id}
-                className="mt-3 text-[11px] tracking-[0.16em] uppercase text-[color:var(--ink-muted)] transition-opacity duration-500"
-              >
-                {current.label} · {activeIdx + 1} of {SCROLL_TEXTURES.length}
-              </p>
-            </div>
-            <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] max-w-[36rem]">
-              {elaboration[featured]}
-            </p>
-          </div>
-        </div>
-      </div>
+/** All twelve verified finishes in one grid: wood grains show their real
+ *  texture photo, solids show their verified colour. */
+const FinishGrid = () => (
+  <Section tone="soft" size="lg">
+    <div className="grid lg:grid-cols-12 gap-x-12 mb-12">
+      <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+        {find(featured).title}
+      </h2>
+      <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
+        {elaboration[featured]}
+      </p>
     </div>
-  );
-};
+    <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
+      {FRAME_FINISHES.map((f) => (
+        <li key={f.id}>
+          <Link to="/finishes" className="group block">
+            <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas)]">
+              {f.textureImagePath ? (
+                <img
+                  src={f.textureImagePath}
+                  alt={`${f.label} finish texture`}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.04]"
+                />
+              ) : (
+                <div className="w-full h-full" style={{ backgroundColor: f.swatchHex }} />
+              )}
+            </div>
+            <p className="mt-3 text-body-sm font-medium text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+              {f.label}
+            </p>
+            <p className="text-[11px] tracking-[0.12em] uppercase text-[color:var(--ink-muted)]">
+              {f.category === "wood-grain" ? "Wood grain" : "Solid"}
+            </p>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </Section>
+);
 const rest = [
   "fire-retardant",
   "thermal-efficiency",
@@ -151,7 +118,7 @@ const WhyUpvc = () => (
 
       <div className="container-editorial flex-1 flex items-center py-12 lg:py-16">
         <div className="grid lg:grid-cols-12 gap-x-12 gap-y-16 items-center w-full">
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-6">
             <p className="eyebrow mb-6">
               The material
             </p>
@@ -162,14 +129,18 @@ const WhyUpvc = () => (
               We use uPVC because of what this country does to a window. The heat, the humidity, the salt air along the coast, the storms. The rest of this page is what that actually means for the frame in your wall.
             </p>
           </div>
-          <div className="lg:col-span-7">
-            <img
-              src="/images/wp-export/Walnut-Profile.png"
-              alt="FourlinQ multi-chamber uPVC profile in Walnut finish"
-              loading="eager"
-              decoding="async"
-              className="block w-full h-auto max-h-[70vh] object-contain"
-            />
+          {/* Contained on a soft panel and sized down: the cut profile reads as
+              a product study, not a floating cutout filling half the screen. */}
+          <div className="lg:col-span-5 lg:col-start-8">
+            <div className="bg-[color:var(--canvas-soft)] p-8 lg:p-12 flex items-center justify-center">
+              <img
+                src="/images/wp-export/Walnut-Profile.png"
+                alt="FourlinQ multi-chamber uPVC profile in Walnut finish"
+                loading="eager"
+                decoding="async"
+                className="block w-full h-auto max-h-[48vh] object-contain"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -221,19 +192,14 @@ const WhyUpvc = () => (
         part of the answer to "why uPVC", and it's what actually backs the
         European-engineering claim. */}
     <Section tone="soft" size="lg">
-      <div className="grid lg:grid-cols-12 gap-x-12 mb-12">
-        <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
-          The profiles we build with.
-        </h2>
-        <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
-          We don't extrude our own profile. We fabricate on established systems, and we'll tell you which one is in your wall.
-        </p>
-      </div>
+      <h2 className="mb-12 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+        The profiles we build with.
+      </h2>
       <ProfileSystems material="upvc" />
     </Section>
 
-    {/* ── Featured advantage ── pinned scroll, cross-fades through 5 finishes ── */}
-    <FeaturedTextureScroll />
+    {/* ── Featured advantage ── all twelve finishes, one grid ── */}
+    <FinishGrid />
 
     {/* ── Six remaining advantages ── one repeating tile, 3x2 grid ── */}
     <Section tone="canvas" size="lg">

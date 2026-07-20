@@ -3,6 +3,9 @@ import Layout from "@/components/layout/Layout";
 import Section from "@/components/primitives/Section";
 
 const ScrollWindow = lazy(() => import("@/components/home/ScrollWindow"));
+// The real configurator, embedded (left picker / right live preview) — not a
+// teaser card. Lazy so its icon set and preview don't weigh the first paint.
+const DesignToolEmbed = lazy(() => import("@/pages/DesignTool"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
 import SystemsTiles from "@/components/home/SystemsTiles";
@@ -11,7 +14,6 @@ import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
 import BrandCTA from "@/components/home/BrandCTA";
 import UtilityBand from "@/components/home/UtilityBand";
-import DesignToolPreview from "@/components/home/DesignToolPreview";
 
 // Captions are intentionally generic until client confirms actual project locations.
 const heroSlides: HeroSlide[] = [
@@ -58,7 +60,13 @@ const Index = () => {
       <ProjectReels />
 
       <Section tone="canvas" size="lg">
-        <DesignToolPreview />
+        <div className="mb-10 lg:mb-12">
+          <div className="h-[5px] w-10 bg-[color:var(--accent)] mb-3" />
+          <h2 className="eyebrow text-[color:var(--ink-muted)]">Design tool</h2>
+        </div>
+        <Suspense fallback={null}>
+          <DesignToolEmbed embedded />
+        </Suspense>
       </Section>
 
       <InspirationStrip />

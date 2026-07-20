@@ -5,10 +5,9 @@ import EditorialButton from "@/components/primitives/Button";
 import EditorialImage from "@/components/primitives/EditorialImage";
 import EditorialSplit from "@/components/primitives/EditorialSplit";
 import FullBleed from "@/components/primitives/FullBleed";
-import Statement from "@/components/primitives/Statement";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import ConsultationForm from "@/components/shared/ConsultationForm";
-import { Reveal, Stagger, StaggerItem } from "@/components/primitives/Reveal";
+import { Stagger, StaggerItem } from "@/components/primitives/Reveal";
 import { certifications, CONTACT, BRANCHES, BRAND, phoneHref } from "@/data/brand";
 import { Phone, Mail, ArrowUpRight } from "lucide-react";
 
@@ -44,19 +43,8 @@ const Brand = () => (
       </div>
     </section>
 
-    {/* Statement moment the promise in three phrases */}
-    <Section tone="canvas" size="xl">
-      <Statement lines={["Custom-made.", "Built to last.", "Yours alone."]} dimFrom={2} />
-      <Reveal delay={0.2}>
-        <p className="mt-10 lg:mt-14 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] leading-[1.55] max-w-[40rem]">
-          Every window and door is cut to the architect's spec and fitted to your
-          walls. No standard sizes off the shelf. That is the whole promise.
-        </p>
-      </Reveal>
-    </Section>
-
     {/* Story editorial splits, alternating */}
-    <Section tone="canvas" size="md" className="!pt-0">
+    <Section tone="canvas" size="md">
       <div className="flex flex-col gap-24 lg:gap-36">
         <EditorialSplit
           image="/images/projects/real/residence-wood-grain-corner.webp"

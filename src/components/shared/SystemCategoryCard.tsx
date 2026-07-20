@@ -44,7 +44,9 @@ const SystemCategoryCard = ({ category }: { category: SystemCategory }) => (
           className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-all duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
         />
       </div>
-      <p className="mt-2 text-body-sm text-[color:var(--ink-secondary)] max-w-[30ch]">
+      {/* Fixed three-line block so the item list below starts at the same
+          height on every card in a row, whatever the description length. */}
+      <p className="mt-2 text-body-sm text-[color:var(--ink-secondary)] max-w-[30ch] min-h-[4rem] line-clamp-3">
         {category.description}
       </p>
       <ul className="mt-4 border-t border-[color:var(--rule-soft)]">

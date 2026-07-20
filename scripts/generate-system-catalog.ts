@@ -26,10 +26,40 @@ import {
   FRAME_FINISHES,
 } from "../src/data/fourlinq-data";
 
-const OUT_PATH = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../public/docs/fourlinq-system-catalog.pdf",
-);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const OUT_PATH = path.join(ROOT, "public/docs/fourlinq-system-catalog.pdf");
+
+/**
+ * Inline a public/ image as a data URI so the PDF renders it without a
+ * server. Images are downscaled + recompressed via sharp first (cached per
+ * run), otherwise the embedded originals balloon the PDF past 6 MB.
+ */
+const imageCache = new Map<string, string>();
+async function prepareImage(publicPath: string, maxWidth = 900): Promise<void> {
+  if (imageCache.has(publicPath)) return;
+  const file = path.join(ROOT, "public", publicPath.replace(/^\//, ""));
+  const sharp = (await import("sharp")).default;
+  const buf = await sharp(file)
+    .resize({ width: maxWidth, withoutEnlargement: true })
+    .jpeg({ quality: 72 })
+    .toBuffer();
+  imageCache.set(publicPath, `data:image/jpeg;base64,${buf.toString("base64")}`);
+}
+function img(publicPath: string): string {
+  const data = imageCache.get(publicPath);
+  if (!data) throw new Error(`Image not prepared: ${publicPath}`);
+  return data;
+}
+
+// Same renders the live /products page ships — approved-accurate per type.
+const PRODUCT_IMAGE: Record<string, string> = {
+  "casement": "/images/wp-export/casement.webp",
+  "sliding": "/images/wp-export/slidingwindow.webp",
+  "special-shapes": "/images/wp-export/specialshapes.webp",
+  "awning": "/images/wp-export/awning.webp",
+  "slide-and-fold": "/images/wp-export/slideandfold.webp",
+  "lift-and-slide": "/images/wp-export/liftandslide.webp",
+};
 
 const ACCENT = "#C8102E";
 const INK = "#242424";
@@ -50,7 +80,7 @@ const generatedOn = new Date().toLocaleDateString("en-PH", {
   month: "long",
 });
 
-const html = `<!doctype html>
+const buildHtml = () => `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8" />
@@ -122,13 +152,16 @@ const html = `<!doctype html>
 <body>
 
 <!-- ── Cover ─────────────────────────────────── -->
-<section class="page cover">
-  <div class="mark">${esc(BRAND.name)}<span>.</span> <span style="color:rgba(255,255,255,0.55); font-size:9pt; letter-spacing:0.16em; text-transform:uppercase; font-family:Manrope,sans-serif;">${esc(BRAND.tagline)}</span></div>
-  <div>
+<section class="page cover" style="position: relative; overflow: hidden;">
+  <img src="${img("/images/projects/real/residence-wood-grain-corner.webp")}"
+       style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.42;" />
+  <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(13,11,10,0.94), rgba(13,11,10,0.55) 55%, rgba(13,11,10,0.35));"></div>
+  <div class="mark" style="position:relative;">${esc(BRAND.name)}<span>.</span> <span style="color:rgba(255,255,255,0.55); font-size:9pt; letter-spacing:0.16em; text-transform:uppercase; font-family:Manrope,sans-serif;">${esc(BRAND.tagline)}</span></div>
+  <div style="position:relative;">
     <h1>System Catalog</h1>
     <p class="promise">“${esc(BRAND.promise)}”</p>
   </div>
-  <div class="meta">
+  <div class="meta" style="position:relative;">
     <div>
       <p class="warranty">${esc(BRAND.warranty)}</p>
       <p>${esc(BRAND.heroQuote)}</p>
@@ -144,7 +177,7 @@ const html = `<!doctype html>
 <section class="page">
   <p class="eyebrow">The FourlinQ advantages</p>
   <h2>Seven reasons the spec holds.</h2>
-  <p class="lead">${esc(BRAND.promiseSupport)} Each claim below is carried by the profile itself — the material, the chambers, the seals.</p>
+  <p class="lead">${esc(BRAND.promiseSupport)} Each claim below is carried by the profile itself: the material, the chambers, the seals.</p>
   <div class="grid2">
     ${ADVANTAGES.map((a) => `
       <div class="card accent">
@@ -152,14 +185,20 @@ const html = `<!doctype html>
         <p>${esc(a.description)}</p>
       </div>`).join("")}
   </div>
-  <div class="footer"><span>${esc(BRAND.name)} — System Catalog</span><span>Advantages</span></div>
+  <div class="footer"><span>${esc(BRAND.name)} · System Catalog</span><span>Advantages</span></div>
 </section>
 
 <!-- ── Profile cut section ───────────────────── -->
 <section class="page">
   <p class="eyebrow">uPVC profile cut section</p>
   <h2>What's inside the frame.</h2>
-  <p class="lead">Seven engineering features, numbered as on the profile diagram.</p>
+  <div style="display:grid; grid-template-columns: 3fr 2fr; gap: 8mm; align-items: start; margin-bottom: 5mm;">
+    <p class="lead" style="margin-bottom:0;">Seven engineering features, numbered as on the profile diagram. The photographs show the actual multi-chamber profile: the white cut section and the Walnut wood-grain laminate.</p>
+    <div style="display:flex; gap:3mm;">
+      <img src="${img("/images/wp-export/White-Profile.jpg")}" style="width:50%; aspect-ratio:1; object-fit:cover; border:1px solid ${RULE};" />
+      <img src="${img("/images/wp-export/Walnut-Profile.jpg")}" style="width:50%; aspect-ratio:1; object-fit:cover; border:1px solid ${RULE};" />
+    </div>
+  </div>
   ${UPVC_PROFILE_FEATURES.map((f) => `
     <div class="feature">
       <div class="no">${String(f.number).padStart(2, "0")}</div>
@@ -169,17 +208,19 @@ const html = `<!doctype html>
         <p class="plain">${esc(f.benefitPlain)}</p>
       </div>
     </div>`).join("")}
-  <div class="footer"><span>${esc(BRAND.name)} — System Catalog</span><span>Profile engineering</span></div>
+  <div class="footer"><span>${esc(BRAND.name)} · System Catalog</span><span>Profile engineering</span></div>
 </section>
 
-<!-- ── Product types ─────────────────────────── -->
+<!-- ── Product types (paginated: 4 + 2, the photo cards are tall) ── -->
+${[PRODUCT_TYPES.slice(0, 4), PRODUCT_TYPES.slice(4)].map((chunk, ci) => `
 <section class="page">
   <p class="eyebrow">Window &amp; door systems</p>
-  <h2>The product range.</h2>
-  <p class="lead">${esc(BRAND.heroQuote)}</p>
+  <h2>The product range${ci > 0 ? ", continued" : ""}.</h2>
+  ${ci === 0 ? `<p class="lead">${esc(BRAND.heroQuote)}</p>` : ""}
   <div class="grid2">
-    ${PRODUCT_TYPES.map((p) => `
+    ${chunk.map((p) => `
       <div class="card">
+        ${PRODUCT_IMAGE[p.id] ? `<img src="${img(PRODUCT_IMAGE[p.id])}" style="width:100%; aspect-ratio:16/10; object-fit:cover; margin-bottom:3mm;" />` : ""}
         <span class="chip">${esc(p.category === "both" ? "Window · Door" : p.category)}</span>
         <h3>${esc(p.label)}</h3>
         <p class="tag">${esc(p.tagline)}</p>
@@ -187,8 +228,8 @@ const html = `<!doctype html>
         <p class="benefit">${esc(p.primaryBenefit)}</p>
       </div>`).join("")}
   </div>
-  <div class="footer"><span>${esc(BRAND.name)} — System Catalog</span><span>Product range</span></div>
-</section>
+  <div class="footer"><span>${esc(BRAND.name)} · System Catalog</span><span>Product range</span></div>
+</section>`).join("")}
 
 <!-- ── Materials + profile systems ───────────── -->
 <section class="page">
@@ -214,7 +255,7 @@ const html = `<!doctype html>
         <td class="muted">${esc(s.origin ?? s.note ?? "")}</td>
       </tr>`).join("")}
   </table>
-  <div class="footer"><span>${esc(BRAND.name)} — System Catalog</span><span>Materials</span></div>
+  <div class="footer"><span>${esc(BRAND.name)} · System Catalog</span><span>Materials</span></div>
 </section>
 
 <!-- ── Finishes ──────────────────────────────── -->
@@ -227,7 +268,9 @@ const html = `<!doctype html>
       <span class="chip">Wood grain</span>
       ${woodFinish.map((f) => `
         <div class="swatch">
-          <div class="chipbox" style="background:${f.swatchHex};"></div>
+          ${f.textureImagePath
+            ? `<img src="${img(f.textureImagePath)}" class="chipbox" style="object-fit:cover;" />`
+            : `<div class="chipbox" style="background:${f.swatchHex};"></div>`}
           <div><h4>${esc(f.label)}</h4><p>${esc(f.description)}</p></div>
         </div>`).join("")}
     </div>
@@ -248,7 +291,7 @@ const html = `<!doctype html>
       </div>
     </div>
   </div>
-  <div class="footer"><span>${esc(BRAND.name)} — System Catalog</span><span>Finishes</span></div>
+  <div class="footer"><span>${esc(BRAND.name)} · System Catalog</span><span>Finishes</span></div>
 </section>
 
 <!-- ── Warranty + contact ────────────────────── -->
@@ -282,7 +325,7 @@ const html = `<!doctype html>
     section drawings, and dimensional limits are confirmed per project —
     email ${esc(CONTACT.email)} with your elevations.
   </p>
-  <div class="footer"><span>${esc(BRAND.name)} — System Catalog</span><span>${esc(generatedOn)}</span></div>
+  <div class="footer"><span>${esc(BRAND.name)} · System Catalog</span><span>${esc(generatedOn)}</span></div>
 </section>
 
 </body>
@@ -290,9 +333,20 @@ const html = `<!doctype html>
 
 async function main() {
   fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
+
+  // Downscale + cache every embedded image before the template renders.
+  const neededImage = [
+    "/images/projects/real/residence-wood-grain-corner.webp",
+    "/images/wp-export/White-Profile.jpg",
+    "/images/wp-export/Walnut-Profile.jpg",
+    ...Object.values(PRODUCT_IMAGE),
+    ...FRAME_FINISHES.filter((f) => f.textureImagePath).map((f) => f.textureImagePath!),
+  ];
+  for (const p of neededImage) await prepareImage(p, p.includes("projects/real") ? 1400 : 900);
+
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: "networkidle" });
+  await page.setContent(buildHtml(), { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   await page.pdf({
     path: OUT_PATH,

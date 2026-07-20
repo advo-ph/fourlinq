@@ -21,6 +21,32 @@ export type ProjectCategory =
   | "exterior"
   | "doors";
 
+/**
+ * Gallery filter axis for /inspiration. Broader than ProjectCategory and
+ * multi-valued: one install is usually windows AND doors, and often has both
+ * an interior and an exterior story. Values derive from what the FourlinQ
+ * Facebook captions actually say about each project, not from guesses.
+ */
+export type InspirationTag = "windows" | "doors" | "interior" | "exterior";
+
+/** Fallback for CMS rows that only carry the legacy single category. */
+export function tagFromCategory(category: string): InspirationTag[] {
+  switch (category) {
+    case "casement":
+    case "sliding":
+    case "specialist":
+      return ["windows"];
+    case "doors":
+      return ["doors"];
+    case "interior":
+      return ["interior"];
+    case "exterior":
+      return ["exterior"];
+    default:
+      return [];
+  }
+}
+
 export interface Project {
   id: string;
   /** Real location from the FourlinQ Facebook caption. */
@@ -33,6 +59,8 @@ export interface Project {
    *  (these images were posted together by FourlinQ themselves). */
   gallery?: string[];
   category: ProjectCategory;
+  /** Multi-valued gallery filter tags; see InspirationTag. */
+  tag?: InspirationTag[];
   caption?: string;
   description?: string;
   year?: number;
@@ -56,6 +84,7 @@ export const projects: Project[] = [
       `${FB}/x63pl_14.jpg`,
     ],
     category: "interior",
+    tag: ["windows", "doors", "interior"],
     caption: "Modern window and door installations built for durability, style, and everyday comfort.",
     description:
       "FourlinQ proudly completes this Las Piñas project. Modern window and door installations built for durability, style, and everyday comfort. Every detail counts, from initial measurement to installation.",
@@ -72,6 +101,7 @@ export const projects: Project[] = [
       `${FB}/K6n763QM.jpg`,
     ],
     category: "casement",
+    tag: ["windows", "doors"],
     caption: "Premium windows and doors turned over for this Taytay home.",
     description:
       "Standard is never enough when it comes to your dream home. We officially turned over the keys to this gorgeous project in Taytay, Rizal, featuring our premium windows and doors. Better security. Better insulation. Better views.",
@@ -88,6 +118,7 @@ export const projects: Project[] = [
       `${FB}/gjR_DEfu.jpg`,
     ],
     category: "exterior",
+    tag: ["windows", "doors", "exterior"],
     caption: "Windows and doors turnover in Nuvali, Laguna.",
     description:
       "Another milestone achieved. We successfully completed the turnover for the new windows and doors on this project. These installations were more than just openings; they became the new face of the home, immediately providing better efficiency, more natural light, and a boost to curb appeal.",
@@ -104,6 +135,7 @@ export const projects: Project[] = [
       `${FB}/9OqANnRg.jpg`,
     ],
     category: "exterior",
+    tag: ["windows", "doors", "exterior"],
     caption: "Style meets function. Every breathtaking view framed with perfection.",
     description:
       "Fresh views, new beginnings. We've just completed our windows and doors turnover in the breathtaking Tagaytay City, Cavite. Style meets function, and every view is framed with perfection.",
@@ -124,6 +156,7 @@ export const projects: Project[] = [
       `${FB}/2vzBfKBe.jpg`,
     ],
     category: "doors",
+    tag: ["windows", "doors", "interior"],
     caption: "FourlinQ's first aluminium windows and doors installation.",
     description:
       "Turn-over completed. Proud to unveil our first aluminium windows and doors installation at San Lorenzo, Makati. A remarkable milestone made possible by the hard work of our team.",
@@ -135,6 +168,7 @@ export const projects: Project[] = [
     image: `${FB}/SISsEiUz.jpg`,
     gallery: [`${FB}/roGKW8A5.jpg`],
     category: "doors",
+    tag: ["windows", "doors"],
     caption: "Sliding door installation at the S. Residences project.",
     description: "S. Residences in Alta Vista Subdivision, Pardo, Cebu City. Sliding doors and modern window installations.",
   },
@@ -145,6 +179,7 @@ export const projects: Project[] = [
     image: `${FB}/bmZ6fgTu.jpg`,
     gallery: [`${FB}/GNCqPBUr.jpg`],
     category: "doors",
+    tag: ["windows", "doors"],
     caption: "Modern window and door installation at the G. Residences project.",
     description: "G. Residences in Vista Grande Subdivision, Talisay City. Premium windows and doors tailored to the home's design.",
   },
@@ -154,6 +189,7 @@ export const projects: Project[] = [
     location: "Monterrazas de Cebu, Guadalupe, Cebu City",
     image: `${FB}/1BZGuW8L.jpg`,
     category: "interior",
+    tag: ["windows", "doors", "interior"],
     caption: "Window and door installation at the R. Residences project.",
     description: "R. Residences in Monterrazas de Cebu, Guadalupe, Cebu City. Window and door installation in a hillside residence.",
   },
@@ -163,6 +199,7 @@ export const projects: Project[] = [
     location: "Oslob, Cebu",
     image: `${FB}/hRCCxHm4.jpg`,
     category: "exterior",
+    tag: ["windows", "exterior"],
     caption: "Modernist hillside residence in Oslob, Cebu.",
     description: "A. Residences in Oslob, Cebu. Modernist hillside home with white-frame elevator tower.",
   },
@@ -178,6 +215,7 @@ export const projects: Project[] = [
       `${FB}/mw3WVp7m.jpg`,
     ],
     category: "exterior",
+    tag: ["windows", "doors", "exterior"],
     caption: "Window and door installation at the C. Residences project in Batangas.",
     description: "Batangas Project: C. Residences. Premium windows and doors specified throughout the home.",
   },
@@ -191,6 +229,7 @@ export const projects: Project[] = [
       `${FB}/-pFxhSkE.jpg`,
     ],
     category: "interior",
+    tag: ["windows", "doors", "interior"],
     caption: "Modern, high-quality windows and doors at the N. Residence in Bulacan.",
     description: "N. Residence Project Site: Bulacan. Durable, stylish windows and doors tailored to the home's design.",
   },
@@ -204,6 +243,7 @@ export const projects: Project[] = [
       `${FB}/UdQMQaA-.jpg`,
     ],
     category: "interior",
+    tag: ["windows", "doors", "interior"],
     caption: "Window and door installation at the G. Residence in Taguig City.",
     description: "G. Residence Project Site: Taguig City. Upgrade your view. Elevate your living.",
   },

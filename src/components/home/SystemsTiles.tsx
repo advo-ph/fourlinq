@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
-import EyebrowHeading from "@/components/primitives/EyebrowHeading";
+import AccentStripe from "@/components/primitives/AccentStripe";
 import FeatureLink from "@/components/primitives/FeatureLink";
 import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
 
@@ -143,70 +143,58 @@ function SystemFrameTile({ system }: { system: SystemTile }) {
   );
 }
 
+/** Static material tile matching the frame-tile grammar (image, serif title,
+ *  arrow, short description) so both axes read as one five-item row. */
+function MaterialTile({ material }: { material: (typeof PROFILE_MATERIAL)[number] }) {
+  return (
+    <li>
+      <Link to={material.to} className="group block">
+        <div className="relative aspect-video overflow-hidden bg-[color:var(--canvas-soft)] mb-6">
+          <img
+            src={material.image}
+            alt={material.label}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.035]"
+          />
+        </div>
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+            {material.label}
+          </h3>
+          <ArrowUpRight
+            size={20}
+            className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
+          />
+        </div>
+        <p className="mt-3 text-body-sm lg:text-body text-[color:var(--ink-secondary)] max-w-[24rem]">
+          {material.description}
+        </p>
+      </Link>
+    </li>
+  );
+}
+
+/** One section, five items: the three types then the two profile systems
+ *  (Imie's two axes, presented as a single browse row). */
 const SystemsTiles = () => (
   <div id="browse-products">
-    <div className="mb-12 lg:mb-16">
-      <EyebrowHeading eyebrow="Browse products" level={2}>
-        By type.
-      </EyebrowHeading>
-      <p className="mt-8 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.65]">
-        Custom-fabricated windows and doors from our Manila workshop. Measured
-        to your architect's drawings, finished in any of twelve colors, and
-        installed by our own crew.
-      </p>
+    <div className="mb-10 lg:mb-12">
+      <AccentStripe width="sm" color="accent" className="mb-3" />
+      <h2 className="eyebrow text-[color:var(--ink-muted)]">Browse products</h2>
     </div>
 
-    <ul className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-12">
+    <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
       {systemTile.map((sys) => (
         <SystemFrameTile key={sys.name} system={sys} />
       ))}
+      {PROFILE_MATERIAL.map((m) => (
+        <MaterialTile key={m.material_code} material={m} />
+      ))}
     </ul>
 
-    {/* Axis 2. Aluminium is a material, not a fourth type — so it gets its own
-        heading here rather than a fourth tile above (Imie, 2026-07-02). */}
-    <div className="mt-20 lg:mt-24 pt-14 lg:pt-16 border-t border-[color:var(--rule-strong)]">
-      <EyebrowHeading eyebrow="Browse products" level={2}>
-        By material.
-      </EyebrowHeading>
-      <p className="mt-8 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[34rem] leading-[1.65]">
-        Every type is fabricated in either profile system. The material is a
-        separate choice from the type.
-      </p>
-
-      <ul className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-10 lg:max-w-[48rem]">
-        {PROFILE_MATERIAL.map((m) => (
-          <li key={m.material_code}>
-            <Link to={m.to} className="group block">
-              <div className="flex items-start justify-between gap-4 border-t-[3px] border-[color:var(--accent)] pt-5">
-                <h3 className="font-serif text-h5 lg:text-h4 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                  {m.label}
-                </h3>
-                <ArrowUpRight
-                  size={20}
-                  className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
-                />
-              </div>
-              <p className="mt-3 text-body-sm lg:text-body text-[color:var(--ink-secondary)] max-w-[26rem]">
-                {m.description}
-              </p>
-              <ul className="mt-4 border-t border-[color:var(--rule-soft)]">
-                {m.item.map((it) => (
-                  <li
-                    key={it}
-                    className="text-body-sm text-[color:var(--ink-primary)] py-2.5 border-b border-[color:var(--rule-soft)]"
-                  >
-                    {it}
-                  </li>
-                ))}
-              </ul>
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-8">
-        <FeatureLink to="/why-upvc">Why uPVC</FeatureLink>
-      </div>
+    <div className="mt-10">
+      <FeatureLink to="/why-upvc">Why uPVC</FeatureLink>
     </div>
   </div>
 );

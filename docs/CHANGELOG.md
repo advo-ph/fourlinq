@@ -27,6 +27,29 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+### Session: 2026-07-21 — Prince's UI punch list: Marvin-grade header, embedded design tool, page de-texting
+
+Twenty-item UI pass from Prince's review, targeting the "big change Imie will look for". The header is the flagship: image-rich mega-panels with the frame-open hover animation, plus site search copied from marvin.com's real pattern.
+
+#### Added
+
+- **Header mega-panels with imagery** — Systems shows the three type tiles playing their 53-frame opening animation on hover/unhover (`NavFrameTile`) plus a By-material column with photos; Our Projects shows four photo cards (Windows/Doors/Interior/Exterior); What's New shows three (Products/Projects/Events). Panels are state-driven with a 160ms close-grace timer and full-bar hover zones, fixing the "unhover instantly hides the popup" bug. [src/components/layout/QuietNavbar.tsx](../src/components/layout/QuietNavbar.tsx), [src/components/layout/NavFrameTile.tsx](../src/components/layout/NavFrameTile.tsx) (new).
+- **Site search** (`NavSearch`) — magnifier in the header opens a full-width flyout patterned on marvin.com's Algolia search (researched from their live implementation): autofocus input, search-as-you-type, "Suggested" page/document links + "Suggested products" and "Projects" image cards with see-all links, popular-search chips, no-results tips, Esc/outside-click close. Client-side over the site's own static data. [src/components/layout/NavSearch.tsx](../src/components/layout/NavSearch.tsx) (new).
+- **Design tool embedded on the homepage** — the real configurator (left picker, right live preview) renders in place of the old teaser card via a new `embedded` prop, with an "Open Design Tool" button beside Continue. [src/pages/Index.tsx](../src/pages/Index.tsx), [src/pages/DesignTool.tsx](../src/pages/DesignTool.tsx).
+- **Multi-category project tags** — `InspirationTag` (windows/doors/interior/exterior, multi-valued per project, derived from the FB captions) replaces the sparse single-category filters that left Sliding/Specialist empty. Filters live in the URL so the nav deep-links them. [src/data/projects.ts](../src/data/projects.ts), [src/pages/Inspiration.tsx](../src/pages/Inspiration.tsx).
+- **Catalog PDF imagery** — cover photo, per-type product renders (the approved /products images), real profile cut-section photos, and the seven wood-grain textures, sharp-compressed to keep the file at 1.2 MB. [scripts/generate-system-catalog.ts](../scripts/generate-system-catalog.ts).
+
+#### Changed
+
+- **Book a Consultation** is now a red button (arrow removed).
+- **Homepage browse** — By type + By material merged into one five-item "Browse products" section; explainer paragraphs cut.
+- **Heading de-texting** — subtitle/lede paragraphs removed from What's New, Our Projects, Systems, Design Tool; statement sections removed from Brand and For Architects; "we don't extrude" line removed from Why uPVC.
+- **Why uPVC** — hero profile image contained and sized down; the 500vh pinned texture scroll replaced with a 12-finish grid (real textures for wood grains).
+- **For Architects hero** — new photo + headline ("Drawings, samples, and a spec team.").
+- **Hero scrim strengthened globally** (black/45→black/75 gradient) — fixes unreadable text on the Brand and For Architects heroes and FullBleed captions.
+- **/inspiration cards** now 4:3 to match the source photos (was 4:5 portrait).
+- **/products landing cards** — description block fixed to three lines so item lists start at the same height; What's New page filters moved to the URL (`?filter=`).
+
 ### Session: 2026-07-20 — /for-architects technical library goes CMS-backed with real downloads
 
 The technical library on /for-architects was a hardcoded list where nearly every row said "Available on request". It now renders from a new `cms_document` table, ships with an actual downloadable System Catalog PDF, and every slot is uploadable from the admin — no code change needed when the real DWGs/manuals arrive.

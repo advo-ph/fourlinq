@@ -1,18 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
-import { projects as fallbackProject, type ProjectCategory, type Project } from "@/data/projects";
+import { projects as fallbackProject, tagFromCategory, type InspirationTag, type Project } from "@/data/projects";
 import { fetchProjects, mergeProject } from "@/lib/cms-api";
 import { cn } from "@/lib/utils";
 
-type Filter = "all" | ProjectCategory;
+type Filter = "all" | InspirationTag;
 
 // Normalize a merged Project to the view shape used by this page. The merge
 // (not a replace) happens in mergeProject so a CMS response that omits a
 // project cannot delete it from the gallery, and so every card links to the
 // canonical slug rather than whichever spelling the CMS happens to store.
-type ViewProject = { id: string; name: string; location: string; image: string; caption?: string; category: string };
+type ViewProject = { id: string; name: string; location: string; image: string; caption?: string; tag: InspirationTag[] };
 function toView(p: Project): ViewProject {
   return {
     id: p.id,
@@ -20,45 +20,48 @@ function toView(p: Project): ViewProject {
     location: p.location,
     image: p.image,
     caption: p.caption,
-    category: p.category,
+    // Multi-category: an install is usually windows AND doors. CMS rows that
+    // only carry the legacy single category get a derived tag.
+    tag: p.tag?.length ? p.tag : tagFromCategory(p.category),
   };
 }
 
 const filters: { label: string; value: Filter }[] = [
   { label: "All projects", value: "all" },
-  { label: "Casement", value: "casement" },
-  { label: "Sliding", value: "sliding" },
+  { label: "Windows", value: "windows" },
   { label: "Doors", value: "doors" },
-  { label: "Specialist", value: "specialist" },
   { label: "Interior", value: "interior" },
   { label: "Exterior", value: "exterior" },
 ];
 
+const isFilter = (v: string | null): v is Filter =>
+  v !== null && filters.some((f) => f.value === v);
+
 const Inspiration = () => {
-  const [active, setActive] = useState<Filter>("all");
+  // Filter lives in the URL (?filter=windows) so the nav can deep-link a
+  // category and the back button restores the previous view.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramFilter = searchParams.get("filter");
+  const active: Filter = isFilter(paramFilter) ? paramFilter : "all";
+  const setActive = (f: Filter) => setSearchParams(f === "all" ? {} : { filter: f });
   const [items, setItems] = useState<ViewProject[]>(() => fallbackProject.map(toView));
 
   useEffect(() => {
-    let active = true;
+    let live = true;
     fetchProjects()
-      .then((row) => { if (active) setItems(mergeProject(fallbackProject, row).map(toView)); })
+      .then((row) => { if (live) setItems(mergeProject(fallbackProject, row).map(toView)); })
       .catch(() => { /* keep fallback */ });
-    return () => { active = false; };
+    return () => { live = false; };
   }, []);
 
   const filtered = useMemo(
-    () => (active === "all" ? items : items.filter((p) => p.category === active)),
+    () => (active === "all" ? items : items.filter((p) => p.tag.includes(active))),
     [active, items]
   );
 
   return (
     <Layout>
-      <PageHeader
-        eyebrow="Inspiration"
-        title="Real projects, real homes."
-        breadcrumbLabel="Inspiration"
-        subtitle="Every FourlinQ install is custom-fabricated and project-specified. The homes shown here are by FourlinQ owners across Metro Manila, Cebu, and the resort coast."
-      />
+      <PageHeader title="Our Projects" breadcrumbLabel="Our Projects" />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
@@ -90,7 +93,8 @@ const Inspiration = () => {
               {filtered.map((p) => (
                 <li key={p.id}>
                   <Link to={`/projects/${p.id}`} className="group block">
-                    <div className="relative aspect-[4/5] overflow-hidden bg-[color:var(--canvas-soft)]">
+                    {/* Source photos are 4:3 — match the crop to the material. */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
                       <img
                         src={p.image}
                         alt={p.name}

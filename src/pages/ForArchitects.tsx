@@ -5,7 +5,6 @@ import EditorialButton from "@/components/primitives/Button";
 import EditorialImage from "@/components/primitives/EditorialImage";
 import EditorialSplit from "@/components/primitives/EditorialSplit";
 import FullBleed from "@/components/primitives/FullBleed";
-import Statement from "@/components/primitives/Statement";
 import { Reveal, Stagger, StaggerItem } from "@/components/primitives/Reveal";
 import { Mail, MapPin, ArrowUpRight, ArrowDownToLine } from "lucide-react";
 import { CONTACT, phoneHref } from "@/data/fourlinq-data";
@@ -113,8 +112,8 @@ const ForArchitects = () => {
     {/* Cinematic hero */}
     <section className="relative h-[82vh] min-h-[560px] overflow-hidden">
       <EditorialImage
-        src="/images/projects/real/special-shapes-glazing.webp"
-        alt="A custom special-shape FourlinQ glazing detail"
+        src="/images/projects/real/residence-wood-grain-corner.webp"
+        alt="A two-storey residence with full-height FourlinQ corner glazing"
         ratio="h-full"
         eager
         scrim
@@ -127,7 +126,7 @@ const ForArchitects = () => {
             </StaggerItem>
             <StaggerItem>
               <h1 className="font-serif font-normal text-white text-display leading-[0.98] tracking-tight max-w-[16ch]">
-                The spec that never changes.
+                Drawings, samples, and a spec team.
               </h1>
             </StaggerItem>
           </Stagger>
@@ -135,20 +134,8 @@ const ForArchitects = () => {
       </div>
     </section>
 
-    {/* Statement moment */}
-    <Section tone="canvas" size="xl">
-      <Statement lines={["Same profile.", "Same hardware.", "Same finish."]} dimFrom={2} />
-      <Reveal delay={0.2}>
-        <p className="mt-10 lg:mt-14 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] leading-[1.55] max-w-[42rem]">
-          FourlinQ is a single-brand uPVC system. One spec, consistent across
-          every project. What changes is the geometry of the opening. And your
-          intent.
-        </p>
-      </Reveal>
-    </Section>
-
     {/* The support flow. Numbered editorial splits */}
-    <Section tone="canvas" size="md" className="!pt-0">
+    <Section tone="canvas" size="md">
       <Reveal className="mb-16 lg:mb-24 max-w-[40rem]">
         <p className="eyebrow mb-4">Project support</p>
         <h2 className="font-serif text-h2 lg:text-h1 text-[color:var(--ink-primary)] leading-[1.04] tracking-tight">
