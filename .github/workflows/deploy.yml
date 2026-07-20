@@ -24,7 +24,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Node 22 (current LTS). Was 20 — bumped 2026-07-20 because Node 20
+          # is EOL April 2026 and the runner internals are already forcing v20
+          # actions onto Node 24 anyway (see the deprecation warning on the
+          # 07-19 deploy run). This is the app's runtime version; the internal
+          # Node used by actions/checkout@v4 + actions/setup-node@v4 will
+          # follow when those actions ship v5.
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
