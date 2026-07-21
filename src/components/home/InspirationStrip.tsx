@@ -160,7 +160,7 @@ const InspirationStrip = () => {
                   loading={i === 0 ? "eager" : "lazy"}
                   decoding="async"
                   className={cn(
-                    "absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-marvin motion-reduce:transition-none",
+                    "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-marvin motion-reduce:transition-none",
                     i === activeIndex ? "opacity-100" : "opacity-0",
                   )}
                 />
