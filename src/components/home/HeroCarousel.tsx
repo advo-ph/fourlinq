@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import EditorialButton from "@/components/primitives/Button";
 
@@ -40,14 +40,15 @@ const HeroCarousel = ({
   const [paused, setPaused] = useState(false);
   const total = slides.length;
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (paused || total <= 1) return;
+    if (prefersReducedMotion || paused || total <= 1) return;
     intervalRef.current = setInterval(() => {
       setActive((i) => (i + 1) % total);
     }, interval);
     return () => clearInterval(intervalRef.current);
-  }, [paused, total, interval]);
+  }, [prefersReducedMotion, paused, total, interval]);
 
   return (
     <section
@@ -60,31 +61,43 @@ const HeroCarousel = ({
     >
       {/* Stacked image layers — only the active one is opacity-1 */}
       <div className="absolute inset-0">
-        <AnimatePresence initial={false}>
-          {slides.map((slide, i) =>
-            i === active ? (
-              <motion.div
-                key={i}
-                className="absolute inset-0 will-change-[opacity,transform]"
-                initial={{ opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1.05 }}
-                exit={{ opacity: 0, scale: 1.08 }}
-                transition={{
-                  opacity: { duration: 1.2, ease: [0.5, 0, 0, 0.75] },
-                  scale:   { duration: 8.0, ease: [0.5, 0, 0, 0.75] },
-                }}
-              >
-                <img
-                  src={slide.src}
-                  alt={slide.alt}
-                  className="w-full h-full object-cover"
-                  loading={i === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                />
-              </motion.div>
-            ) : null
-          )}
-        </AnimatePresence>
+        {prefersReducedMotion ? (
+          <div className="absolute inset-0">
+            <img
+              src={slides[active]?.src}
+              alt={slides[active]?.alt ?? ""}
+              className="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+        ) : (
+          <AnimatePresence initial={false}>
+            {slides.map((slide, i) =>
+              i === active ? (
+                <motion.div
+                  key={i}
+                  className="absolute inset-0 will-change-[opacity,transform]"
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1.05 }}
+                  exit={{ opacity: 0, scale: 1.08 }}
+                  transition={{
+                    opacity: { duration: 1.2, ease: [0.5, 0, 0, 0.75] },
+                    scale: { duration: 8, ease: [0.5, 0, 0, 0.75] },
+                  }}
+                >
+                  <img
+                    src={slide.src}
+                    alt={slide.alt}
+                    className="w-full h-full object-cover"
+                    loading={i === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                </motion.div>
+              ) : null
+            )}
+          </AnimatePresence>
+        )}
       </div>
 
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
