@@ -1,0 +1,2148 @@
+{
+  "version": 1,
+  "threshold": 50,
+  "projects": {
+    "las-pinas-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/DOuJGHUl.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 20,
+            "interior": 45,
+            "exterior": 40
+          },
+          "reasoning": "Upward view of a double-height corner clad in dark aluminium-framed fixed glazing with wood-slat ceiling, windows are the dominant subject."
+        },
+        {
+          "path": "/images/projects-fb/ttZUwHC9.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 55,
+            "interior": 82,
+            "exterior": 15
+          },
+          "reasoning": "Interior corner room shot with floor-to-ceiling black sliding glass doors and screens opening to a treetop view."
+        },
+        {
+          "path": "/images/projects-fb/1624zR2K.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 15,
+            "interior": 78,
+            "exterior": 20
+          },
+          "reasoning": "Interior view of a large gridded black-framed fixed glazed wall wrapping a corner, windows are the clear focus with wood floor visible."
+        },
+        {
+          "path": "/images/projects-fb/wmPQfS3V.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 12,
+            "interior": 72,
+            "exterior": 20
+          },
+          "reasoning": "Interior shot of a full-height gridded black-framed fixed glazing wall, mullioned windows are the prominent subject."
+        },
+        {
+          "path": "/images/projects-fb/x63pl_14.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 18,
+            "interior": 55,
+            "exterior": 15
+          },
+          "reasoning": "Interior view of an open black casement window swung out beside fixed glazing onto a deck and greenery."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/DOuJGHUl.jpg",
+        "heroScore": 72,
+        "enhanced": true,
+        "enhancedConfidence": 62,
+        "notes": "Crisp upward-angle courtyard shot with warm wood ceiling and blue-framed glass, well-lit and graded but an unconventional cropped detail rather than a classic full-facade hero."
+      }
+    },
+    "cebu-a-residences": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-a-residences.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 15,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Dramatic hillside exterior elevation of a modern white cantilevered villa with glass-railed balconies and a tower."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-a-residences.jpg",
+        "heroScore": 86,
+        "enhanced": true,
+        "enhancedConfidence": 80,
+        "notes": "Striking modern white villa shot from a dramatic upward angle against a soft graded sky, crisp and professionally composed."
+      }
+    },
+    "cebu-as-residence-consolacion": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-as-residence-consolacion.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 12,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Golden-hour corner exterior of a Mediterranean two-storey house with prominent tall arched white-framed windows."
+        },
+        {
+          "path": "/images/projects-fb/cebu-as-residence-consolacion-2.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 12,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Overcast corner curb view of the same Mediterranean house showing facade, arched and gridded windows behind a fence."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-as-residence-consolacion.jpg",
+        "heroScore": 89,
+        "enhanced": true,
+        "enhancedConfidence": 88,
+        "notes": "Crisp warm golden-hour render of a striking Mediterranean corner facade with clean framing and rich color grading."
+      }
+    },
+    "cebu-f-residence-fortunado": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-f-residence-fortunado.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Side exterior elevation of a modern three-storey stepped grey house with many dark-framed windows behind a slat fence."
+        },
+        {
+          "path": "/images/projects-fb/cebu-f-residence-fortunado-2.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 25,
+            "interior": 20,
+            "exterior": 85
+          },
+          "reasoning": "Exterior of the modern house with a projecting open casement window on the mid floor and large ground-floor glazing."
+        },
+        {
+          "path": "/images/projects-fb/cebu-f-residence-fortunado-3.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 40,
+            "interior": 10,
+            "exterior": 92
+          },
+          "reasoning": "Front elevation of the modern house with a tall glazed stair volume, wood screen, stone accent, and glazed entry doors."
+        },
+        {
+          "path": "/images/projects-fb/cebu-f-residence-fortunado-4.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Corner exterior of the modern house with projecting awning-style windows open and glazed doors at ground level."
+        },
+        {
+          "path": "/images/projects-fb/cebu-f-residence-fortunado-5.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 15,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Rear/side exterior of the grey modern house on a landscaped slope with pebble beds and planting."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-f-residence-fortunado.jpg",
+        "heroScore": 84,
+        "enhanced": true,
+        "enhancedConfidence": 72,
+        "notes": "Sharp modern tower home against a clean gradient blue sky with tidy landscaping and a polished, magazine-ready look."
+      }
+    },
+    "cebu-residence-vista-grande": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-residence-vista-grande.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 45,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Warm exterior of a Mediterranean two-storey house with tiled roof, arched window, and an ornate black entry gate."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-residence-vista-grande.jpg",
+        "heroScore": 87,
+        "enhanced": true,
+        "enhancedConfidence": 85,
+        "notes": "Warm golden Mediterranean villa against a saturated blue sky, polished and well-composed with strong portfolio appeal."
+      }
+    },
+    "fourlinq-turnover-2": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 30,
+            "interior": 15,
+            "exterior": 80
+          },
+          "reasoning": "Exterior looking up at a white house balcony with glass railing, sliding glass panel and a person on the terrace."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-3.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 15,
+            "interior": 50,
+            "exterior": 20
+          },
+          "reasoning": "Interior view of a single dark-framed double-hung window in a stairwell, the window unit is the clear subject."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-4.jpg",
+          "scores": {
+            "windows": 25,
+            "doors": 88,
+            "interior": 20,
+            "exterior": 45
+          },
+          "reasoning": "Pair of tinted-glass wood-framed doors with handles set in a vertical wood-slat wall, doors are the clear subject."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-5.jpg",
+          "scores": {
+            "windows": 25,
+            "doors": 88,
+            "interior": 25,
+            "exterior": 45
+          },
+          "reasoning": "Frontal view of double glazed wood-framed doors with handles recessed in a wood-slat wall, doors are the focus."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/fourlinq-turnover-2.jpg",
+        "heroScore": 34,
+        "enhanced": false,
+        "enhancedConfidence": 10,
+        "notes": "Awkward low-angle crop of a balcony with people and a blown-out sky, reads as a casual phone snapshot."
+      }
+    },
+    "portfolio-residence-06": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-06.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 15,
+            "interior": 5,
+            "exterior": 92
+          },
+          "reasoning": "Dusk exterior elevation of a modern white house with large upper-floor glazing, glass-railed balcony and dramatic sunset sky."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-06.jpg",
+        "heroScore": 90,
+        "enhanced": true,
+        "enhancedConfidence": 91,
+        "notes": "Sharp modern white contemporary at twilight with a vivid orange-and-blue sky and warm under-eave lighting, cleanly framed and graded."
+      }
+    },
+    "portfolio-residence-14": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-14.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Symmetrical exterior facade of a large stone-and-stucco mansion with numerous white-framed and open awning windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-14.jpg",
+        "heroScore": 66,
+        "enhanced": false,
+        "enhancedConfidence": 30,
+        "notes": "Sharp wide daytime shot of a large stone-and-stucco mansion facade under blue sky, but flat documentary lighting and a construction fence in front keep it snapshot-grade."
+      }
+    },
+    "taytay-rizal-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/pndqSKzg.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Full curb-view exterior of a two-storey modern house on a corner lot, with a dark-glazed upper picture window and a wood-slat gate visible below."
+        },
+        {
+          "path": "/images/projects-fb/emyl2Fwr.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 15,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Frontal exterior elevation of the same modern facade, with a prominent second-storey glazed window bay flanked by vertical louvres."
+        },
+        {
+          "path": "/images/projects-fb/SKxVxxW4.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 15,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Angled exterior view of the house showing the cantilevered roof and a large dark upper-floor window as the main glazed feature."
+        },
+        {
+          "path": "/images/projects-fb/vzSdxxg0.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 10,
+            "interior": 5,
+            "exterior": 82
+          },
+          "reasoning": "Exterior of the white side elevation where several dark-framed awning and picture windows are the clear focal detail against the plain wall."
+        },
+        {
+          "path": "/images/projects-fb/K6n763QM.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 10,
+            "interior": 5,
+            "exterior": 62
+          },
+          "reasoning": "Tight exterior crop of the white upper wall dominated by three dark-framed windows (a horizontal slider, a small fixed pane, and an awning unit)."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/pndqSKzg.jpg",
+        "heroScore": 64,
+        "enhanced": false,
+        "enhancedConfidence": 45,
+        "notes": "Clean sharp daytime corner-facade phone photo with nice blue sky but a plain snapshot look and a somewhat busy street/fence foreground."
+      }
+    },
+    "batangas-c-residences": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/ohQTuBNz.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 15,
+            "interior": 5,
+            "exterior": 65
+          },
+          "reasoning": "Upward exterior shot of a corner where wood-framed casement and sliding windows wrap the second storey as the dominant subject."
+        },
+        {
+          "path": "/images/projects-fb/zp4alT38.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 12,
+            "interior": 8,
+            "exterior": 45
+          },
+          "reasoning": "Close upward view of a large wood-framed picture-plus-awning window unit reflecting sky, with a second window at left; windows are clearly the hero."
+        },
+        {
+          "path": "/images/projects-fb/aJiYThAZ.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 10,
+            "interior": 90,
+            "exterior": 5
+          },
+          "reasoning": "Editorial interior bedroom shot with wood floor, bed, TV wall and wrap-around dark-framed windows framing the view."
+        },
+        {
+          "path": "/images/projects-fb/6uH-fLmF.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 80,
+            "interior": 30,
+            "exterior": 40
+          },
+          "reasoning": "Covered porch/lanai showing a solid wood entry door as clear subject, flanked by wood-framed windows under a wood-plank ceiling."
+        },
+        {
+          "path": "/images/projects-fb/mw3WVp7m.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 82,
+            "interior": 30,
+            "exterior": 40
+          },
+          "reasoning": "Balcony corner with a large wood-framed sliding glass door as the prominent walk-through element, plus adjacent picture windows over a stone-tiled wall."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/ohQTuBNz.jpg",
+        "heroScore": 40,
+        "enhanced": false,
+        "enhancedConfidence": 15,
+        "notes": "Blown-out white sky with an awkward tight crop that clips the house and exposes an AC unit and CCTV, a flat phone snapshot."
+      }
+    },
+    "cebu-p-residence-kishanta": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-p-residence-kishanta.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 55,
+            "interior": 8,
+            "exterior": 90
+          },
+          "reasoning": "Twilight curb-view exterior of a modern two-storey home with a dark front entry door and large warm-lit floor-to-ceiling glazing across the facade."
+        },
+        {
+          "path": "/images/projects-fb/cebu-p-residence-kishanta-2.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 48,
+            "interior": 8,
+            "exterior": 88
+          },
+          "reasoning": "Daytime street-view exterior of the same modern facade showing a central entry door and multiple tall tinted window bays."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-p-residence-kishanta.jpg",
+        "heroScore": 84,
+        "enhanced": true,
+        "enhancedConfidence": 80,
+        "notes": "Sharp, professionally graded dusk shot of a modern stone-and-glass facade with warm glowing interiors."
+      }
+    },
+    "cebu-b-residence-monterrazas": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-b-residence-monterrazas.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 70,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Exterior of a modern home with a striking red pivot entry door and wavy handle as a focal point, tall corner glazing, and a carport with a parked car."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-b-residence-monterrazas.jpg",
+        "heroScore": 52,
+        "enhanced": false,
+        "enhancedConfidence": 70,
+        "notes": "Attractive modern facade but flat overcast light, a parked SUV, and a stray bucket clutter the frame in a lower-res snapshot."
+      }
+    },
+    "cebu-residence-monterrazas": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-residence-monterrazas.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 35,
+            "interior": 8,
+            "exterior": 92
+          },
+          "reasoning": "Wide dusk exterior of a large stone-clad Mediterranean-modern mansion showing a symmetrical facade with wood-framed windows and a gated carport."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-residence-monterrazas.jpg",
+        "heroScore": 90,
+        "enhanced": true,
+        "enhancedConfidence": 85,
+        "notes": "Golden-hour stone-and-stucco luxury facade with warm interior glow and clean composition, professionally graded and strongly magazine-cover."
+      }
+    },
+    "fourlinq-turnover-3": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 10,
+            "interior": 5,
+            "exterior": 68
+          },
+          "reasoning": "Exterior of a house still under construction with scaffolding and blue tarps on a sloped lot; windows are partly obscured."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-2.jpg",
+          "scores": {
+            "windows": 35,
+            "doors": 12,
+            "interior": 5,
+            "exterior": 66
+          },
+          "reasoning": "Exterior of the same in-progress house with scaffolding and a worker, dark-framed windows visible on the upper storey behind the works."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-3.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 82,
+            "interior": 55,
+            "exterior": 20
+          },
+          "reasoning": "Interior of an unfinished room shot from inside toward large black-framed sliding/glass doors opening to a tarped exterior."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-4.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 15,
+            "interior": 45,
+            "exterior": 20
+          },
+          "reasoning": "Interior corner showing two black-framed casement/awning windows with tag stickers as the clear installed-window subject against a raw wall."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-5.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 88,
+            "interior": 55,
+            "exterior": 15
+          },
+          "reasoning": "Interior view of an open black-framed glass double/pivot door as the walk-through subject, with a smaller framed window at left in a raw finished room."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/fourlinq-turnover-3.jpg",
+        "heroScore": 27,
+        "enhanced": false,
+        "enhancedConfidence": 8,
+        "notes": "Active construction site showing scaffolding and blue tarps, cluttered and unappealing as a cover."
+      }
+    },
+    "portfolio-residence-05": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-05.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 15,
+            "interior": 12,
+            "exterior": 95
+          },
+          "reasoning": "Dramatic sunset rear exterior of a large stone-and-shingle mansion with warm-lit two-storey glazing, a pool, and a covered terrace."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-05.jpg",
+        "heroScore": 90,
+        "enhanced": true,
+        "enhancedConfidence": 91,
+        "notes": "Editorial twilight rear elevation with reflecting pool and warmly lit interiors under a vivid orange sky, striking and polished."
+      }
+    },
+    "portfolio-residence-13": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-13.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 92
+          },
+          "reasoning": "Frontal curb-view exterior of a modern two-storey home with dark-framed windows, a large gate and a stone-clad perimeter wall."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-13.jpg",
+        "heroScore": 57,
+        "enhanced": false,
+        "enhancedConfidence": 55,
+        "notes": "Letterboxed daytime modern facade with a bright blue sky and reasonable sharpness, but flat lighting and panoramic crop feel snapshot-like."
+      }
+    },
+    "portfolio-interior-02": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-interior-02.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 60,
+            "interior": 92,
+            "exterior": 8
+          },
+          "reasoning": "Editorial interior living-room shot with an L-sofa on terracotta tile, framed by floor-to-ceiling wood-framed glazing and a glass door onto a garden."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-interior-02.jpg",
+        "heroScore": 66,
+        "enhanced": false,
+        "enhancedConfidence": 32,
+        "notes": "Bright, cleanly staged living room with a sectional sofa, garden windows and terracotta floor, pleasant and well-lit but a standard real-estate phone photo."
+      }
+    },
+    "nuvali-laguna-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/mbArIDA5.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Upward exterior elevation of a modern two-storey wood-clad house against blue sky, with vertical windows and a glass-railed balcony."
+        },
+        {
+          "path": "/images/projects-fb/u9QGO5wI.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Exterior facade close-up of wood-slat cladding with a prominent bank of ground-floor casement windows and a balcony above."
+        },
+        {
+          "path": "/images/projects-fb/AOQsrPKg.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 25,
+            "interior": 5,
+            "exterior": 65
+          },
+          "reasoning": "Tight exterior facade shot dominated by tall vertical window units set in warm wood-slat wall with a balcony overhead."
+        },
+        {
+          "path": "/images/projects-fb/5e9SkvSf.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Dramatic upward exterior view of the multi-storey house framed by trees, showing the facade, entry canopy and stone stair."
+        },
+        {
+          "path": "/images/projects-fb/gjR_DEfu.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 55,
+            "interior": 85,
+            "exterior": 10
+          },
+          "reasoning": "Interior bedroom shot looking out through a floor-to-ceiling window-and-sliding-door wall to a green valley, with curtains and toys inside."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/mbArIDA5.jpg",
+        "heroScore": 82,
+        "enhanced": true,
+        "enhancedConfidence": 68,
+        "notes": "Striking low-angle modern villa with wood-slat cladding against a dramatic cloud-filled sky, crisp and vibrantly graded with strong editorial appeal."
+      }
+    },
+    "bulacan-n-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/ZoZWYiwi.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 90,
+            "interior": 15,
+            "exterior": 45
+          },
+          "reasoning": "Exterior view of a large wood-framed glass bi-fold/folding door system with sidelight windows under a covered lanai."
+        },
+        {
+          "path": "/images/projects-fb/S2T-OFy4.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 65,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Full exterior elevation of a white house with butterfly roof against blue sky, featuring a large corner glass door-and-window wall."
+        },
+        {
+          "path": "/images/projects-fb/-pFxhSkE.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 90,
+            "interior": 15,
+            "exterior": 40
+          },
+          "reasoning": "Close-up of a wood-framed sliding glass door system with transoms and fixed sidelights, viewed from an exterior patio."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/ZoZWYiwi.jpg",
+        "heroScore": 42,
+        "enhanced": false,
+        "enhancedConfidence": 15,
+        "notes": "Wide-angle phone shot of glass doors with a FourlinQ logo burned into the corner and busy reflections."
+      }
+    },
+    "cebu-m-residence-molave": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-m-residence-molave.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 35,
+            "interior": 5,
+            "exterior": 92
+          },
+          "reasoning": "Polished dusk exterior elevation of a modern two-storey house with stone accent wall, tall windows, gates and driveway."
+        },
+        {
+          "path": "/images/projects-fb/cebu-m-residence-molave-2.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 35,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Daytime frontal exterior of the same house showing facade, entry door, perimeter fence and gates from the street."
+        },
+        {
+          "path": "/images/projects-fb/cebu-m-residence-molave-3.jpg",
+          "scores": {
+            "windows": 65,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Angled exterior view emphasizing the wood-trimmed vertical windows and stone facade behind the perimeter fence."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-m-residence-molave.jpg",
+        "heroScore": 91,
+        "enhanced": true,
+        "enhancedConfidence": 90,
+        "notes": "Wide, editorial golden-hour render of a tropical-modern home framed by lush trees with excellent light and clarity."
+      }
+    },
+    "cebu-c-residence-amara": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-c-residence-amara.jpg",
+          "scores": {
+            "windows": 75,
+            "doors": 45,
+            "interior": 10,
+            "exterior": 70
+          },
+          "reasoning": "Exterior corner shot of a double-height stone-clad facade with a full-height black-framed glazed window-and-door curtain wall."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-c-residence-amara.jpg",
+        "heroScore": 82,
+        "enhanced": true,
+        "enhancedConfidence": 78,
+        "notes": "Crisp, well-lit stone-and-glass facade framed by lush palms with rich color and good depth, looks professionally graded."
+      }
+    },
+    "portfolio-interior-03": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-interior-03.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 10,
+            "interior": 92,
+            "exterior": 5
+          },
+          "reasoning": "Interior lounge room with vaulted wood ceiling, sofas and red cushions, ringed by a band of small clerestory-height windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-interior-03.jpg",
+        "heroScore": 38,
+        "enhanced": false,
+        "enhancedConfidence": 15,
+        "notes": "Cluttered attic lounge with scattered red floor pillows, exposed A/C units and harsh flat lighting make for an awkward, un-editorial snapshot."
+      }
+    },
+    "tagaytay-cavite-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/ZzCSzF_o.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 8,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Exterior elevation of a modern white multi-story home with balconies, dark-framed windows and lush landscaping."
+        },
+        {
+          "path": "/images/projects-fb/I0S5nOmZ.jpg",
+          "scores": {
+            "windows": 58,
+            "doors": 8,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Upward exterior view of the white home's facade featuring a prominent dark-framed sliding window and wood-slat pergola."
+        },
+        {
+          "path": "/images/projects-fb/WWWCQcpX.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 8,
+            "interior": 5,
+            "exterior": 84
+          },
+          "reasoning": "Low-angle exterior shot of the modern facade with a balcony pergola and a dark-framed window band."
+        },
+        {
+          "path": "/images/projects-fb/Bf8HH614.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 5,
+            "interior": 82,
+            "exterior": 6
+          },
+          "reasoning": "Interior conference/dining room shot with a wall of dark-framed awning windows overlooking a garden, table and mesh chairs."
+        },
+        {
+          "path": "/images/projects-fb/9OqANnRg.jpg",
+          "scores": {
+            "windows": 84,
+            "doors": 5,
+            "interior": 78,
+            "exterior": 6
+          },
+          "reasoning": "Interior room shot dominated by a large grid of dark-framed awning windows on two walls opening to the yard."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/ZzCSzF_o.jpg",
+        "heroScore": 76,
+        "enhanced": true,
+        "enhancedConfidence": 60,
+        "notes": "White modernist home framed by lush tropical greenery under a bright blue sky, well-composed and punchy though the house sits slightly small in frame."
+      }
+    },
+    "taguig-g-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/BOyTwrQH.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 82,
+            "interior": 6,
+            "exterior": 80
+          },
+          "reasoning": "Exterior facade with a prominent wooden pivot entry door flanked by tall black-framed glazed window walls."
+        },
+        {
+          "path": "/images/projects-fb/vhoJDNZw.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 20,
+            "interior": 12,
+            "exterior": 72
+          },
+          "reasoning": "Exterior looking up at a tall two-story black-framed glass curtain-wall window unit on the stone-clad facade."
+        },
+        {
+          "path": "/images/projects-fb/UdQMQaA-.jpg",
+          "scores": {
+            "windows": 72,
+            "doors": 10,
+            "interior": 85,
+            "exterior": 8
+          },
+          "reasoning": "Interior sunroom with floor-to-ceiling black-framed glazing, a sofa and greenery views from inside."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/BOyTwrQH.jpg",
+        "heroScore": 55,
+        "enhanced": false,
+        "enhancedConfidence": 25,
+        "notes": "Handsome modern facade but flat overcast light and a burned-in logo watermark keep it in plain snapshot territory."
+      }
+    },
+    "cebu-d-residence-mandaue": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-d-residence-mandaue.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 10,
+            "interior": 4,
+            "exterior": 88
+          },
+          "reasoning": "Exterior elevation of a white two-story modern house with small punched windows and a gray metal driveway gate."
+        },
+        {
+          "path": "/images/projects-fb/cebu-d-residence-mandaue-2.jpg",
+          "scores": {
+            "windows": 48,
+            "doors": 10,
+            "interior": 4,
+            "exterior": 87
+          },
+          "reasoning": "Corner exterior view of the same white house showing two facades of modest windows and the perimeter gate."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-d-residence-mandaue.jpg",
+        "heroScore": 58,
+        "enhanced": false,
+        "enhancedConfidence": 35,
+        "notes": "Clean minimalist white-cube facade but a flatter, plainer daytime phone snapshot with modest resolution."
+      }
+    },
+    "cebu-ds-residence-talisay": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-ds-residence-talisay.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 10,
+            "interior": 4,
+            "exterior": 92
+          },
+          "reasoning": "Corner curb view of a large ornate white Mediterranean mansion with arched windows and a perimeter fence."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-ds-residence-talisay.jpg",
+        "heroScore": 90,
+        "enhanced": true,
+        "enhancedConfidence": 90,
+        "notes": "Striking white mansion against a deep blue sky with vibrant green hedges and clean magazine-cover framing, clearly high-res and color-graded."
+      }
+    },
+    "cabanatuan-t-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cabanatuan-t-residence.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 12,
+            "interior": 6,
+            "exterior": 86
+          },
+          "reasoning": "Exterior street view of a modern Asian-contemporary home with a prominent second-floor black-framed window band and parked cars."
+        },
+        {
+          "path": "/images/projects-fb/cabanatuan-t-residence-2.jpg",
+          "scores": {
+            "windows": 42,
+            "doors": 8,
+            "interior": 4,
+            "exterior": 88
+          },
+          "reasoning": "Wide roadside exterior elevation of the same contemporary two-story house behind a dark slat fence."
+        },
+        {
+          "path": "/images/projects-fb/cabanatuan-t-residence-3.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 10,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Corner exterior view of the modern house with a glass-railed balcony and dark perimeter fencing."
+        },
+        {
+          "path": "/images/projects-fb/cabanatuan-t-residence-4.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 10,
+            "interior": 5,
+            "exterior": 87
+          },
+          "reasoning": "Street-corner exterior of the contemporary residence with balcony glazing, dark fence and a car parked out front."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cabanatuan-t-residence.jpg",
+        "heroScore": 47,
+        "enhanced": false,
+        "enhancedConfidence": 15,
+        "notes": "Wide street-level snapshot with parked cars cluttering the foreground and a FourlinQ logo burned top-left."
+      }
+    },
+    "portfolio-residence-04": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-04.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 12,
+            "interior": 6,
+            "exterior": 90
+          },
+          "reasoning": "Twilight exterior elevation of a Mediterranean-style white two-story home with prominent arched dark-framed windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-04.jpg",
+        "heroScore": 89,
+        "enhanced": true,
+        "enhancedConfidence": 90,
+        "notes": "Low-angle Mediterranean villa at sunset with dramatic clouds and glowing sconces, sharp and professionally color-graded."
+      }
+    },
+    "portfolio-residence-12": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-12.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 45,
+            "interior": 6,
+            "exterior": 90
+          },
+          "reasoning": "Rear exterior elevation of a large stone mansion with a pool, balconies, white-grid windows and a ground-level bank of sliding glass doors."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-12.jpg",
+        "heroScore": 46,
+        "enhanced": false,
+        "enhancedConfidence": 60,
+        "notes": "Rear elevation with pool under a dull overcast sky, muted and flat with a snapshot-grade quality despite the grand house."
+      }
+    },
+    "san-lorenzo-makati-aluminium": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/yDrxH9L-.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 8,
+            "interior": 60,
+            "exterior": 5
+          },
+          "reasoning": "Bare interior room dominated by a six-pane grid of dark aluminium awning windows over a wood floor."
+        },
+        {
+          "path": "/images/projects-fb/P7DLic-T.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 55,
+            "interior": 5,
+            "exterior": 78
+          },
+          "reasoning": "Exterior terrace/balcony view of a construction-phase facade with dark-framed sliding glass doors and windows behind a glass railing."
+        },
+        {
+          "path": "/images/projects-fb/P8m34kD5.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 5,
+            "interior": 8,
+            "exterior": 30
+          },
+          "reasoning": "Close-up of a tall dark aluminium awning window unit reflecting sky, shot from the building exterior."
+        },
+        {
+          "path": "/images/projects-fb/z8K5dOzz.jpg",
+          "scores": {
+            "windows": 82,
+            "doors": 10,
+            "interior": 55,
+            "exterior": 8
+          },
+          "reasoning": "Bright interior stairwell with a two-part dark aluminium awning window above a glass-railed staircase."
+        },
+        {
+          "path": "/images/projects-fb/2vzBfKBe.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 30,
+            "interior": 62,
+            "exterior": 20
+          },
+          "reasoning": "Interior room with a full-height dark aluminium window-and-door wall opening onto a terrace and neighboring facade."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/yDrxH9L-.jpg",
+        "heroScore": 30,
+        "enhanced": false,
+        "enhancedConfidence": 20,
+        "notes": "Empty raw-concrete interior room with bare unfinished walls and a bank of windows, flat lighting and a construction-documentation feel with no magazine appeal."
+      }
+    },
+    "cebu-n-residence-pardo": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-n-residence-pardo.jpg",
+          "scores": {
+            "windows": 52,
+            "doors": 70,
+            "interior": 3,
+            "exterior": 88
+          },
+          "reasoning": "Exterior of a modern two-story house with a prominent wooden pivot entry door and several windows on the elevation."
+        },
+        {
+          "path": "/images/projects-fb/cebu-n-residence-pardo-2.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 62,
+            "interior": 3,
+            "exterior": 90
+          },
+          "reasoning": "Wider exterior facade of the same house showing the wooden entry door, carport, and multiple window units."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-n-residence-pardo.jpg",
+        "heroScore": 62,
+        "enhanced": false,
+        "enhancedConfidence": 35,
+        "notes": "Clean sunny two-story facade against a blue sky, pleasant but a fairly plain low-resolution daytime phone photo with the car partly clipped."
+      }
+    },
+    "cebu-es-residence-maria-luisa": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-es-residence-maria-luisa.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 40,
+            "interior": 3,
+            "exterior": 90
+          },
+          "reasoning": "Distant exterior of a white two-story house against a cliff, with a wooden entry door and dark-framed windows on the facade."
+        },
+        {
+          "path": "/images/projects-fb/cebu-es-residence-maria-luisa-2.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 42,
+            "interior": 3,
+            "exterior": 92
+          },
+          "reasoning": "Closer exterior elevation showing large dark tinted windows, a wooden door, and a gated garage on the white facade."
+        },
+        {
+          "path": "/images/projects-fb/cebu-es-residence-maria-luisa-3.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 30,
+            "interior": 3,
+            "exterior": 88
+          },
+          "reasoning": "Angled exterior view emphasizing tall dark-framed picture windows across the white two-story facade."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-es-residence-maria-luisa.jpg",
+        "heroScore": 44,
+        "enhanced": false,
+        "enhancedConfidence": 20,
+        "notes": "Low-res harsh-midday snapshot on a cramped hillside lot with a cluttered rock backdrop and burned-in yard signage."
+      }
+    },
+    "bataan-s-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/bataan-s-residence.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 62,
+            "interior": 8,
+            "exterior": 85
+          },
+          "reasoning": "Garden-level exterior of a modern house with a full-height glazed sliding door wall and upper balcony glazing."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-2.jpg",
+          "scores": {
+            "windows": 48,
+            "doors": 65,
+            "interior": 8,
+            "exterior": 84
+          },
+          "reasoning": "Exterior view through garden shrubs of the same facade with a wide curtained sliding glass door and terrace."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-3.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 72,
+            "interior": 8,
+            "exterior": 82
+          },
+          "reasoning": "Exterior corner showing a wooden pivot entry door with steps and an adjacent glazed sliding door wall."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-4.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 78,
+            "interior": 10,
+            "exterior": 80
+          },
+          "reasoning": "Exterior corner featuring folding/sliding glass doors onto a wood deck plus dark-framed window units."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-5.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 55,
+            "interior": 8,
+            "exterior": 80
+          },
+          "reasoning": "Exterior side elevation with dark-framed windows, a curtained glass door, and a wood-deck dining terrace."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/bataan-s-residence.jpg",
+        "heroScore": 55,
+        "enhanced": false,
+        "enhancedConfidence": 35,
+        "notes": "Nice blue sky and lush greenery but a low tilted phone angle with foreground shrubs blocking a partial view of the modern house."
+      }
+    },
+    "portfolio-residence-02": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-02.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Dusk exterior of a modern white house with a striking tall dark-framed window wall and awning windows on the facade."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-02.jpg",
+        "heroScore": 87,
+        "enhanced": true,
+        "enhancedConfidence": 84,
+        "notes": "High-resolution dusk facade with dramatic clouds and warm accent lighting, retouched to an editorial finish."
+      }
+    },
+    "portfolio-residence-10": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-10.jpg",
+          "scores": {
+            "windows": 72,
+            "doors": 20,
+            "interior": 3,
+            "exterior": 90
+          },
+          "reasoning": "Exterior of a two-story Asian-modern house with large dark-tinted window walls across the elevation."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-10.jpg",
+        "heroScore": 48,
+        "enhanced": false,
+        "enhancedConfidence": 62,
+        "notes": "Cropped letterboxed daytime tropical-Asian house with softer, slightly washed resolution and a mundane utility box in frame."
+      }
+    },
+    "cebu-s-residences": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-s-residences.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 45,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Golden-hour front elevation of a modern two-storey house with tall glazed window walls, stone accents and a recessed wooden entry door."
+        },
+        {
+          "path": "/images/projects-fb/cebu-s-residences-2.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 35,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Daytime front-corner elevation of the same modern house showing the facade, large corner glazing and roofline."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-s-residences.jpg",
+        "heroScore": 92,
+        "enhanced": true,
+        "enhancedConfidence": 88,
+        "notes": "Sharp low-angle modern facade with stone cladding, warm interior glow and lush palms against a rich graded blue sky, a polished magazine-cover hero."
+      }
+    },
+    "cebu-n-residence-pardo-b": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-n-residence-pardo-b.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 60,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Sunset rear elevation of a white terraced house with exterior staircase, balcony glazing and a lit ground-floor sliding glass door to the lawn."
+        },
+        {
+          "path": "/images/projects-fb/cebu-n-residence-pardo-b-2.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 55,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Daytime rear elevation of the same house showing the exterior stair, balcony rail glazing and a ground-floor sliding glass door."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-n-residence-pardo-b.jpg",
+        "heroScore": 84,
+        "enhanced": true,
+        "enhancedConfidence": 78,
+        "notes": "Warm golden-hour rear elevation with lush framing landscaping and a glowing interior, a well-composed magazine-style shot."
+      }
+    },
+    "cebu-cmsprs": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-cmsprs.jpg",
+          "scores": {
+            "windows": 20,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 82
+          },
+          "reasoning": "Street view of a tile-roofed bungalow behind a black gate and hedge with the entrance and facade partly obscured by planting."
+        },
+        {
+          "path": "/images/projects-fb/cebu-cmsprs-2.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 85,
+            "interior": 15,
+            "exterior": 55
+          },
+          "reasoning": "Poolside courtyard showing a long wall of dark aluminium folding/sliding glass doors along the house facade."
+        },
+        {
+          "path": "/images/projects-fb/cebu-cmsprs-3.jpg",
+          "scores": {
+            "windows": 20,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 84
+          },
+          "reasoning": "Street view of the bungalow behind a gate with lush garden, showing the tiled roof and facade beyond the fence."
+        },
+        {
+          "path": "/images/projects-fb/cebu-cmsprs-4.jpg",
+          "scores": {
+            "windows": 20,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 84
+          },
+          "reasoning": "Near-identical street view of the gated bungalow facade and garden from the road."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-cmsprs.jpg",
+        "heroScore": 36,
+        "enhanced": false,
+        "enhancedConfidence": 15,
+        "notes": "Dull flat daytime snapshot with a cluttered fence and overgrown foliage largely obscuring the house."
+      }
+    },
+    "cebu-g-residences": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-g-residences.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Daytime front elevation of a three-storey modern house with many dark-framed windows and stone accents behind a perimeter fence."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-g-residences.jpg",
+        "heroScore": 68,
+        "enhanced": true,
+        "enhancedConfidence": 55,
+        "notes": "Warmly lit golden-hour multi-story home with accent lighting, but lower resolution and a power pole cluttering the left edge soften its hero impact."
+      }
+    },
+    "cebu-sch-residence-monterrazas": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-sch-residence-monterrazas.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 35,
+            "interior": 10,
+            "exterior": 90
+          },
+          "reasoning": "Sunset exterior of a single-storey modern house with a tall double-height glazed entry section and driveway gate."
+        },
+        {
+          "path": "/images/projects-fb/cebu-sch-residence-monterrazas-2.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 30,
+            "interior": 8,
+            "exterior": 88
+          },
+          "reasoning": "Daytime front elevation of the same modern house showing the two-storey glazed corner and carport behind the gated fence."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-sch-residence-monterrazas.jpg",
+        "heroScore": 90,
+        "enhanced": true,
+        "enhancedConfidence": 88,
+        "notes": "Dramatic twilight facade with warm interior glow, saturated dusk sky, and crisp high-resolution professional grading, the strongest of the set."
+      }
+    },
+    "cebu-residence-vista-grande-talisay": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-residence-vista-grande-talisay.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 90,
+            "interior": 62,
+            "exterior": 10
+          },
+          "reasoning": "Interior view of a large arched black-framed French/glass door system opening onto a planted courtyard, wood floor in foreground."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-residence-vista-grande-talisay.jpg",
+        "heroScore": 58,
+        "enhanced": true,
+        "enhancedConfidence": 55,
+        "notes": "Nicely lit interior of arched black-framed patio doors, but plastic-wrapped furniture and a plain construction-site backdrop weaken its cover appeal."
+      }
+    },
+    "cebu-r-residences": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-r-residences.jpg",
+          "scores": {
+            "windows": 58,
+            "doors": 25,
+            "interior": 8,
+            "exterior": 90
+          },
+          "reasoning": "Golden-hour exterior of a large multi-level hillside residence with rows of aluminium-framed windows across the facade."
+        },
+        {
+          "path": "/images/projects-fb/cebu-r-residences-2.jpg",
+          "scores": {
+            "windows": 52,
+            "doors": 22,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Daytime exterior elevation of the same hillside home showing the full facade with dark-framed window units and a garage gate."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-r-residences.jpg",
+        "heroScore": 84,
+        "enhanced": true,
+        "enhancedConfidence": 78,
+        "notes": "Dusk hillside mansion with warm interior glow and a manicured rock garden, well-composed and color-graded though a large driveway dominates the foreground."
+      }
+    },
+    "cebu-s-residence-maria-luisa": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-s-residence-maria-luisa.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 20,
+            "interior": 6,
+            "exterior": 88
+          },
+          "reasoning": "Exterior facade of a two-story home behind a horizontal-slat gate, with a prominent floor-to-ceiling glazed corner window bay."
+        },
+        {
+          "path": "/images/projects-fb/cebu-s-residence-maria-luisa-2.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 84
+          },
+          "reasoning": "Frontal exterior of the same residence emphasizing the tall glazed corner window and wood-clad facade behind the gate."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-s-residence-maria-luisa.jpg",
+        "heroScore": 55,
+        "enhanced": false,
+        "enhancedConfidence": 25,
+        "notes": "Attractive modern home undercut by a dark perimeter fence dominating the foreground plus flat light and low resolution."
+      }
+    },
+    "cebu-ta-residence-monterrazas": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-ta-residence-monterrazas.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 52,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Exterior facade of a stone-clad two-story mansion with wood-framed windows and a clearly visible wooden entry door at center."
+        },
+        {
+          "path": "/images/projects-fb/cebu-ta-residence-monterrazas-2.jpg",
+          "scores": {
+            "windows": 58,
+            "doors": 30,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Angled exterior of the same stone-and-white mansion showing multiple window units and an open carport with parked cars."
+        },
+        {
+          "path": "/images/projects-fb/cebu-ta-residence-monterrazas-3.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 48,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Frontal exterior of the mansion with curtained windows flanking a recessed wooden front entry door."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-ta-residence-monterrazas.jpg",
+        "heroScore": 83,
+        "enhanced": true,
+        "enhancedConfidence": 78,
+        "notes": "Crisp blue-sky render of a striking stone-clad facade, slightly weakened by a faint corner watermark."
+      }
+    },
+    "cebu-residence-alta-vista": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-residence-alta-vista.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 18,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Corner exterior of a white classical-style mansion with arched windows and balconies behind a landscaped wall."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-residence-alta-vista.jpg",
+        "heroScore": 90,
+        "enhanced": true,
+        "enhancedConfidence": 90,
+        "notes": "Striking white mansion under a deep blue sky with vibrant hedges and clean framing, a high-res color-graded magazine-cover shot."
+      }
+    },
+    "curved-facade-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/curved-facade-residence.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 30,
+            "interior": 6,
+            "exterior": 88
+          },
+          "reasoning": "Golden-hour exterior of a modern home whose curved facade is dominated by a large floor-to-ceiling black-framed glazed window wall."
+        },
+        {
+          "path": "/images/projects-fb/curved-facade-residence-2.jpg",
+          "scores": {
+            "windows": 76,
+            "doors": 28,
+            "interior": 6,
+            "exterior": 85
+          },
+          "reasoning": "Daytime exterior of the same curved modern residence highlighting the tall wraparound glazed window feature above the carport."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/curved-facade-residence.jpg",
+        "heroScore": 92,
+        "enhanced": true,
+        "enhancedConfidence": 90,
+        "notes": "Striking golden-hour architectural render, crisp and color-graded with clean magazine-cover framing."
+      }
+    },
+    "portfolio-interior-01": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-interior-01.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 8,
+            "interior": 90,
+            "exterior": 4
+          },
+          "reasoning": "Editorial interior corner shot of a sofa framed by large openable casement windows overlooking greenery, so it is a strong interior hero with windows prominently featured."
+        },
+        {
+          "path": "/images/projects-fb/portfolio-interior-01-2.jpg",
+          "scores": {
+            "windows": 72,
+            "doors": 5,
+            "interior": 92,
+            "exterior": 6
+          },
+          "reasoning": "Furnished living room shot from inside with a full wall of large windows and shades, making it an excellent interior hero with windows as a major secondary element."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-interior-01.jpg",
+        "heroScore": 62,
+        "enhanced": false,
+        "enhancedConfidence": 30,
+        "notes": "Cozy corner sofa framed by large windows onto greenery with glossy wood floor, warm and inviting but slightly dark and low-resolution."
+      }
+    },
+    "portfolio-residence-01": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-01.jpg",
+          "scores": {
+            "windows": 58,
+            "doors": 20,
+            "interior": 4,
+            "exterior": 88
+          },
+          "reasoning": "Sunset curb view of a large three-story facade with prominent aluminium-framed glazing bands but no featured walk-through door, so it is a strong exterior with well-shown windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-01.jpg",
+        "heroScore": 88,
+        "enhanced": true,
+        "enhancedConfidence": 85,
+        "notes": "Polished sunset three-story facade with warm graded sky and clean composition, clearly professionally enhanced."
+      }
+    },
+    "portfolio-residence-03": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-03.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 68,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Modern facade at dusk with a prominently featured wood pivot entry door plus a carport, making it a strong exterior that also showcases a door and good windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-03.jpg",
+        "heroScore": 91,
+        "enhanced": true,
+        "enhancedConfidence": 92,
+        "notes": "Crisp modern two-story at golden-hour twilight with a dramatic pink sky and warm entry glow, a magazine-cover-grade graded render."
+      }
+    },
+    "portfolio-residence-07": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-07.jpg",
+          "scores": {
+            "windows": 66,
+            "doors": 22,
+            "interior": 4,
+            "exterior": 90
+          },
+          "reasoning": "Bright daytime front elevation of a large two-story home with a prominent upper mullioned window bay, an excellent exterior hero with strongly shown windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-07.jpg",
+        "heroScore": 66,
+        "enhanced": false,
+        "enhancedConfidence": 55,
+        "notes": "Clean, sharp modern facade under a bright blue daytime sky, but flat midday lighting keeps it a solid daytime shot rather than editorial."
+      }
+    },
+    "portfolio-residence-08": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-08.jpg",
+          "scores": {
+            "windows": 64,
+            "doors": 18,
+            "interior": 4,
+            "exterior": 90
+          },
+          "reasoning": "Three-story hillside facade in daylight with dense dark-framed window arrays across every floor and no featured door, a strong exterior with prominent windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-08.jpg",
+        "heroScore": 52,
+        "enhanced": false,
+        "enhancedConfidence": 62,
+        "notes": "Wide letterboxed daytime shot of a large multi-level house with softer resolution and some overgrown foreground, snapshot-grade."
+      }
+    },
+    "portfolio-residence-09": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-09.jpg",
+          "scores": {
+            "windows": 82,
+            "doors": 15,
+            "interior": 4,
+            "exterior": 84
+          },
+          "reasoning": "White facade dominated by striking arched aluminium-framed windows that are the visual focus, so it doubles as both an excellent windows and exterior hero."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-09.jpg",
+        "heroScore": 50,
+        "enhanced": false,
+        "enhancedConfidence": 60,
+        "notes": "Letterboxed daytime Mediterranean house on a slope with a van in the driveway and plain flat lighting, cropped and unpolished."
+      }
+    },
+    "portfolio-residence-11": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-11.jpg",
+          "scores": {
+            "windows": 74,
+            "doors": 45,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Modern corner facade with a bold vertical window array and a visible wood entry door behind the fence, a strong exterior that prominently showcases windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-11.jpg",
+        "heroScore": 60,
+        "enhanced": false,
+        "enhancedConfidence": 55,
+        "notes": "Panoramic-crop daytime modern house with decent sharpness and lush greenery, but flat midday lighting limits editorial appeal."
+      }
+    },
+    "portfolio-residence-15": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/portfolio-residence-15.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 48,
+            "interior": 4,
+            "exterior": 88
+          },
+          "reasoning": "Cliffside white facade with large tinted glazing, a centered wood entry door up the steps, and lower garage doors, making it a strong exterior with visible door and windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-residence-15.jpg",
+        "heroScore": 70,
+        "enhanced": false,
+        "enhancedConfidence": 35,
+        "notes": "Attractive white modern hillside home against a rock cliff with lush greenery and a nice diagonal composition, though still a warm daytime phone photo rather than a graded render."
+      }
+    },
+    "binan-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/binan-residence.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 15,
+            "interior": 3,
+            "exterior": 88
+          },
+          "reasoning": "Street-level exterior of the two-tone orange-and-blue box facade with small punched windows; a strong elevation shot but windows are only a minor element."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-2.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 10,
+            "interior": 5,
+            "exterior": 82
+          },
+          "reasoning": "Exterior upper-story view showing the glazed second-floor balcony wall against the orange volume; a good facade shot with moderately prominent glazing."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-3.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 12,
+            "interior": 5,
+            "exterior": 80
+          },
+          "reasoning": "Dramatic upward exterior angle of the cantilevered soffit with a large glazed balustrade and window band; facade dominant with windows clearly featured."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-4.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 55,
+            "interior": 10,
+            "exterior": 40
+          },
+          "reasoning": "Outdoor close-up of a row of blue-framed awning windows with one wood entry door visible at left; windows are the clear hero subject."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-5.jpg",
+          "scores": {
+            "windows": 94,
+            "doors": 8,
+            "interior": 12,
+            "exterior": 35
+          },
+          "reasoning": "Tight detail of three open blue awning windows along a pebble-lined path; aluminium casement windows are unmistakably the primary subject."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/binan-residence.jpg",
+        "heroScore": 30,
+        "enhanced": false,
+        "enhancedConfidence": 15,
+        "notes": "Harsh snapshot with overhead power lines, parked vans and people cluttering the frame and an awkward angled crop of a partial building."
+      }
+    },
+    "fourlinq-turnover-1": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 25,
+            "interior": 8,
+            "exterior": 88
+          },
+          "reasoning": "Full three-story facade with wood-slat cladding and a prominent multi-pane glazed corner; strong exterior elevation with well-shown windows."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-2.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 12,
+            "interior": 55,
+            "exterior": 8
+          },
+          "reasoning": "Interior kitchen view centered on a dark-framed sliding window between shelving; the window unit is the clear subject within an interior scene."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-3.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 20,
+            "interior": 8,
+            "exterior": 90
+          },
+          "reasoning": "Upward exterior shot of the glazed corner volume and balcony against blue sky; excellent facade hero with prominent window wall."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-4.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 45,
+            "interior": 92,
+            "exterior": 5
+          },
+          "reasoning": "Editorial interior living room with sheer curtains and a full-height glazed wall opening to a pool; a superb interior hero shot."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-5.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 82,
+            "interior": 85,
+            "exterior": 5
+          },
+          "reasoning": "Interior dining area looking through a tall black-framed glass sliding/patio door to a balcony; both interior scene and a walk-through door are prominent."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/fourlinq-turnover-1.jpg",
+        "heroScore": 52,
+        "enhanced": false,
+        "enhancedConfidence": 22,
+        "notes": "Handsome wood-slat modern facade undercut by parked pickup trucks and construction mess in a harsh-sun snapshot."
+      }
+    },
+    "cebu-t-residence-cebu-city": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-t-residence-cebu-city.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 35,
+            "interior": 8,
+            "exterior": 85
+          },
+          "reasoning": "Exterior facade of a white modern home with a large multi-story glazed curtain wall, carport and entry; both the elevation and its prominent window wall read strongly."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-t-residence-cebu-city.jpg",
+        "heroScore": 42,
+        "enhanced": false,
+        "enhancedConfidence": 20,
+        "notes": "Overcast raw phone snapshot of a modern facade with a blown-out grey sky, parked car, and people clutter on the balcony."
+      }
+    },
+    "sarangani-s-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/sarangani-s-residence.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 45,
+            "interior": 3,
+            "exterior": 90
+          },
+          "reasoning": "Full rear elevation of the two-storey white house with a large grid of black-framed windows and sliding-door units across the ground floor, so it reads strongly as exterior with prominent windows."
+        },
+        {
+          "path": "/images/projects-fb/sarangani-s-residence-2.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 55,
+            "interior": 4,
+            "exterior": 82
+          },
+          "reasoning": "Front facade and entry porch with a decorative wrought-iron front door and a side gate, making exterior the primary subject with a visible entry door."
+        },
+        {
+          "path": "/images/projects-fb/sarangani-s-residence-3.jpg",
+          "scores": {
+            "windows": 72,
+            "doors": 6,
+            "interior": 68,
+            "exterior": 5
+          },
+          "reasoning": "Interior stairwell shot with a chandelier framing a single black-framed fixed window as the focal element, so both interior scene and the window read well."
+        },
+        {
+          "path": "/images/projects-fb/sarangani-s-residence-4.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 35,
+            "interior": 30,
+            "exterior": 45
+          },
+          "reasoning": "Interior courtyard view of a bank of tall black French-style glazed doors/windows below a wrought-iron balcony, ambiguous inside-out framing with windows most prominent."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/sarangani-s-residence.jpg",
+        "heroScore": 58,
+        "enhanced": false,
+        "enhancedConfidence": 20,
+        "notes": "Clean daytime rear-facade phone shot with a tidy lawn but flat lighting and a FourlinQ logo burned into the corner."
+      }
+    },
+    "cebu-m-residence-2": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-m-residence-2.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 72,
+            "interior": 88,
+            "exterior": 8
+          },
+          "reasoning": "Editorial living-room shot from inside with a large clerestory window band above and a full sliding glass door wall behind the sofa, so interior leads with strong windows and doors."
+        },
+        {
+          "path": "/images/projects-fb/cebu-m-residence-2-2.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 35,
+            "interior": 5,
+            "exterior": 90
+          },
+          "reasoning": "Clean front elevation of the modern two-storey house with gate and carport, a textbook exterior facade shot with windows and entry secondary."
+        },
+        {
+          "path": "/images/projects-fb/cebu-m-residence-2-3.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 30,
+            "interior": 4,
+            "exterior": 88
+          },
+          "reasoning": "Wider street-level facade with visible awning windows and carport under overcast sky, primarily an exterior elevation with moderately prominent windows."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-m-residence-2.jpg",
+        "heroScore": 82,
+        "enhanced": true,
+        "enhancedConfidence": 78,
+        "notes": "Bright, well-lit double-height living-room interior with polished styling, warm neutrals and a clean composition."
+      }
+    },
+    "cebu-maratas-residence": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-maratas-residence.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 30,
+            "interior": 4,
+            "exterior": 88
+          },
+          "reasoning": "Full front elevation of the two-storey house with slat screens, awning windows and gate, a strong exterior facade shot with windows secondary."
+        },
+        {
+          "path": "/images/projects-fb/cebu-maratas-residence-2.jpg",
+          "scores": {
+            "windows": 72,
+            "doors": 70,
+            "interior": 86,
+            "exterior": 8
+          },
+          "reasoning": "Interior living-room view from inside with a tall clerestory window above and a dark-framed sliding glass door wall behind the sofa, so interior leads with prominent windows and doors."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-maratas-residence.jpg",
+        "heroScore": 48,
+        "enhanced": false,
+        "enhancedConfidence": 22,
+        "notes": "Flat grey-sky phone snapshot of a modern house behind a fence with plain lighting and a mediocre street-level crop."
+      }
+    },
+    "cebu-aa-residence-vista-grande": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/cebu-aa-residence-vista-grande.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 45,
+            "interior": 3,
+            "exterior": 92
+          },
+          "reasoning": "Sunlit Mediterranean-style villa facade with arched windows, wrought-iron entry gate and landscaping, a picturesque exterior elevation with windows and gate secondary."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/cebu-aa-residence-vista-grande.jpg",
+        "heroScore": 87,
+        "enhanced": true,
+        "enhancedConfidence": 85,
+        "notes": "Warm golden Mediterranean villa against a saturated blue sky, polished and well-composed with a strong editorial feel."
+      }
+    }
+  }
+}

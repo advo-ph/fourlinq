@@ -1,6 +1,5 @@
 import { useState } from "react";
 import HeroCarousel, { type HeroSlide } from "./HeroCarousel";
-import EditorialButton from "@/components/primitives/Button";
 
 /**
  * Decide once, synchronously on mount — no useEffect flicker.
@@ -29,12 +28,9 @@ interface VideoHeroProps {
    *  (reduced motion, save-data, narrow viewport). */
   fallbackSlides: HeroSlide[];
 
+  /** Hero headline. May contain "\n" for an intentional two-line lockup —
+   *  the h1 renders with `whitespace-pre-line`. */
   headline: string;
-  lede: string;
-  ctaLabel: string;
-  ctaTo: string;
-  secondaryLabel?: string;
-  secondaryTo?: string;
 
   /** Eyebrow shown above headline (e.g. "Featured residence"). */
   caption?: string;
@@ -65,11 +61,6 @@ const VideoHero = (props: VideoHeroProps) => {
       <HeroCarousel
         slides={props.fallbackSlides}
         headline={props.headline}
-        lede={props.lede}
-        ctaLabel={props.ctaLabel}
-        ctaTo={props.ctaTo}
-        secondaryLabel={props.secondaryLabel}
-        secondaryTo={props.secondaryTo}
       />
     );
   }
@@ -98,7 +89,7 @@ const VideoHero = (props: VideoHeroProps) => {
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/55 to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black/55 via-black/18 to-transparent pointer-events-none" />
 
-      <div className="absolute inset-x-0 bottom-[5.75rem] sm:bottom-[6.5rem] md:bottom-[7rem] lg:bottom-[7.5rem]">
+      <div className="absolute inset-x-0 bottom-[3rem] sm:bottom-[3.75rem] md:bottom-[4.25rem] lg:bottom-[4.75rem]">
         <div className="container-editorial">
           <div className="w-full max-w-[43rem] text-left">
           {props.caption && (
@@ -106,22 +97,9 @@ const VideoHero = (props: VideoHeroProps) => {
               {props.caption}
             </p>
           )}
-          <h1 className="font-serif text-[2.35rem] font-normal leading-[1.04] tracking-tight text-white sm:text-[2.75rem] md:text-[3.15rem] lg:text-[3.75rem] xl:text-h1">
+          <h1 className="whitespace-pre-line font-serif text-[2.35rem] font-normal leading-[1.04] tracking-tight text-white sm:text-[2.75rem] md:text-[3.15rem] lg:text-[3.75rem] xl:text-h1">
             {props.headline}
           </h1>
-          <p className="mt-4 max-w-[34rem] text-body text-white/90 md:text-body-lg">
-            {props.lede}
-          </p>
-          <div className="mt-7 flex w-full max-w-[26rem] flex-col items-start gap-3 md:max-w-none md:flex-row">
-            <EditorialButton to={props.ctaTo} variant="primary" size="md">
-              {props.ctaLabel}
-            </EditorialButton>
-            {props.secondaryLabel && props.secondaryTo && (
-              <EditorialButton to={props.secondaryTo} variant="secondary" size="md">
-                {props.secondaryLabel}
-              </EditorialButton>
-            )}
-          </div>
           </div>
         </div>
       </div>

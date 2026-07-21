@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import EditorialButton from "@/components/primitives/Button";
 
 export interface HeroSlide {
   src: string;
@@ -12,12 +11,9 @@ export interface HeroSlide {
 
 interface HeroCarouselProps {
   slides: HeroSlide[];
+  /** Hero headline. May contain "\n" for a two-line lockup — the h1 renders
+   *  with `whitespace-pre-line`. */
   headline: string;
-  lede: string;
-  ctaLabel: string;
-  ctaTo: string;
-  secondaryLabel?: string;
-  secondaryTo?: string;
   /** Auto-advance interval in ms. Default 6000. */
   interval?: number;
 }
@@ -29,11 +25,6 @@ interface HeroCarouselProps {
 const HeroCarousel = ({
   slides,
   headline,
-  lede,
-  ctaLabel,
-  ctaTo,
-  secondaryLabel,
-  secondaryTo,
   interval = 6000,
 }: HeroCarouselProps) => {
   const [active, setActive] = useState(0);
@@ -92,7 +83,7 @@ const HeroCarousel = ({
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/55 to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black/55 via-black/18 to-transparent pointer-events-none" />
 
-      <div className="absolute inset-x-0 bottom-[5.75rem] sm:bottom-[6.5rem] md:bottom-[7rem] lg:bottom-[7.5rem]">
+      <div className="absolute inset-x-0 bottom-[3rem] sm:bottom-[3.75rem] md:bottom-[4.25rem] lg:bottom-[4.75rem]">
         <div className="container-editorial">
           <div className="w-full max-w-[43rem] text-left">
           {slides[active]?.caption && (
@@ -100,22 +91,9 @@ const HeroCarousel = ({
               {slides[active].caption}
             </p>
           )}
-          <h1 className="font-serif text-[2.35rem] font-normal leading-[1.04] tracking-tight text-white sm:text-[2.75rem] md:text-[3.15rem] lg:text-[3.75rem] xl:text-h1">
+          <h1 className="whitespace-pre-line font-serif text-[2.35rem] font-normal leading-[1.04] tracking-tight text-white sm:text-[2.75rem] md:text-[3.15rem] lg:text-[3.75rem] xl:text-h1">
             {headline}
           </h1>
-          <p className="mt-4 max-w-[34rem] text-body text-white/90 md:text-body-lg">
-            {lede}
-          </p>
-          <div className="mt-7 flex w-full max-w-[26rem] flex-col items-start gap-3 md:max-w-none md:flex-row">
-            <EditorialButton to={ctaTo} variant="primary" size="md">
-              {ctaLabel}
-            </EditorialButton>
-            {secondaryLabel && secondaryTo && (
-              <EditorialButton to={secondaryTo} variant="secondary" size="md">
-                {secondaryLabel}
-              </EditorialButton>
-            )}
-          </div>
           </div>
         </div>
       </div>

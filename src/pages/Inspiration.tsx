@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import { projects as fallbackProject, tagFromCategory, type InspirationTag, type Project } from "@/data/projects";
+import { projectCategoryImages, projectDerivedTags, projectOrder, projectCategoryOrder, type CategoryImages } from "@/data/project-category-images.generated";
 import { fetchProjects, mergeProject } from "@/lib/cms-api";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +13,7 @@ type Filter = "all" | InspirationTag;
 // (not a replace) happens in mergeProject so a CMS response that omits a
 // project cannot delete it from the gallery, and so every card links to the
 // canonical slug rather than whichever spelling the CMS happens to store.
-type ViewProject = { id: string; name: string; location: string; image: string; caption?: string; tag: InspirationTag[] };
+type ViewProject = { id: string; name: string; location: string; image: string; caption?: string; tag: InspirationTag[]; categoryImages: CategoryImages };
 function toView(p: Project): ViewProject {
   return {
     id: p.id,
@@ -20,9 +21,14 @@ function toView(p: Project): ViewProject {
     location: p.location,
     image: p.image,
     caption: p.caption,
-    // Multi-category: an install is usually windows AND doors. CMS rows that
-    // only carry the legacy single category get a derived tag.
-    tag: p.tag?.length ? p.tag : tagFromCategory(p.category),
+    // Category membership is derived from what the project's images actually
+    // show (AI vision analysis in server/data/project-image-analysis.json).
+    // Analyzed projects use that; anything not yet analyzed falls back to hand
+    // tags, then the legacy single category. `??` (not `?.length`) so an
+    // analyzed project with zero qualifying categories is honored, not overridden.
+    tag: projectDerivedTags[p.id] ?? (p.tag?.length ? p.tag : tagFromCategory(p.category)),
+    // Per-category best image; empty {} for projects without analysis.
+    categoryImages: projectCategoryImages[p.id] ?? {},
   };
 }
 
@@ -54,10 +60,16 @@ const Inspiration = () => {
     return () => { live = false; };
   }, []);
 
-  const filtered = useMemo(
-    () => (active === "all" ? items : items.filter((p) => p.tag.includes(active))),
-    [active, items]
-  );
+  const filtered = useMemo(() => {
+    const base = active === "all" ? items : items.filter((p) => p.tag.includes(active));
+    // Best pictures first: "All projects" orders by AI hero-quality; a category
+    // view orders by each project's best image FOR THAT category. Unranked
+    // projects (e.g. a CMS-only entry not yet analyzed) sort to the end, stably.
+    const order = active === "all" ? projectOrder : projectCategoryOrder[active];
+    const rank = new Map(order.map((id, i) => [id, i]));
+    const rankOf = (id: string) => rank.get(id) ?? Number.MAX_SAFE_INTEGER;
+    return [...base].sort((a, b) => rankOf(a.id) - rankOf(b.id));
+  }, [active, items]);
 
   return (
     <Layout>
@@ -89,30 +101,28 @@ const Inspiration = () => {
           {filtered.length === 0 ? (
             <p className="text-body text-[color:var(--ink-muted)]">No projects in this category yet.</p>
           ) : (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
               {filtered.map((p) => (
                 <li key={p.id}>
                   <Link to={`/projects/${p.id}`} className="group block">
                     {/* Source photos are 4:3 — match the crop to the material. */}
                     <div className="relative aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
+                      {/* In a category view, show that project's best image for
+                          the active category; "All projects" keeps the hero. */}
                       <img
-                        src={p.image}
+                        src={active !== "all" ? (p.categoryImages[active] ?? p.image) : p.image}
                         alt={p.name}
                         loading="lazy"
                         decoding="async"
                         className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                       />
                     </div>
-                    <div className="mt-5">
-                      <p className="eyebrow mb-3">{p.location}</p>
-                      <h3 className="font-serif text-h5 lg:text-h4 text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                        {p.name}
+                    <div className="mt-3">
+                      <h3 className="font-serif text-body text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+                        {p.location && p.location !== "Philippines" && !p.name.toLowerCase().includes(p.location.toLowerCase())
+                          ? `${p.name}, ${p.location}`
+                          : p.name}
                       </h3>
-                      {p.caption && (
-                        <p className="mt-3 text-body-sm text-[color:var(--ink-secondary)] leading-[1.6] max-w-md">
-                          {p.caption}
-                        </p>
-                      )}
                     </div>
                   </Link>
                 </li>

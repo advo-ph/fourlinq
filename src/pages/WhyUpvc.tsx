@@ -302,7 +302,10 @@ uPV<span className="text-[color:var(--accent)]">C</span>
     <PageBody route="/why-upvc" />
 
     {/* ── CTA ── single dark section, two buttons ── */}
-    <Section tone="dark" size="md">
+    {/* noAnimation: this dark band sits flush against the (also-dark) footer.
+        Container-level fade+slide made the footer/background look like it was
+        animating. Match the Index BrandCTA/UtilityBand treatment. */}
+    <Section tone="dark" size="md" noAnimation>
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
         <h2 className="font-serif font-normal tracking-tight text-h3 text-white leading-[1.15]">
           Come look at uPVC in person.

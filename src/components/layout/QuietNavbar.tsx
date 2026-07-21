@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, Search, X, ArrowUpRight } from "lucide-react";
+import { Menu, Search, X, ArrowUpRight, ArrowDownToLine } from "lucide-react";
 import Logo from "@/components/shared/Logo";
+import SystemCardMedia from "@/components/shared/SystemCardMedia";
 import { cn } from "@/lib/utils";
-import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
+import { MATERIAL_TILE } from "@/data/taxonomy";
+import { products } from "@/data/products";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
-import NavFrameTile from "@/components/layout/NavFrameTile";
 import NavSearch from "@/components/layout/NavSearch";
 
 /**
- * Header with Marvin-style mega-panels: every dropdown item carries imagery
- * (the Systems tiles replay the 53-frame opening animation on hover), panels
- * are state-driven with a close-grace timer so the pointer can travel from
- * the trigger into the panel without it vanishing, and a site search flyout
- * hangs off the magnifier at the right.
+ * Header with Marvin-style mega-panels: every dropdown item carries imagery,
+ * panels are state-driven with a close-grace timer so the pointer can travel
+ * from the trigger into the panel without it vanishing, and a site search
+ * flyout hangs off the magnifier at the right. The Systems panel lists every
+ * window & door product on a wide left column, then the material axis as a
+ * 2x2 grid on the right, split by a vertical rule.
  */
 
 interface NavCard {
@@ -22,12 +24,16 @@ interface NavCard {
   description?: string;
   /** Static preview image. */
   image?: string;
-  /** Frame-sequence path — renders as a hover-animated NavFrameTile instead. */
-  framePath?: string;
+  /** Product slug — enables the frame-based "opening" hover animation. */
+  id?: string;
 }
 
 interface NavGroup {
   title?: string;
+  /** Tailwind aspect class for this group's image cards. Defaults to 16:9;
+      each panel overrides it to sit close to its photos' native ratio so
+      object-cover trims as little as possible. */
+  aspect?: string;
   card: NavCard[];
 }
 
@@ -37,54 +43,68 @@ interface NavLink {
   group?: NavGroup[];
 }
 
-const FRAME_PATH: Record<string, string> = {
-  window: "/images/systems/window/frame_{index}.jpg",
-  door: "/images/systems/door/frame_{index}.jpg",
-  specialist: "/images/systems/specialist/frame_{index}.jpg",
-};
+// Systems keeps both taxonomy axes. Left column, in a 4-up grid: the four
+// windows fill the top row, then every door beneath it. Special Shapes reads as
+// the niche window, so it sits last among windows. Right column: the material
+// axis as a 2x2 grid (aluminium is a material, not a fourth type — Imie,
+// 2026-07-02). Product tiles deep-link to their drawer on /products via the
+// ?product= param.
+const WINDOW_PRODUCTS = products.filter((p) => p.category === "windows");
+const SYSTEM_PRODUCTS: NavCard[] = [
+  ...WINDOW_PRODUCTS.filter((p) => p.id !== "special-shapes"),
+  ...WINDOW_PRODUCTS.filter((p) => p.id === "special-shapes"),
+  ...products.filter((p) => p.category === "doors"),
+].map((p) => ({
+  label: p.name,
+  to: `/products?filter=${p.category}&product=${p.id}`,
+  image: p.image,
+  id: p.id,
+}));
 
-// Systems keeps both taxonomy axes: the three types as animated tiles, the
-// two profile systems as a labelled side column (aluminium is a material,
-// not a fourth type — Imie, 2026-07-02).
 const SYSTEM_GROUP: NavGroup[] = [
-  {
-    card: SYSTEM_TYPE.map((t) => ({
-      label: t.label,
-      to: t.to,
-      description: t.item.join(", "),
-      framePath: FRAME_PATH[t.type_code],
-    })),
-  },
+  { title: "Windows & Doors", card: SYSTEM_PRODUCTS },
   {
     title: "By material",
-    card: PROFILE_MATERIAL.map((m) => ({
-      label: m.label,
-      to: m.to,
-      description: m.item.join(", "),
-      image: m.image,
-    })),
+    card: MATERIAL_TILE.map((m) => ({ label: m.label, to: m.to, description: m.bestFor })),
   },
+];
+
+// Brochures live in the Systems panel, below the material axis. Each opens its
+// PDF straight in a new tab — no page navigation. The replacement guide file is
+// not in /public/docs yet; the button is wired so it works the moment it lands.
+const SYSTEM_BROCHURES: { label: string; file: string }[] = [
+  { label: "System Catalog", file: "/docs/fourlinq-system-catalog.pdf" },
+  { label: "Replacement Guide", file: "/docs/fourlinq-replacement-guide.pdf" },
 ];
 
 // Every image below is a photo whose content matches its label — no
 // stock-mismatch: the doors card is the verified corner sliding-door install.
 const PROJECT_GROUP: NavGroup[] = [
   {
+    // Windows, Doors and Interior are all ~3:2; Exterior is 16:9. A 3:2 frame
+    // keeps the first three near-pristine and trims only ~10% off Exterior's
+    // sides — far gentler than the old 16:9 container, which chopped the top and
+    // bottom off every one.
+    aspect: "aspect-[3/2]",
     card: [
       { label: "Windows", to: "/inspiration?filter=windows", image: "/images/wp-export/FQC-Project-17.jpg" },
       { label: "Doors", to: "/inspiration?filter=doors", image: "/images/products/real/sliding-door.webp" },
-      { label: "Interior", to: "/inspiration?filter=interior", image: "/images/projects/real/sliding-doors-interior.webp" },
-      { label: "Exterior", to: "/inspiration?filter=exterior", image: "/images/projects/real/residence-wood-grain-corner.webp" },
+      { label: "Interior", to: "/inspiration?filter=interior", image: "/images/projects/real/interior-living-panel-windows.webp" },
+      { label: "Exterior", to: "/inspiration?filter=exterior", image: "/images/projects/real/exterior-curved-residence.webp" },
     ],
   },
 ];
 
 const WHATS_NEW_GROUP: NavGroup[] = [
   {
+    // Products & Events are native 16:9, Projects is 4:3. 16:10 nudges off 16:9
+    // toward that outlier: the two wide cards lose ~10% width while Projects'
+    // crop drops from ~25% to ~17% — a more even trim across the row.
+    aspect: "aspect-[16/10]",
     card: [
-      { label: "Products", to: "/whats-new?filter=product", image: "/images/wp-export/Great-Profile-Colors.jpg" },
-      { label: "Projects", to: "/whats-new?filter=project", image: "/images/projects-fb/DOuJGHUl.jpg" },
-      { label: "Events", to: "/whats-new?filter=event", image: "/images/projects-fb/6ezPWg1k.jpg" },
+      { label: "Products", to: "/whats-new?filter=product", image: "/images/nav-whatsnew/products.jpg" },
+      { label: "Projects", to: "/whats-new?filter=project", image: "/images/nav-whatsnew/projects.jpg" },
+      { label: "Events", to: "/whats-new?filter=event", image: "/images/nav-whatsnew/events.jpg" },
     ],
   },
 ];
@@ -97,10 +117,19 @@ const navLinks: NavLink[] = [
   { label: "Brand", to: "/brand" },
 ];
 
-/** Static image card used inside the mega-panels. */
-const NavImageCard = ({ card, onNavigate }: { card: NavCard; onNavigate: () => void }) => (
+/** Static image card used inside the mega-panels. `aspect` lets each panel pick
+    the frame ratio closest to its photos so object-cover trims minimally. */
+const NavImageCard = ({
+  card,
+  aspect = "aspect-video",
+  onNavigate,
+}: {
+  card: NavCard;
+  aspect?: string;
+  onNavigate: () => void;
+}) => (
   <Link to={card.to} onClick={onNavigate} className="group block">
-    <div className="relative aspect-video overflow-hidden bg-[color:var(--canvas-soft)]">
+    <div className={cn("relative overflow-hidden bg-[color:var(--canvas-soft)]", aspect)}>
       <img
         src={card.image}
         alt={card.label}
@@ -125,15 +154,145 @@ const NavImageCard = ({ card, onNavigate }: { card: NavCard; onNavigate: () => v
   </Link>
 );
 
+/**
+ * Dense image+label tile used in the Systems panel's window & door grid. Once
+ * `animated` is true, each product with a frame sequence plays its "opening"
+ * animation on hover (reversing on leave) via SystemCardMedia; products without
+ * a sequence, or before the panel has ever opened, stay a plain static image so
+ * the 1.4 MB of frames isn't fetched on pages where the menu is never touched.
+ */
+const NavCompactCard = ({
+  card,
+  animated,
+  onNavigate,
+}: {
+  card: NavCard;
+  animated: boolean;
+  onNavigate: () => void;
+}) => {
+  const imgClassName =
+    "w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.05]";
+  return (
+    <Link to={card.to} onClick={onNavigate} className="group block">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
+        {animated && card.id ? (
+          <SystemCardMedia
+            productId={card.id}
+            src={card.image ?? ""}
+            alt={card.label}
+            imgClassName={imgClassName}
+          />
+        ) : (
+          <img
+            src={card.image}
+            alt={card.label}
+            loading="lazy"
+            decoding="async"
+            className={imgClassName}
+          />
+        )}
+      </div>
+      <p className="mt-2 text-center text-[12px] font-medium leading-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+        {card.label}
+      </p>
+    </Link>
+  );
+};
+
+/**
+ * Outline button used in the Systems panel's "By material" grid: no image, just
+ * the material name over a "best for" subtitle (the card's description). Sharp
+ * corners to match the panel's editorial imagery, with a hover arrow and accent
+ * rule that echo the image cards' affordance.
+ */
+const NavMaterialButton = ({ card, onNavigate }: { card: NavCard; onNavigate: () => void }) => (
+  <Link
+    to={card.to}
+    onClick={onNavigate}
+    className="group relative flex h-full flex-col justify-center border border-[color:var(--rule-strong)] px-4 py-3.5 transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
+  >
+    {/* Left accent rule wipes in on hover — a quiet, sharp-edged focus cue. */}
+    <span
+      aria-hidden="true"
+      className="absolute inset-y-0 left-0 w-[2px] origin-top scale-y-0 bg-[color:var(--accent)] transition-transform duration-300 ease-marvin group-hover:scale-y-100"
+    />
+    <span className="flex items-center justify-between gap-2">
+      <span className="text-[13px] font-medium leading-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+        {card.label}
+      </span>
+      <ArrowUpRight
+        size={14}
+        strokeWidth={1.5}
+        className="shrink-0 -translate-x-1 text-[color:var(--ink-muted)] opacity-0 transition-all duration-300 ease-marvin group-hover:translate-x-0 group-hover:text-[color:var(--accent)] group-hover:opacity-100"
+      />
+    </span>
+    {card.description && (
+      <span className="mt-1 text-[11px] leading-snug text-[color:var(--ink-muted)]">
+        {card.description}
+      </span>
+    )}
+  </Link>
+);
+
+/**
+ * Full-width outline button used for the Systems panel's brochures. Mirrors
+ * NavMaterialButton's sharp-edged, accent-wipe styling, but it's a plain anchor
+ * that opens the PDF in a new tab (target="_blank") instead of routing — a
+ * download arrow replaces the material button's diagonal.
+ */
+const NavBrochureButton = ({
+  label,
+  file,
+  onNavigate,
+}: {
+  label: string;
+  file: string;
+  onNavigate: () => void;
+}) => (
+  <a
+    href={file}
+    target="_blank"
+    rel="noopener noreferrer"
+    onClick={onNavigate}
+    className="group relative flex items-center justify-between gap-2 border border-[color:var(--rule-strong)] px-4 py-3.5 transition-colors duration-300 ease-marvin hover:bg-[color:var(--canvas-soft)]"
+  >
+    <span
+      aria-hidden="true"
+      className="absolute inset-y-0 left-0 w-[2px] origin-top scale-y-0 bg-[color:var(--accent)] transition-transform duration-300 ease-marvin group-hover:scale-y-100"
+    />
+    <span className="text-[13px] font-medium leading-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+      {label}
+    </span>
+    <ArrowDownToLine
+      size={14}
+      strokeWidth={1.5}
+      className="shrink-0 text-[color:var(--ink-muted)] transition-colors duration-300 ease-marvin group-hover:text-[color:var(--accent)]"
+    />
+  </a>
+);
+
 const QuietNavbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  // Latches true the first time the Systems panel opens, so the window & door
+  // tiles only mount their hover-animation player (and fetch its frames) once
+  // the menu is actually used — never on a page load that never touches it.
+  const [systemsWarmed, setSystemsWarmed] = useState(false);
+  // Force-hidden by full-bleed sections (e.g. the ScrollWindow benefit sequence)
+  // that want the viewport to themselves — overrides the scroll-direction logic.
+  const [forceHidden, setForceHidden] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const lastScrollY = useRef(0);
   const location = useLocation();
   const isHome = location.pathname === "/";
   const transparent = isHome && !scrolled && !mobileOpen && !openPanel && !searchOpen;
+  // Slide the bar away on scroll-down, bring it back on scroll-up — but never
+  // while a panel, the mobile drawer, or search is open (the panel hangs off
+  // the bar) or when parked near the top.
+  const navHidden = forceHidden || (hidden && !openPanel && !mobileOpen && !searchOpen);
   const mobileDialogRef = useDialogFocus<HTMLDivElement>({
     isOpen: mobileOpen,
     onClose: () => setMobileOpen(false),
@@ -150,12 +309,27 @@ const QuietNavbar = () => {
     closeTimer.current = setTimeout(() => setOpenPanel(null), 160);
   };
 
-  // Close everything on route change
+  // Warm the window & door hover animations the first time Systems opens.
+  useEffect(() => {
+    if (openPanel === "Systems") setSystemsWarmed(true);
+  }, [openPanel]);
+
+  // Close everything on route change, and reveal the bar for the new page.
   useEffect(() => {
     setMobileOpen(false);
     setOpenPanel(null);
     setSearchOpen(false);
+    setHidden(false);
+    setForceHidden(false);
+    lastScrollY.current = window.scrollY;
   }, [location]);
+
+  // Full-bleed sections can request the bar be hidden regardless of scroll.
+  useEffect(() => {
+    const onHide = (e: Event) => setForceHidden(!!(e as CustomEvent).detail);
+    window.addEventListener("fq-hide-header", onHide as EventListener);
+    return () => window.removeEventListener("fq-hide-header", onHide as EventListener);
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -166,7 +340,21 @@ const QuietNavbar = () => {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => {
+      const y = Math.max(0, window.scrollY);
+      setScrolled(y > 12);
+
+      // Direction with a small dead-zone so jitter and rubber-banding don't
+      // flip the bar. Always show it in the top 72px.
+      const delta = y - lastScrollY.current;
+      if (y <= 72) {
+        setHidden(false);
+        lastScrollY.current = y;
+      } else if (Math.abs(delta) > 6) {
+        setHidden(delta > 0);
+        lastScrollY.current = y;
+      }
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -178,8 +366,9 @@ const QuietNavbar = () => {
         data-main-nav
         className={cn(
           "fixed top-0 inset-x-0 z-50",
-          "h-[72px]",
-          "transition-[background-color,backdrop-filter,color] duration-300 ease-marvin",
+          "h-[72px] will-change-transform",
+          "transition-[background-color,backdrop-filter,color,transform] duration-300 ease-marvin",
+          navHidden && "-translate-y-full",
           transparent
             ? "bg-transparent text-white"
             : "bg-white/80 text-[color:var(--ink-primary)] backdrop-blur-md"
@@ -205,28 +394,67 @@ const QuietNavbar = () => {
                     onMouseEnter={() => link.group && holdPanel(link.label)}
                     onMouseLeave={() => link.group && releasePanel()}
                   >
-                    <Link
-                      to={link.to}
-                      onFocus={() => link.group && holdPanel(link.label)}
-                      className={cn(
-                        "whitespace-nowrap text-body-sm font-medium transition-[background-color,color] duration-300 ease-marvin",
-                        "inline-flex min-h-8 items-center rounded-sm px-4",
-                        active || panelOpen
-                          ? transparent
-                            ? "bg-white/15 text-white"
-                            : "bg-[color:var(--canvas-soft)] text-[color:var(--ink-primary)]"
-                          : transparent
-                            ? "text-white hover:bg-white/15"
-                            : "text-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)]"
-                      )}
-                    >
-                      {link.label}
-                    </Link>
+                    {link.group ? (
+                      /* A panel trigger. Hover opens it; click toggles it open
+                         and closed. It never navigates — the panel is the
+                         destination. */
+                      <button
+                        type="button"
+                        aria-haspopup="true"
+                        aria-expanded={panelOpen}
+                        onFocus={() => holdPanel(link.label)}
+                        onClick={() => {
+                          clearTimeout(closeTimer.current);
+                          setOpenPanel(panelOpen ? null : link.label);
+                        }}
+                        className={cn(
+                          "whitespace-nowrap text-body-sm font-medium transition-[background-color,color] duration-300 ease-marvin",
+                          "inline-flex min-h-8 items-center rounded-sm px-4",
+                          active || panelOpen
+                            ? transparent
+                              ? "bg-white/15 text-white"
+                              : "bg-[color:var(--canvas-soft)] text-[color:var(--ink-primary)]"
+                            : transparent
+                              ? "text-white hover:bg-white/15"
+                              : "text-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)]"
+                        )}
+                      >
+                        {link.label}
+                      </button>
+                    ) : (
+                      <Link
+                        to={link.to}
+                        className={cn(
+                          "whitespace-nowrap text-body-sm font-medium transition-[background-color,color] duration-300 ease-marvin",
+                          "inline-flex min-h-8 items-center rounded-sm px-4",
+                          active
+                            ? transparent
+                              ? "bg-white/15 text-white"
+                              : "bg-[color:var(--canvas-soft)] text-[color:var(--ink-primary)]"
+                            : transparent
+                              ? "text-white hover:bg-white/15"
+                              : "text-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)]"
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
 
                     {link.group && (
                       <div
+                        // The parent <li> is the single source of truth for
+                        // hover: its onMouseEnter/onMouseLeave already keep the
+                        // panel open while the pointer is anywhere inside the
+                        // trigger+panel subtree. Because this panel is a DOM
+                        // descendant of that <li> (position:fixed changes where
+                        // it paints, not where it lives in the tree), moving the
+                        // pointer from the panel back up onto the trigger never
+                        // fires the <li>'s mouseleave — so the panel stays open.
+                        // onMouseEnter here is a harmless safety net. A panel
+                        // onMouseLeave is deliberately omitted: it used to fire
+                        // on that panel→trigger move and schedule a close, which
+                        // read as "hovering the button a second time closes it".
                         onMouseEnter={() => holdPanel(link.label)}
-                        onMouseLeave={releasePanel}
                         className={cn(
                           "fixed left-0 right-0 top-[72px]",
                           panelOpen
@@ -237,49 +465,88 @@ const QuietNavbar = () => {
                       >
                         <div className="bg-white text-[color:var(--ink-primary)] border-b border-[color:var(--rule-soft)]">
                           <div className="container-editorial py-9 max-h-[calc(100vh-72px)] overflow-y-auto">
-                            <div
-                              className={cn(
-                                "grid gap-x-12 gap-y-8",
-                                link.group.length > 1 ? "grid-cols-[7fr_3fr]" : "grid-cols-1",
-                              )}
-                            >
-                              {link.group.map((g, gi) => (
-                                <div key={g.title ?? gi}>
-                                  {g.title && (
-                                    <p className="eyebrow mb-5 pb-3 border-b border-[color:var(--rule-soft)]">
-                                      {g.title}
-                                    </p>
-                                  )}
-                                  <ul
-                                    className={cn(
-                                      "grid gap-x-6 gap-y-8",
-                                      g.title
-                                        ? "grid-cols-1"
-                                        : g.card.length === 4
-                                          ? "grid-cols-4"
-                                          : "grid-cols-3",
-                                    )}
-                                  >
-                                    {g.card.map((c) => (
-                                      <li key={c.to}>
-                                        {c.framePath ? (
-                                          <NavFrameTile
-                                            label={c.label}
-                                            description={c.description}
-                                            to={c.to}
-                                            framePath={c.framePath}
-                                            active={panelOpen}
-                                            onNavigate={() => setOpenPanel(null)}
-                                          />
-                                        ) : (
-                                          <NavImageCard card={c} onNavigate={() => setOpenPanel(null)} />
-                                        )}
+                            {link.label === "Systems" ? (
+                              /* Systems: a 4-up product grid (windows on the top
+                                 row, doors beneath) on the left, a vertical
+                                 rule, and the 2x2 material grid on the right. */
+                              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_22rem] gap-y-10">
+                                <div className="xl:pr-12">
+                                  <p className="eyebrow mb-5 pb-3 border-b border-[color:var(--rule-soft)]">
+                                    {link.group[0].title}
+                                  </p>
+                                  <ul className="grid grid-cols-2 sm:grid-cols-4 gap-x-5 gap-y-7">
+                                    {link.group[0].card.map((c) => (
+                                      <li key={c.label}>
+                                        <NavCompactCard
+                                          card={c}
+                                          animated={systemsWarmed}
+                                          onNavigate={() => setOpenPanel(null)}
+                                        />
                                       </li>
                                     ))}
                                   </ul>
                                 </div>
-                              ))}
-                            </div>
+                                <div className="xl:pl-10 xl:border-l border-[color:var(--rule-soft)]">
+                                  <p className="eyebrow mb-5 pb-3 border-b border-[color:var(--rule-soft)]">
+                                    {link.group[1].title}
+                                  </p>
+                                  <ul className="grid grid-cols-2 gap-3">
+                                    {link.group[1].card.map((c) => (
+                                      <li key={c.label}>
+                                        <NavMaterialButton card={c} onNavigate={() => setOpenPanel(null)} />
+                                      </li>
+                                    ))}
+                                  </ul>
+                                  <p className="eyebrow mt-10 mb-5 pb-3 border-b border-[color:var(--rule-soft)]">
+                                    Brochures
+                                  </p>
+                                  <ul className="grid grid-cols-1 gap-3">
+                                    {SYSTEM_BROCHURES.map((b) => (
+                                      <li key={b.label}>
+                                        <NavBrochureButton
+                                          label={b.label}
+                                          file={b.file}
+                                          onNavigate={() => setOpenPanel(null)}
+                                        />
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                className={cn(
+                                  "grid gap-x-12 gap-y-8",
+                                  link.group.length > 1 ? "grid-cols-[7fr_3fr]" : "grid-cols-1",
+                                )}
+                              >
+                                {link.group.map((g, gi) => (
+                                  <div key={g.title ?? gi}>
+                                    {g.title && (
+                                      <p className="eyebrow mb-5 pb-3 border-b border-[color:var(--rule-soft)]">
+                                        {g.title}
+                                      </p>
+                                    )}
+                                    <ul
+                                      className={cn(
+                                        "grid gap-x-6 gap-y-8",
+                                        g.title
+                                          ? "grid-cols-1"
+                                          : g.card.length === 4
+                                            ? "grid-cols-4"
+                                            : "grid-cols-3",
+                                      )}
+                                    >
+                                      {g.card.map((c) => (
+                                        <li key={c.label}>
+                                          <NavImageCard card={c} aspect={g.aspect} onNavigate={() => setOpenPanel(null)} />
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -334,6 +601,20 @@ const QuietNavbar = () => {
 
       </nav>
 
+      {/* Dim + blur the page behind an open mega-panel. Sits under the nav
+          (z-40 vs the nav's z-50) so the bar and its crisp panel stay on top,
+          while everything below the bar is frosted. Hovering it closes the
+          panel. */}
+      <div
+        aria-hidden="true"
+        onMouseEnter={() => setOpenPanel(null)}
+        className={cn(
+          "fixed inset-x-0 top-[72px] bottom-0 z-40 bg-black/60 backdrop-blur-md",
+          "transition-opacity duration-300 ease-marvin",
+          openPanel ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+        )}
+      />
+
       {/* Search flyout (desktop + tablet) */}
       <NavSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
 
@@ -383,7 +664,7 @@ const QuietNavbar = () => {
                             {g.title && <p className="eyebrow mb-1.5">{g.title}</p>}
                             <ul className="space-y-1">
                               {g.card.map((c) => (
-                                <li key={c.to}>
+                                <li key={c.label}>
                                   <Link
                                     to={c.to}
                                     className="block py-1.5 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
@@ -395,6 +676,26 @@ const QuietNavbar = () => {
                             </ul>
                           </div>
                         ))}
+                        {link.label === "Systems" && (
+                          <div>
+                            <p className="eyebrow mb-1.5">Brochures</p>
+                            <ul className="space-y-1">
+                              {SYSTEM_BROCHURES.map((b) => (
+                                <li key={b.label}>
+                                  <a
+                                    href={b.file}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 py-1.5 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+                                  >
+                                    {b.label}
+                                    <ArrowDownToLine size={14} strokeWidth={1.5} className="shrink-0 text-[color:var(--ink-muted)]" />
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     )}
                   </li>

@@ -150,7 +150,9 @@ const Aluminium = () => {
       </Section>
 
       {/* CTA */}
-      <Section tone="dark" size="md">
+      {/* noAnimation: dark band flush against the dark footer — animating the
+          container read as the footer/background moving. See Index BrandCTA. */}
+      <Section tone="dark" size="md" noAnimation>
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
           <h2 className="font-serif font-normal tracking-tight text-h3 text-white leading-[1.15]">
             Project on the edge of uPVC? Book the conversation.

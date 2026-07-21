@@ -1,124 +1,122 @@
-import { useRef, useEffect, useState, useCallback, type ReactNode } from "react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
-import { useScrollFrames } from "@/hooks/useScrollFrames";
+import { useSegmentedFrames } from "@/hooks/useSegmentedFrames";
 import {
-  SCROLL_PHASES,
+  WINDOW_PARTS,
+  WINDOW_MATERIALS,
+  PART_ZERO,
+  SECTION_EYEBROW,
+  SECTION_TITLE,
   TOTAL_FRAMES,
   FRAME_PATH_TEMPLATE,
   FRAME_PAD_LENGTH,
-  THERMAL_PHASE_ID,
-  THERMAL_SYSTEMS,
-  type ScrollPhase,
-  type ThermalSystemId,
+  THERMAL_PART_ID,
+  type MaterialId,
 } from "@/data/scroll-window-phases";
-import ThermalSystemToggle from "./ThermalSystemToggle";
+import MaterialToggle from "./ThermalSystemToggle";
+import PhaseCalloutLines from "./PhaseCalloutLines";
+import PhaseCalloutMarkers from "./PhaseCalloutMarkers";
 
-// ── PhaseText ──────────────────────────────────────────────
-// Opacity and Y position are purely scroll-driven.
-// If you stop scrolling, the text freezes exactly where it is.
+const THERMAL_INDEX = WINDOW_PARTS.findIndex((p) => p.id === THERMAL_PART_ID);
+const POSTER = FRAME_PATH_TEMPLATE.replace("{index}", "0001");
+const ALU_IMAGE = WINDOW_MATERIALS.find((m) => m.id === "alu")?.image ?? "";
 
-interface PhaseTextProps {
-  phase: ScrollPhase;
-  isActive: boolean;
-  /** 0–1 scroll progress within this phase's scroll zone */
-  progress: number;
-  /** Optional content below the body that shares the text's fade/translate. */
-  footer?: ReactNode;
-  /** When this key changes, the text block cross-fades to the new content. */
-  contentKey?: string;
-}
-
-const FADE_IN_END = 0.15;
-const FADE_OUT_START = 0.85;
-const Y_BOTTOM = 60;   // px — text starts here at phase start
-const Y_TOP = -60;     // px — text ends here at phase end
-
-const PhaseText = ({ phase, isActive, progress, footer, contentKey }: PhaseTextProps) => {
-  if (!phase.text) return null;
-
-  // Y moves linearly from bottom bound to top bound across the entire phase
-  const translateY = isActive
-    ? Y_BOTTOM + (Y_TOP - Y_BOTTOM) * progress
-    : Y_BOTTOM;
-
-  // Opacity fades in at start, holds, fades out at end
-  let opacity: number;
-  if (!isActive) {
-    opacity = 0;
-  } else if (progress < FADE_IN_END) {
-    opacity = progress / FADE_IN_END;
-  } else if (progress > FADE_OUT_START) {
-    opacity = (1 - progress) / (1 - FADE_OUT_START);
-  } else {
-    opacity = 1;
-  }
-
-  return (
-    <div
-      style={{
-        opacity,
-        transform: `translateY(${translateY}px)`,
-        willChange: "opacity, transform",
-      }}
-      className={cn(
-        "absolute inset-0 flex items-end pb-10 lg:items-center lg:pb-0",
-        opacity === 0 && "pointer-events-none"
-      )}
-    >
-      <div className="w-full px-6 md:px-12 lg:px-20">
-        <div className="max-w-[26rem] mx-auto lg:mx-0 text-center lg:text-left">
-          <div key={contentKey} className={cn(contentKey && "animate-fade-up")}>
-            <p className="eyebrow !text-[color:var(--ink-muted)] mb-3 lg:mb-4">{phase.text.eyebrow}</p>
-            <h3 className="font-serif text-[1.5rem] md:text-h3 lg:text-h2 text-[color:var(--ink-primary)] tracking-tight leading-[1.15] mb-3 lg:mb-5">
-              {phase.text.headline}
-            </h3>
-            <p className="text-body-sm lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.55]">
-              {phase.text.body}
-            </p>
-          </div>
-          {footer && <div className="mt-6 lg:mt-7">{footer}</div>}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ── ScrollWindow ───────────────────────────────────────────
-
-const SCROLL_HEIGHT_VH = 500;
-
-const THERMAL_END_FRAME =
-  SCROLL_PHASES.find((p) => p.id === THERMAL_PHASE_ID)?.endFrame ?? 0;
-const ALU_SYSTEM = THERMAL_SYSTEMS.find((s) => s.id === "alu");
+// ── Scroll layout ──────────────────────────────────────────
+const PART0_VH = 78;     // "Part 0" run-in panel — title + intro, top-aligned; sized so the gap to Part 1 matches the others
+const PANEL_VH = 66;     // per-part scroll height (controls the gap between texts)
+const TRAILING_VH = 40;  // keeps Part 3 pinned while it's centered
+// A part activates once its text scrolls up to its activation line (fraction of
+// the viewport). Part 1 activates just below the middle, so scrolling back up
+// cleanly drops it to Part 0. Later parts activate earlier — nearer the bottom —
+// so they highlight sooner as they come up. Larger fractions = line sits lower
+// on screen = each part highlights a little earlier while scrolling down.
+const ACTIVATION_MIDDLE = 0.62;
+const ACTIVATION_EARLY = 0.72;
+// Non-active parts (and everything during the Part-0 run-in) sit translucent.
+const INACTIVE_OPACITY = 0.28;
 
 const ScrollWindow = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const mediaBoxRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const itemRefs = useRef<(HTMLElement | null)[]>([]);
+
   const [nearViewport, setNearViewport] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [material, setMaterial] = useState<MaterialId>("upvc");
+  const [matFade, setMatFade] = useState(true);
 
-  // Thermal system selector — uPVC (canvas frame) vs Aluminium Thermal Break
-  // (overlay image). `aluFade` toggles the cross-fade: user picks = fade,
-  // scrolling out of the section = instant (the frame is about to animate).
-  const [thermalSystem, setThermalSystem] = useState<ThermalSystemId>("upvc");
-  const [aluFade, setAluFade] = useState(true);
-
+  // Preload gate.
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const observer = new IntersectionObserver(
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setNearViewport(true);
-          observer.disconnect();
+          io.disconnect();
         }
       },
-      { rootMargin: "0px" },
+      { rootMargin: "300px" },
     );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
-    observer.observe(container);
-    return () => observer.disconnect();
+  // Connector lines only in the desktop layout.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  // Active part = the last part whose text has scrolled up to the activation
+  // line. Before the first part reaches it (the Part-0 run-in) and if you scroll
+  // back above it, activeIndex is -1 → the animation rests on frame 1, no
+  // highlight.
+  useEffect(() => {
+    let raf = 0;
+    let headerHidden = false;
+    const setHeader = (v: boolean) => {
+      if (v === headerHidden) return;
+      headerHidden = v;
+      window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: v }));
+    };
+    const compute = () => {
+      const vh = window.innerHeight;
+      let next = -1;
+      for (let i = 0; i < panelRefs.current.length; i++) {
+        const el = panelRefs.current[i];
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        const line = vh * (i === 0 ? ACTIVATION_MIDDLE : ACTIVATION_EARLY);
+        if (r.top + r.height / 2 <= line) next = i;
+      }
+      setActiveIndex((prev) => (prev !== next ? next : prev));
+
+      // Hide the site header while the section fully covers the viewport.
+      const c = containerRef.current;
+      if (c) {
+        const cr = c.getBoundingClientRect();
+        setHeader(cr.top <= 1 && cr.bottom >= vh - 1);
+      }
+    };
+    const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(compute); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    compute();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(raf);
+      setHeader(false);
+    };
   }, []);
 
   const { images, progress, isLoaded } = useFramePreloader(
@@ -127,48 +125,46 @@ const ScrollWindow = () => {
     { enabled: nearViewport, padLength: FRAME_PAD_LENGTH },
   );
 
-  const { displayedFrame, scrollPhaseId, scrollPhaseProgress } = useScrollFrames({
-    containerRef,
-    totalFrames: TOTAL_FRAMES,
-    phases: SCROLL_PHASES,
+  const { displayedFrame, settled } = useSegmentedFrames({
+    activeIndex,
+    parts: WINDOW_PARTS,
     enabled: isLoaded,
   });
 
-  // The toggle is only pressable once the thermal phase has fully settled on
-  // its end frame — never while the frames are still animating into place.
-  const thermalSettled =
-    scrollPhaseId === THERMAL_PHASE_ID && displayedFrame === THERMAL_END_FRAME;
+  const thermalActive = activeIndex === THERMAL_INDEX;
+  const thermalSettled = thermalActive && settled;
 
-  // User picks a system → cross-fade the swap.
-  const handleSystemChange = useCallback((id: ThermalSystemId) => {
-    setAluFade(true);
-    setThermalSystem(id);
+  const activeMaterial = useMemo(
+    () => WINDOW_MATERIALS.find((m) => m.id === material) ?? WINDOW_MATERIALS[0],
+    [material],
+  );
+
+  const handleMaterial = useCallback((id: string) => {
+    setMatFade(true);
+    setMaterial(id as MaterialId);
   }, []);
 
-  // Leaving the thermal section → snap back to uPVC instantly (no fade), since
-  // the canvas frame is about to start animating again.
+  // Leaving Part 2 always snaps the selection back to uPVC.
   useEffect(() => {
-    if (scrollPhaseId !== THERMAL_PHASE_ID && thermalSystem !== "upvc") {
-      setAluFade(false);
-      setThermalSystem("upvc");
+    if (!thermalActive && material !== "upvc") {
+      setMatFade(false);
+      setMaterial("upvc");
     }
-  }, [scrollPhaseId, thermalSystem]);
+  }, [thermalActive, material]);
 
-  // Draw frame to canvas
+  // Draw the current frame (displayedFrame is 1-indexed; images[] is 0-indexed).
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !isLoaded) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Prefer the requested frame; fall back to nearest buffered frame so the
-    // canvas stays painted even while later frames are still streaming in.
-    let img = images[displayedFrame];
+    let img = images[displayedFrame - 1];
     if (!img || !img.naturalWidth) {
-      for (let offset = 1; offset < images.length; offset++) {
-        const before = images[displayedFrame - offset];
+      for (let o = 1; o < images.length; o++) {
+        const before = images[displayedFrame - 1 - o];
         if (before?.naturalWidth) { img = before; break; }
-        const after = images[displayedFrame + offset];
+        const after = images[displayedFrame - 1 + o];
         if (after?.naturalWidth) { img = after; break; }
       }
     }
@@ -178,109 +174,189 @@ const ScrollWindow = () => {
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
     }
-
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0);
   }, [displayedFrame, images, isLoaded]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative bg-[color:var(--canvas)]"
-      style={{ height: `${SCROLL_HEIGHT_VH}vh` }}
-    >
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-[color:var(--canvas)]">
-        {/* Loading state */}
-        {!isLoaded && nearViewport && (
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <div className="text-center">
-              <div className="w-48 h-[2px] bg-[color:var(--rule-soft)] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[color:var(--ink-muted)] transition-[width] duration-200"
-                  style={{ width: `${progress * 100}%` }}
-                />
-              </div>
-              <p className="mt-4 eyebrow text-[color:var(--ink-faint)]">Loading</p>
-            </div>
-          </div>
-        )}
-
-        {/* Instant poster — first frame painted by the browser before the
-            JS preloader has a chance to start. Eliminates the blank hero.
-            Mobile: top half (~55vh, object-contain so the full frame shows
-            above the text). Desktop: full-bleed cover behind centered text. */}
-        <img
-          src={FRAME_PATH_TEMPLATE.replace("{index}", "0001")}
-          alt=""
-          decoding="async"
-          aria-hidden="true"
-          className={cn(
-            "absolute left-0 right-0 top-0 h-[55vh] w-full object-contain",
-            "lg:inset-0 lg:h-full lg:object-cover",
-            "transition-opacity duration-300",
-            isLoaded ? "opacity-0" : "opacity-100",
-          )}
-        />
-
-        {/* Canvas for frame rendering. Same responsive sizing as the poster. */}
-        <canvas
-          ref={canvasRef}
-          className={cn(
-            "absolute left-0 right-0 top-0 h-[55vh] w-full object-contain",
-            "lg:inset-0 lg:h-full lg:object-cover",
-            "transition-opacity duration-300",
-            isLoaded ? "opacity-100" : "opacity-0",
-          )}
-        />
-
-        {/* Aluminium Thermal Break overlay — same box/scale as the canvas frame.
-            Cross-fades in when selected; snaps out instantly on scroll-away. */}
-        {nearViewport && ALU_SYSTEM?.image && (
+    <div ref={containerRef} className="relative bg-[color:var(--canvas)]">
+      {/* FULL-WIDTH pinned media */}
+      <div
+        ref={stickyRef}
+        className="sticky top-0 flex h-screen w-full items-center overflow-hidden bg-[color:var(--canvas)]"
+      >
+        <div ref={mediaBoxRef} className="relative w-full aspect-[1920/1080]">
+          {/* Instant poster */}
           <img
-            src={ALU_SYSTEM.image}
+            src={POSTER}
             alt=""
             aria-hidden="true"
             decoding="async"
             className={cn(
-              "absolute left-0 right-0 top-0 h-[55vh] w-full object-contain",
-              "lg:inset-0 lg:h-full lg:object-cover",
-              "pointer-events-none",
-              aluFade ? "transition-opacity duration-500 ease-out" : "transition-none",
-              thermalSystem === "alu" ? "opacity-100" : "opacity-0",
+              "absolute inset-0 h-full w-full object-contain transition-opacity duration-300",
+              isLoaded ? "opacity-0" : "opacity-100",
             )}
           />
+          {/* Animated frame canvas */}
+          <canvas
+            ref={canvasRef}
+            className={cn(
+              "absolute inset-0 h-full w-full object-contain transition-opacity duration-300",
+              isLoaded ? "opacity-100" : "opacity-0",
+            )}
+          />
+          {/* Aluminium still — cross-fades over the uPVC canvas frame when picked */}
+          {nearViewport && (
+            <img
+              src={ALU_IMAGE}
+              alt=""
+              aria-hidden="true"
+              decoding="async"
+              className={cn(
+                "pointer-events-none absolute inset-0 h-full w-full object-contain",
+                matFade ? "transition-opacity duration-500 ease-out" : "transition-none",
+                thermalSettled && material === "alu" ? "opacity-100" : "opacity-0",
+              )}
+            />
+          )}
+          {/* Part-2 numbered pins — the mobile stand-in for the connector lines */}
+          <PhaseCalloutMarkers callouts={activeMaterial.callouts} active={thermalSettled} />
+        </div>
+
+        {/* Loading bar */}
+        {!isLoaded && nearViewport && (
+          <div className="absolute inset-x-0 bottom-10 z-10 flex justify-center">
+            <div className="h-[2px] w-48 overflow-hidden rounded-full bg-[color:var(--rule-soft)]">
+              <div
+                className="h-full bg-[color:var(--ink-muted)] transition-[width] duration-200"
+                style={{ width: `${progress * 100}%` }}
+              />
+            </div>
+          </div>
         )}
 
-        {/* Phase text overlays — scroll-driven, freezes when scroll stops */}
-        {isLoaded &&
-          SCROLL_PHASES.filter((p) => p.text).map((phase) => {
-            const isThermal = phase.id === THERMAL_PHASE_ID;
-            const selectedSystem =
-              THERMAL_SYSTEMS.find((s) => s.id === thermalSystem) ?? THERMAL_SYSTEMS[0];
-            const effectivePhase =
-              isThermal && phase.text
-                ? { ...phase, text: selectedSystem.text }
-                : phase;
+        {/* Part-2 connector lines — pinned with the media, drawn behind the text */}
+        {isDesktop && (
+          <PhaseCalloutLines
+            originRef={stickyRef}
+            imageBoxRef={mediaBoxRef}
+            itemRefs={itemRefs}
+            callouts={activeMaterial.callouts}
+            active={thermalSettled}
+          />
+        )}
+      </div>
 
-            return (
-              <PhaseText
-                key={phase.id}
-                phase={effectivePhase}
-                isActive={scrollPhaseId === phase.id}
-                progress={scrollPhaseId === phase.id ? scrollPhaseProgress : 0}
-                contentKey={isThermal ? thermalSystem : undefined}
-                footer={
-                  isThermal ? (
-                    <ThermalSystemToggle
-                      systems={THERMAL_SYSTEMS}
-                      value={thermalSystem}
-                      onChange={handleSystemChange}
-                      disabled={!thermalSettled}
-                    />
-                  ) : undefined
-                }
-              />
-            );
-          })}
+      {/* NORMAL-FLOW text — scrolls over the pinned media */}
+      <div className="relative z-10 -mt-[100vh]">
+        {/* Section title + Part 0 intro — top of the section, aligned to the
+            same left margin as the benefit texts. Title stays solid; the Part 0
+            copy dims once the first benefit takes over. */}
+        <div className="flex items-start" style={{ minHeight: `${PART0_VH}vh` }}>
+          <div className="mx-auto w-full max-w-[100rem] px-6 pt-[12vh] md:px-10 lg:px-16">
+            <p className="eyebrow mb-3 text-[color:var(--ink-muted)]">{SECTION_EYEBROW}</p>
+            <h2 className="max-w-[13ch] font-serif text-h3 leading-[1.05] tracking-tight text-[color:var(--ink-primary)] lg:text-h2">
+              {SECTION_TITLE}
+            </h2>
+            <div
+              className="mt-8 max-w-[24rem] transition-opacity duration-500 ease-out lg:max-w-[27rem]"
+              style={{ opacity: activeIndex < 0 ? 1 : INACTIVE_OPACITY }}
+            >
+              <div className="mb-5 h-px w-full bg-[color:var(--rule-soft)]" />
+              <p className="mb-6 text-body-sm leading-[1.6] text-[color:var(--ink-secondary)] lg:text-body">
+                {PART_ZERO.body}
+              </p>
+              <ul>
+                {PART_ZERO.materials.map((m) => (
+                  <li
+                    key={m.label}
+                    className="border-t border-[color:var(--rule-soft)] py-3 text-body-sm leading-snug"
+                  >
+                    <span className="font-medium text-[color:var(--ink-primary)]">{m.label}</span>
+                    <span className="text-[color:var(--ink-muted)]"> — {m.desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {WINDOW_PARTS.map((part, i) => {
+          const isThermal = part.id === THERMAL_PART_ID;
+          return (
+            <div
+              key={part.id}
+              ref={(el) => { panelRefs.current[i] = el; }}
+              className="flex items-center"
+              style={{ minHeight: `${PANEL_VH}vh` }}
+            >
+              <div className="mx-auto w-full max-w-[100rem] px-6 md:px-10 lg:px-16">
+                <div
+                  className="max-w-[24rem] transition-opacity duration-500 ease-out lg:max-w-[27rem]"
+                  style={{ opacity: i === activeIndex ? 1 : INACTIVE_OPACITY }}
+                >
+                  <p className="eyebrow mb-3 text-[color:var(--ink-muted)]">{part.text.eyebrow}</p>
+                  <h3 className="mb-3 font-serif text-[1.6rem] leading-[1.1] tracking-tight text-[color:var(--ink-primary)] lg:text-h2">
+                    {part.text.headline}
+                  </h3>
+                  {part.text.lede && (
+                    <p className="mb-6 text-body-sm leading-[1.6] text-[color:var(--ink-secondary)] lg:text-body">
+                      {part.text.lede}
+                    </p>
+                  )}
+
+                  {part.text.bullets && (
+                    <ul>
+                      {part.text.bullets.map((b) => (
+                        <li
+                          key={b}
+                          className="border-t border-[color:var(--rule-soft)] py-3 text-body-sm leading-snug text-[color:var(--ink-secondary)]"
+                        >
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {isThermal && (
+                    <>
+                      <ul>
+                        {activeMaterial.callouts.map((c, ci) => (
+                          <li
+                            key={c.label}
+                            ref={(el) => { itemRefs.current[ci] = el; }}
+                            className="flex items-start gap-2.5 border-t border-[color:var(--rule-soft)] py-3 text-body-sm leading-snug"
+                          >
+                            {/* Matches the numbered pin on the still — mobile only */}
+                            <span
+                              className="mt-px flex h-5 w-5 flex-none items-center justify-center rounded-full bg-[color:var(--accent)] text-[0.65rem] font-semibold leading-none text-white lg:hidden"
+                              aria-hidden="true"
+                            >
+                              {ci + 1}
+                            </span>
+                            <span className="min-w-0">
+                              <span className="font-medium text-[color:var(--ink-primary)]">{c.label}</span>
+                              <span className="text-[color:var(--ink-muted)]"> — {c.desc}</span>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-2 border-t border-[color:var(--rule-soft)] pt-4">
+                        <MaterialToggle
+                          systems={WINDOW_MATERIALS}
+                          value={material}
+                          onChange={handleMaterial}
+                          disabled={!thermalSettled}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {/* Trailing settle room so Part 3 stays pinned while centered */}
+        <div aria-hidden="true" style={{ height: `${TRAILING_VH}vh` }} />
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
 import AccentStripe from "@/components/primitives/AccentStripe";
-import FeatureLink from "@/components/primitives/FeatureLink";
 import { SYSTEM_TYPE, PROFILE_MATERIAL } from "@/data/taxonomy";
 
 const TILE_FRAMES = 53;
@@ -143,58 +142,127 @@ function SystemFrameTile({ system }: { system: SystemTile }) {
   );
 }
 
-/** Static material tile matching the frame-tile grammar (image, serif title,
- *  arrow, short description) so both axes read as one five-item row. */
-function MaterialTile({ material }: { material: (typeof PROFILE_MATERIAL)[number] }) {
+/**
+ * The material axis, as text-only spec columns (no image). Four peers in one
+ * row: uPVC and the three aluminium systems. Routes come from the shared
+ * taxonomy (uPVC → /why-upvc, all aluminium → /aluminium) so this surface can't
+ * drift from the nav. Content mirrors useAluminium.ts (aluminium best_for) and
+ * the uPVC advantages, condensed to homepage length.
+ */
+interface MaterialColumn {
+  title: string;
+  /** The "Best for" subtitle. Kept short so every column wraps to two lines. */
+  bestFor: string;
+  /** Three feature/spec lines — equal count keeps the four columns level. */
+  features: string[];
+  to: string;
+}
+
+const materialRoute = (code: (typeof PROFILE_MATERIAL)[number]["material_code"]) =>
+  PROFILE_MATERIAL.find((m) => m.material_code === code)!.to;
+
+const MATERIAL_COLUMN: MaterialColumn[] = [
+  {
+    title: "uPVC",
+    bestFor: "Everyday residential windows and doors.",
+    features: [
+      "Multi-chamber, steel-reinforced profile",
+      "Corrosion-free, no repainting",
+      "24–32 dB sound attenuation",
+    ],
+    to: materialRoute("upvc"),
+  },
+  {
+    title: "Aluminium Thermal Break",
+    bestFor: "Air-conditioned and west-facing interiors.",
+    features: [
+      "Polyamide isolator inside the frame",
+      "Cuts heat transfer and condensation",
+      "High-end, climate-controlled builds",
+    ],
+    to: materialRoute("aluminium"),
+  },
+  {
+    title: "Non-Thermal Break",
+    bestFor: "Naturally ventilated spaces and lanais.",
+    features: [
+      "Solid aluminium, no isolator",
+      "Slimmer sightlines, lower cost",
+      "Wall thickness 1.2–3.0 mm",
+    ],
+    to: materialRoute("aluminium"),
+  },
+  {
+    title: "Aluminium Slim",
+    bestFor: "Floor-to-ceiling, minimum-sightline glazing.",
+    features: [
+      "Minimum-sightline profile",
+      "Maximum glass, frame recedes",
+      "Panoramic, full-height spans",
+    ],
+    to: materialRoute("aluminium"),
+  },
+];
+
+/**
+ * A single material column: serif title, an uppercase "Best for" subtitle, then
+ * a hairline-ruled spec list. The whole column is the link — hovering anywhere
+ * on it reddens the title. Every title is a single line (whitespace-nowrap plus
+ * a size that fits the four-up column), so the "Best for" blocks and spec lists
+ * all start at the same y; the subtitle's fixed min-height and h-full keep the
+ * four columns a common height even when a "Best for" line wraps.
+ */
+function MaterialCard({ material }: { material: MaterialColumn }) {
   return (
     <li>
-      <Link to={material.to} className="group block">
-        <div className="relative aspect-video overflow-hidden bg-[color:var(--canvas-soft)] mb-6">
-          <img
-            src={material.image}
-            alt={material.label}
-            loading="lazy"
-            decoding="async"
-            className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.035]"
-          />
-        </div>
-        <div className="flex items-start justify-between gap-4">
-          <h3 className="font-serif text-h4 lg:text-h3 font-normal tracking-tight text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-            {material.label}
-          </h3>
-          <ArrowUpRight
-            size={20}
-            className="text-[color:var(--ink-muted)] mt-1 shrink-0 transition-transform duration-300 ease-marvin group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[color:var(--accent)]"
-          />
-        </div>
-        <p className="mt-3 text-body-sm lg:text-body text-[color:var(--ink-secondary)] max-w-[24rem]">
-          {material.description}
+      <Link to={material.to} className="group flex h-full flex-col text-left">
+        <h3 className="font-serif text-base xl:text-lg font-normal tracking-tight leading-[1.25] whitespace-nowrap text-[color:var(--ink-primary)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+          {material.title}
+        </h3>
+
+        <p className="mt-3 text-[11px] tracking-[0.14em] uppercase text-[color:var(--ink-muted)]">
+          Best for
         </p>
+        <p className="mt-1.5 text-body-sm leading-[1.4] min-h-[2.75em] text-[color:var(--ink-secondary)]">
+          {material.bestFor}
+        </p>
+
+        <ul className="mt-5 border-t border-[color:var(--rule-strong)] divide-y divide-[color:var(--rule-soft)]">
+          {material.features.map((feature) => (
+            <li
+              key={feature}
+              className="py-2.5 text-body-sm leading-[1.35] text-[color:var(--ink-primary)]"
+            >
+              {feature}
+            </li>
+          ))}
+        </ul>
       </Link>
     </li>
   );
 }
 
-/** One section, five items: the three types then the two profile systems
- *  (Imie's two axes, presented as a single browse row). */
+/** One section, two axes: the three system types as animated frame tiles, then
+ *  the material axis (uPVC + three aluminium systems) as a text-only spec row. */
 const SystemsTiles = () => (
   <div id="browse-products">
     <div className="mb-10 lg:mb-12">
       <AccentStripe width="sm" color="accent" className="mb-3" />
-      <h2 className="eyebrow text-[color:var(--ink-muted)]">Browse products</h2>
+      <h2 className="eyebrow text-[color:var(--ink-muted)]">Products and materials</h2>
     </div>
 
     <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
       {systemTile.map((sys) => (
         <SystemFrameTile key={sys.name} system={sys} />
       ))}
-      {PROFILE_MATERIAL.map((m) => (
-        <MaterialTile key={m.material_code} material={m} />
-      ))}
     </ul>
 
-    <div className="mt-10">
-      <FeatureLink to="/why-upvc">Why uPVC</FeatureLink>
+    <div className="mt-14 lg:mt-16 border-t border-[color:var(--rule-strong)] pt-10 lg:pt-12">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10 items-stretch">
+        {MATERIAL_COLUMN.map((material) => (
+          <MaterialCard key={material.title} material={material} />
+        ))}
+      </ul>
     </div>
   </div>
 );

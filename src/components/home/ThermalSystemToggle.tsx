@@ -1,10 +1,14 @@
 import { cn } from "@/lib/utils";
-import type { ThermalSystem, ThermalSystemId } from "@/data/scroll-window-phases";
+
+interface ToggleOption {
+  id: string;
+  label: string;
+}
 
 interface ThermalSystemToggleProps {
-  systems: ThermalSystem[];
-  value: ThermalSystemId;
-  onChange: (id: ThermalSystemId) => void;
+  systems: ToggleOption[];
+  value: string;
+  onChange: (id: string) => void;
   /** Disabled while the scroll animation is still settling on the frame. */
   disabled?: boolean;
 }

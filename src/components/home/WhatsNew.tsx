@@ -1,75 +1,51 @@
 import { Link } from "react-router-dom";
-import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import FeatureLink from "@/components/primitives/FeatureLink";
 import ScrollReveal from "@/components/primitives/ScrollReveal";
-import { whatsNew as allEntries, type WhatsNewEntry } from "@/data/whats-new";
+import { whatsNew as allEntries } from "@/data/whats-new";
 
 /**
- * Homepage WhatsNew shows only event + press categories — projects already
- * have their own InspirationStrip section directly above this one, and the
- * "product" entries (e.g. "Twelve finish options across every system") were
- * reading as misplaced when stacked next to project cards. Full feed lives
- * on the /whats-new page where the visitor expects to see everything mixed.
+ * Homepage feature block. Per Prince (2026-07-22) this section no longer
+ * shows the multi-card What's New feed — it spotlights a single post, the
+ * showroom invite, in a Marvin-style split: wide image left, editorial
+ * column right (top hairline, overline, serif headline, lede, arrow link).
+ * The full feed still lives on the /whats-new page.
  */
-const whatsNew = allEntries
-  .filter((e) => e.category === "event" || e.category === "press")
-  .slice(0, 3);
-
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase();
-};
-
-const categoryLabel = (c: WhatsNewEntry["category"]) => {
-  switch (c) {
-    case "project": return "Project";
-    case "product": return "Product";
-    case "event":   return "Event";
-    case "press":   return "Press";
-  }
-};
+const featured =
+  allEntries.find((e) => e.id === "showroom-invite") ?? allEntries[0];
 
 const WhatsNew = () => (
-  <div>
-    <div className="grid lg:grid-cols-[1fr,auto] items-end gap-8 mb-12 lg:mb-16">
-      <EyebrowHeading eyebrow="Updates" level={2}>
-        What's new?
-      </EyebrowHeading>
-      <FeatureLink to="/whats-new">All updates</FeatureLink>
-    </div>
+  <div className="grid items-start gap-y-10 lg:grid-cols-[1.4fr,1fr] lg:gap-x-16">
+    {/* Left — the image, the hero of the block */}
+    <ScrollReveal>
+      <Link
+        to={featured.link || "/whats-new"}
+        className="group block relative aspect-[4/3] overflow-hidden bg-neutral-100"
+      >
+        <img
+          src={featured.image}
+          alt={featured.title}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
+        />
+      </Link>
+    </ScrollReveal>
 
-    <ul className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
-      {whatsNew.map((entry) => (
-        <li key={entry.id}>
-          <Link to={entry.link || "#"} className="group block">
-            <ScrollReveal>
-              <div className="relative aspect-[5/4] overflow-hidden bg-neutral-100">
-                <img
-                  src={entry.image}
-                  alt={entry.title}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
-                />
-              </div>
-            </ScrollReveal>
-            <div className="mt-5">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="eyebrow !text-[color:var(--ink-primary)]">{categoryLabel(entry.category)}</span>
-                <span className="text-[color:var(--rule-strong)]">·</span>
-                <span className="eyebrow">{formatDate(entry.date)}</span>
-              </div>
-              <h3 className="font-serif text-h5 lg:text-h4 text-[color:var(--ink-primary)] tracking-tight leading-snug group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                {entry.title}
-              </h3>
-              <p className="mt-3 text-body-sm text-[color:var(--ink-secondary)]">
-                {entry.excerpt}
-              </p>
-            </div>
-          </Link>
-        </li>
-      ))}
-    </ul>
+    {/* Right — editorial column, led by a top hairline rule */}
+    <div className="border-t border-[color:var(--rule-strong)] pt-6 lg:pt-8 lg:pr-8">
+      <p className="eyebrow mb-4 text-[color:var(--ink-muted)]">
+        FourlinQ Showrooms
+      </p>
+      <h2 className="font-serif font-normal tracking-tight leading-[1.1] text-[2rem] lg:text-h3 text-[color:var(--ink-primary)]">
+        {featured.title}
+      </h2>
+      <p className="mt-5 max-w-[34rem] text-body text-[color:var(--ink-secondary)]">
+        {featured.excerpt}
+      </p>
+      <div className="mt-7">
+        <FeatureLink to={featured.link || "/whats-new"}>Learn more</FeatureLink>
+      </div>
+    </div>
   </div>
 );
 

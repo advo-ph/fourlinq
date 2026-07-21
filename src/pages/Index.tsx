@@ -28,38 +28,46 @@ const heroSlides: HeroSlide[] = [
 const Index = () => {
   return (
     <Layout>
-      {/* Hero headline approved by Tita 2026-05-25. Lede acknowledges both
-          FourlinQ product lines (uPVC + aluminium). No warranty mention:
-          per Tita, some customers opt out of the 10-yr warranty so it's
-          not a universal homepage anchor. */}
+      {/* Hero headline approved by Tita 2026-05-25. Two-line lockup, no lede
+          or CTAs (per Prince, 2026-07-21) — the headline alone carries the
+          hero and sits low over the video. */}
       <VideoHero
         videoSrc="/videos/hero-loop.mp4"
         fallbackSlides={heroSlides}
-        headline="Built to Last. Designed to Inspire."
-        lede="Custom-made uPVC and aluminium systems, fabricated to your specifications."
-        ctaLabel="Explore Systems"
-        ctaTo="/products"
-        secondaryLabel="Book Consultation"
-        secondaryTo="/brand#contact"
+        headline={"Built to Last.\nDesigned to Inspire."}
       />
 
-      {/* Categories before benefits. Imie, meeting 2026-07-10 (00:35:06):
-          "categorize muna". The site was reaching the benefit story before it
-          ever showed what we sell. The product gateway used to sit below the
-          500vh ScrollWindow sequence, starting around y=5400 on desktop. It now
-          comes first, within one viewport of the hero; the benefit sequence
-          follows it. */}
-      <Section tone="soft" size="lg">
-        <SystemsTiles />
-      </Section>
+      {/* A little breathing room above the benefit sequence. */}
+      <div aria-hidden="true" className="h-[10vh]" />
 
+      {/* Benefit sequence. Its section title + Part 0 intro live inside the
+          component now (aligned to the sequence's own margins), per Prince
+          2026-07-21 — the old editorial subtitle moved into Part 0. */}
       <Suspense fallback={null}>
         <ScrollWindow />
       </Suspense>
 
+      {/* Product gateway follows the ScrollWindow benefit sequence (per Prince,
+          2026-07-21 — reverses the 2026-07-10 "categorize muna" ordering). On a
+          white canvas rather than the soft grey it used when it sat above. */}
+      <Section tone="canvas" size="lg">
+        <SystemsTiles />
+      </Section>
+
       <ProjectReels />
 
+      {/* Our Projects gallery moved above the design tool (per Prince,
+          2026-07-21) — project proof sits before the configurator. */}
+      <InspirationStrip />
+
+      {/* Showroom spotlight now sits above the design tool (per Prince,
+          2026-07-22) — it carries the full canvas padding that the design
+          tool section used to, and the design tool follows with !pt-0. */}
       <Section tone="canvas" size="lg">
+        <WhatsNew />
+      </Section>
+
+      <Section tone="canvas" size="lg" className="!pt-0">
         <div className="mb-10 lg:mb-12">
           <div className="h-[5px] w-10 bg-[color:var(--accent)] mb-3" />
           <h2 className="eyebrow text-[color:var(--ink-muted)]">Design tool</h2>
@@ -67,12 +75,6 @@ const Index = () => {
         <Suspense fallback={null}>
           <DesignToolEmbed embedded />
         </Suspense>
-      </Section>
-
-      <InspirationStrip />
-
-      <Section tone="canvas" size="lg" className="!pt-0">
-        <WhatsNew />
       </Section>
 
       <Section tone="dark" size="lg" noAnimation>

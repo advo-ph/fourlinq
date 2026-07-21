@@ -48,7 +48,7 @@ function ReelCard({ reel }: { reel: (typeof PROJECT_REELS)[number] }) {
       />
       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
       <div className="absolute bottom-0 inset-x-0 p-5 lg:p-6">
-        <p className="font-serif text-h5 lg:text-h4 text-white tracking-tight">
+        <p className="font-serif text-h6 lg:text-h5 text-white tracking-tight">
           {reel.location}
         </p>
       </div>

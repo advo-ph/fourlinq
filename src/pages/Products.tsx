@@ -208,6 +208,7 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const paramFilter = (searchParams.get("filter") as Filter) || "all";
+  const paramProduct = searchParams.get("product");
   const [activeFilter, setActiveFilterState] = useState<Filter>(paramFilter);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -221,6 +222,14 @@ const Products = () => {
   };
 
   const { data: products = [], isLoading } = useProducts();
+
+  // Deep-link: /products?product=<id> (used by the header's Systems panel) opens
+  // that system's drawer once the catalog has loaded.
+  useEffect(() => {
+    if (!paramProduct || products.length === 0) return;
+    const match = products.find((p) => p.id === paramProduct);
+    if (match) setSelectedProduct(match);
+  }, [paramProduct, products]);
 
   // The landing shows the four category cards; a filter drills into that
   // category's systems.
@@ -363,7 +372,17 @@ const Products = () => {
       </section>
 
       <AnimatePresence>
-        {selectedProduct && <ProductDrawer product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
+        {selectedProduct && (
+          <ProductDrawer
+            product={selectedProduct}
+            onClose={() => {
+              setSelectedProduct(null);
+              // Drop the deep-link param so closing leaves a clean URL and the
+              // open-from-param effect won't immediately re-fire.
+              if (paramProduct) setSearchParams(activeFilter === "all" ? {} : { filter: activeFilter });
+            }}
+          />
+        )}
       </AnimatePresence>
     </Layout>
   );

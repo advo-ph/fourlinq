@@ -60,7 +60,7 @@ const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }
         ref={heroRef}
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
-        className="relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden bg-[color:var(--canvas-soft)]"
+        className="relative aspect-[16/9] overflow-hidden bg-[color:var(--canvas-soft)]"
       >
         {photos.map((photo, i) => (
           <img

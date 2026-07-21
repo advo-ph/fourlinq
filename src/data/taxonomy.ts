@@ -142,6 +142,45 @@ export const PROFILE_MATERIAL: ProfileMaterial[] = [
   },
 ];
 
+// ─────────────────────────────────────────────
+// MATERIAL AXIS, FLATTENED FOR NAVIGATION
+// A presentation view of PROFILE_MATERIAL that gives every material system its
+// own tile: uPVC plus the three aluminium subsystems (thermal break,
+// non-thermal break, slim). The three aluminium tiles all point at /aluminium,
+// so nothing here reads as a fourth *type* — this stays on the material axis.
+// Used by the header's 2x2 "By material" grid.
+// ─────────────────────────────────────────────
+
+export interface MaterialTile {
+  label: string;
+  to: string;
+  /** The "best for" one-liner rendered as the button subtitle in the nav. */
+  bestFor: string;
+}
+
+export const MATERIAL_TILE: MaterialTile[] = [
+  {
+    label: "uPVC",
+    to: "/why-upvc",
+    bestFor: "Everyday windows & doors",
+  },
+  {
+    label: "Aluminium Thermal Break",
+    to: "/aluminium",
+    bestFor: "Large spans, thermal comfort",
+  },
+  {
+    label: "Non-Thermal Break",
+    to: "/aluminium",
+    bestFor: "Wide openings, value pick",
+  },
+  {
+    label: "Aluminium Slim",
+    to: "/aluminium",
+    bestFor: "Slim sightlines, max glass",
+  },
+];
+
 /** Look up a type by its `?filter=` query value (also its Product.category). */
 export function findTypeByFilter(filter: string): SystemType | undefined {
   return SYSTEM_TYPE.find((t) => t.filter === filter);
