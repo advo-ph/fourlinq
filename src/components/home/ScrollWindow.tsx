@@ -33,7 +33,9 @@ const TRAILING_VH = 40;  // keeps Part 3 pinned while it's centered
 // on screen = each part highlights a little earlier while scrolling down.
 const ACTIVATION_MIDDLE = 0.62;
 const ACTIVATION_EARLY = 0.72;
-// Non-active parts (and everything during the Part-0 run-in) sit translucent.
+// Non-active parts (and everything during the Part-0 run-in) sit translucent on
+// desktop. On mobile, inactive parts are fully hidden (opacity 0) so only the
+// active text is visible; the panels still occupy scroll space so activation works.
 const INACTIVE_OPACITY = 0.28;
 
 const ScrollWindow = () => {
@@ -49,6 +51,10 @@ const ScrollWindow = () => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [material, setMaterial] = useState<MaterialId>("upvc");
   const [matFade, setMatFade] = useState(true);
+
+  // On mobile, fully hide inactive text (opacity 0) so only the active panel is
+  // visible. Panels still occupy scroll space so scroll-based activation works.
+  const inactiveOpacity = isDesktop ? INACTIVE_OPACITY : 0;
 
   // Preload gate.
   useEffect(() => {
@@ -183,7 +189,7 @@ const ScrollWindow = () => {
       {/* FULL-WIDTH pinned media */}
       <div
         ref={stickyRef}
-        className="sticky top-0 flex h-screen w-full items-center overflow-hidden bg-[color:var(--canvas)]"
+        className="sticky top-0 flex h-screen w-full items-end pb-[6vh] overflow-hidden bg-[color:var(--canvas)] lg:items-center lg:pb-0"
       >
         <div ref={mediaBoxRef} className="relative w-full aspect-[1920/1080]">
           {/* Instant poster */}
@@ -260,7 +266,7 @@ const ScrollWindow = () => {
             </h2>
             <div
               className="mt-8 max-w-[24rem] transition-opacity duration-500 ease-out lg:max-w-[27rem]"
-              style={{ opacity: activeIndex < 0 ? 1 : INACTIVE_OPACITY }}
+              style={{ opacity: activeIndex < 0 ? 1 : inactiveOpacity }}
             >
               <div className="mb-5 h-px w-full bg-[color:var(--rule-soft)]" />
               <p className="mb-6 text-body-sm leading-[1.6] text-[color:var(--ink-secondary)] lg:text-body">
@@ -292,7 +298,7 @@ const ScrollWindow = () => {
               <div className="mx-auto w-full max-w-[100rem] px-6 md:px-10 lg:px-16">
                 <div
                   className="max-w-[24rem] transition-opacity duration-500 ease-out lg:max-w-[27rem]"
-                  style={{ opacity: i === activeIndex ? 1 : INACTIVE_OPACITY }}
+                  style={{ opacity: i === activeIndex ? 1 : inactiveOpacity }}
                 >
                   <p className="eyebrow mb-3 text-[color:var(--ink-muted)]">{part.text.eyebrow}</p>
                   <h3 className="mb-3 font-serif text-[1.6rem] leading-[1.1] tracking-tight text-[color:var(--ink-primary)] lg:text-h2">

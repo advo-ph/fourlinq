@@ -36,6 +36,30 @@ It also emits the gallery ordering into `project-category-images.generated.ts`:
 - `projectCategoryOrder` — per category, the qualifying projects ordered by their
   best image's score FOR THAT category; used by each filter view.
 
+## First-image convention (best exterior → best interior)
+
+The first image of each project (the `image` field in `src/data/projects.ts`) is
+kept in the following priority order by `scripts/reorder-project-images.mjs`:
+
+1. **Best exterior image** — the image with the highest `scores.exterior` that
+   also clears the threshold (≥ 50). Tiebreak: highest interior score, then
+   earlier original position.
+2. **Best interior image** (fallback) — if no exterior image clears the threshold,
+   use the image with the highest `scores.interior` (any value).
+3. **Untouched** — projects with a single image, or no analysis data, keep their
+   current order.
+
+Re-run after adding new images or after adjusting analysis scores:
+
+```
+npm run projects:reorder
+npm run projects:extract
+npm run projects:images
+```
+
+The `projects:reorder` script is idempotent: running it twice produces the same
+result.
+
 ## Re-tuning the threshold (no re-analysis)
 
 Edit `THRESHOLD` in `scripts/build-project-category-images.mjs`, then:

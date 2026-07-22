@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Phone, Mail, Calendar, Tag, RefreshCw, MessageSquare, Send, X, Loader2, ChevronRight, Lock, LogOut, MessagesSquare, ArrowLeft, HelpCircle, FolderKanban, Users } from "lucide-react";
+import { Phone, Mail, Calendar, Tag, RefreshCw, MessageSquare, Send, X, Loader2, ChevronRight, Lock, LogOut, MessagesSquare, ArrowLeft, HelpCircle, FolderKanban, Users, ImageIcon } from "lucide-react";
 import { ContentManager, MediaLibrary, CmsRagApi } from "../../packages/cms-rag/client/index";
 import UsersPanel from "./admin/UsersPanel";
+import ProjectImagesPanel from "./admin/ProjectImagesPanel";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const cmsApi = new CmsRagApi("/api/admin/cms");
+const adminQueryClient = new QueryClient();
 
 interface CurrentUser { profile_id: number; email: string; first_name: string; last_name: string; role: string; role_label: string }
 import Logo from "@/components/shared/Logo";
@@ -385,7 +388,7 @@ const Admin = ({ onLogout, currentUser }: { onLogout: () => void; currentUser: C
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Inquiry | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
-  const [tab, setTab] = useState<"leads" | "chats" | "content" | "team">("leads");
+  const [tab, setTab] = useState<"leads" | "chats" | "content" | "team" | "images">("leads");
   const isAdmin = currentUser?.role === "admin";
   const isMediaOnly = currentUser?.role === "media";
 
@@ -512,6 +515,16 @@ const Admin = ({ onLogout, currentUser }: { onLogout: () => void; currentUser: C
           >
             <FolderKanban size={14} /> Content
           </button>
+          {!isMediaOnly && (
+            <button
+              onClick={() => setTab("images")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                tab === "images" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary hover:bg-muted"
+              }`}
+            >
+              <ImageIcon size={14} /> Project Images
+            </button>
+          )}
           {isAdmin && (
             <button
               onClick={() => setTab("team")}
@@ -543,6 +556,13 @@ const Admin = ({ onLogout, currentUser }: { onLogout: () => void; currentUser: C
               customPanels={[{ kind: "media", labelPlural: "Media", render: () => <MediaLibrary api={cmsApi} /> }]}
             />
           </>
+        )}
+
+        {/* Project Images Tab — admin and editor */}
+        {tab === "images" && !isMediaOnly && (
+          <QueryClientProvider client={adminQueryClient}>
+            <ProjectImagesPanel />
+          </QueryClientProvider>
         )}
 
         {/* Team Tab — admin only */}

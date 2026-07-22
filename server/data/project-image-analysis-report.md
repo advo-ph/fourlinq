@@ -2,8 +2,8 @@
 
 Threshold: **50/100** (a category is kept only if its best image clears this).
 
-Projects analyzed: **61/61**
-Hero-quality rated: **61/61**
+Projects analyzed: **62/62**
+Hero-quality rated: **62/62**
 
 ## Gallery order — "All projects" (best hero first)
 
@@ -30,46 +30,47 @@ Hero-quality rated: **61/61**
 | 19 | cebu-n-residence-pardo-b | 84 | ✨ | Warm golden-hour rear elevation with lush framing landscaping and a glowing interior, a well-composed magazine-style shot. |
 | 20 | cebu-p-residence-kishanta | 84 | ✨ | Sharp, professionally graded dusk shot of a modern stone-and-glass facade with warm glowing interiors. |
 | 21 | cebu-f-residence-fortunado | 84 | ✨ | Sharp modern tower home against a clean gradient blue sky with tidy landscaping and a polished, magazine-ready look. |
-| 22 | cebu-ta-residence-monterrazas | 83 | ✨ | Crisp blue-sky render of a striking stone-clad facade, slightly weakened by a faint corner watermark. |
-| 23 | nuvali-laguna-residence | 82 | ✨ | Striking low-angle modern villa with wood-slat cladding against a dramatic cloud-filled sky, crisp and vibrantly graded with strong editorial appeal. |
-| 24 | cebu-m-residence-2 | 82 | ✨ | Bright, well-lit double-height living-room interior with polished styling, warm neutrals and a clean composition. |
-| 25 | cebu-c-residence-amara | 82 | ✨ | Crisp, well-lit stone-and-glass facade framed by lush palms with rich color and good depth, looks professionally graded. |
-| 26 | tagaytay-cavite-residence | 76 | ✨ | White modernist home framed by lush tropical greenery under a bright blue sky, well-composed and punchy though the house sits slightly small in frame. |
-| 27 | las-pinas-residence | 72 | ✨ | Crisp upward-angle courtyard shot with warm wood ceiling and blue-framed glass, well-lit and graded but an unconventional cropped detail rather than a classic full-facade hero. |
-| 28 | portfolio-residence-15 | 70 | — | Attractive white modern hillside home against a rock cliff with lush greenery and a nice diagonal composition, though still a warm daytime phone photo rather than a graded render. |
-| 29 | cebu-g-residences | 68 | ✨ | Warmly lit golden-hour multi-story home with accent lighting, but lower resolution and a power pole cluttering the left edge soften its hero impact. |
-| 30 | portfolio-residence-07 | 66 | — | Clean, sharp modern facade under a bright blue daytime sky, but flat midday lighting keeps it a solid daytime shot rather than editorial. |
-| 31 | portfolio-residence-14 | 66 | — | Sharp wide daytime shot of a large stone-and-stucco mansion facade under blue sky, but flat documentary lighting and a construction fence in front keep it snapshot-grade. |
-| 32 | portfolio-interior-02 | 66 | — | Bright, cleanly staged living room with a sectional sofa, garden windows and terracotta floor, pleasant and well-lit but a standard real-estate phone photo. |
-| 33 | taytay-rizal-residence | 64 | — | Clean sharp daytime corner-facade phone photo with nice blue sky but a plain snapshot look and a somewhat busy street/fence foreground. |
-| 34 | cebu-n-residence-pardo | 62 | — | Clean sunny two-story facade against a blue sky, pleasant but a fairly plain low-resolution daytime phone photo with the car partly clipped. |
-| 35 | portfolio-interior-01 | 62 | — | Cozy corner sofa framed by large windows onto greenery with glossy wood floor, warm and inviting but slightly dark and low-resolution. |
-| 36 | portfolio-residence-11 | 60 | — | Panoramic-crop daytime modern house with decent sharpness and lush greenery, but flat midday lighting limits editorial appeal. |
-| 37 | cebu-residence-vista-grande-talisay | 58 | ✨ | Nicely lit interior of arched black-framed patio doors, but plastic-wrapped furniture and a plain construction-site backdrop weaken its cover appeal. |
-| 38 | cebu-d-residence-mandaue | 58 | — | Clean minimalist white-cube facade but a flatter, plainer daytime phone snapshot with modest resolution. |
-| 39 | sarangani-s-residence | 58 | — | Clean daytime rear-facade phone shot with a tidy lawn but flat lighting and a FourlinQ logo burned into the corner. |
-| 40 | portfolio-residence-13 | 57 | — | Letterboxed daytime modern facade with a bright blue sky and reasonable sharpness, but flat lighting and panoramic crop feel snapshot-like. |
-| 41 | taguig-g-residence | 55 | — | Handsome modern facade but flat overcast light and a burned-in logo watermark keep it in plain snapshot territory. |
-| 42 | cebu-s-residence-maria-luisa | 55 | — | Attractive modern home undercut by a dark perimeter fence dominating the foreground plus flat light and low resolution. |
-| 43 | bataan-s-residence | 55 | — | Nice blue sky and lush greenery but a low tilted phone angle with foreground shrubs blocking a partial view of the modern house. |
-| 44 | cebu-b-residence-monterrazas | 52 | — | Attractive modern facade but flat overcast light, a parked SUV, and a stray bucket clutter the frame in a lower-res snapshot. |
-| 45 | fourlinq-turnover-1 | 52 | — | Handsome wood-slat modern facade undercut by parked pickup trucks and construction mess in a harsh-sun snapshot. |
-| 46 | portfolio-residence-08 | 52 | — | Wide letterboxed daytime shot of a large multi-level house with softer resolution and some overgrown foreground, snapshot-grade. |
-| 47 | portfolio-residence-09 | 50 | — | Letterboxed daytime Mediterranean house on a slope with a van in the driveway and plain flat lighting, cropped and unpolished. |
-| 48 | cebu-maratas-residence | 48 | — | Flat grey-sky phone snapshot of a modern house behind a fence with plain lighting and a mediocre street-level crop. |
-| 49 | portfolio-residence-10 | 48 | — | Cropped letterboxed daytime tropical-Asian house with softer, slightly washed resolution and a mundane utility box in frame. |
-| 50 | cabanatuan-t-residence | 47 | — | Wide street-level snapshot with parked cars cluttering the foreground and a FourlinQ logo burned top-left. |
-| 51 | portfolio-residence-12 | 46 | — | Rear elevation with pool under a dull overcast sky, muted and flat with a snapshot-grade quality despite the grand house. |
-| 52 | cebu-es-residence-maria-luisa | 44 | — | Low-res harsh-midday snapshot on a cramped hillside lot with a cluttered rock backdrop and burned-in yard signage. |
-| 53 | bulacan-n-residence | 42 | — | Wide-angle phone shot of glass doors with a FourlinQ logo burned into the corner and busy reflections. |
-| 54 | cebu-t-residence-cebu-city | 42 | — | Overcast raw phone snapshot of a modern facade with a blown-out grey sky, parked car, and people clutter on the balcony. |
-| 55 | batangas-c-residences | 40 | — | Blown-out white sky with an awkward tight crop that clips the house and exposes an AC unit and CCTV, a flat phone snapshot. |
-| 56 | portfolio-interior-03 | 38 | — | Cluttered attic lounge with scattered red floor pillows, exposed A/C units and harsh flat lighting make for an awkward, un-editorial snapshot. |
-| 57 | cebu-cmsprs | 36 | — | Dull flat daytime snapshot with a cluttered fence and overgrown foliage largely obscuring the house. |
-| 58 | fourlinq-turnover-2 | 34 | — | Awkward low-angle crop of a balcony with people and a blown-out sky, reads as a casual phone snapshot. |
-| 59 | san-lorenzo-makati-aluminium | 30 | — | Empty raw-concrete interior room with bare unfinished walls and a bank of windows, flat lighting and a construction-documentation feel with no magazine appeal. |
-| 60 | binan-residence | 30 | — | Harsh snapshot with overhead power lines, parked vans and people cluttering the frame and an awkward angled crop of a partial building. |
-| 61 | fourlinq-turnover-3 | 27 | — | Active construction site showing scaffolding and blue tarps, cluttered and unappealing as a cover. |
+| 22 | portfolio-interior-04 | 84 | ✨ | Double-height charcoal living room with tall white-framed windows, cellular shades and mountain views; crisp, professionally staged and graded. |
+| 23 | cebu-ta-residence-monterrazas | 83 | ✨ | Crisp blue-sky render of a striking stone-clad facade, slightly weakened by a faint corner watermark. |
+| 24 | nuvali-laguna-residence | 82 | ✨ | Striking low-angle modern villa with wood-slat cladding against a dramatic cloud-filled sky, crisp and vibrantly graded with strong editorial appeal. |
+| 25 | cebu-m-residence-2 | 82 | ✨ | Bright, well-lit double-height living-room interior with polished styling, warm neutrals and a clean composition. |
+| 26 | cebu-c-residence-amara | 82 | ✨ | Crisp, well-lit stone-and-glass facade framed by lush palms with rich color and good depth, looks professionally graded. |
+| 27 | tagaytay-cavite-residence | 76 | ✨ | White modernist home framed by lush tropical greenery under a bright blue sky, well-composed and punchy though the house sits slightly small in frame. |
+| 28 | las-pinas-residence | 72 | ✨ | Crisp upward-angle courtyard shot with warm wood ceiling and blue-framed glass, well-lit and graded but an unconventional cropped detail rather than a classic full-facade hero. |
+| 29 | portfolio-residence-15 | 70 | — | Attractive white modern hillside home against a rock cliff with lush greenery and a nice diagonal composition, though still a warm daytime phone photo rather than a graded render. |
+| 30 | cebu-g-residences | 68 | ✨ | Warmly lit golden-hour multi-story home with accent lighting, but lower resolution and a power pole cluttering the left edge soften its hero impact. |
+| 31 | portfolio-residence-07 | 66 | — | Clean, sharp modern facade under a bright blue daytime sky, but flat midday lighting keeps it a solid daytime shot rather than editorial. |
+| 32 | portfolio-residence-14 | 66 | — | Sharp wide daytime shot of a large stone-and-stucco mansion facade under blue sky, but flat documentary lighting and a construction fence in front keep it snapshot-grade. |
+| 33 | portfolio-interior-02 | 66 | — | Bright, cleanly staged living room with a sectional sofa, garden windows and terracotta floor, pleasant and well-lit but a standard real-estate phone photo. |
+| 34 | taytay-rizal-residence | 64 | — | Clean sharp daytime corner-facade phone photo with nice blue sky but a plain snapshot look and a somewhat busy street/fence foreground. |
+| 35 | cebu-n-residence-pardo | 62 | — | Clean sunny two-story facade against a blue sky, pleasant but a fairly plain low-resolution daytime phone photo with the car partly clipped. |
+| 36 | portfolio-interior-01 | 62 | — | Cozy corner sofa framed by large windows onto greenery with glossy wood floor, warm and inviting but slightly dark and low-resolution. |
+| 37 | portfolio-residence-11 | 60 | — | Panoramic-crop daytime modern house with decent sharpness and lush greenery, but flat midday lighting limits editorial appeal. |
+| 38 | cebu-residence-vista-grande-talisay | 58 | ✨ | Nicely lit interior of arched black-framed patio doors, but plastic-wrapped furniture and a plain construction-site backdrop weaken its cover appeal. |
+| 39 | cebu-d-residence-mandaue | 58 | — | Clean minimalist white-cube facade but a flatter, plainer daytime phone snapshot with modest resolution. |
+| 40 | sarangani-s-residence | 58 | — | Clean daytime rear-facade phone shot with a tidy lawn but flat lighting and a FourlinQ logo burned into the corner. |
+| 41 | portfolio-residence-13 | 57 | — | Letterboxed daytime modern facade with a bright blue sky and reasonable sharpness, but flat lighting and panoramic crop feel snapshot-like. |
+| 42 | taguig-g-residence | 55 | — | Handsome modern facade but flat overcast light and a burned-in logo watermark keep it in plain snapshot territory. |
+| 43 | cebu-s-residence-maria-luisa | 55 | — | Attractive modern home undercut by a dark perimeter fence dominating the foreground plus flat light and low resolution. |
+| 44 | bataan-s-residence | 55 | — | Nice blue sky and lush greenery but a low tilted phone angle with foreground shrubs blocking a partial view of the modern house. |
+| 45 | cebu-b-residence-monterrazas | 52 | — | Attractive modern facade but flat overcast light, a parked SUV, and a stray bucket clutter the frame in a lower-res snapshot. |
+| 46 | fourlinq-turnover-1 | 52 | — | Handsome wood-slat modern facade undercut by parked pickup trucks and construction mess in a harsh-sun snapshot. |
+| 47 | portfolio-residence-08 | 52 | — | Wide letterboxed daytime shot of a large multi-level house with softer resolution and some overgrown foreground, snapshot-grade. |
+| 48 | portfolio-residence-09 | 50 | — | Letterboxed daytime Mediterranean house on a slope with a van in the driveway and plain flat lighting, cropped and unpolished. |
+| 49 | cebu-maratas-residence | 48 | — | Flat grey-sky phone snapshot of a modern house behind a fence with plain lighting and a mediocre street-level crop. |
+| 50 | portfolio-residence-10 | 48 | — | Cropped letterboxed daytime tropical-Asian house with softer, slightly washed resolution and a mundane utility box in frame. |
+| 51 | cabanatuan-t-residence | 47 | — | Wide street-level snapshot with parked cars cluttering the foreground and a FourlinQ logo burned top-left. |
+| 52 | portfolio-residence-12 | 46 | — | Rear elevation with pool under a dull overcast sky, muted and flat with a snapshot-grade quality despite the grand house. |
+| 53 | cebu-es-residence-maria-luisa | 44 | — | Low-res harsh-midday snapshot on a cramped hillside lot with a cluttered rock backdrop and burned-in yard signage. |
+| 54 | bulacan-n-residence | 42 | — | Wide-angle phone shot of glass doors with a FourlinQ logo burned into the corner and busy reflections. |
+| 55 | cebu-t-residence-cebu-city | 42 | — | Overcast raw phone snapshot of a modern facade with a blown-out grey sky, parked car, and people clutter on the balcony. |
+| 56 | batangas-c-residences | 40 | — | Blown-out white sky with an awkward tight crop that clips the house and exposes an AC unit and CCTV, a flat phone snapshot. |
+| 57 | portfolio-interior-03 | 38 | — | Cluttered attic lounge with scattered red floor pillows, exposed A/C units and harsh flat lighting make for an awkward, un-editorial snapshot. |
+| 58 | cebu-cmsprs | 36 | — | Dull flat daytime snapshot with a cluttered fence and overgrown foliage largely obscuring the house. |
+| 59 | fourlinq-turnover-2 | 34 | — | Awkward low-angle crop of a balcony with people and a blown-out sky, reads as a casual phone snapshot. |
+| 60 | san-lorenzo-makati-aluminium | 30 | — | Empty raw-concrete interior room with bare unfinished walls and a bank of windows, flat lighting and a construction-documentation feel with no magazine appeal. |
+| 61 | binan-residence | 30 | — | Harsh snapshot with overhead power lines, parked vans and people cluttering the frame and an awkward angled crop of a partial building. |
+| 62 | fourlinq-turnover-3 | 27 | — | Active construction site showing scaffolding and blue tarps, cluttered and unappealing as a cover. |
 
 ## Per-category selection
 
@@ -228,8 +229,8 @@ Hero-quality rated: **61/61**
 | nuvali-laguna-residence | interior | gjR_DEfu.jpg | 85 | ✅ |
 | nuvali-laguna-residence | windows | AOQsrPKg.jpg | 80 | ✅ |
 | portfolio-interior-01 | doors | portfolio-interior-01.jpg | 8 | — |
-| portfolio-interior-01 | exterior | portfolio-interior-01-2.jpg | 6 | — |
-| portfolio-interior-01 | interior | portfolio-interior-01-2.jpg | 92 | ✅ |
+| portfolio-interior-01 | exterior | portfolio-interior-01.jpg | 4 | — |
+| portfolio-interior-01 | interior | portfolio-interior-01.jpg | 90 | ✅ |
 | portfolio-interior-01 | windows | portfolio-interior-01.jpg | 78 | ✅ |
 | portfolio-interior-02 | doors | portfolio-interior-02.jpg | 60 | ✅ |
 | portfolio-interior-02 | exterior | portfolio-interior-02.jpg | 8 | — |
@@ -239,6 +240,10 @@ Hero-quality rated: **61/61**
 | portfolio-interior-03 | exterior | portfolio-interior-03.jpg | 5 | — |
 | portfolio-interior-03 | interior | portfolio-interior-03.jpg | 92 | ✅ |
 | portfolio-interior-03 | windows | portfolio-interior-03.jpg | 55 | ✅ |
+| portfolio-interior-04 | doors | portfolio-interior-01-2.jpg | 5 | — |
+| portfolio-interior-04 | exterior | portfolio-interior-01-2.jpg | 6 | — |
+| portfolio-interior-04 | interior | portfolio-interior-01-2.jpg | 92 | ✅ |
+| portfolio-interior-04 | windows | portfolio-interior-01-2.jpg | 72 | ✅ |
 | portfolio-residence-01 | doors | portfolio-residence-01.jpg | 20 | — |
 | portfolio-residence-01 | exterior | portfolio-residence-01.jpg | 88 | ✅ |
 | portfolio-residence-01 | interior | portfolio-residence-01.jpg | 4 | — |

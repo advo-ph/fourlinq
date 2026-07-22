@@ -76,9 +76,9 @@ export const projects: Project[] = [
     id: "las-pinas-residence",
     name: "Las Piñas residence",
     location: "Las Piñas",
-    image: `${FB}/DOuJGHUl.jpg`,
+    image: `${FB}/ttZUwHC9.jpg`,
     gallery: [
-      `${FB}/ttZUwHC9.jpg`,
+      `${FB}/DOuJGHUl.jpg`,
       `${FB}/1624zR2K.jpg`,
       `${FB}/wmPQfS3V.jpg`,
       `${FB}/x63pl_14.jpg`,
@@ -148,9 +148,9 @@ export const projects: Project[] = [
     // (P7DLic-T.jpg) was a construction-deck-with-scaffolding photo that
     // read as raw; the finished room with the awning-window grid is
     // editorial.
-    image: `${FB}/yDrxH9L-.jpg`,
+    image: `${FB}/P7DLic-T.jpg`,
     gallery: [
-      `${FB}/P7DLic-T.jpg`,
+      `${FB}/yDrxH9L-.jpg`,
       `${FB}/P8m34kD5.jpg`,
       `${FB}/z8K5dOzz.jpg`,
       `${FB}/2vzBfKBe.jpg`,
@@ -231,9 +231,9 @@ export const projects: Project[] = [
     id: "bulacan-n-residence",
     name: "N. Residence",
     location: "Bulacan",
-    image: `${FB}/ZoZWYiwi.jpg`,
+    image: `${FB}/S2T-OFy4.jpg`,
     gallery: [
-      `${FB}/S2T-OFy4.jpg`,
+      `${FB}/ZoZWYiwi.jpg`,
       `${FB}/-pFxhSkE.jpg`,
     ],
     category: "interior",
@@ -271,9 +271,9 @@ export const projects: Project[] = [
     name: "N. Residence",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable).
-    image: `${FB}/cebu-n-residence-pardo.jpg`,
+    image: `${FB}/cebu-n-residence-pardo-2.jpg`,
     gallery: [
-      `${FB}/cebu-n-residence-pardo-2.jpg`,
+      `${FB}/cebu-n-residence-pardo.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -384,9 +384,9 @@ export const projects: Project[] = [
     name: "E.S. Residence",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable).
-    image: `${FB}/cebu-es-residence-maria-luisa.jpg`,
+    image: `${FB}/cebu-es-residence-maria-luisa-2.jpg`,
     gallery: [
-      `${FB}/cebu-es-residence-maria-luisa-2.jpg`,
+      `${FB}/cebu-es-residence-maria-luisa.jpg`,
       `${FB}/cebu-es-residence-maria-luisa-3.jpg`,
     ],
     category: "exterior",
@@ -399,10 +399,10 @@ export const projects: Project[] = [
     name: "Residence",
     location: "Cebu",
     // Enhanced photo (TASK1 deliverable).
-    image: `${FB}/cebu-cmsprs.jpg`,
+    image: `${FB}/cebu-cmsprs-3.jpg`,
     gallery: [
+      `${FB}/cebu-cmsprs.jpg`,
       `${FB}/cebu-cmsprs-2.jpg`,
-      `${FB}/cebu-cmsprs-3.jpg`,
       `${FB}/cebu-cmsprs-4.jpg`,
     ],
     category: "exterior",
@@ -415,9 +415,9 @@ export const projects: Project[] = [
     name: "M. Residence",
     location: "Cebu",
     // Enhanced photo (TASK1 deliverable).
-    image: `${FB}/cebu-m-residence-2.jpg`,
+    image: `${FB}/cebu-m-residence-2-2.jpg`,
     gallery: [
-      `${FB}/cebu-m-residence-2-2.jpg`,
+      `${FB}/cebu-m-residence-2.jpg`,
       `${FB}/cebu-m-residence-2-3.jpg`,
     ],
     category: "exterior",
@@ -446,10 +446,10 @@ export const projects: Project[] = [
     location: "Cebu",
     // Enhanced photo (TASK1 deliverable). Skyframe CM, charcoal gray with
     // reflective grey glass.
-    image: `${FB}/cebu-f-residence-fortunado.jpg`,
+    image: `${FB}/cebu-f-residence-fortunado-3.jpg`,
     gallery: [
+      `${FB}/cebu-f-residence-fortunado.jpg`,
       `${FB}/cebu-f-residence-fortunado-2.jpg`,
-      `${FB}/cebu-f-residence-fortunado-3.jpg`,
       `${FB}/cebu-f-residence-fortunado-4.jpg`,
       `${FB}/cebu-f-residence-fortunado-5.jpg`,
     ],
@@ -632,10 +632,10 @@ export const projects: Project[] = [
     name: "T. Residence",
     location: "Cabanatuan",
     // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/cabanatuan-t-residence.jpg`,
+    image: `${FB}/cabanatuan-t-residence-3.jpg`,
     gallery: [
+      `${FB}/cabanatuan-t-residence.jpg`,
       `${FB}/cabanatuan-t-residence-2.jpg`,
-      `${FB}/cabanatuan-t-residence-3.jpg`,
       `${FB}/cabanatuan-t-residence-4.jpg`,
     ],
     category: "exterior",
@@ -648,10 +648,10 @@ export const projects: Project[] = [
     name: "Residence",
     location: "Philippines",
     // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/fourlinq-turnover-1.jpg`,
+    image: `${FB}/fourlinq-turnover-1-3.jpg`,
     gallery: [
+      `${FB}/fourlinq-turnover-1.jpg`,
       `${FB}/fourlinq-turnover-1-2.jpg`,
-      `${FB}/fourlinq-turnover-1-3.jpg`,
       `${FB}/fourlinq-turnover-1-4.jpg`,
       `${FB}/fourlinq-turnover-1-5.jpg`,
     ],
@@ -868,9 +868,6 @@ export const projects: Project[] = [
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-interior-01.jpg`,
-    gallery: [
-      `${FB}/portfolio-interior-01-2.jpg`,
-    ],
     category: "interior",
     tag: ["windows", "doors", "interior"],
     description: "A FourlinQ interior windows and doors installation.",
@@ -891,6 +888,17 @@ export const projects: Project[] = [
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-interior-03.jpg`,
+    category: "interior",
+    tag: ["windows", "doors", "interior"],
+    description: "A FourlinQ interior windows and doors installation.",
+  },
+  {
+    id: "portfolio-interior-04",
+    name: "Residence",
+    location: "Philippines",
+    // Portfolio image (source/location unknown); split out of portfolio-interior-01
+    // on 2026-07-22 — the two photos are different projects.
+    image: `${FB}/portfolio-interior-01-2.jpg`,
     category: "interior",
     tag: ["windows", "doors", "interior"],
     description: "A FourlinQ interior windows and doors installation.",

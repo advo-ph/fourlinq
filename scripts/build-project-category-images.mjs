@@ -14,6 +14,7 @@
 //   server/data/project-image-analysis.json          (merged manifest, source of truth)
 //   server/data/project-image-analysis-report.md      (human spot-check report)
 //   src/data/project-category-images.generated.ts     (frontend data)
+//   src/data/project-category-images.baseline.json    (runtime fallback JSON — same four exports)
 
 import fs from "node:fs";
 import path from "node:path";
@@ -25,10 +26,12 @@ const PARTS_DIR = path.join(DATA, "_analysis");
 const MANIFEST = path.join(DATA, "project-image-analysis.json");
 const REPORT = path.join(DATA, "project-image-analysis-report.md");
 const GENERATED = path.join(ROOT, "src", "data", "project-category-images.generated.ts");
+const BASELINE_JSON = path.join(ROOT, "src", "data", "project-category-images.baseline.json");
 
 // A category qualifies for a project only if its best image scores at least
 // this. Below it: no image for that category, project drops out of that filter.
 // Tunable — re-running this script re-derives membership with zero re-analysis.
+// SYNC: must match THRESHOLD in server/routes/project-images.ts
 const THRESHOLD = 50;
 const CATEGORIES = ["windows", "doors", "interior", "exterior"];
 
@@ -201,6 +204,13 @@ export const projectCategoryOrder: Record<InspirationTag, string[]> = ${JSON.str
 `;
 fs.writeFileSync(GENERATED, ts);
 
+// ── write baseline JSON sidecar (runtime fallback for /inspiration) ──────────
+// This JSON file ships in dist/ alongside the TS module and is used by the
+// frontend as an instant fallback when /api/project-images/merged is unavailable.
+// Committed alongside the generated TS — regenerate both with: node scripts/build-project-category-images.mjs
+const baselineJson = JSON.stringify({ projectCategoryImages: ci, projectDerivedTags: dt, projectOrder, projectCategoryOrder }, null, 2) + "\n";
+fs.writeFileSync(BASELINE_JSON, baselineJson);
+
 // ── write spot-check report ──────────────────────────────────────────────
 let md = `# Project image analysis — spot check\n\n`;
 md += `Threshold: **${THRESHOLD}/100** (a category is kept only if its best image clears this).\n\n`;
@@ -228,9 +238,10 @@ if (unscored.length) md += `\n## Unscored images\n\n${unscored.map((u) => "- " +
 fs.writeFileSync(REPORT, md);
 
 // ── console summary ──────────────────────────────────────────────────────
-console.log(`Manifest:  ${MANIFEST}`);
-console.log(`Generated: ${GENERATED}`);
-console.log(`Report:    ${REPORT}`);
+console.log(`Manifest:   ${MANIFEST}`);
+console.log(`Generated:  ${GENERATED}`);
+console.log(`Baseline:   ${BASELINE_JSON}`);
+console.log(`Report:     ${REPORT}`);
 console.log(`Covered: ${covered.length}/${canon.length} projects`);
 console.log(`Hero-quality: ${covered.length - missingQuality.length}/${covered.length} rated`);
 if (dupes.length) console.log(`Merge notes: ${dupes.length} (see report)`);

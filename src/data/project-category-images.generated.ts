@@ -271,7 +271,7 @@ export const projectCategoryImages: Record<string, CategoryImages> = {
   },
   "portfolio-interior-01": {
     "windows": "/images/projects-fb/portfolio-interior-01.jpg",
-    "interior": "/images/projects-fb/portfolio-interior-01-2.jpg"
+    "interior": "/images/projects-fb/portfolio-interior-01.jpg"
   },
   "portfolio-interior-02": {
     "windows": "/images/projects-fb/portfolio-interior-02.jpg",
@@ -281,6 +281,10 @@ export const projectCategoryImages: Record<string, CategoryImages> = {
   "portfolio-interior-03": {
     "windows": "/images/projects-fb/portfolio-interior-03.jpg",
     "interior": "/images/projects-fb/portfolio-interior-03.jpg"
+  },
+  "portfolio-interior-04": {
+    "windows": "/images/projects-fb/portfolio-interior-01-2.jpg",
+    "interior": "/images/projects-fb/portfolio-interior-01-2.jpg"
   }
 };
 
@@ -556,6 +560,10 @@ export const projectDerivedTags: Record<string, InspirationTag[]> = {
   "portfolio-interior-03": [
     "windows",
     "interior"
+  ],
+  "portfolio-interior-04": [
+    "windows",
+    "interior"
   ]
 };
 
@@ -582,6 +590,7 @@ export const projectOrder: string[] = [
   "cebu-n-residence-pardo-b",
   "cebu-p-residence-kishanta",
   "cebu-f-residence-fortunado",
+  "portfolio-interior-04",
   "cebu-ta-residence-monterrazas",
   "nuvali-laguna-residence",
   "cebu-m-residence-2",
@@ -646,6 +655,7 @@ export const projectCategoryOrder: Record<InspirationTag, string[]> = {
     "sarangani-s-residence",
     "cebu-c-residence-amara",
     "portfolio-residence-11",
+    "portfolio-interior-04",
     "cebu-maratas-residence",
     "portfolio-residence-10",
     "cebu-f-residence-fortunado",
@@ -708,10 +718,11 @@ export const projectCategoryOrder: Record<InspirationTag, string[]> = {
     "cebu-ta-residence-monterrazas"
   ],
   "interior": [
+    "portfolio-interior-04",
     "portfolio-interior-02",
-    "portfolio-interior-01",
     "fourlinq-turnover-1",
     "portfolio-interior-03",
+    "portfolio-interior-01",
     "batangas-c-residences",
     "cebu-m-residence-2",
     "cebu-maratas-residence",

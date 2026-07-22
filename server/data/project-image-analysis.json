@@ -1676,7 +1676,19 @@
             "exterior": 4
           },
           "reasoning": "Editorial interior corner shot of a sofa framed by large openable casement windows overlooking greenery, so it is a strong interior hero with windows prominently featured."
-        },
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/portfolio-interior-01.jpg",
+        "heroScore": 62,
+        "enhanced": false,
+        "enhancedConfidence": 30,
+        "notes": "Cozy corner sofa framed by large windows onto greenery with glossy wood floor, warm and inviting but slightly dark and low-resolution."
+      }
+    },
+    "portfolio-interior-04": {
+      "finished": true,
+      "images": [
         {
           "path": "/images/projects-fb/portfolio-interior-01-2.jpg",
           "scores": {
@@ -1689,11 +1701,11 @@
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/portfolio-interior-01.jpg",
-        "heroScore": 62,
-        "enhanced": false,
-        "enhancedConfidence": 30,
-        "notes": "Cozy corner sofa framed by large windows onto greenery with glossy wood floor, warm and inviting but slightly dark and low-resolution."
+        "heroImage": "/images/projects-fb/portfolio-interior-01-2.jpg",
+        "heroScore": 84,
+        "enhanced": true,
+        "enhancedConfidence": 80,
+        "notes": "Double-height charcoal living room with tall white-framed windows, cellular shades and mountain views; crisp, professionally staged and graded."
       }
     },
     "portfolio-residence-01": {

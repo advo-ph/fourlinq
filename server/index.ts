@@ -9,6 +9,7 @@ import adminChatRouter from "./routes/admin-chat.js";
 import inquiriesRouter from "./routes/inquiries.js";
 import analyticsRouter from "./routes/analytics.js";
 import productsRouter from "./routes/products.js";
+import { projectImagesPublic, projectImagesAdmin } from "./routes/project-images.js";
 import { cmsPublic, cmsAdmin, uploadRouter, docsUploadRouter, usersRouter, auditMiddleware } from "./cms-config.js";
 import { loginHandler, logoutHandler, checkAuthHandler, requireAdmin, requireRole } from "./auth.js";
 import { spaStatusForPath } from "./spa-route.js";
@@ -41,6 +42,8 @@ app.use("/uploads", express.static(path.resolve(import.meta.dirname, "../uploads
 app.use("/api", inquiriesRouter);
 // Public product catalog (Phase 1 — DB-backed, hook falls back to static if 5xx)
 app.use("/api/products", productsRouter);
+// Public project-images merged endpoint (no auth, cached 30 s)
+app.use("/api/project-images", projectImagesPublic);
 
 // ─── Admin auth (open) ──────────────────────────
 app.post("/api/admin/login", loginHandler);
@@ -62,6 +65,9 @@ app.use("/api/admin/cms",
 
 // User management — admin only
 app.use("/api/admin/users", ...requireRole(["admin"]), auditMiddleware, usersRouter);
+
+// Project-images override management — admin + editor
+app.use("/api/admin/project-images", ...requireRole(["admin", "editor"]), projectImagesAdmin);
 
 // Admin inquiries (router has /inquiries GET and /inquiries/:id PATCH)
 app.use("/api/admin", requireAdmin, inquiriesRouter);
