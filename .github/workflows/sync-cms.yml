@@ -1,19 +1,23 @@
 name: Sync CMS data
 
-# Upserts the pushed static content into the production CMS tables on the VPS,
-# so the DB (which the live site reads via /api/cms/*) matches src/data/*.
+# Applies pending DB migrations and upserts the pushed static content into the
+# production CMS tables on the VPS, so the DB (which the live site reads via
+# /api/cms/* and /api/project-images) matches src/data/* and server/migrations/*.
 #
+#   migration 014          project_image_override table (guarded: applied only
+#                          if the table does not exist yet)
 #   migrate-cms-data.ts    src/data/projects.ts + whats-new.ts
 #                          -> cms_project, cms_news_post, cms_media_asset
 #   sync-product-content.ts src/data/products.ts display fields
 #                          -> product (name, thumbnail, copy) — non-destructive
 #
-# Both scripts are idempotent (upsert / update-in-place by slug). The VPS
-# already has the latest src/data/ from the Deploy workflow's rsync, and tsx is
-# a runtime dependency there, so this runs the scripts in place against the
-# production .env / DATABASE_URL.
+# The content scripts are idempotent (upsert / update-in-place by slug). The VPS
+# already has the latest src/data/ + server/ from the Deploy workflow's rsync,
+# and tsx is a runtime dependency there, so this runs in place against the
+# production .env / DATABASE_URL. Migrations here are applied by hand (no
+# runner), so this workflow is the SSH path for that.
 #
-# Manual trigger only — a DB content sync is a deliberate, observable action.
+# Manual trigger only — a DB migration / content sync is a deliberate action.
 on:
   workflow_dispatch:
 
@@ -34,24 +38,32 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Sync CMS + product content on the VPS
+      - name: Apply migrations + sync content on the VPS
         env:
           VPS: ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}
-          REMOTE_DIR: /opt/fourlinq
         run: |
           set -euo pipefail
           SSH="ssh -i $HOME/.ssh/id_ed25519 -o StrictHostKeyChecking=yes"
+          $SSH "$VPS" bash -s <<'REMOTE'
+          set -euo pipefail
+          cd /opt/fourlinq
 
-          echo "::group::Deployed revision on the VPS"
-          $SSH "$VPS" "head -3 $REMOTE_DIR/deployed-from.txt 2>/dev/null || echo '(no audit file)'"
-          echo "::endgroup::"
+          echo "--- deployed revision on the VPS ---"
+          head -3 deployed-from.txt 2>/dev/null || echo "(no audit file)"
 
-          echo "::group::migrate-cms-data (projects + news)"
-          $SSH "$VPS" "cd $REMOTE_DIR && ./node_modules/.bin/tsx server/scripts/migrate-cms-data.ts"
-          echo "::endgroup::"
+          echo "--- migration 014: project_image_override ---"
+          if [ -z "$(sudo -u postgres psql fourlinq -tAc "SELECT to_regclass('public.project_image_override')")" ]; then
+            echo "table missing — applying 014_project_image_overrides.sql"
+            sudo -u postgres psql fourlinq -v ON_ERROR_STOP=1 -f server/migrations/014_project_image_overrides.sql
+          else
+            echo "project_image_override already exists — skipping."
+          fi
 
-          echo "::group::sync-product-content (product display fields)"
-          $SSH "$VPS" "cd $REMOTE_DIR && ./node_modules/.bin/tsx server/scripts/sync-product-content.ts"
-          echo "::endgroup::"
+          echo "--- migrate-cms-data (projects + news) ---"
+          ./node_modules/.bin/tsx server/scripts/migrate-cms-data.ts
 
-          echo "CMS data synced against production."
+          echo "--- sync-product-content (product display fields) ---"
+          ./node_modules/.bin/tsx server/scripts/sync-product-content.ts
+
+          echo "Done: migrations applied and content synced against production."
+          REMOTE
