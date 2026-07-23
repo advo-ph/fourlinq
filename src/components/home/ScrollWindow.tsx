@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
 import { useSegmentedFrames } from "@/hooks/useSegmentedFrames";
@@ -45,7 +45,6 @@ const INACTIVE_OPACITY = 0.28;
 // text fades up and out, the next fades in at the same position (and the
 // highlight advances). Swipe down: fades down, the previous returns.
 const STEP_COUNT = WINDOW_PARTS.length + 1; // intro + parts
-const TRACK_EXTRA_VH = 0.6;                 // fractional extra viewport-heights of scroll track at the end
 
 const ScrollWindow = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,17 +53,29 @@ const ScrollWindow = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
-  const trackRef = useRef<HTMLDivElement>(null);
+
+  // ── Gesture refs (unconditional — Rules of Hooks) ──────────
+  const animatingRef = useRef(false);
+  const engagedRef = useRef(false);        // true only while section is fully settled in-view
+  const touchStartYRef = useRef(0);
+  const touchLastYRef = useRef(0);
+  const touchSamplesRef = useRef<Array<{ y: number; t: number }>>([]);
+  const gestureDirectionRef = useRef<'up' | 'down' | null>(null);
+  const gestureCapturedRef = useRef(false);
 
   const [nearViewport, setNearViewport] = useState(false);
   const [isDesktop, setIsDesktop] = useState(
     () => window.matchMedia("(min-width: 1024px)").matches,
   );
   const [activeIndex, setActiveIndex] = useState(-1); // desktop: scroll-driven
-  const [step, setStep] = useState(0);                // mobile: scroll-progress-driven (0 = intro)
+  const [step, setStep] = useState(0);                // mobile: touch-driven (0 = intro)
   const stepRef = useRef(0);
   const [material, setMaterial] = useState<MaterialId>("upvc");
   const [matFade, setMatFade] = useState(true);
+
+  // ── Mobile swipe MotionValues (unconditional — Rules of Hooks) ─────────────
+  const cardY = useMotionValue(0);
+  const cardOpacity = useMotionValue(1);
 
   // Preload gate.
   useEffect(() => {
@@ -91,38 +102,6 @@ const ScrollWindow = () => {
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
   }, []);
-
-  // ── framer-motion scroll progress (unconditional — Rules of Hooks) ─────────
-  // scrollYProgress tracks 0.0 (track top at viewport top) → 1.0 (track bottom
-  // at viewport bottom). Used on mobile only; desktop ignores these values.
-  const { scrollYProgress } = useScroll({
-    target: trackRef,
-    offset: ["start start", "end end"],
-  });
-
-  // Drive discrete step state from scroll progress (mobile only).
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (isDesktop) return;
-    const next = Math.min(STEP_COUNT - 1, Math.floor(latest * STEP_COUNT));
-    if (next !== stepRef.current) {
-      stepRef.current = next;
-      setStep(next);
-    }
-  });
-
-  // Per-step opacity and translateY MotionValues — all 4 declared unconditionally.
-  const stepOpacities = [
-    useTransform(scrollYProgress, [0 / 4, 0.5 / 4, 1 / 4], [0, 1, 0]),
-    useTransform(scrollYProgress, [1 / 4, 1.5 / 4, 2 / 4], [0, 1, 0]),
-    useTransform(scrollYProgress, [2 / 4, 2.5 / 4, 3 / 4], [0, 1, 0]),
-    useTransform(scrollYProgress, [3 / 4, 3.5 / 4, 4 / 4], [0, 1, 0]),
-  ];
-  const stepYs = [
-    useTransform(scrollYProgress, [0 / 4, 0.5 / 4, 1 / 4], [24, 0, -24]),
-    useTransform(scrollYProgress, [1 / 4, 1.5 / 4, 2 / 4], [24, 0, -24]),
-    useTransform(scrollYProgress, [2 / 4, 2.5 / 4, 3 / 4], [24, 0, -24]),
-    useTransform(scrollYProgress, [3 / 4, 3.5 / 4, 4 / 4], [24, 0, -24]),
-  ];
 
   // ── Desktop: active part = the last part whose text has scrolled up to the
   // activation line. Before the first part reaches it (the Part-0 run-in) and
@@ -168,28 +147,318 @@ const ScrollWindow = () => {
     };
   }, [isDesktop]);
 
-  // ── Mobile: IntersectionObserver fires fq-hide-header + fq-scrollwindow-inview
-  // when the scroll track covers ≥90% of the viewport.
+  // ── Mobile: scroll-settle engagement state machine ─────────────────────────
+  // Replaces the v1 IntersectionObserver approach. Dispatches fq-hide-header
+  // and fq-scrollwindow-inview based on scroll settle position, not IO threshold.
+  // Also handles orientation change reset.
   useEffect(() => {
     if (isDesktop) return;
+
     const el = containerRef.current;
     if (!el) return;
-    const dispatch = (inView: boolean) => {
-      window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: inView }));
-      window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView } }));
-    };
-    const io = new IntersectionObserver(
-      ([entry]) => dispatch(entry.intersectionRatio >= 0.9),
-      { threshold: [0, 0.9] },
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      dispatch(false); // cleanup: always unhide header + restore chat bubble
-    };
-  }, [isDesktop]);
 
-  // Which part is highlighted — scroll-driven on desktop, scroll-progress-driven on mobile.
+    // Cache section height once on mount — not re-read on toolbar resize.
+    const cachedHeight = el.getBoundingClientRect().height;
+
+    let armedRef = true;
+    let prevSectionTopRef = 0;
+    let settleTimerRef: ReturnType<typeof setTimeout> | null = null;
+
+    // Fix B2: dedupe dispatches — only emit when flag actually changes
+    let lastDispatchFlag: boolean | null = null;
+    const dispatchInSection = (flag: boolean) => {
+      if (flag === lastDispatchFlag) return;
+      lastDispatchFlag = flag;
+      window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: flag }));
+      window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView: flag } }));
+    };
+
+    const onSettle = () => {
+      const top = el.getBoundingClientRect().top;
+      if (armedRef && Math.abs(top) <= 48) {
+        // Fix B3: skip smooth-align glide when already aligned (avoids settle churn)
+        if (Math.abs(top) >= 1) {
+          window.scrollTo({ top: window.scrollY + top, behavior: "smooth" });
+        }
+        armedRef = false;
+        engagedRef.current = true;          // Bug A fix: mark section as engaged
+        el.style.touchAction = "none";      // Fix A1: deterministic capture — no race with browser
+        // Approaching from above (top was positive before) → step 0; from below → last step
+        setStep(prevSectionTopRef > 0 ? 0 : STEP_COUNT - 1);
+        stepRef.current = prevSectionTopRef > 0 ? 0 : STEP_COUNT - 1;
+        dispatchInSection(true);
+        cardY.set(0);
+        cardOpacity.set(1);
+      } else {
+        // Fix B1: loose bounds with epsilon — sub-pixel fractional top won't false-disengage
+        const stillIn = top <= 56 && top + cachedHeight >= window.innerHeight - 56;
+        if (!stillIn) {
+          dispatchInSection(false);
+        }
+      }
+    };
+
+    const clearSettle = () => {
+      if (settleTimerRef !== null) {
+        clearTimeout(settleTimerRef);
+        settleTimerRef = null;
+      }
+    };
+
+    const scheduleSettle = () => {
+      clearSettle();
+      settleTimerRef = setTimeout(onSettle, 120);
+    };
+
+    const onScroll = () => {
+      const top = el.getBoundingClientRect().top;
+      prevSectionTopRef = top;
+      // Re-arm when far from section so the next approach can engage
+      if (Math.abs(top) > 80) {
+        armedRef = true;
+        engagedRef.current = false;         // Bug A fix: disengage when user scrolls away
+        el.style.touchAction = "";          // Fix A2: restore native scroll on disengage
+      }
+      if ("onscrollend" in window) {
+        // scheduleSettle acts as fallback; scrollend fires the settle directly
+        scheduleSettle();
+      } else {
+        scheduleSettle();
+      }
+    };
+
+    const onScrollEnd = () => {
+      clearSettle();
+      onSettle();
+    };
+
+    const onOrientationChange = () => {
+      engagedRef.current = false;           // Bug A fix: disengage on rotation
+      el.style.touchAction = "";            // Fix A3: restore native scroll on rotation
+      dispatchInSection(false);
+      cardY.set(0);
+      cardOpacity.set(1);
+      setStep(0);
+      stepRef.current = 0;
+      armedRef = true;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    if ("onscrollend" in window) {
+      window.addEventListener("scrollend", onScrollEnd);
+    }
+    window.addEventListener("orientationchange", onOrientationChange);
+
+    return () => {
+      clearSettle();
+      engagedRef.current = false;           // Bug A fix: disengage on unmount/isDesktop change
+      el.style.touchAction = "";            // Fix A4: restore native scroll on cleanup
+      window.removeEventListener("scroll", onScroll);
+      if ("onscrollend" in window) {
+        window.removeEventListener("scrollend", onScrollEnd);
+      }
+      window.removeEventListener("orientationchange", onOrientationChange);
+      dispatchInSection(false);
+    };
+  }, [isDesktop, cardY, cardOpacity]);
+
+  // ── Mobile: native touch gesture engine ────────────────────────────────────
+  useEffect(() => {
+    if (isDesktop) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    // Fix B2: dedupe dispatches — only emit when flag actually changes
+    let lastDispatchFlag: boolean | null = null;
+    const dispatchInSection = (flag: boolean) => {
+      if (flag === lastDispatchFlag) return;
+      lastDispatchFlag = flag;
+      window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: flag }));
+      window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView: flag } }));
+    };
+
+    const springBack = () => {
+      animate(cardY, 0, { type: "spring", stiffness: 380, damping: 32 });
+      animate(cardOpacity, 1, { duration: 0.18 });
+    };
+
+    const commitCard = (direction: "up" | "down") => {
+      animatingRef.current = true;
+      const exitY = direction === "up" ? -140 : 140;
+      animate(cardY, exitY, { duration: 0.16, ease: "easeOut" });
+      animate(cardOpacity, 0, {
+        duration: 0.14,
+        onComplete: () => {
+          const current = stepRef.current;
+          const next = Math.max(0, Math.min(STEP_COUNT - 1, direction === "up" ? current + 1 : current - 1));
+          stepRef.current = next;
+          setStep(next);
+          // Entry pose for incoming card
+          cardY.set(direction === "up" ? 36 : -36);
+          cardOpacity.set(0);
+          // Spring in
+          animate(cardY, 0, {
+            type: "spring",
+            stiffness: 300,
+            damping: 30,
+            onComplete: () => {
+              animatingRef.current = false;
+            },
+          });
+          animate(cardOpacity, 1, { duration: 0.28 });
+        },
+      });
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      // Bug B fix: ALWAYS reset gesture refs for ref hygiene, even during animation.
+      // onTouchMove already returns early while animatingRef is true, so a gesture that
+      // starts mid-animation will correctly re-lock from the current finger position
+      // once the animation finishes (dy is measured from this touchstart's clientY).
+      if (e.touches.length > 1) {
+        touchStartYRef.current = 0;
+        touchLastYRef.current = 0;
+        touchSamplesRef.current = [];
+        gestureDirectionRef.current = null;
+        gestureCapturedRef.current = false;
+        return;
+      }
+      touchStartYRef.current = e.touches[0].clientY;
+      touchLastYRef.current = e.touches[0].clientY;
+      touchSamplesRef.current = [];
+      gestureDirectionRef.current = null;
+      gestureCapturedRef.current = false;
+      if (animatingRef.current) {
+        // During commit animation — refs are clean; let native events propagate
+        return;
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (animatingRef.current) {
+        // During commit animation — do not prevent default; let native scroll happen
+        return;
+      }
+
+      // Multi-touch: release capture if it was grabbed
+      if (e.touches.length > 1) {
+        if (gestureCapturedRef.current) {
+          gestureCapturedRef.current = false;
+          springBack();
+        }
+        return;
+      }
+
+      const currentY = e.touches[0].clientY;
+      const dy = currentY - touchStartYRef.current;
+
+      // Direction lock after 6px movement
+      if (gestureDirectionRef.current === null && Math.abs(dy) > 6) {
+        // Bug A fix: if section is not engaged (e.g. partially scrolled into view),
+        // immediately lock the gesture as pass-through so native scroll is not hijacked.
+        if (!engagedRef.current) {
+          gestureDirectionRef.current = "down"; // any non-null value to prevent re-evaluation
+          gestureCapturedRef.current = false;
+          return;
+        }
+        if (dy < 0) {
+          // Swipe up
+          if (stepRef.current === STEP_COUNT - 1) {
+            // Fix A3/A5: EXIT GLIDE — touch-action:none means native scroll won't fire;
+            // instead we programmatically glide the page out of the section.
+            // Guard: mark direction non-null so this fires at most once per gesture.
+            gestureDirectionRef.current = "up";
+            gestureCapturedRef.current = false;
+            engagedRef.current = false;           // disengage
+            el.style.touchAction = "";            // Fix A5: restore on boundary exit
+            dispatchInSection(false);
+            window.scrollBy({ top: window.innerHeight * 0.55, behavior: "smooth" });
+          } else {
+            gestureDirectionRef.current = "up";
+            gestureCapturedRef.current = true;
+          }
+        } else {
+          // Swipe down
+          if (stepRef.current === 0) {
+            // Fix A3/A5: EXIT GLIDE — symmetric for swipe-down at first step.
+            gestureDirectionRef.current = "down";
+            gestureCapturedRef.current = false;
+            engagedRef.current = false;           // disengage
+            el.style.touchAction = "";            // Fix A5: restore on boundary exit
+            dispatchInSection(false);
+            window.scrollBy({ top: -(window.innerHeight * 0.55), behavior: "smooth" });
+          } else {
+            gestureDirectionRef.current = "down";
+            gestureCapturedRef.current = true;
+          }
+        }
+      }
+
+      if (!gestureCapturedRef.current) {
+        return;
+      }
+
+      e.preventDefault();
+
+      touchLastYRef.current = currentY;
+      const currentDy = currentY - touchStartYRef.current;
+      const now = Date.now();
+      touchSamplesRef.current.push({ y: currentDy, t: now });
+      if (touchSamplesRef.current.length > 3) {
+        touchSamplesRef.current.shift();
+      }
+
+      cardY.set(currentDy);
+      cardOpacity.set(Math.max(0, 1 - Math.abs(currentDy) / 260));
+    };
+
+    const onTouchEnd = () => {
+      if (!gestureCapturedRef.current) return;
+
+      const dy = touchLastYRef.current - touchStartYRef.current;
+      const samples = touchSamplesRef.current;
+      let v = 0;
+      if (samples.length >= 2) {
+        const first = samples[0];
+        const last = samples[samples.length - 1];
+        const dt = last.t - first.t;
+        if (dt > 0) {
+          v = (last.y - first.y) / dt;
+        }
+      }
+
+      const shouldCommit = (Math.abs(dy) > 60 || Math.abs(v) > 0.5);
+      if (shouldCommit) {
+        commitCard(dy < 0 ? "up" : "down");
+      } else {
+        springBack();
+      }
+    };
+
+    const onTouchCancel = () => {
+      if (!gestureCapturedRef.current) return;
+      springBack();
+    };
+
+    // touchstart must be passive — never preventDefault here
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    // touchmove must be non-passive so we can preventDefault to block native scroll
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("touchcancel", onTouchCancel, { passive: true });
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchCancel);
+      el.style.touchAction = "";            // Fix A6: restore on gesture engine teardown
+      dispatchInSection(false);
+    };
+  }, [isDesktop, cardY, cardOpacity]);
+
+  // Which part is highlighted — scroll-driven on desktop, touch-driven on mobile.
   const effectiveActive = isDesktop ? activeIndex : step - 1;
 
   const { images, progress, isLoaded } = useFramePreloader(
@@ -253,18 +522,17 @@ const ScrollWindow = () => {
 
   return (
     <div
-      ref={(el) => {
-        containerRef.current = el;
-        trackRef.current = el;
-      }}
+      ref={containerRef}
       className="relative bg-[color:var(--canvas)]"
-      style={!isDesktop ? { height: `${(STEP_COUNT + TRACK_EXTRA_VH) * 100}dvh` } : undefined}
     >
-      {/* FULL-WIDTH pinned media */}
+      {/* FULL-WIDTH layout — sticky on desktop, static full-screen on mobile */}
       <div
         ref={stickyRef}
-        className="sticky top-0 flex h-screen w-full overflow-hidden bg-[color:var(--canvas)] items-end pb-[3vh] lg:items-center lg:pb-0"
-        style={!isDesktop ? { height: "100dvh" } : undefined}
+        className={cn(
+          !isDesktop
+            ? "flex w-full h-[100lvh] overflow-hidden bg-[color:var(--canvas)] items-end"
+            : "sticky top-0 flex h-screen w-full overflow-hidden bg-[color:var(--canvas)] lg:items-center lg:pb-0"
+        )}
       >
         <div ref={mediaBoxRef} className="relative w-full aspect-square lg:aspect-[1920/1080]">
           {/* Instant poster */}
@@ -334,15 +602,19 @@ const ScrollWindow = () => {
           />
         )}
 
-        {/* MOBILE scroll-step texts — all stacked at the same position over the
-            pinned media; scroll progress fades each step in and out via motion values. */}
+        {/* MOBILE swipe-card text overlays — all stacked at the same position;
+            the active card tracks the finger 1:1 via cardY/cardOpacity MotionValues. */}
         {!isDesktop && (
           <div className="pointer-events-none absolute inset-0 z-10">
             {/* Step 0 — section title + Part 0 intro */}
             <motion.div
               className="absolute inset-x-0 top-0 px-6 pt-[4vh] pointer-events-auto"
-              style={{ opacity: stepOpacities[0], y: stepYs[0] }}
               aria-hidden={step !== 0}
+              style={
+                step === 0
+                  ? { y: cardY, opacity: cardOpacity, willChange: "transform, opacity", pointerEvents: "auto" }
+                  : { opacity: 0, pointerEvents: "none" }
+              }
             >
               <p className="eyebrow mb-3 text-[color:var(--ink-muted)]">{SECTION_EYEBROW}</p>
               <h2 className="max-w-[13ch] font-serif text-h3 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
@@ -371,8 +643,12 @@ const ScrollWindow = () => {
               <motion.div
                 key={part.id}
                 className="absolute inset-x-0 top-0 px-6 pt-[4vh] pointer-events-auto"
-                style={{ opacity: stepOpacities[i + 1], y: stepYs[i + 1] }}
                 aria-hidden={step !== i + 1}
+                style={
+                  step === i + 1
+                    ? { y: cardY, opacity: cardOpacity, willChange: "transform, opacity", pointerEvents: "auto" }
+                    : { opacity: 0, pointerEvents: "none" }
+                }
               >
                 <div className="max-w-[24rem]">
                   <PartBody
