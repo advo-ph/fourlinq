@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [cookieVisible, setCookieVisible] = useState(false);
+  const [scrollWindowInView, setScrollWindowInView] = useState(false);
 
   useEffect(() => {
     const onCookieVisibility = (event: Event) => {
@@ -18,6 +19,18 @@ const ChatBubble = () => {
     return () => window.removeEventListener("fourlinq:cookie-visibility", onCookieVisibility);
   }, []);
 
+  useEffect(() => {
+    // Only respond to the event on mobile viewports
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onInView = (event: Event) => {
+      if (mq.matches) return; // desktop: ignore
+      const detail = (event as CustomEvent<{ inView: boolean }>).detail;
+      setScrollWindowInView(detail?.inView === true);
+    };
+    window.addEventListener("fq-scrollwindow-inview", onInView);
+    return () => window.removeEventListener("fq-scrollwindow-inview", onInView);
+  }, []);
+
   return (
     <>
       <ChatPanel isOpen={isOpen} onClose={() => setIsOpen(false)} />
@@ -25,8 +38,9 @@ const ChatBubble = () => {
       <div
         data-chat-bubble
         className={cn(
-          "fixed right-6 z-[61] transition-[bottom] duration-300 ease-marvin",
+          "fixed right-6 z-[61] transition-[bottom,opacity] duration-300 ease-marvin",
           cookieVisible ? "bottom-[13rem] sm:bottom-[11.5rem] md:bottom-[10rem] lg:bottom-6" : "bottom-6",
+          scrollWindowInView && !isOpen ? "opacity-0 pointer-events-none" : "opacity-100",
         )}
       >
         <button

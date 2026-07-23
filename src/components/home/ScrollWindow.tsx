@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
 import { useSegmentedFrames } from "@/hooks/useSegmentedFrames";
@@ -44,9 +45,7 @@ const INACTIVE_OPACITY = 0.28;
 // text fades up and out, the next fades in at the same position (and the
 // highlight advances). Swipe down: fades down, the previous returns.
 const STEP_COUNT = WINDOW_PARTS.length + 1; // intro + parts
-const SWIPE_THRESHOLD = 48;                 // min vertical travel (px) that counts as a swipe
-const STEP_COOLDOWN_MS = 400;               // min gap between accepted steps
-const ENGAGE_EPSILON = 2;                   // px tolerance for the pin line
+const TRACK_EXTRA_VH = 0.6;                 // fractional extra viewport-heights of scroll track at the end
 
 const ScrollWindow = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -55,16 +54,15 @@ const ScrollWindow = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   const [nearViewport, setNearViewport] = useState(false);
   const [isDesktop, setIsDesktop] = useState(
     () => window.matchMedia("(min-width: 1024px)").matches,
   );
   const [activeIndex, setActiveIndex] = useState(-1); // desktop: scroll-driven
-  const [step, setStep] = useState(0);                // mobile: swipe-driven (0 = intro)
-  const [engaged, setEngaged] = useState(false);      // mobile: section pinned + swipes captured
+  const [step, setStep] = useState(0);                // mobile: scroll-progress-driven (0 = intro)
   const stepRef = useRef(0);
-  const engagedRef = useRef(false);
   const [material, setMaterial] = useState<MaterialId>("upvc");
   const [matFade, setMatFade] = useState(true);
 
@@ -93,6 +91,38 @@ const ScrollWindow = () => {
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
   }, []);
+
+  // ── framer-motion scroll progress (unconditional — Rules of Hooks) ─────────
+  // scrollYProgress tracks 0.0 (track top at viewport top) → 1.0 (track bottom
+  // at viewport bottom). Used on mobile only; desktop ignores these values.
+  const { scrollYProgress } = useScroll({
+    target: trackRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Drive discrete step state from scroll progress (mobile only).
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (isDesktop) return;
+    const next = Math.min(STEP_COUNT - 1, Math.floor(latest * STEP_COUNT));
+    if (next !== stepRef.current) {
+      stepRef.current = next;
+      setStep(next);
+    }
+  });
+
+  // Per-step opacity and translateY MotionValues — all 4 declared unconditionally.
+  const stepOpacities = [
+    useTransform(scrollYProgress, [0 / 4, 0.5 / 4, 1 / 4], [0, 1, 0]),
+    useTransform(scrollYProgress, [1 / 4, 1.5 / 4, 2 / 4], [0, 1, 0]),
+    useTransform(scrollYProgress, [2 / 4, 2.5 / 4, 3 / 4], [0, 1, 0]),
+    useTransform(scrollYProgress, [3 / 4, 3.5 / 4, 4 / 4], [0, 1, 0]),
+  ];
+  const stepYs = [
+    useTransform(scrollYProgress, [0 / 4, 0.5 / 4, 1 / 4], [24, 0, -24]),
+    useTransform(scrollYProgress, [1 / 4, 1.5 / 4, 2 / 4], [24, 0, -24]),
+    useTransform(scrollYProgress, [2 / 4, 2.5 / 4, 3 / 4], [24, 0, -24]),
+    useTransform(scrollYProgress, [3 / 4, 3.5 / 4, 4 / 4], [24, 0, -24]),
+  ];
 
   // ── Desktop: active part = the last part whose text has scrolled up to the
   // activation line. Before the first part reaches it (the Part-0 run-in) and
@@ -138,151 +168,28 @@ const ScrollWindow = () => {
     };
   }, [isDesktop]);
 
-  // ── Mobile: pin the section when its top crosses the viewport top, then
-  // capture swipes as discrete steps. Scrolling down into the section engages
-  // at the intro; scrolling up into it from below engages at the last part.
-  // A swipe past either end releases the pin and hands scrolling back.
+  // ── Mobile: IntersectionObserver fires fq-hide-header + fq-scrollwindow-inview
+  // when the scroll track covers ≥90% of the viewport.
   useEffect(() => {
     if (isDesktop) return;
-    const container = containerRef.current;
-    if (!container) return;
-
-    let prevTop = container.getBoundingClientRect().top;
-    let lastStepAt = 0;
-    let wheelAcc = 0;
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchActive = false;
-    let ignoreGesture = false; // swallow the gesture that caused engagement
-
-    const setEngagedBoth = (v: boolean) => {
-      engagedRef.current = v;
-      setEngaged(v);
+    const el = containerRef.current;
+    if (!el) return;
+    const dispatch = (inView: boolean) => {
+      window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: inView }));
+      window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView } }));
     };
-    const setStepBoth = (s: number) => {
-      stepRef.current = s;
-      setStep(s);
-    };
-
-    const snap = () => {
-      const top = container.getBoundingClientRect().top;
-      if (Math.abs(top) > 1) window.scrollBy(0, top);
-    };
-
-    const exit = (dir: 1 | -1) => {
-      setEngagedBoth(false);
-      // Hand the viewport to the neighboring content — a full viewport down
-      // (next section top-aligned) or most of one back up.
-      window.scrollBy({
-        top: Math.round(window.innerHeight * (dir === 1 ? 1 : -0.9)),
-        behavior: "smooth",
-      });
-    };
-
-    const stepBy = (dir: 1 | -1, now: number) => {
-      if (now - lastStepAt < STEP_COOLDOWN_MS) return;
-      lastStepAt = now;
-      const next = stepRef.current + dir;
-      if (next < 0) { exit(-1); return; }
-      if (next > STEP_COUNT - 1) { exit(1); return; }
-      setStepBoth(next);
-    };
-
-    const onScroll = () => {
-      const top = container.getBoundingClientRect().top;
-      if (engagedRef.current) {
-        // Programmatic jumps (anchor nav, scroll-to-top) release the pin
-        // instead of fighting it.
-        if (Math.abs(top) > window.innerHeight) {
-          setEngagedBoth(false);
-          prevTop = top;
-          return;
-        }
-        // Clamp leftover fling momentum so the section stays pinned.
-        if (Math.abs(top) > 1) window.scrollBy(0, top);
-        prevTop = 0;
-        return;
-      }
-      const crossedDown = prevTop > ENGAGE_EPSILON && top <= ENGAGE_EPSILON;
-      const crossedUp = prevTop < -ENGAGE_EPSILON && top >= -ENGAGE_EPSILON;
-      if (crossedDown || crossedUp) {
-        setStepBoth(crossedDown ? 0 : STEP_COUNT - 1);
-        setEngagedBoth(true);
-        lastStepAt = performance.now(); // the engaging gesture doesn't also step
-        if (touchActive) ignoreGesture = true;
-        snap();
-        prevTop = 0;
-        return;
-      }
-      prevTop = top;
-    };
-
-    const onTouchStart = (e: TouchEvent) => {
-      touchActive = true;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      if (engagedRef.current && e.cancelable) e.preventDefault();
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      if (!touchActive) return;
-      touchActive = false;
-      if (ignoreGesture) { ignoreGesture = false; return; }
-      if (!engagedRef.current) return;
-      const t = e.changedTouches[0];
-      const dy = touchStartY - t.clientY;
-      const dx = touchStartX - t.clientX;
-      if (Math.abs(dy) < SWIPE_THRESHOLD || Math.abs(dy) <= Math.abs(dx)) return;
-      stepBy(dy > 0 ? 1 : -1, performance.now());
-    };
-
-    // Wheel/trackpad parity so narrow desktop windows behave like touch.
-    const onWheel = (e: WheelEvent) => {
-      if (!engagedRef.current) return;
-      e.preventDefault();
-      wheelAcc += e.deltaY;
-      if (Math.abs(wheelAcc) >= 60) {
-        const dir = wheelAcc > 0 ? 1 : -1;
-        wheelAcc = 0;
-        stepBy(dir, performance.now());
-      }
-    };
-
-    const onResize = () => {
-      if (engagedRef.current) snap();
-    };
-
-    // Touch/wheel listeners live on window, not the container — fixed overlays
-    // outside the section (e.g. the cookie banner) would otherwise swallow
-    // swipes that start on them. While engaged the section owns the viewport,
-    // and taps (not swipes) on such overlays still work normally.
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-    window.addEventListener("wheel", onWheel, { passive: false });
-    onScroll();
+    const io = new IntersectionObserver(
+      ([entry]) => dispatch(entry.intersectionRatio >= 0.9),
+      { threshold: [0, 0.9] },
+    );
+    io.observe(el);
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("wheel", onWheel);
-      setEngagedBoth(false);
+      io.disconnect();
+      dispatch(false); // cleanup: always unhide header + restore chat bubble
     };
   }, [isDesktop]);
 
-  // Mobile: header hides while the section is pinned.
-  useEffect(() => {
-    if (isDesktop) return;
-    window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: engaged }));
-    return () => { window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: false })); };
-  }, [engaged, isDesktop]);
-
-  // Which part is highlighted — scroll-driven on desktop, swipe-driven on mobile.
+  // Which part is highlighted — scroll-driven on desktop, scroll-progress-driven on mobile.
   const effectiveActive = isDesktop ? activeIndex : step - 1;
 
   const { images, progress, isLoaded } = useFramePreloader(
@@ -344,24 +251,20 @@ const ScrollWindow = () => {
     ctx.drawImage(img, 0, 0);
   }, [displayedFrame, images, isLoaded]);
 
-  // Mobile step transition: the leaving text fades toward where it "went"
-  // (up when advancing, down when going back) and the entering text fades in
-  // at the same position, slightly delayed so out reads before in.
-  const stepClass = (i: number) =>
-    cn(
-      "absolute inset-x-0 top-0 px-6 pt-[12vh] transition-[opacity,transform] duration-[420ms] ease-out",
-      i === step
-        ? "pointer-events-auto translate-y-0 opacity-100 delay-200"
-        : cn("opacity-0", i < step ? "-translate-y-6" : "translate-y-6"),
-    );
-
   return (
-    <div ref={containerRef} className="relative bg-[color:var(--canvas)]">
+    <div
+      ref={(el) => {
+        containerRef.current = el;
+        trackRef.current = el;
+      }}
+      className="relative bg-[color:var(--canvas)]"
+      style={!isDesktop ? { height: `${(STEP_COUNT + TRACK_EXTRA_VH) * 100}dvh` } : undefined}
+    >
       {/* FULL-WIDTH pinned media */}
       <div
         ref={stickyRef}
-        className="sticky top-0 flex h-screen w-full items-end pb-[6vh] overflow-hidden bg-[color:var(--canvas)] lg:items-center lg:pb-0"
-        style={!isDesktop ? { height: "100dvh", touchAction: engaged ? "none" : undefined } : undefined}
+        className="sticky top-0 flex h-screen w-full overflow-hidden bg-[color:var(--canvas)] items-end pb-[3vh] lg:items-center lg:pb-0"
+        style={!isDesktop ? { height: "100dvh" } : undefined}
       >
         <div ref={mediaBoxRef} className="relative w-full aspect-square lg:aspect-[1920/1080]">
           {/* Instant poster */}
@@ -431,12 +334,16 @@ const ScrollWindow = () => {
           />
         )}
 
-        {/* MOBILE swipe-step texts — all stacked at the same position over the
-            pinned media; swipes swap them with fade-up / fade-down. */}
+        {/* MOBILE scroll-step texts — all stacked at the same position over the
+            pinned media; scroll progress fades each step in and out via motion values. */}
         {!isDesktop && (
           <div className="pointer-events-none absolute inset-0 z-10">
             {/* Step 0 — section title + Part 0 intro */}
-            <div className={stepClass(0)} aria-hidden={step !== 0}>
+            <motion.div
+              className="absolute inset-x-0 top-0 px-6 pt-[4vh] pointer-events-auto"
+              style={{ opacity: stepOpacities[0], y: stepYs[0] }}
+              aria-hidden={step !== 0}
+            >
               <p className="eyebrow mb-3 text-[color:var(--ink-muted)]">{SECTION_EYEBROW}</p>
               <h2 className="max-w-[13ch] font-serif text-h3 leading-[1.05] tracking-tight text-[color:var(--ink-primary)]">
                 {SECTION_TITLE}
@@ -458,10 +365,15 @@ const ScrollWindow = () => {
                   ))}
                 </ul>
               </div>
-            </div>
+            </motion.div>
             {/* Steps 1..N — one per part */}
             {WINDOW_PARTS.map((part, i) => (
-              <div key={part.id} className={stepClass(i + 1)} aria-hidden={step !== i + 1}>
+              <motion.div
+                key={part.id}
+                className="absolute inset-x-0 top-0 px-6 pt-[4vh] pointer-events-auto"
+                style={{ opacity: stepOpacities[i + 1], y: stepYs[i + 1] }}
+                aria-hidden={step !== i + 1}
+              >
                 <div className="max-w-[24rem]">
                   <PartBody
                     part={part}
@@ -471,7 +383,7 @@ const ScrollWindow = () => {
                     toggleEnabled={thermalSettled}
                   />
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
