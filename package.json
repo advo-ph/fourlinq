@@ -23,6 +23,7 @@
     "projects:extract": "tsx scripts/extract-project-images.ts",
     "projects:images": "node scripts/build-project-category-images.mjs",
     "projects:reorder": "node scripts/reorder-project-images.mjs",
+    "projects:ratios": "node scripts/derive-project-ratios.mjs",
     "preview": "vite preview",
     "dev:api": "tsx watch server/index.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
