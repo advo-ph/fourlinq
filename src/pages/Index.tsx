@@ -68,10 +68,6 @@ const Index = () => {
       </Section>
 
       <Section tone="canvas" size="lg" className="!pt-0">
-        <div className="mb-10 lg:mb-12">
-          <div className="h-[5px] w-10 bg-[color:var(--accent)] mb-3" />
-          <h2 className="eyebrow text-[color:var(--ink-muted)]">Design tool</h2>
-        </div>
         <Suspense fallback={null}>
           <DesignToolEmbed embedded />
         </Suspense>

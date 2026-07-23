@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import AccentStripe from "@/components/primitives/AccentStripe";
 import FeatureLink from "@/components/primitives/FeatureLink";
 import { projects } from "@/data/projects";
 import { cn } from "@/lib/utils";
@@ -122,14 +121,6 @@ const InspirationStrip = () => {
       <div className="border-t border-[color:var(--rule-strong)]" aria-hidden="true" />
 
       <div className="px-4 md:px-6 lg:px-8 py-section-mobile md:py-section-tablet lg:py-section-desktop">
-        <div className="flex items-end justify-between gap-6 mb-8 lg:mb-10">
-          <div>
-            <AccentStripe width="sm" color="accent" className="mb-3" />
-            <p className="eyebrow text-[color:var(--ink-muted)]">Our Projects</p>
-          </div>
-          <FeatureLink to="/inspiration">View full gallery</FeatureLink>
-        </div>
-
         {/* Left: sticky crossfading feature. Right: the full catalog, scrolling. */}
         <div
           ref={trackRef}
@@ -142,7 +133,7 @@ const InspirationStrip = () => {
             style={{ top: STICKY_TOP }}
           >
             {/* Thin scroll-position line: fills across a part, then the hero turns over. */}
-            <div className="relative h-px w-full overflow-hidden bg-[color:var(--rule-soft)]">
+            <div className="relative h-[1.5px] w-full overflow-hidden bg-[color:var(--rule-soft)]">
               <div
                 ref={lineRef}
                 className="absolute inset-y-0 left-0 bg-[color:var(--accent)]"
@@ -170,14 +161,17 @@ const InspirationStrip = () => {
             {/* Title + subtitle under the feature. Copy is real: the regions
                 and systems reflect the actual installs in projects.ts. */}
             <div className="mt-6">
-              <h3 className="font-serif font-normal tracking-tight leading-[1.15] text-h5 lg:text-h4 text-[color:var(--ink-primary)]">
+              <h3 className="font-serif font-normal tracking-tight leading-[1.15] text-h4 lg:text-h3 text-[color:var(--ink-primary)]">
                 From Luzon to Mindanao
               </h3>
-              <p className="mt-3 max-w-[32rem] text-body-sm text-[color:var(--ink-secondary)] leading-[1.6]">
+              <p className="mt-3 max-w-[32rem] text-body text-[color:var(--ink-secondary)] leading-[1.6]">
                 Documented FourlinQ installations across the Philippines —
                 casement and sliding windows, entrance doors, and full aluminium
                 systems.
               </p>
+              <div className="mt-5">
+                <FeatureLink to="/inspiration">View full gallery</FeatureLink>
+              </div>
             </div>
           </div>
 
