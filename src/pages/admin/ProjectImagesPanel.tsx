@@ -47,6 +47,7 @@ import {
   Image,
   Maximize2,
   Flag,
+  Check,
   Trash2,
   RotateCcw,
   Sliders,
@@ -90,6 +91,7 @@ interface BaselineProject {
   categoryImages: Partial<Record<Category, string>>;
   derivedTags: Category[];
   flagged: boolean;
+  checked: boolean;
   hidden: boolean;
   deleted: boolean;
   ratio: string;
@@ -319,6 +321,7 @@ function ProjectOrderRow({
   heroPath,
   isCurrentProject,
   flagged,
+  checked,
   onOpen,
 }: {
   pid: string;
@@ -326,6 +329,7 @@ function ProjectOrderRow({
   heroPath: string | undefined;
   isCurrentProject: boolean;
   flagged: boolean;
+  checked: boolean;
   onOpen: (id: string) => void;
 }) {
   const name = pid.replace(/-/g, " ");
@@ -337,6 +341,7 @@ function ProjectOrderRow({
         {name}
       </span>
       {flagged && <Flag size={10} className="text-orange-500 shrink-0" />}
+      {checked && <Check size={10} className="text-green-600 shrink-0" />}
       {isCurrentProject && <span className="text-[9px] bg-primary/20 text-primary px-1 py-0.5 rounded shrink-0">this</span>}
     </>
   );
@@ -966,6 +971,23 @@ function ProjectDetailView({
 
           {/* Project-level action bar (Feature A) */}
           <div className="flex items-center gap-2 flex-wrap mt-3">
+            {/* Check toggle */}
+            <button
+              type="button"
+              onClick={() =>
+                project.checked
+                  ? handleDeleteProjectOverride("project_checked")
+                  : handleAddProjectOverride("project_checked")
+              }
+              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors ${
+                project.checked
+                  ? "bg-green-500/15 text-green-600 hover:bg-green-500/25"
+                  : "bg-muted text-muted-foreground hover:bg-border"
+              }`}
+            >
+              <Check size={13} /> {project.checked ? "Marked as Checked" : "Check"}
+            </button>
+
             {/* Flag toggle */}
             <button
               type="button"
@@ -1163,6 +1185,7 @@ function ProjectDetailView({
                           heroPath={heroPath}
                           isCurrentProject={pid === project.id}
                           flagged={p?.flagged ?? false}
+                          checked={p?.checked ?? false}
                           onOpen={onSelectProject}
                         />
                       )}
@@ -1199,6 +1222,7 @@ function ProjectDetailView({
                           heroPath={heroPath}
                           isCurrentProject={pid === project.id}
                           flagged={p?.flagged ?? false}
+                          checked={p?.checked ?? false}
                           onOpen={onSelectProject}
                         />
                       )}
@@ -1329,7 +1353,7 @@ export default function ProjectImagesPanel() {
   // Mutations for these types must also invalidate the baseline query so the
   // UI reflects the new state immediately rather than waiting 5 minutes.
   const PROJECT_LEVEL_TYPES = new Set([
-    "project_flagged", "project_hidden", "project_deleted", "project_ratio",
+    "project_flagged", "project_checked", "project_hidden", "project_deleted", "project_ratio",
   ]);
 
   const addOverrideMutation = useMutation({

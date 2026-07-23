@@ -1090,3 +1090,44 @@ Steps are ordered for safe, phase-gated execution.
 - Phase 1 complete when: `npm run typecheck` passes + all Phase 1 curl checks pass.
 - Phase 2 complete when: `npm run build` passes + all Phase 2 browser flows verified manually.
 - Phase 3 complete when: prod smoke test passes + apply-exterior-first button works on prod + sync-cms still holds tombstone exclusions.
+
+---
+
+## Addendum — `project_checked` increment (2026-07-23)
+
+### What was added
+
+A **Check** toggle button was added to each project's control row in the admin "Project Images" tab, and a green check icon was added to the "Project Order in Gallery" sortable list. This mirrors the existing `project_flagged` pattern 1:1.
+
+**Requirement:** Button row order is now: **Check, Flag, Ratio, Hide, Delete**.
+
+- Button label: `Check` when unchecked; `Marked as Checked` (green) when checked.
+- Green check icon (`Check size={10} className="text-green-600"`) appears next to flagged-project icons in the `ProjectOrderRow` sortable list.
+- `project_checked` is a **purely visual marker** — it has no effect on the public `/inspiration` page, project ordering, or any filtering logic.
+- Persisted to `project_image_override` table (`image_path = '__project__'`, no value needed).
+
+### Files touched
+
+| File | Change |
+|---|---|
+| `server/migrations/016_project_checked.sql` | New migration — expands CHECK constraint to include `project_checked` |
+| `server/routes/project-images.ts` | `MergedResponse`: added `checkedProjects: string[]`; `buildMergedResponse`: added `checkedSet`, switch case, return field; `validTypes`: added `"project_checked"`; `/baseline` handler: added `baselineCheckedSet`, switch case, `checked` field per project |
+| `src/types/project-images.d.ts` | Added `checkedProjects?: string[]` with doc comment |
+| `src/pages/admin/ProjectImagesPanel.tsx` | Imported `Check` from lucide-react; added `checked: boolean` to `BaselineProject`; added `checked` + `Check` icon to `ProjectOrderRow`; added Check toggle button (first in action bar); added `"project_checked"` to `PROJECT_LEVEL_TYPES`; wired `checked={p?.checked ?? false}` at both `ProjectOrderRow` call sites |
+
+### Local migration status
+
+Migration 016 was applied to local `fourlinq` DB (PG16). Constraint verified:
+
+```
+project_image_override_override_type_check includes 'project_checked'
+```
+
+### Verification
+
+- `npm run typecheck` — PASSED (0 errors)
+- `npm run test` (vitest) — PASSED (109/109 tests)
+
+### Follow-up required before prod deploy
+
+Migration 016 must be wired into `.github/workflows/sync-cms.yml` as a guarded block (matching the pattern used for migration 015 in that workflow) before pushing to production. Without this, inserting a `project_checked` override on prod will fail with a CHECK constraint violation.

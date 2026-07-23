@@ -35,6 +35,9 @@ export interface MergedProjectImagesResponse {
   /** projectIds with project_flagged override. Public payload only — no automation. */
   flaggedProjects?: string[];
 
+  /** projectIds with project_checked override (purely visual marker; no automation, no public-site effect). */
+  checkedProjects?: string[];
+
   /** projectIds excluded from public site (project_hidden override). Server already excludes from ordering. */
   hiddenProjects?: string[];
 

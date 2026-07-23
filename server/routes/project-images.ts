@@ -86,6 +86,8 @@ export interface MergedResponse {
   replacedImages: Record<string, Record<string, string>>;
   overrideCount: number;
   flaggedProjects: string[];
+  /** projectIds with project_checked override (purely visual marker; no automation). */
+  checkedProjects: string[];
   hiddenProjects: string[];
   deletedProjects: string[];
   projectRatios: Record<string, string>;
@@ -213,6 +215,7 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
   const categoryOrderMap = new Map<string, Map<string, number>>(); // category → projectId → value_int
   const imageOrderMap = new Map<string, Map<string, number>>(); // projectId → imagePath → value_int
   const flaggedSet = new Set<string>(); // projectIds with project_flagged override
+  const checkedSet = new Set<string>(); // projectIds with project_checked override
   const hiddenProjectSet = new Set<string>(); // projectIds with project_hidden override
   const deletedProjectSet = new Set<string>(); // projectIds with project_deleted override
   const projectRatioMap = new Map<string, string>(); // projectId → value_text ('16:9' | '4:3')
@@ -246,6 +249,9 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
         break;
       case "project_flagged":
         flaggedSet.add(row.project_id);
+        break;
+      case "project_checked":
+        checkedSet.add(row.project_id);
         break;
       case "project_hidden":
         hiddenProjectSet.add(row.project_id);
@@ -380,6 +386,7 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     replacedImages,
     overrideCount: overrides.length,
     flaggedProjects: [...flaggedSet],
+    checkedProjects: [...checkedSet],
     hiddenProjects: [...hiddenProjectSet],
     deletedProjects: [...deletedProjectSet],
     projectRatios,
@@ -499,7 +506,7 @@ projectImagesAdmin.post("/overrides", async (req, res) => {
     const validTypes = [
       "hidden", "replaced", "best_for_category",
       "project_order", "category_order", "image_order",
-      "project_flagged", "project_hidden", "project_deleted",
+      "project_flagged", "project_checked", "project_hidden", "project_deleted",
       "project_ratio", "score_override", "image_flagged",
     ];
     if (!validTypes.includes(override_type)) {
@@ -610,6 +617,7 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
 
     // Build lookup maps from override rows
     const baselineFlaggedSet = new Set<string>();
+    const baselineCheckedSet = new Set<string>();
     const baselineHiddenProjectSet = new Set<string>();
     const baselineDeletedProjectSet = new Set<string>();
     const baselineProjectRatioMap = new Map<string, string>();
@@ -619,6 +627,9 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
       switch (row.override_type) {
         case "project_flagged":
           baselineFlaggedSet.add(row.project_id);
+          break;
+        case "project_checked":
+          baselineCheckedSet.add(row.project_id);
           break;
         case "project_hidden":
           baselineHiddenProjectSet.add(row.project_id);
@@ -664,6 +675,7 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
           categoryImages: projectCategoryImages[c.id] ?? {},
           derivedTags: projectDerivedTags[c.id] ?? [],
           flagged: baselineFlaggedSet.has(c.id),
+          checked: baselineCheckedSet.has(c.id),
           hidden: baselineHiddenProjectSet.has(c.id),
           deleted: baselineDeletedProjectSet.has(c.id),
           ratio: baselineProjectRatioMap.get(c.id) ?? "16:9",

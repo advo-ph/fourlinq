@@ -71,6 +71,14 @@ jobs:
             echo "override_type constraint already includes project_flagged — skipping."
           fi
 
+          echo "--- migration 016: add project_checked to override_type CHECK constraint ---"
+          if [ -z "$(sudo -u postgres psql fourlinq -tAc "SELECT 1 FROM pg_constraint WHERE conrelid='public.project_image_override'::regclass AND contype='c' AND pg_get_constraintdef(oid) LIKE '%project_checked%'")" ]; then
+            echo "constraint missing project_checked — applying 016_project_checked.sql"
+            sudo -u postgres psql fourlinq -v ON_ERROR_STOP=1 -f server/migrations/016_project_checked.sql
+          else
+            echo "override_type constraint already includes project_checked — skipping."
+          fi
+
           echo "--- migrate-cms-data (projects + news) ---"
           ./node_modules/.bin/tsx server/scripts/migrate-cms-data.ts
 
