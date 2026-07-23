@@ -6,6 +6,10 @@ name: Sync CMS data
 #
 #   migration 014          project_image_override table (guarded: applied only
 #                          if the table does not exist yet)
+#   migration 015          expands override_type CHECK constraint with 6 new
+#                          values (project_flagged, project_hidden, project_deleted,
+#                          project_ratio, score_override, image_flagged); guarded
+#                          by absence of 'project_flagged' in the constraint def
 #   migrate-cms-data.ts    src/data/projects.ts + whats-new.ts
 #                          -> cms_project, cms_news_post, cms_media_asset
 #   sync-product-content.ts src/data/products.ts display fields
@@ -57,6 +61,14 @@ jobs:
             sudo -u postgres psql fourlinq -v ON_ERROR_STOP=1 -f server/migrations/014_project_image_overrides.sql
           else
             echo "project_image_override already exists — skipping."
+          fi
+
+          echo "--- migration 015: expand override_type CHECK constraint ---"
+          if [ -z "$(sudo -u postgres psql fourlinq -tAc "SELECT 1 FROM pg_constraint WHERE conrelid='public.project_image_override'::regclass AND contype='c' AND pg_get_constraintdef(oid) LIKE '%project_flagged%'")" ]; then
+            echo "constraint missing project_flagged — applying 015_project_override_types.sql"
+            sudo -u postgres psql fourlinq -v ON_ERROR_STOP=1 -f server/migrations/015_project_override_types.sql
+          else
+            echo "override_type constraint already includes project_flagged — skipping."
           fi
 
           echo "--- migrate-cms-data (projects + news) ---"
