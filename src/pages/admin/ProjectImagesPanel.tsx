@@ -48,6 +48,7 @@ import {
   Image,
   Maximize2,
 } from "lucide-react";
+import { toThumbPath } from "@/lib/project-thumbs";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -318,7 +319,7 @@ function ProjectOrderRow({
   const inner = (
     <>
       <span className="text-[10px] text-muted-foreground w-5 text-right shrink-0">{index + 1}</span>
-      {heroPath && <img src={heroPath} alt="" className="h-10 w-14 object-cover rounded shrink-0" loading="lazy" />}
+      {heroPath && <img src={toThumbPath(heroPath)} alt="" className="h-10 w-14 object-cover rounded shrink-0" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).src = heroPath; }} />}
       <span className={`text-xs capitalize truncate ${isCurrentProject ? "font-medium text-foreground" : "text-muted-foreground"}`}>
         {name}
       </span>
@@ -407,10 +408,11 @@ function ProjectListView({
               <div className="relative aspect-[4/3] bg-muted overflow-hidden">
                 {heroPath ? (
                   <img
-                    src={heroPath}
+                    src={toThumbPath(heroPath)}
                     alt=""
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = heroPath; }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -488,10 +490,11 @@ function ImageRow({
           className="relative shrink-0 group/img cursor-zoom-in md:w-80 lg:w-96 bg-muted"
         >
           <img
-            src={displaySrc}
+            src={toThumbPath(displaySrc)}
             alt=""
             className="w-full aspect-[4/3] md:aspect-auto md:h-60 object-cover"
             loading="lazy"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = displaySrc; }}
           />
           {/* Hover zoom affordance */}
           <span className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/img:bg-black/30 opacity-0 group-hover/img:opacity-100 transition-opacity">
@@ -757,9 +760,13 @@ function ProjectDetailView({
             className="shrink-0 cursor-zoom-in rounded overflow-hidden border border-border/40 hover:border-primary/40 transition-colors"
           >
             <img
-              src={project.quality?.heroImage ?? project.images[0]?.path}
+              src={toThumbPath(project.quality?.heroImage ?? project.images[0]?.path ?? "")}
               alt=""
               className="h-20 w-28 object-cover"
+              onError={(e) => {
+                const full = project.quality?.heroImage ?? project.images[0]?.path;
+                if (full) (e.currentTarget as HTMLImageElement).src = full;
+              }}
             />
           </button>
         )}

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import compression from "compression";
 import cookieParser from "cookie-parser";
 import path from "path";
 import dotenv from "dotenv";
@@ -23,6 +24,9 @@ const isProd = process.env.NODE_ENV === "production";
 
 // Security
 app.use(helmet({ contentSecurityPolicy: false }));
+// Gzip/Brotli compression for all responses (JSON API + served files).
+// Placed before routes and static so every response is compressed.
+app.use(compression());
 app.use(cors({
   origin: isProd
     ? ["https://fourlinq.ph", "https://www.fourlinq.ph"]
@@ -85,7 +89,7 @@ app.use("/api", (_req, res) => {
 // Serve frontend in production
 if (isProd) {
   const distPath = path.resolve(import.meta.dirname, "../dist");
-  app.use(express.static(distPath));
+  app.use(express.static(distPath, { maxAge: "30d", immutable: true }));
   app.use((req, res) => {
     res.status(spaStatusForPath(req.path)).sendFile(path.join(distPath, "index.html"));
   });

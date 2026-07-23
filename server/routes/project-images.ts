@@ -549,6 +549,10 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
         };
       });
 
+    // Allow the client to cache baseline data for 5 min (matches TanStack Query
+    // staleTime on the admin panel). 'private' ensures this never lands in a
+    // shared/CDN cache — baseline includes AI reasoning intended for admins.
+    res.setHeader("Cache-Control", "private, max-age=300");
     res.json({
       projects,
       projectOrder,

@@ -13,6 +13,7 @@ import {
 import { fetchProjects, mergeProject } from "@/lib/cms-api";
 import { cn } from "@/lib/utils";
 import type { MergedProjectImagesResponse } from "@/types/project-images";
+import { toThumbPath } from "@/lib/project-thumbs";
 
 type Filter = "all" | InspirationTag;
 
@@ -68,33 +69,49 @@ const isFilter = (v: string | null): v is Filter =>
 // CardImage — keeps the currently-painted src visible while a new src decodes
 // in the background. On decode completion the displayed src swaps atomically,
 // so the tile never shows a blank or half-loaded state during a category switch.
+//
+// Cards render the thumbnail variant (640px WebP) for fast initial paint.
+// If the thumbnail is missing (e.g. a newly added image whose thumb hasn't
+// been generated yet), onError falls back to the original full-res path.
 // ---------------------------------------------------------------------------
 interface CardImageProps {
-  src: string;
+  src: string;       // full-resolution path (used for fallback and decoding)
   alt: string;
   className: string;
 }
 
 function CardImage({ src, alt, className }: CardImageProps) {
-  // displayedSrc is what the <img> actually renders; it trails `src` by one
-  // async decode cycle so the visible tile always shows a complete image.
-  const [displayedSrc, setDisplayedSrc] = useState(src);
+  // thumbSrc is the preferred small variant; falls back to src on error.
+  const thumbSrc = toThumbPath(src);
+
+  // displayedSrc is what the <img> actually renders; it trails the target by
+  // one async decode cycle so the tile always shows a complete image.
+  // We start with the thumb so the initial paint is fast.
+  const [displayedSrc, setDisplayedSrc] = useState(thumbSrc);
+  // Track current thumb target so we update displayedSrc when src changes.
   const pendingRef = useRef<string | null>(null);
 
   useEffect(() => {
+    const target = toThumbPath(src);
     // Nothing to do when the target matches what's already painted.
-    if (src === displayedSrc) return;
+    if (target === displayedSrc) return;
 
     // Mark which src this decode is racing for, so a stale decode that resolves
     // after a newer target has already been set can be discarded.
-    pendingRef.current = src;
+    pendingRef.current = target;
 
     const img = new window.Image();
-    img.src = src;
+    img.src = target;
 
     const commit = () => {
       // Discard if a newer target arrived while we were decoding.
-      if (pendingRef.current !== src) return;
+      if (pendingRef.current !== target) return;
+      setDisplayedSrc(target);
+    };
+
+    const fallback = () => {
+      // Thumb failed (missing variant) — decode the full-res instead and display that.
+      if (pendingRef.current !== target) return;
       setDisplayedSrc(src);
     };
 
@@ -102,13 +119,16 @@ function CardImage({ src, alt, className }: CardImageProps) {
     // (e.g. old Safari) that reject immediately on every call.
     if (typeof img.decode === "function") {
       img.decode().then(commit).catch(() => {
-        // decode() rejected (e.g. network error or browser limitation) — swap
-        // anyway so the tile does not stay frozen on the previous category.
-        commit();
+        // decode() rejected — this can mean network error OR browser limitation.
+        // Attempt a plain load; if the image already cached it fires immediately.
+        const fallbackImg = new window.Image();
+        fallbackImg.src = src;
+        fallbackImg.onload = () => commit();
+        fallbackImg.onerror = () => commit(); // show something rather than staying stale
       });
     } else {
       img.onload = commit;
-      img.onerror = commit; // show something rather than staying stale
+      img.onerror = fallback; // thumb missing → use full-res
     }
 
     return () => {
@@ -126,6 +146,12 @@ function CardImage({ src, alt, className }: CardImageProps) {
       loading="lazy"
       decoding="async"
       className={className}
+      onError={(e) => {
+        // If the displayed thumb fails to load (e.g. cleared dist), swap to full-res.
+        if (displayedSrc !== src) {
+          (e.currentTarget as HTMLImageElement).src = src;
+        }
+      }}
     />
   );
 }
@@ -181,16 +207,20 @@ const Inspiration = () => {
     return () => { controller.abort(); };
   }, []);
 
-  // Idle preload of category-variant images that differ from each project's
-  // hero. Heroes are already loading in the grid; this primes the cache for
-  // every other per-category best image so the first category switch paints
-  // from cache rather than waiting on the network.
+  // Idle preload of thumbnail variants for category-switch images. Fires
+  // immediately using the baked BASELINE_MERGED data (via mergedData initial
+  // state) so preloading starts before the CMS/overrides fetches complete.
+  // Re-fires when mergedData updates with live overrides, priming any new URLs.
+  //
+  // We preload the THUMB variants (640px WebP) since those are what the cards
+  // actually render — preloading full-res would waste bandwidth on card views.
   useEffect(() => {
-    // Collect all category-variant URLs that are not the project's own hero.
+    // Collect all category-variant thumbnail URLs from mergedData directly so
+    // we don't have to wait for the items/CMS waterfall to resolve.
     const urls = new Set<string>();
-    for (const vp of items) {
-      for (const url of Object.values(vp.categoryImages)) {
-        if (url && url !== vp.image) urls.add(url);
+    for (const catImages of Object.values(mergedData.projectCategoryImages)) {
+      for (const url of Object.values(catImages)) {
+        if (url) urls.add(toThumbPath(url));
       }
     }
     if (urls.size === 0) return;
@@ -213,7 +243,7 @@ const Inspiration = () => {
         window.cancelIdleCallback(id);
       }
     };
-  }, [items]); // re-prime when items update (CMS merge may bring new URLs)
+  }, [mergedData]); // fires on baseline immediately, re-primes when live overrides arrive
 
   const filtered = useMemo(() => {
     const base = active === "all" ? items : items.filter((p) => p.tag.includes(active));
