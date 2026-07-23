@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import FeatureLink from "@/components/primitives/FeatureLink";
 import { projects } from "@/data/projects";
+import { toThumbPath } from "@/lib/project-thumbs";
 import { cn } from "@/lib/utils";
 
 const FB = "/images/projects-fb";
@@ -28,15 +29,23 @@ const STICKY_TOP = 88;
 const ProjectTile = ({ project }: { project: (typeof projects)[number] }) => (
   <Link
     to={`/projects/${project.id}`}
-    className="group block overflow-hidden bg-neutral-100"
+    className="group block overflow-hidden rounded-sm bg-[color:var(--canvas-soft)]"
   >
-    <img
-      src={project.image}
-      alt={project.name}
-      loading="lazy"
-      decoding="async"
-      className="w-full h-auto transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.04]"
-    />
+    <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
+      <img
+        src={toThumbPath(project.image)}
+        alt={project.name}
+        loading="lazy"
+        decoding="async"
+        className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.04]"
+        onError={(e) => {
+          // Thumb missing (e.g. newly added image) — fall back to full-res.
+          if ((e.currentTarget as HTMLImageElement).src !== project.image) {
+            (e.currentTarget as HTMLImageElement).src = project.image;
+          }
+        }}
+      />
+    </div>
   </Link>
 );
 
