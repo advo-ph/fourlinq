@@ -6,62 +6,222 @@
       "finished": true,
       "images": [
         {
-          "path": "/images/projects-fb/DOuJGHUl.jpg",
+          "path": "/images/projects-fb/las-pinas-residence.jpg",
           "scores": {
-            "windows": 88,
-            "doors": 20,
-            "interior": 45,
-            "exterior": 40
+            "windows": 72,
+            "doors": 10,
+            "interior": 50,
+            "exterior": 5
           },
-          "reasoning": "Upward view of a double-height corner clad in dark aluminium-framed fixed glazing with wood-slat ceiling, windows are the dominant subject."
+          "reasoning": "Upward interior shot where a long plastic-wrapped transom window with FourlinQ label is the clear subject, with only a wood door jamb at the edge."
         },
         {
-          "path": "/images/projects-fb/ttZUwHC9.jpg",
+          "path": "/images/projects-fb/las-pinas-residence-2.jpg",
           "scores": {
-            "windows": 70,
+            "windows": 60,
             "doors": 55,
-            "interior": 82,
+            "interior": 50,
+            "exterior": 10
+          },
+          "reasoning": "Interior view of a floor-to-ceiling black-framed glass wall with sliding door panels onto a courtyard, though construction boxes dilute the inspiration value."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-3.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 5,
+            "interior": 60,
             "exterior": 15
           },
-          "reasoning": "Interior corner room shot with floor-to-ceiling black sliding glass doors and screens opening to a treetop view."
+          "reasoning": "A large dark-framed grid window wall dominates this interior room shot with wood flooring and a bright neighborhood view."
         },
         {
-          "path": "/images/projects-fb/1624zR2K.jpg",
+          "path": "/images/projects-fb/las-pinas-residence-4.jpg",
           "scores": {
-            "windows": 90,
-            "doors": 15,
-            "interior": 78,
+            "windows": 88,
+            "doors": 5,
+            "interior": 50,
             "exterior": 20
           },
-          "reasoning": "Interior view of a large gridded black-framed fixed glazed wall wrapping a corner, windows are the clear focus with wood floor visible."
+          "reasoning": "An open black casement window and fixed corner glazing are the crisp subject against blue sky and greenery from inside a bedroom."
         },
         {
-          "path": "/images/projects-fb/wmPQfS3V.jpg",
+          "path": "/images/projects-fb/las-pinas-residence-5.jpg",
           "scores": {
-            "windows": 90,
-            "doors": 12,
-            "interior": 72,
-            "exterior": 20
+            "windows": 78,
+            "doors": 5,
+            "interior": 55,
+            "exterior": 5
           },
-          "reasoning": "Interior shot of a full-height gridded black-framed fixed glazing wall, mullioned windows are the prominent subject."
+          "reasoning": "Symmetrical upward interior hallway shot where a three-pane awning window (still film-covered) is the focal point between gray plaster walls."
         },
         {
-          "path": "/images/projects-fb/x63pl_14.jpg",
+          "path": "/images/projects-fb/las-pinas-residence-6.jpg",
+          "scores": {
+            "windows": 35,
+            "doors": 75,
+            "interior": 15,
+            "exterior": 40
+          },
+          "reasoning": "Shot from outside, a tall black-framed sliding glass door with handle is the main subject, flanked by a wood main door amid construction clutter."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-7.jpg",
+          "scores": {
+            "windows": 75,
+            "doors": 5,
+            "interior": 55,
+            "exterior": 5
+          },
+          "reasoning": "Two people admire a full-height black grid window wall from inside, showing scale though heavy backlighting silhouettes the frames."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-8.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 5,
+            "interior": 65,
+            "exterior": 15
+          },
+          "reasoning": "A wraparound corner curtain-wall of dark grid windows is beautifully prominent in this bright interior loft with wood floor and stair."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-9.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 58,
+            "interior": 60,
+            "exterior": 10
+          },
+          "reasoning": "A wide multi-panel black sliding door/window unit opening to a balcony fills the frame of this clean interior shot."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-10.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 5,
+            "interior": 45,
+            "exterior": 5
+          },
+          "reasoning": "Dim upward interior angle of clerestory awning windows with a reversed FourlinQ sticker; the window is the subject but the shot is dark and utilitarian."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-11.jpg",
           "scores": {
             "windows": 85,
-            "doors": 18,
+            "doors": 5,
+            "interior": 55,
+            "exterior": 20
+          },
+          "reasoning": "Corner glazing with an open black casement window over a balcony view is the clear subject, slightly marred by a leaning veneer board."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-12.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 50,
+            "interior": 55,
+            "exterior": 10
+          },
+          "reasoning": "Kitchen interior looking through floor-to-ceiling black sliding glass panels into a side yard still under construction."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-13.jpg",
+          "scores": {
+            "windows": 75,
+            "doors": 25,
+            "interior": 10,
+            "exterior": 88
+          },
+          "reasoning": "Dramatic upward exterior courtyard shot of dark grid curtain-wall windows under wood-slat soffits with a wood door corner, a strong facade inspiration image."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-14.jpg",
+          "scores": {
+            "windows": 72,
+            "doors": 5,
+            "interior": 55,
+            "exterior": 5
+          },
+          "reasoning": "Two visitors at the full-height grid window wall from inside; warm backlit scene showcases window scale but silhouettes dominate."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-15.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 0,
+            "interior": 45,
+            "exterior": 10
+          },
+          "reasoning": "A black-framed sliding window with a treetop view is the sole subject, though newspaper masking around the frame betrays unfinished work."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-16.jpg",
+          "scores": {
+            "windows": 82,
+            "doors": 0,
+            "interior": 40,
+            "exterior": 10
+          },
+          "reasoning": "Tall dark casement window framed by shadowed walls with a vivid rooftop view; the window unit itself is unmistakably the subject."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-17.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 10,
             "interior": 55,
             "exterior": 15
           },
-          "reasoning": "Interior view of an open black casement window swung out beside fixed glazing onto a deck and greenery."
+          "reasoning": "Corner floor-to-ceiling glazing with slim black mullions and a lush neighborhood view, partly obstructed by plastic-wrapped furniture."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-18.jpg",
+          "scores": {
+            "windows": 74,
+            "doors": 0,
+            "interior": 40,
+            "exterior": 5
+          },
+          "reasoning": "Upward interior view of two dark clerestory sliding windows revealing the orange soffit outside, with newspaper masking still visible at right."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-19.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 0,
+            "interior": 5,
+            "exterior": 65
+          },
+          "reasoning": "Exterior detail shot of a dark aluminum sliding window set in white textured plaster beneath a wood-plank soffit, a clean product-focused facade image."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-20.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 10,
+            "interior": 55,
+            "exterior": 30
+          },
+          "reasoning": "Sunlit mezzanine corner wrapped in dark grid curtain-wall windows with a glass railing and wood ceiling, strongly showcasing the window system."
+        },
+        {
+          "path": "/images/projects-fb/las-pinas-residence-21.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 55,
+            "interior": 60,
+            "exterior": 15
+          },
+          "reasoning": "Interior corridor lined with floor-to-ceiling black sliding glass doors and screens opening to greenery, reading as a livable indoor-outdoor space."
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/DOuJGHUl.jpg",
-        "heroScore": 72,
-        "enhanced": true,
-        "enhancedConfidence": 62,
-        "notes": "Crisp upward-angle courtyard shot with warm wood ceiling and blue-framed glass, well-lit and graded but an unconventional cropped detail rather than a classic full-facade hero."
+        "heroImage": "/images/projects-fb/las-pinas-residence.jpg",
+        "heroScore": 42,
+        "enhanced": false,
+        "enhancedConfidence": 65,
+        "notes": "A tilted upward angle of a still plastic-wrapped transom window with typical phone HDR saturation reads as a construction-progress snapshot rather than a polished cover photo."
       }
     },
     "cebu-a-residences": {
@@ -180,78 +340,166 @@
         "notes": "Sharp modern tower home against a clean gradient blue sky with tidy landscaping and a polished, magazine-ready look."
       }
     },
-    "cebu-residence-vista-grande": {
-      "finished": true,
-      "images": [
-        {
-          "path": "/images/projects-fb/cebu-residence-vista-grande.jpg",
-          "scores": {
-            "windows": 40,
-            "doors": 45,
-            "interior": 5,
-            "exterior": 90
-          },
-          "reasoning": "Warm exterior of a Mediterranean two-storey house with tiled roof, arched window, and an ornate black entry gate."
-        }
-      ],
-      "quality": {
-        "heroImage": "/images/projects-fb/cebu-residence-vista-grande.jpg",
-        "heroScore": 87,
-        "enhanced": true,
-        "enhancedConfidence": 85,
-        "notes": "Warm golden Mediterranean villa against a saturated blue sky, polished and well-composed with strong portfolio appeal."
-      }
-    },
     "fourlinq-turnover-2": {
       "finished": true,
       "images": [
         {
           "path": "/images/projects-fb/fourlinq-turnover-2.jpg",
           "scores": {
-            "windows": 45,
-            "doors": 30,
-            "interior": 15,
-            "exterior": 80
+            "windows": 85,
+            "doors": 5,
+            "interior": 50,
+            "exterior": 15
           },
-          "reasoning": "Exterior looking up at a white house balcony with glass railing, sliding glass panel and a person on the terrace."
+          "reasoning": "Interior bedroom shot where a dark-framed double-pane window with greenery view is the clear central subject, with a black bed frame at the edge."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-2.jpg",
+          "scores": {
+            "windows": 20,
+            "doors": 88,
+            "interior": 30,
+            "exterior": 45
+          },
+          "reasoning": "Symmetric frontal shot of wood-framed sliding double doors with dark screen panels set in a wood-slat wall, doors unmistakably the subject."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-2-3.jpg",
           "scores": {
-            "windows": 85,
-            "doors": 15,
-            "interior": 50,
-            "exterior": 20
+            "windows": 45,
+            "doors": 30,
+            "interior": 10,
+            "exterior": 80
           },
-          "reasoning": "Interior view of a single dark-framed double-hung window in a stairwell, the window unit is the clear subject."
+          "reasoning": "Upward exterior view of the white facade with maroon fascia, glass-railed balcony, awning windows, and sliding panels under a blue sky."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-2-4.jpg",
           "scores": {
-            "windows": 25,
-            "doors": 88,
-            "interior": 20,
-            "exterior": 45
+            "windows": 42,
+            "doors": 30,
+            "interior": 10,
+            "exterior": 82
           },
-          "reasoning": "Pair of tinted-glass wood-framed doors with handles set in a vertical wood-slat wall, doors are the clear subject."
+          "reasoning": "Wider upward facade shot of the balcony with glass railing, sliding glass units, and awning windows against sky and foliage."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-2-5.jpg",
           "scores": {
-            "windows": 25,
-            "doors": 88,
-            "interior": 25,
+            "windows": 15,
+            "doors": 90,
+            "interior": 30,
+            "exterior": 40
+          },
+          "reasoning": "Portrait angled close-up of the wood-framed sliding screen double doors in the slat wall, doors filling the frame."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-6.jpg",
+          "scores": {
+            "windows": 10,
+            "doors": 80,
+            "interior": 45,
+            "exterior": 15
+          },
+          "reasoning": "Oblique interior-side detail of the wood-framed sliding door panels and track along the slat wall, reading as an interior finish shot."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-7.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 15,
+            "interior": 55,
+            "exterior": 5
+          },
+          "reasoning": "Downward interior close-up of a dark-framed window with honeycomb blinds and insect screen over a wood floor, a window-hardware detail shot."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-8.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 65,
+            "interior": 5,
+            "exterior": 75
+          },
+          "reasoning": "Exterior white textured wall featuring both a glass louver window and a dark-framed glazed French door under a glass canopy."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-9.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 5,
+            "interior": 50,
+            "exterior": 15
+          },
+          "reasoning": "Near-duplicate interior bedroom angle where the dark-framed window with screen and garden view is the dominant subject."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-10.jpg",
+          "scores": {
+            "windows": 15,
+            "doors": 90,
+            "interior": 10,
             "exterior": 45
           },
-          "reasoning": "Frontal view of double glazed wood-framed doors with handles recessed in a wood-slat wall, doors are the focus."
+          "reasoning": "Frontal portrait of dark-framed glazed French double doors with multipoint hinges on the white stone wall, doors clearly the hero."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-11.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 60,
+            "interior": 5,
+            "exterior": 75
+          },
+          "reasoning": "Wide exterior wall composition pairing the louver window and the black-framed entry door beneath the glass canopy."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-12.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 5,
+            "interior": 5,
+            "exterior": 45
+          },
+          "reasoning": "Tight exterior close-up of an open frameless glass louver window in a black frame, the window unit completely dominating."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-13.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 3,
+            "interior": 3,
+            "exterior": 50
+          },
+          "reasoning": "Portrait exterior shot of two dark-framed single-hung windows with lush plant reflections on the white textured wall."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-14.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 3,
+            "interior": 3,
+            "exterior": 50
+          },
+          "reasoning": "Landscape exterior of the same pair of dark-framed single-hung windows with garden reflections, an aircon unit at frame edge."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-2-15.jpg",
+          "scores": {
+            "windows": 25,
+            "doors": 88,
+            "interior": 10,
+            "exterior": 55
+          },
+          "reasoning": "Dark-framed aluminum sliding glass patio doors on the terrace with palm and neighborhood reflections, doors clearly the subject."
         }
       ],
       "quality": {
         "heroImage": "/images/projects-fb/fourlinq-turnover-2.jpg",
-        "heroScore": 34,
+        "heroScore": 55,
         "enhanced": false,
-        "enhancedConfidence": 10,
-        "notes": "Awkward low-angle crop of a balcony with people and a blown-out sky, reads as a casual phone snapshot."
+        "enhancedConfidence": 70,
+        "notes": "A clean, bright interior window shot with pleasant greenery through the glass, but the blown-out wall glare, off-center framing, and bed-frame clutter read as a saturated phone/HDR snapshot rather than a professionally graded cover photo."
       }
     },
     "portfolio-residence-06": {
@@ -302,124 +550,184 @@
       "finished": true,
       "images": [
         {
-          "path": "/images/projects-fb/pndqSKzg.jpg",
+          "path": "/images/projects-fb/taytay-rizal-residence.jpg",
           "scores": {
-            "windows": 55,
-            "doors": 20,
-            "interior": 5,
+            "windows": 65,
+            "doors": 5,
+            "interior": 0,
+            "exterior": 85
+          },
+          "reasoning": "Upward exterior shot of the white second-storey facade where three dark-framed windows are visible subjects but the wall plane and roofline dominate the frame."
+        },
+        {
+          "path": "/images/projects-fb/taytay-rizal-residence-2.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 5,
+            "interior": 55,
+            "exterior": 10
+          },
+          "reasoning": "Interior shot against a terracotta wall where the long black-framed sliding/awning window is unmistakably the subject, framing the neighboring rooftops."
+        },
+        {
+          "path": "/images/projects-fb/taytay-rizal-residence-3.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 5,
+            "interior": 55,
+            "exterior": 10
+          },
+          "reasoning": "Centered interior view of a dark-framed square picture window with a sculptural pendant light, a clean window-focused interior composition."
+        },
+        {
+          "path": "/images/projects-fb/taytay-rizal-residence-4.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 10,
+            "interior": 0,
             "exterior": 90
           },
-          "reasoning": "Full curb-view exterior of a two-storey modern house on a corner lot, with a dark-glazed upper picture window and a wood-slat gate visible below."
+          "reasoning": "Full exterior of the modern two-storey house under blue sky where glazed upper-floor windows read clearly but the overall facade is the star."
         },
         {
-          "path": "/images/projects-fb/emyl2Fwr.jpg",
+          "path": "/images/projects-fb/taytay-rizal-residence-5.jpg",
           "scores": {
-            "windows": 62,
-            "doors": 15,
-            "interior": 5,
+            "windows": 55,
+            "doors": 5,
+            "interior": 0,
             "exterior": 88
           },
-          "reasoning": "Frontal exterior elevation of the same modern facade, with a prominent second-storey glazed window bay flanked by vertical louvres."
+          "reasoning": "Wide upward exterior of the white facade with blue-gray trimmed windows framed by trees, primarily a facade inspiration shot with windows as supporting subjects."
         },
         {
-          "path": "/images/projects-fb/SKxVxxW4.jpg",
+          "path": "/images/projects-fb/taytay-rizal-residence-6.jpg",
           "scores": {
-            "windows": 60,
+            "windows": 92,
+            "doors": 5,
+            "interior": 0,
+            "exterior": 55
+          },
+          "reasoning": "Tight exterior detail of two dark-gray framed sliding windows under concrete sunshade hoods, making the window units the dominant subject."
+        },
+        {
+          "path": "/images/projects-fb/taytay-rizal-residence-7.jpg",
+          "scores": {
+            "windows": 35,
             "doors": 15,
-            "interior": 5,
-            "exterior": 88
+            "interior": 0,
+            "exterior": 92
           },
-          "reasoning": "Angled exterior view of the house showing the cantilevered roof and a large dark upper-floor window as the main glazed feature."
+          "reasoning": "Corner street-level view of the whole house with perimeter fence and driveway gate, a classic full-facade exterior inspiration shot."
         },
         {
-          "path": "/images/projects-fb/vzSdxxg0.jpg",
+          "path": "/images/projects-fb/taytay-rizal-residence-8.jpg",
           "scores": {
-            "windows": 68,
-            "doors": 10,
-            "interior": 5,
-            "exterior": 82
+            "windows": 90,
+            "doors": 5,
+            "interior": 60,
+            "exterior": 10
           },
-          "reasoning": "Exterior of the white side elevation where several dark-framed awning and picture windows are the clear focal detail against the plain wall."
+          "reasoning": "Interior room shot where the black-framed awning-over-fixed window with a lush banana-tree view is the clear focal subject."
         },
         {
-          "path": "/images/projects-fb/K6n763QM.jpg",
+          "path": "/images/projects-fb/taytay-rizal-residence-9.jpg",
           "scores": {
-            "windows": 80,
-            "doors": 10,
-            "interior": 5,
-            "exterior": 62
+            "windows": 45,
+            "doors": 5,
+            "interior": 65,
+            "exterior": 0
           },
-          "reasoning": "Tight exterior crop of the white upper wall dominated by three dark-framed windows (a horizontal slider, a small fixed pane, and an awning unit)."
+          "reasoning": "Bedroom interior still in turnover state with plastic-protected furniture and film-covered corner and slot windows, reading as a progress interior rather than a polished window showcase."
+        },
+        {
+          "path": "/images/projects-fb/taytay-rizal-residence-10.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 10,
+            "interior": 0,
+            "exterior": 90
+          },
+          "reasoning": "Dramatic upward exterior of the front facade with dark slat cladding and large second-floor glazing, primarily an architectural exterior shot."
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/pndqSKzg.jpg",
-        "heroScore": 64,
+        "heroImage": "/images/projects-fb/taytay-rizal-residence.jpg",
+        "heroScore": 62,
         "enhanced": false,
-        "enhancedConfidence": 45,
-        "notes": "Clean sharp daytime corner-facade phone photo with nice blue sky but a plain snapshot look and a somewhat busy street/fence foreground."
+        "enhancedConfidence": 60,
+        "notes": "Bright, punchy daylight shot with clean lines, but the tight upward crop, cut-off ground-floor windows, and visible AC unit read as a good phone snapshot rather than a professionally graded cover photo."
       }
     },
     "batangas-c-residences": {
       "finished": true,
       "images": [
         {
-          "path": "/images/projects-fb/ohQTuBNz.jpg",
+          "path": "/images/projects-fb/batangas-c-residences.jpg",
           "scores": {
-            "windows": 78,
-            "doors": 15,
-            "interior": 5,
-            "exterior": 65
-          },
-          "reasoning": "Upward exterior shot of a corner where wood-framed casement and sliding windows wrap the second storey as the dominant subject."
-        },
-        {
-          "path": "/images/projects-fb/zp4alT38.jpg",
-          "scores": {
-            "windows": 88,
-            "doors": 12,
-            "interior": 8,
-            "exterior": 45
-          },
-          "reasoning": "Close upward view of a large wood-framed picture-plus-awning window unit reflecting sky, with a second window at left; windows are clearly the hero."
-        },
-        {
-          "path": "/images/projects-fb/aJiYThAZ.jpg",
-          "scores": {
-            "windows": 60,
-            "doors": 10,
+            "windows": 70,
+            "doors": 5,
             "interior": 90,
             "exterior": 5
           },
-          "reasoning": "Editorial interior bedroom shot with wood floor, bed, TV wall and wrap-around dark-framed windows framing the view."
+          "reasoning": "Spacious bedroom interior where wood-framed windows on two walls frame garden views, but the room itself is the star."
         },
         {
-          "path": "/images/projects-fb/6uH-fLmF.jpg",
+          "path": "/images/projects-fb/batangas-c-residences-2.jpg",
           "scores": {
-            "windows": 62,
-            "doors": 80,
-            "interior": 30,
-            "exterior": 40
+            "windows": 60,
+            "doors": 10,
+            "interior": 5,
+            "exterior": 80
           },
-          "reasoning": "Covered porch/lanai showing a solid wood entry door as clear subject, flanked by wood-framed windows under a wood-plank ceiling."
+          "reasoning": "Upward exterior corner shot of the white house where wood-framed upper-storey windows and the balcony read as facade elements under a blown-out sky."
         },
         {
-          "path": "/images/projects-fb/mw3WVp7m.jpg",
+          "path": "/images/projects-fb/batangas-c-residences-3.jpg",
           "scores": {
-            "windows": 55,
-            "doors": 82,
-            "interior": 30,
-            "exterior": 40
+            "windows": 65,
+            "doors": 70,
+            "interior": 15,
+            "exterior": 55
           },
-          "reasoning": "Balcony corner with a large wood-framed sliding glass door as the prominent walk-through element, plus adjacent picture windows over a stone-tiled wall."
+          "reasoning": "Covered porch view where the solid wood entry door and the large wood-framed casement window share equal prominence against stone and white walls."
+        },
+        {
+          "path": "/images/projects-fb/batangas-c-residences-4.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 68,
+            "interior": 10,
+            "exterior": 55
+          },
+          "reasoning": "Balcony close-up of a wood-framed sliding glass door and wraparound corner glazing, with adjacent window units filling the frame."
+        },
+        {
+          "path": "/images/projects-fb/batangas-c-residences-5.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 5,
+            "interior": 5,
+            "exterior": 55
+          },
+          "reasoning": "Upward detail shot where wood-framed awning windows reflecting blue sky are unmistakably the sole subject."
+        },
+        {
+          "path": "/images/projects-fb/batangas-c-residences-6.jpg",
+          "scores": {
+            "windows": 15,
+            "doors": 5,
+            "interior": 30,
+            "exterior": 0
+          },
+          "reasoning": "Branded promotional composite of a woman in a bedroom with text overlay, not an actual project photo, with windows only incidental in the background."
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/ohQTuBNz.jpg",
-        "heroScore": 40,
+        "heroImage": "/images/projects-fb/batangas-c-residences.jpg",
+        "heroScore": 72,
         "enhanced": false,
-        "enhancedConfidence": 15,
-        "notes": "Blown-out white sky with an awkward tight crop that clips the house and exposes an AC unit and CCTV, a flat phone snapshot."
+        "enhancedConfidence": 60,
+        "notes": "Well-composed wide bedroom shot with pleasing wood tones, but blown-out window highlights and flat haze mark it as a lightly processed phone photo rather than a professional grade."
       }
     },
     "cebu-p-residence-kishanta": {
@@ -454,28 +762,6 @@
         "notes": "Sharp, professionally graded dusk shot of a modern stone-and-glass facade with warm glowing interiors."
       }
     },
-    "cebu-b-residence-monterrazas": {
-      "finished": true,
-      "images": [
-        {
-          "path": "/images/projects-fb/cebu-b-residence-monterrazas.jpg",
-          "scores": {
-            "windows": 55,
-            "doors": 70,
-            "interior": 5,
-            "exterior": 90
-          },
-          "reasoning": "Exterior of a modern home with a striking red pivot entry door and wavy handle as a focal point, tall corner glazing, and a carport with a parked car."
-        }
-      ],
-      "quality": {
-        "heroImage": "/images/projects-fb/cebu-b-residence-monterrazas.jpg",
-        "heroScore": 52,
-        "enhanced": false,
-        "enhancedConfidence": 70,
-        "notes": "Attractive modern facade but flat overcast light, a parked SUV, and a stray bucket clutter the frame in a lower-res snapshot."
-      }
-    },
     "cebu-residence-monterrazas": {
       "finished": true,
       "images": [
@@ -504,60 +790,240 @@
         {
           "path": "/images/projects-fb/fourlinq-turnover-3.jpg",
           "scores": {
-            "windows": 30,
-            "doors": 10,
-            "interior": 5,
-            "exterior": 68
+            "windows": 60,
+            "doors": 55,
+            "interior": 55,
+            "exterior": 5
           },
-          "reasoning": "Exterior of a house still under construction with scaffolding and blue tarps on a sloped lot; windows are partly obscured."
+          "reasoning": "Bright interior showing both a black-framed sliding door wall and a grid window, but mid-room scaffolding and floor debris dilute the inspiration value."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-3-2.jpg",
           "scores": {
-            "windows": 35,
-            "doors": 12,
-            "interior": 5,
-            "exterior": 66
+            "windows": 85,
+            "doors": 5,
+            "interior": 45,
+            "exterior": 5
           },
-          "reasoning": "Exterior of the same in-progress house with scaffolding and a worker, dark-framed windows visible on the upper storey behind the works."
+          "reasoning": "Clean, frontal shot where the black-framed sliding window with grilles is the unmistakable subject against a mostly tidy wall."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-3-3.jpg",
           "scores": {
-            "windows": 45,
-            "doors": 82,
-            "interior": 55,
-            "exterior": 20
+            "windows": 25,
+            "doors": 85,
+            "interior": 45,
+            "exterior": 10
           },
-          "reasoning": "Interior of an unfinished room shot from inside toward large black-framed sliding/glass doors opening to a tarped exterior."
+          "reasoning": "Open steel-look glass French doors dominate the frame in a bright interior passage, with only minor construction context."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-3-4.jpg",
           "scores": {
-            "windows": 88,
-            "doors": 15,
-            "interior": 45,
-            "exterior": 20
+            "windows": 20,
+            "doors": 5,
+            "interior": 0,
+            "exterior": 30
           },
-          "reasoning": "Interior corner showing two black-framed casement/awning windows with tag stickers as the clear installed-window subject against a raw wall."
+          "reasoning": "Exterior facade view but heavily obscured by scaffolding, blue tarps, and a truck, making it a construction-progress shot rather than inspiration."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-3-5.jpg",
           "scores": {
-            "windows": 50,
-            "doors": 88,
-            "interior": 55,
+            "windows": 88,
+            "doors": 5,
+            "interior": 45,
+            "exterior": 5
+          },
+          "reasoning": "Large four-panel black-framed window wall with a lush green view is the clear hero subject on a fairly clean interior wall."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-6.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 72,
+            "interior": 35,
+            "exterior": 10
+          },
+          "reasoning": "Open black French casement doors to the balcony are the clear subject, though dirty unfinished walls and an orange pipe add clutter."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-7.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 80,
+            "interior": 48,
             "exterior": 15
           },
-          "reasoning": "Interior view of an open black-framed glass double/pivot door as the walk-through subject, with a smaller framed window at left in a raw finished room."
+          "reasoning": "Open glass French door leads the eye down a clean corridor with matching windows and a wrought-iron railing, reading well as door inspiration."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-8.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 35,
+            "interior": 40,
+            "exterior": 5
+          },
+          "reasoning": "Tall sliding glass unit above an ornate stair railing is prominent, but a scaffolding plank cutting across the frame lowers the polish."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-9.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 0,
+            "interior": 35,
+            "exterior": 0
+          },
+          "reasoning": "Black-framed sliding window with greenery fills the frame, though the installer mid-shot and exposed ceiling framing mark it as in-progress."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-10.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 65,
+            "interior": 55,
+            "exterior": 5
+          },
+          "reasoning": "Wide interior showcasing a full sliding door wall to the terrace and a glass partition, slightly weakened by a leaning panel and floor materials."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-11.jpg",
+          "scores": {
+            "windows": 35,
+            "doors": 80,
+            "interior": 0,
+            "exterior": 55
+          },
+          "reasoning": "Frontal exterior shot of the branded black-framed sliding door unit on a clean facade, a strong door-focused product photo."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-12.jpg",
+          "scores": {
+            "windows": 20,
+            "doors": 0,
+            "interior": 0,
+            "exterior": 42
+          },
+          "reasoning": "Attractive hillside house exterior under blue sky, but scaffolding, tarps, and a parked vehicle keep it from being a finished facade shot."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-13.jpg",
+          "scores": {
+            "windows": 75,
+            "doors": 0,
+            "interior": 40,
+            "exterior": 0
+          },
+          "reasoning": "Two sunlit black-framed sliding windows anchor the corner, though exposed conduit and rough wall patches add construction noise."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-14.jpg",
+          "scores": {
+            "windows": 20,
+            "doors": 55,
+            "interior": 28,
+            "exterior": 0
+          },
+          "reasoning": "Full-height sliding door units are visible but a worker, blue tarps, stained walls, and debris bags make this a clear work-in-progress scene."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-15.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 40,
+            "interior": 5,
+            "exterior": 45
+          },
+          "reasoning": "Angled porch view of a large grid sliding glass unit with a second door beyond, a decent glazing showcase with mild reflection clutter."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-16.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 60,
+            "interior": 0,
+            "exterior": 65
+          },
+          "reasoning": "Clean exterior facade pairing a branded sliding window and a glass door on white stucco, reading nicely as finished exterior inspiration."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-17.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 5,
+            "interior": 40,
+            "exterior": 0
+          },
+          "reasoning": "Large four-panel sliding window is the dominant subject on a clean wall, with scaffolding visible only through the glass."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-18.jpg",
+          "scores": {
+            "windows": 58,
+            "doors": 0,
+            "interior": 30,
+            "exterior": 0
+          },
+          "reasoning": "Expansive window wall with a view, but the silhouetted installer, scaffolding outside, and exposed ceiling mark it as an installation shot."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-19.jpg",
+          "scores": {
+            "windows": 35,
+            "doors": 75,
+            "interior": 45,
+            "exterior": 5
+          },
+          "reasoning": "Full-height sliding glass door wall to the terrace is the clear subject in a bright, relatively tidy interior."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-20.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 5,
+            "interior": 30,
+            "exterior": 5
+          },
+          "reasoning": "Upper-floor sliding window with screen offers a nice vista, but scaffolding inside and outside the frame reduces gallery appeal."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-21.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 0,
+            "interior": 25,
+            "exterior": 0
+          },
+          "reasoning": "Casement windows flood the room with green light, yet two workers, a red stool, buckets, and exposed ceiling grid dominate the scene."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-22.jpg",
+          "scores": {
+            "windows": 25,
+            "doors": 50,
+            "interior": 25,
+            "exterior": 0
+          },
+          "reasoning": "Tall grid door units are present but blue tarps behind the glass, a worker, and debris piles make this a construction-progress photo."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-3-23.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 82,
+            "interior": 0,
+            "exterior": 60
+          },
+          "reasoning": "Porch-level shot of the black-framed entry door with glass sidelites plus a matching window, a strong exterior door showcase with minor clutter."
         }
       ],
       "quality": {
         "heroImage": "/images/projects-fb/fourlinq-turnover-3.jpg",
-        "heroScore": 27,
+        "heroScore": 58,
         "enhanced": false,
-        "enhancedConfidence": 8,
-        "notes": "Active construction site showing scaffolding and blue tarps, cluttered and unappealing as a cover."
+        "enhancedConfidence": 85,
+        "notes": "Bright, well-composed wide shot that shows off both door and window units, but the raw phone-style exposure plus visible scaffolding and floor debris keep it from being a polished cover photo."
       }
     },
     "portfolio-residence-05": {
@@ -630,104 +1096,234 @@
       "finished": true,
       "images": [
         {
-          "path": "/images/projects-fb/mbArIDA5.jpg",
+          "path": "/images/projects-fb/nuvali-laguna-residence.jpg",
           "scores": {
-            "windows": 60,
-            "doors": 20,
+            "windows": 40,
+            "doors": 5,
+            "interior": 85,
+            "exterior": 5
+          },
+          "reasoning": "Bright loft lounge with glass railings and art where the large window wall is veiled by sheer curtains, so it reads as an interior inspiration shot more than a window showcase."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-2.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 5,
+            "interior": 65,
+            "exterior": 15
+          },
+          "reasoning": "Huge frameless-look glass window framing the green landscape is the unmistakable subject of this mezzanine interior."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-3.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 5,
+            "interior": 60,
+            "exterior": 15
+          },
+          "reasoning": "Centered floor-to-ceiling picture window with countryside view dominates, though foreground hanging chains slightly clutter the composition."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-4.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 5,
+            "interior": 70,
+            "exterior": 20
+          },
+          "reasoning": "Corner-wrapping glass window walls flooding the mezzanine walkway with greenery views are the clear hero of this interior."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-5.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 5,
+            "interior": 78,
+            "exterior": 15
+          },
+          "reasoning": "Frameless corner glazing with sheers opens the styled lounge (motorcycle, Eames chair) to the landscape, showcasing both the window and the interior."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-6.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 35,
+            "interior": 70,
+            "exterior": 10
+          },
+          "reasoning": "Backlit bedroom shot of a tall wood-framed window wall with a central glazed door to the balcony; windows lead, door secondary, exposure is dim."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-7.jpg",
+          "scores": {
+            "windows": 82,
+            "doors": 5,
+            "interior": 78,
+            "exterior": 15
+          },
+          "reasoning": "Wide mezzanine view of the double-height living space wrapped in tall glass window walls, equally strong as window and interior inspiration."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-8.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 10,
+            "interior": 5,
+            "exterior": 78
+          },
+          "reasoning": "Upward exterior shot of the modern facade with glass balcony and glazed corner, partially obscured by a tree and heavy lens flare."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-9.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 10,
             "interior": 5,
             "exterior": 90
           },
-          "reasoning": "Upward exterior elevation of a modern two-storey wood-clad house against blue sky, with vertical windows and a glass-railed balcony."
+          "reasoning": "Striking full-facade exterior against blue sky showing the wood-slat cladding, corner glazing, and balcony glass — a strong architecture/exterior shot."
         },
         {
-          "path": "/images/projects-fb/u9QGO5wI.jpg",
+          "path": "/images/projects-fb/nuvali-laguna-residence-10.jpg",
           "scores": {
-            "windows": 70,
-            "doors": 30,
+            "windows": 60,
+            "doors": 10,
             "interior": 5,
             "exterior": 85
           },
-          "reasoning": "Exterior facade close-up of wood-slat cladding with a prominent bank of ground-floor casement windows and a balcony above."
+          "reasoning": "Upward exterior view where the wood-framed balcony window band and glass railing are prominent within a strong facade composition."
         },
         {
-          "path": "/images/projects-fb/AOQsrPKg.jpg",
-          "scores": {
-            "windows": 80,
-            "doors": 25,
-            "interior": 5,
-            "exterior": 65
-          },
-          "reasoning": "Tight exterior facade shot dominated by tall vertical window units set in warm wood-slat wall with a balcony overhead."
-        },
-        {
-          "path": "/images/projects-fb/5e9SkvSf.jpg",
-          "scores": {
-            "windows": 45,
-            "doors": 20,
-            "interior": 5,
-            "exterior": 90
-          },
-          "reasoning": "Dramatic upward exterior view of the multi-storey house framed by trees, showing the facade, entry canopy and stone stair."
-        },
-        {
-          "path": "/images/projects-fb/gjR_DEfu.jpg",
+          "path": "/images/projects-fb/nuvali-laguna-residence-11.jpg",
           "scores": {
             "windows": 55,
-            "doors": 55,
-            "interior": 85,
-            "exterior": 10
+            "doors": 10,
+            "interior": 5,
+            "exterior": 75
           },
-          "reasoning": "Interior bedroom shot looking out through a floor-to-ceiling window-and-sliding-door wall to a green valley, with curtains and toys inside."
+          "reasoning": "Close-up of the wood-slat facade with narrow wood-framed windows and balcony glazing above, reading as an exterior detail shot."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-12.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 25,
+            "interior": 50,
+            "exterior": 35
+          },
+          "reasoning": "Covered poolside court where large wood-framed window units with sheers are the main subject, with a carved wood door clipped at the left edge."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-13.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 55,
+            "interior": 45,
+            "exterior": 35
+          },
+          "reasoning": "Poolside elevation combining prominent wood-framed window units with two decorative slatted wood doors clearly visible on the left."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-14.jpg",
+          "scores": {
+            "windows": 82,
+            "doors": 45,
+            "interior": 50,
+            "exterior": 35
+          },
+          "reasoning": "Wood-framed window wall with transoms and a glazed entry door beside the pool lanai, windows leading with the door a clear secondary subject."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-15.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 55,
+            "interior": 45,
+            "exterior": 40
+          },
+          "reasoning": "Patio-side glass wall where a full-height glazed door with visible handle sits near center among tall wood-framed window units."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-16.jpg",
+          "scores": {
+            "windows": 75,
+            "doors": 5,
+            "interior": 70,
+            "exterior": 5
+          },
+          "reasoning": "Dark bedroom where the gridded wood-framed window wall with blinds and bamboo view is the clear subject, though underexposure limits its polish."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-17.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 5,
+            "interior": 80,
+            "exterior": 5
+          },
+          "reasoning": "Kitchen vignette with the wood-framed sliding window over the marble counter perfectly framing lush foliage — strong for both windows and interior."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-18.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 5,
+            "interior": 72,
+            "exterior": 5
+          },
+          "reasoning": "Moody game room interior where the blinds-covered wood window wall provides the light source but the dark room styling is the main story."
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/mbArIDA5.jpg",
-        "heroScore": 82,
-        "enhanced": true,
-        "enhancedConfidence": 68,
-        "notes": "Striking low-angle modern villa with wood-slat cladding against a dramatic cloud-filled sky, crisp and vibrantly graded with strong editorial appeal."
+        "heroImage": "/images/projects-fb/nuvali-laguna-residence.jpg",
+        "heroScore": 70,
+        "enhanced": false,
+        "enhancedConfidence": 60,
+        "notes": "Bright, colorful loft-lounge composition with pleasing leading lines, but the punchy saturation, blown-out sheers, and 16:9 video-frame softness read as a phone/video capture rather than professional retouching."
       }
     },
     "bulacan-n-residence": {
       "finished": true,
       "images": [
         {
-          "path": "/images/projects-fb/ZoZWYiwi.jpg",
+          "path": "/images/projects-fb/bulacan-n-residence.jpg",
           "scores": {
             "windows": 55,
-            "doors": 90,
-            "interior": 15,
-            "exterior": 45
+            "doors": 85,
+            "interior": 10,
+            "exterior": 65
           },
-          "reasoning": "Exterior view of a large wood-framed glass bi-fold/folding door system with sidelight windows under a covered lanai."
+          "reasoning": "Patio-side portrait of a large wood-framed sliding door system with screens and transom windows, with the doors clearly the hero and a pool reflected in the glass."
         },
         {
-          "path": "/images/projects-fb/S2T-OFy4.jpg",
+          "path": "/images/projects-fb/bulacan-n-residence-2.jpg",
           "scores": {
-            "windows": 45,
-            "doors": 65,
-            "interior": 5,
-            "exterior": 90
+            "windows": 75,
+            "doors": 80,
+            "interior": 10,
+            "exterior": 65
           },
-          "reasoning": "Full exterior elevation of a white house with butterfly roof against blue sky, featuring a large corner glass door-and-window wall."
+          "reasoning": "Frontal symmetric shot of a full glazed wall where central wood-framed French doors are flanked by floor-to-ceiling fixed windows under exposed rafters."
         },
         {
-          "path": "/images/projects-fb/-pFxhSkE.jpg",
+          "path": "/images/projects-fb/bulacan-n-residence-3.jpg",
           "scores": {
             "windows": 50,
-            "doors": 90,
-            "interior": 15,
-            "exterior": 40
+            "doors": 55,
+            "interior": 5,
+            "exterior": 92
           },
-          "reasoning": "Close-up of a wood-framed sliding glass door system with transoms and fixed sidelights, viewed from an exterior patio."
+          "reasoning": "Wide facade shot of the modern skillion-roof pavilion under deep blue sky, with the glazed door-and-window wall reading as part of the overall exterior."
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/ZoZWYiwi.jpg",
-        "heroScore": 42,
+        "heroImage": "/images/projects-fb/bulacan-n-residence.jpg",
+        "heroScore": 75,
         "enhanced": false,
-        "enhancedConfidence": 15,
-        "notes": "Wide-angle phone shot of glass doors with a FourlinQ logo burned into the corner and busy reflections."
+        "enhancedConfidence": 55,
+        "notes": "Bright, cleanly framed vertical shot with vivid color and a watermark, but harsh midday sun and casual angle suggest a lightly edited phone photo rather than professional retouching."
       }
     },
     "cebu-m-residence-molave": {
@@ -820,104 +1416,114 @@
       "finished": true,
       "images": [
         {
-          "path": "/images/projects-fb/ZzCSzF_o.jpg",
+          "path": "/images/projects-fb/tagaytay-cavite-residence.jpg",
           "scores": {
             "windows": 45,
-            "doors": 8,
+            "doors": 10,
             "interior": 5,
             "exterior": 88
           },
-          "reasoning": "Exterior elevation of a modern white multi-story home with balconies, dark-framed windows and lush landscaping."
+          "reasoning": "Dramatic upward exterior shot of the white modern facade with pergola slats and balconies, where a large fixed window is visible but the facade itself is the subject."
         },
         {
-          "path": "/images/projects-fb/I0S5nOmZ.jpg",
+          "path": "/images/projects-fb/tagaytay-cavite-residence-2.jpg",
           "scores": {
-            "windows": 58,
-            "doors": 8,
+            "windows": 35,
+            "doors": 10,
             "interior": 5,
             "exterior": 85
           },
-          "reasoning": "Upward exterior view of the white home's facade featuring a prominent dark-framed sliding window and wood-slat pergola."
+          "reasoning": "Wide exterior view of the multi-story house nestled in greenery; windows read only as distant facade elements."
         },
         {
-          "path": "/images/projects-fb/WWWCQcpX.jpg",
+          "path": "/images/projects-fb/tagaytay-cavite-residence-3.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 5,
+            "interior": 60,
+            "exterior": 10
+          },
+          "reasoning": "Interior corner shot where the dark-framed awning-window wall with garden views is unmistakably the subject."
+        },
+        {
+          "path": "/images/projects-fb/tagaytay-cavite-residence-4.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 5,
+            "interior": 5,
+            "exterior": 35
+          },
+          "reasoning": "Frontal close-up of a wood-grain framed awning window grid filling the frame, a pure window product shot taken from outside."
+        },
+        {
+          "path": "/images/projects-fb/tagaytay-cavite-residence-5.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 5,
+            "interior": 75,
+            "exterior": 10
+          },
+          "reasoning": "Meeting-room interior with table and chairs in the foreground and the awning-window wall as a strong secondary subject."
+        },
+        {
+          "path": "/images/projects-fb/tagaytay-cavite-residence-6.jpg",
           "scores": {
             "windows": 55,
-            "doors": 8,
+            "doors": 10,
             "interior": 5,
-            "exterior": 84
+            "exterior": 85
           },
-          "reasoning": "Low-angle exterior shot of the modern facade with a balcony pergola and a dark-framed window band."
-        },
-        {
-          "path": "/images/projects-fb/Bf8HH614.jpg",
-          "scores": {
-            "windows": 78,
-            "doors": 5,
-            "interior": 82,
-            "exterior": 6
-          },
-          "reasoning": "Interior conference/dining room shot with a wall of dark-framed awning windows overlooking a garden, table and mesh chairs."
-        },
-        {
-          "path": "/images/projects-fb/9OqANnRg.jpg",
-          "scores": {
-            "windows": 84,
-            "doors": 5,
-            "interior": 78,
-            "exterior": 6
-          },
-          "reasoning": "Interior room shot dominated by a large grid of dark-framed awning windows on two walls opening to the yard."
+          "reasoning": "Upward exterior shot where a large sliding glass unit and balcony glazing are prominent within an overall facade composition."
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/ZzCSzF_o.jpg",
-        "heroScore": 76,
-        "enhanced": true,
-        "enhancedConfidence": 60,
-        "notes": "White modernist home framed by lush tropical greenery under a bright blue sky, well-composed and punchy though the house sits slightly small in frame."
+        "heroImage": "/images/projects-fb/tagaytay-cavite-residence.jpg",
+        "heroScore": 80,
+        "enhanced": false,
+        "enhancedConfidence": 38,
+        "notes": "Striking low-angle composition with vivid blue sky and clean geometry, but the punchy saturation and slight lens distortion read as a good phone snapshot rather than professional grading."
       }
     },
     "taguig-g-residence": {
       "finished": true,
       "images": [
         {
-          "path": "/images/projects-fb/BOyTwrQH.jpg",
+          "path": "/images/projects-fb/taguig-g-residence.jpg",
           "scores": {
-            "windows": 55,
-            "doors": 82,
-            "interior": 6,
-            "exterior": 80
+            "windows": 65,
+            "doors": 75,
+            "interior": 5,
+            "exterior": 88
           },
-          "reasoning": "Exterior facade with a prominent wooden pivot entry door flanked by tall black-framed glazed window walls."
+          "reasoning": "Frontal facade shot of the modern white-and-stone house where the oversized wood pivot entry door and black-framed glass walls anchor a strong exterior composition."
         },
         {
-          "path": "/images/projects-fb/vhoJDNZw.jpg",
+          "path": "/images/projects-fb/taguig-g-residence-2.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 10,
+            "interior": 10,
+            "exterior": 70
+          },
+          "reasoning": "Upward exterior detail of a two-storey black-framed curtain-wall window bay on stone cladding, with the glazing unmistakably the subject."
+        },
+        {
+          "path": "/images/projects-fb/taguig-g-residence-3.jpg",
           "scores": {
             "windows": 85,
-            "doors": 20,
-            "interior": 12,
-            "exterior": 72
+            "doors": 5,
+            "interior": 80,
+            "exterior": 10
           },
-          "reasoning": "Exterior looking up at a tall two-story black-framed glass curtain-wall window unit on the stone-clad facade."
-        },
-        {
-          "path": "/images/projects-fb/UdQMQaA-.jpg",
-          "scores": {
-            "windows": 72,
-            "doors": 10,
-            "interior": 85,
-            "exterior": 8
-          },
-          "reasoning": "Interior sunroom with floor-to-ceiling black-framed glazing, a sofa and greenery views from inside."
+          "reasoning": "Interior sunroom lounge wrapped in black-framed floor-to-ceiling windows and sloped glazing, doubling as both a window showcase and an interior inspiration shot."
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/BOyTwrQH.jpg",
-        "heroScore": 55,
+        "heroImage": "/images/projects-fb/taguig-g-residence.jpg",
+        "heroScore": 82,
         "enhanced": false,
-        "enhancedConfidence": 25,
-        "notes": "Handsome modern facade but flat overcast light and a burned-in logo watermark keep it in plain snapshot territory."
+        "enhancedConfidence": 55,
+        "notes": "Striking tree-framed facade composition with even overcast light and good exposure balance, though the slightly punchy contrast still reads as an edited phone or Facebook photo rather than a professional grade."
       }
     },
     "cebu-d-residence-mandaue": {
@@ -980,50 +1586,50 @@
         {
           "path": "/images/projects-fb/cabanatuan-t-residence.jpg",
           "scores": {
-            "windows": 60,
-            "doors": 12,
-            "interior": 6,
-            "exterior": 86
+            "windows": 35,
+            "doors": 10,
+            "interior": 0,
+            "exterior": 85
           },
-          "reasoning": "Exterior street view of a modern Asian-contemporary home with a prominent second-floor black-framed window band and parked cars."
+          "reasoning": "Corner street view of the modern two-story house behind its fence, with balcony glazing and window bands visible but subordinate to the facade."
         },
         {
           "path": "/images/projects-fb/cabanatuan-t-residence-2.jpg",
           "scores": {
-            "windows": 42,
-            "doors": 8,
-            "interior": 4,
-            "exterior": 88
+            "windows": 35,
+            "doors": 10,
+            "interior": 0,
+            "exterior": 80
           },
-          "reasoning": "Wide roadside exterior elevation of the same contemporary two-story house behind a dark slat fence."
+          "reasoning": "Side street view of the long facade with glass balcony railings and window strips, partly upstaged by the parked sedan in the foreground."
         },
         {
           "path": "/images/projects-fb/cabanatuan-t-residence-3.jpg",
           "scores": {
-            "windows": 45,
-            "doors": 10,
-            "interior": 5,
-            "exterior": 88
+            "windows": 20,
+            "doors": 5,
+            "interior": 0,
+            "exterior": 78
           },
-          "reasoning": "Corner exterior view of the modern house with a glass-railed balcony and dark perimeter fencing."
+          "reasoning": "Distant wide shot of two modern houses along the road where individual window or door units are too small to be subjects."
         },
         {
           "path": "/images/projects-fb/cabanatuan-t-residence-4.jpg",
           "scores": {
-            "windows": 45,
-            "doors": 10,
-            "interior": 5,
-            "exterior": 87
+            "windows": 55,
+            "doors": 20,
+            "interior": 0,
+            "exterior": 88
           },
-          "reasoning": "Street-corner exterior of the contemporary residence with balcony glazing, dark fence and a car parked out front."
+          "reasoning": "Frontal facade shot where the full-width upper glazing and louvered curtain-wall windows are a strong feature of the exterior composition, with the entry gate visible below."
         }
       ],
       "quality": {
         "heroImage": "/images/projects-fb/cabanatuan-t-residence.jpg",
-        "heroScore": 47,
+        "heroScore": 62,
         "enhanced": false,
-        "enhancedConfidence": 15,
-        "notes": "Wide street-level snapshot with parked cars cluttering the foreground and a FourlinQ logo burned top-left."
+        "enhancedConfidence": 30,
+        "notes": "Solid corner composition with a punchy sky, but intruding power lines, the parked car, and bystanders mark it as a raw Facebook-style phone snapshot."
       }
     },
     "portfolio-residence-04": {
@@ -1074,62 +1680,162 @@
       "finished": true,
       "images": [
         {
-          "path": "/images/projects-fb/yDrxH9L-.jpg",
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium.jpg",
           "scores": {
-            "windows": 90,
-            "doors": 8,
-            "interior": 60,
-            "exterior": 5
-          },
-          "reasoning": "Bare interior room dominated by a six-pane grid of dark aluminium awning windows over a wood floor."
-        },
-        {
-          "path": "/images/projects-fb/P7DLic-T.jpg",
-          "scores": {
-            "windows": 62,
-            "doors": 55,
-            "interior": 5,
-            "exterior": 78
-          },
-          "reasoning": "Exterior terrace/balcony view of a construction-phase facade with dark-framed sliding glass doors and windows behind a glass railing."
-        },
-        {
-          "path": "/images/projects-fb/P8m34kD5.jpg",
-          "scores": {
-            "windows": 92,
+            "windows": 80,
             "doors": 5,
-            "interior": 8,
-            "exterior": 30
-          },
-          "reasoning": "Close-up of a tall dark aluminium awning window unit reflecting sky, shot from the building exterior."
-        },
-        {
-          "path": "/images/projects-fb/z8K5dOzz.jpg",
-          "scores": {
-            "windows": 82,
-            "doors": 10,
             "interior": 55,
-            "exterior": 8
+            "exterior": 10
           },
-          "reasoning": "Bright interior stairwell with a two-part dark aluminium awning window above a glass-railed staircase."
+          "reasoning": "Stairwell interior where the dark-framed awning window is the clear focal subject above wood stairs and a glass rail, though a dangling ceiling wire and blown-out glass add turnover-stage roughness."
         },
         {
-          "path": "/images/projects-fb/2vzBfKBe.jpg",
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-2.jpg",
           "scores": {
             "windows": 85,
-            "doors": 30,
-            "interior": 62,
-            "exterior": 20
+            "doors": 5,
+            "interior": 5,
+            "exterior": 48
           },
-          "reasoning": "Interior room with a full-height dark aluminium window-and-door wall opening onto a terrace and neighboring facade."
+          "reasoning": "Exterior close-up of a black double awning window with sky reflections makes the window unit dominant, but visible scaffolding and tape residue reduce facade-inspiration appeal."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-3.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 8,
+            "interior": 65,
+            "exterior": 5
+          },
+          "reasoning": "Empty wood-floored room framed around a full-width bank of six black awning windows reads as clean interior inspiration, slightly dulled by protective film frosting the glass."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-4.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 5,
+            "interior": 48,
+            "exterior": 8
+          },
+          "reasoning": "Tall stacked awning window fills an interior alcove as the obvious subject, but green scaffolding roofing visible through the glass detracts from the view."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-5.jpg",
+          "scores": {
+            "windows": 38,
+            "doors": 30,
+            "interior": 8,
+            "exterior": 42
+          },
+          "reasoning": "Exterior terrace shot showing glass railing and black door/window wall is heavily compromised by scaffolding poles, rebar, and deck debris."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-6.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 10,
+            "interior": 35,
+            "exterior": 38
+          },
+          "reasoning": "Interesting glass-canopy vista with an open awning window mid-frame, but the rusty perimeter fence and ambiguous framing weaken it as either interior or exterior inspiration."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-7.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 25,
+            "interior": 62,
+            "exterior": 8
+          },
+          "reasoning": "Empty wood-floored room with a full glazed wall of awning windows over a pool terrace is strong window-and-interior material, though scaffolding is visible through the glass."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-8.jpg",
+          "scores": {
+            "windows": 58,
+            "doors": 50,
+            "interior": 65,
+            "exterior": 8
+          },
+          "reasoning": "Bright interior with sliding/folding balcony doors open at left and a window wall ahead reads as spacious inspiration, but plastic-wrapped hardware and outside scaffolding show turnover state."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-9.jpg",
+          "scores": {
+            "windows": 65,
+            "doors": 35,
+            "interior": 50,
+            "exterior": 5
+          },
+          "reasoning": "Full-width glazed wall of sliding panels flanked by awning windows dominates the frame, but prominent scaffolding directly outside the glass lowers gallery appeal."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-10.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 0,
+            "interior": 50,
+            "exterior": 5
+          },
+          "reasoning": "Four open awning windows over marble flooring make the units the clear subject, with scaffolding poles and the neighboring building visible through the glass."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-11.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 55,
+            "interior": 72,
+            "exterior": 8
+          },
+          "reasoning": "Wide interior with sliding balcony doors at left and a glazed corner at right is a good spacious-room shot, softened by wrapped door handles and industrial views outside."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-12.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 70,
+            "interior": 62,
+            "exterior": 8
+          },
+          "reasoning": "Frontal interior view of the black-framed sliding door unit with sidelights and city skyline makes the doors the star, though wrapped handles and construction netting outside cost polish."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-13.jpg",
+          "scores": {
+            "windows": 72,
+            "doors": 0,
+            "interior": 52,
+            "exterior": 5
+          },
+          "reasoning": "Long run of open black awning windows over marble floor showcases the window system well, but bamboo/steel scaffolding fills much of the view through the glass."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-14.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 0,
+            "interior": 48,
+            "exterior": 5
+          },
+          "reasoning": "Angled view down a band of open awning windows above marble flooring keeps windows prominent, with scaffolding visible outside reducing the inspiration factor."
+        },
+        {
+          "path": "/images/projects-fb/san-lorenzo-makati-aluminium-15.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 0,
+            "interior": 50,
+            "exterior": 5
+          },
+          "reasoning": "Low ribbon of awning windows over dramatic blue-veined marble is visually striking, but the taped-up wrapped AC unit on the ceiling and scaffolding outside flag an unfinished site."
         }
       ],
       "quality": {
-        "heroImage": "/images/projects-fb/yDrxH9L-.jpg",
-        "heroScore": 30,
+        "heroImage": "/images/projects-fb/san-lorenzo-makati-aluminium.jpg",
+        "heroScore": 60,
         "enhanced": false,
-        "enhancedConfidence": 20,
-        "notes": "Empty raw-concrete interior room with bare unfinished walls and a bank of windows, flat lighting and a construction-documentation feel with no magazine appeal."
+        "enhancedConfidence": 75,
+        "notes": "Bright, cleanly composed stairwell shot with the black awning window as a natural focal point, but the dangling ceiling wire, string on the handle, and blown-out glass mark it as an unretouched phone snapshot rather than a polished cover photo."
       }
     },
     "cebu-n-residence-pardo": {
@@ -1213,59 +1919,219 @@
           "path": "/images/projects-fb/bataan-s-residence.jpg",
           "scores": {
             "windows": 50,
-            "doors": 62,
-            "interior": 8,
-            "exterior": 85
+            "doors": 35,
+            "interior": 78,
+            "exterior": 8
           },
-          "reasoning": "Garden-level exterior of a modern house with a full-height glazed sliding door wall and upper balcony glazing."
+          "reasoning": "Cozy living-room interior where a tall dark-framed glass balcony door peeks between sheer drapes behind an armchair, so the space reads stronger than the fenestration."
         },
         {
           "path": "/images/projects-fb/bataan-s-residence-2.jpg",
           "scores": {
-            "windows": 48,
-            "doors": 65,
-            "interior": 8,
-            "exterior": 84
+            "windows": 45,
+            "doors": 82,
+            "interior": 35,
+            "exterior": 25
           },
-          "reasoning": "Exterior view through garden shrubs of the same facade with a wide curtained sliding glass door and terrace."
+          "reasoning": "An open dark-framed glass swing door with transom above is the unmistakable subject, framing a garden view from inside."
         },
         {
           "path": "/images/projects-fb/bataan-s-residence-3.jpg",
           "scores": {
-            "windows": 40,
-            "doors": 72,
-            "interior": 8,
-            "exterior": 82
+            "windows": 52,
+            "doors": 20,
+            "interior": 68,
+            "exterior": 5
           },
-          "reasoning": "Exterior corner showing a wooden pivot entry door with steps and an adjacent glazed sliding door wall."
+          "reasoning": "Living-room interior with a full-height glazed wall behind vertical sheers, but a large dark foreground obstruction weakens the composition."
         },
         {
           "path": "/images/projects-fb/bataan-s-residence-4.jpg",
           "scores": {
-            "windows": 55,
-            "doors": 78,
-            "interior": 10,
-            "exterior": 80
+            "windows": 60,
+            "doors": 25,
+            "interior": 82,
+            "exterior": 5
           },
-          "reasoning": "Exterior corner featuring folding/sliding glass doors onto a wood deck plus dark-framed window units."
+          "reasoning": "Wide living-room interior where corner floor-to-ceiling glazing and a clerestory window frame the greenery, though furniture dominates the foreground."
         },
         {
           "path": "/images/projects-fb/bataan-s-residence-5.jpg",
           "scores": {
-            "windows": 68,
+            "windows": 58,
+            "doors": 35,
+            "interior": 80,
+            "exterior": 5
+          },
+          "reasoning": "Low-angle living-room shot showing the dark-framed glazed door and window wall behind sheers with sculptural pendants, reading mainly as interior inspiration."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-6.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 15,
+            "interior": 85,
+            "exterior": 8
+          },
+          "reasoning": "Bright living-room interior where tall dark-framed windows with a clear garden view and layered sheers are the standout feature."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-7.jpg",
+          "scores": {
+            "windows": 65,
             "doors": 55,
-            "interior": 8,
+            "interior": 85,
+            "exterior": 8
+          },
+          "reasoning": "Sunlit dining room showing an open awning window, glazed French doors to the garden, and a curtained glass wall all in one balanced interior."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-8.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 45,
+            "interior": 85,
+            "exterior": 8
+          },
+          "reasoning": "Airy white living-room interior with the glazed terrace door open to greenery and sheer-covered glazing as the backdrop."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-9.jpg",
+          "scores": {
+            "windows": 68,
+            "doors": 20,
+            "interior": 70,
+            "exterior": 5
+          },
+          "reasoning": "Frontal dining-area view where the sheer-draped picture window and open dark-framed casement window are the clear subjects."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-10.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 60,
+            "interior": 5,
+            "exterior": 75
+          },
+          "reasoning": "Terrace shot pairing tall glazed French doors with a band of dark-framed facade windows under pergola beams, clearly an exterior deck scene."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-11.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 50,
+            "interior": 82,
+            "exterior": 8
+          },
+          "reasoning": "Dining interior with an open casement window on the left and glazed double doors to the garden centered beyond the glass table."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-12.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 10,
+            "interior": 82,
+            "exterior": 5
+          },
+          "reasoning": "Bedroom interior where a sheer-veiled floor-to-ceiling glazed wall with a sky view and a small shaded window define the mood."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-13.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 60,
+            "interior": 75,
+            "exterior": 10
+          },
+          "reasoning": "Plant-framed dining interior looking through open dark-framed glass doors to the meadow, with the doors as the focal opening."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-14.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 60,
+            "interior": 85,
+            "exterior": 8
+          },
+          "reasoning": "Bedroom interior featuring a tall glazed balcony door with transom, a blinds-covered glass wall, and a side window in one composed scene."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-15.jpg",
+          "scores": {
+            "windows": 75,
+            "doors": 5,
+            "interior": 3,
+            "exterior": 72
+          },
+          "reasoning": "Exterior close-up along the facade where dark-framed reflective windows rise above lush landscaping against blue sky."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-16.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 55,
+            "interior": 3,
+            "exterior": 85
+          },
+          "reasoning": "Handsome exterior of the wood-and-concrete facade with a large glazed sliding wall onto the deck and flanking dark-framed windows."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-17.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 65,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Exterior corner view where open glazed French doors onto the wood deck and surrounding full-height windows showcase the fenestration."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-18.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 10,
+            "interior": 52,
+            "exterior": 12
+          },
+          "reasoning": "Dramatic stairwell interior where the two-tier dark-framed window wall glowing with greenery is the unmistakable subject."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-19.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 30,
+            "interior": 3,
+            "exterior": 85
+          },
+          "reasoning": "Garden-level exterior of the two-storey facade with glass balcony railing and curtained glazed walls framed by vivid foreground plants."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-20.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 40,
+            "interior": 3,
+            "exterior": 88
+          },
+          "reasoning": "Strong exterior facade shot showing the balcony glazing above and ground-floor glass doors opening to the lawn."
+        },
+        {
+          "path": "/images/projects-fb/bataan-s-residence-21.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 80,
+            "interior": 3,
             "exterior": 80
           },
-          "reasoning": "Exterior side elevation with dark-framed windows, a curtained glass door, and a wood-deck dining terrace."
+          "reasoning": "Exterior entry view where the wood-slat front door and adjacent glazed patio doors anchor the facade above the concrete steps."
         }
       ],
       "quality": {
         "heroImage": "/images/projects-fb/bataan-s-residence.jpg",
-        "heroScore": 55,
+        "heroScore": 52,
         "enhanced": false,
-        "enhancedConfidence": 35,
-        "notes": "Nice blue sky and lush greenery but a low tilted phone angle with foreground shrubs blocking a partial view of the modern house."
+        "enhancedConfidence": 75,
+        "notes": "Pleasant natural light and a cozy chair-by-the-glass-door vignette, but the vertical phone framing and blurred dark foreground obstruction keep it feeling like a casual snapshot rather than a polished cover photo."
       }
     },
     "portfolio-residence-02": {
@@ -1610,28 +2476,6 @@
         "notes": "Crisp blue-sky render of a striking stone-clad facade, slightly weakened by a faint corner watermark."
       }
     },
-    "cebu-residence-alta-vista": {
-      "finished": true,
-      "images": [
-        {
-          "path": "/images/projects-fb/cebu-residence-alta-vista.jpg",
-          "scores": {
-            "windows": 55,
-            "doors": 18,
-            "interior": 5,
-            "exterior": 90
-          },
-          "reasoning": "Corner exterior of a white classical-style mansion with arched windows and balconies behind a landscaped wall."
-        }
-      ],
-      "quality": {
-        "heroImage": "/images/projects-fb/cebu-residence-alta-vista.jpg",
-        "heroScore": 90,
-        "enhanced": true,
-        "enhancedConfidence": 90,
-        "notes": "Striking white mansion under a deep blue sky with vibrant hedges and clean framing, a high-res color-graded magazine-cover shot."
-      }
-    },
     "curved-facade-residence": {
       "finished": true,
       "images": [
@@ -1868,60 +2712,200 @@
         {
           "path": "/images/projects-fb/binan-residence.jpg",
           "scores": {
-            "windows": 45,
-            "doors": 15,
-            "interior": 3,
-            "exterior": 88
+            "windows": 90,
+            "doors": 5,
+            "interior": 10,
+            "exterior": 55
           },
-          "reasoning": "Street-level exterior of the two-tone orange-and-blue box facade with small punched windows; a strong elevation shot but windows are only a minor element."
+          "reasoning": "Close-up of an open dark-framed awning window dominating the frame on a white exterior wall with tiled balcony context."
         },
         {
           "path": "/images/projects-fb/binan-residence-2.jpg",
           "scores": {
-            "windows": 55,
-            "doors": 10,
-            "interior": 5,
-            "exterior": 82
+            "windows": 80,
+            "doors": 0,
+            "interior": 60,
+            "exterior": 5
           },
-          "reasoning": "Exterior upper-story view showing the glazed second-floor balcony wall against the orange volume; a good facade shot with moderately prominent glazing."
+          "reasoning": "Interior view of a horizontal dark-framed twin window with roller blind on a tan bedroom wall, backlit by greenery."
         },
         {
           "path": "/images/projects-fb/binan-residence-3.jpg",
           "scores": {
-            "windows": 60,
-            "doors": 12,
-            "interior": 5,
-            "exterior": 80
+            "windows": 90,
+            "doors": 8,
+            "interior": 10,
+            "exterior": 55
           },
-          "reasoning": "Dramatic upward exterior angle of the cantilevered soffit with a large glazed balustrade and window band; facade dominant with windows clearly featured."
+          "reasoning": "Detail shot of open awning windows with stainless hinge hardware along an exterior corridor, window clearly the subject."
         },
         {
           "path": "/images/projects-fb/binan-residence-4.jpg",
           "scores": {
-            "windows": 90,
-            "doors": 55,
+            "windows": 88,
+            "doors": 12,
             "interior": 10,
-            "exterior": 40
+            "exterior": 65
           },
-          "reasoning": "Outdoor close-up of a row of blue-framed awning windows with one wood entry door visible at left; windows are the clear hero subject."
+          "reasoning": "Porch wall lined with fixed-over-awning window units as the main subject, with a glass door frame at the left edge and yard beyond."
         },
         {
           "path": "/images/projects-fb/binan-residence-5.jpg",
           "scores": {
-            "windows": 94,
-            "doors": 8,
-            "interior": 12,
-            "exterior": 35
+            "windows": 45,
+            "doors": 80,
+            "interior": 15,
+            "exterior": 50
           },
-          "reasoning": "Tight detail of three open blue awning windows along a pebble-lined path; aluminium casement windows are unmistakably the primary subject."
+          "reasoning": "Large dark-framed sliding glass door is the central subject, flanked by an open awning window on a patio corner."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-6.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 60
+          },
+          "reasoning": "Wide four-panel sliding glass unit fills the frame on a yellow exterior wall with garden reflections."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-7.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 85,
+            "interior": 10,
+            "exterior": 55
+          },
+          "reasoning": "Frontal exterior shot of a dark-framed glazed door with transom and curtain, with awning windows secondary on the side wall."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-8.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 65,
+            "interior": 15,
+            "exterior": 75
+          },
+          "reasoning": "Wide balcony composition showing a sliding door with transoms, open awning windows, and glass railing in good light."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-9.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 0,
+            "interior": 8,
+            "exterior": 50
+          },
+          "reasoning": "Tight angled close-up of two open awning windows projecting over a balcony walkway, windows unmistakably the subject."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-10.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 5,
+            "interior": 8,
+            "exterior": 55
+          },
+          "reasoning": "Tall fixed-plus-awning window units open on a cream wall beside warm wood slat cladding, strongly window-focused."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-11.jpg",
+          "scores": {
+            "windows": 15,
+            "doors": 55,
+            "interior": 85,
+            "exterior": 10
+          },
+          "reasoning": "Styled bedroom interior with green accent wall, artwork and armchair, where a glazed balcony door provides the natural light."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-12.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 15,
+            "interior": 8,
+            "exterior": 60
+          },
+          "reasoning": "Row of three tall dark-framed windows with awning vents open along a garden entry wall, with a wooden door in the background."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-13.jpg",
+          "scores": {
+            "windows": 25,
+            "doors": 5,
+            "interior": 0,
+            "exterior": 90
+          },
+          "reasoning": "Street-level facade shot of the full two-story orange-and-blue modern house where windows are small distant elements."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-14.jpg",
+          "scores": {
+            "windows": 20,
+            "doors": 75,
+            "interior": 65,
+            "exterior": 10
+          },
+          "reasoning": "Interior view through a curtained sliding door to the terrace, door as subject but marred by screen moire and a person at the edge."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-15.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 0,
+            "interior": 5,
+            "exterior": 55
+          },
+          "reasoning": "Clean close-up of three open awning windows above a pebbled garden path with potted flowers, a strong window showcase."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-16.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 5,
+            "interior": 0,
+            "exterior": 88
+          },
+          "reasoning": "Small wide shot of the upper facade with orange volume and glass-railed balcony, reading as an exterior overview."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-17.jpg",
+          "scores": {
+            "windows": 40,
+            "doors": 25,
+            "interior": 5,
+            "exterior": 85
+          },
+          "reasoning": "Dramatic upward facade angle of the glass-railed balcony and glazed openings under the blue soffit, primarily an exterior shot."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-18.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 0,
+            "interior": 5,
+            "exterior": 50
+          },
+          "reasoning": "Single open awning window on a stone-clad wall over a pebble-and-paver side path, window clearly dominant."
+        },
+        {
+          "path": "/images/projects-fb/binan-residence-19.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 0,
+            "interior": 5,
+            "exterior": 45
+          },
+          "reasoning": "Upward close-up of a dark sliding window set into warm vertical wood slat cladding, a window-detail inspiration shot."
         }
       ],
       "quality": {
         "heroImage": "/images/projects-fb/binan-residence.jpg",
-        "heroScore": 30,
+        "heroScore": 62,
         "enhanced": false,
-        "enhancedConfidence": 15,
-        "notes": "Harsh snapshot with overhead power lines, parked vans and people cluttering the frame and an awkward angled crop of a partial building."
+        "enhancedConfidence": 70,
+        "notes": "Sharp, bright daylight close-up of an open awning window with pleasing depth, but its tight detail crop and slightly clipped framing read as a good phone snapshot rather than a professionally graded cover image."
       }
     },
     "fourlinq-turnover-1": {
@@ -1930,60 +2914,220 @@
         {
           "path": "/images/projects-fb/fourlinq-turnover-1.jpg",
           "scores": {
-            "windows": 60,
-            "doors": 25,
-            "interior": 8,
-            "exterior": 88
+            "windows": 70,
+            "doors": 50,
+            "interior": 82,
+            "exterior": 15
           },
-          "reasoning": "Full three-story facade with wood-slat cladding and a prominent multi-pane glazed corner; strong exterior elevation with well-shown windows."
+          "reasoning": "Sunlit living-room interior where a floor-to-ceiling dark-framed glazed wall with transoms and door panels frames the pool view."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-1-2.jpg",
           "scores": {
-            "windows": 88,
+            "windows": 50,
             "doors": 12,
-            "interior": 55,
-            "exterior": 8
+            "interior": 5,
+            "exterior": 85
           },
-          "reasoning": "Interior kitchen view centered on a dark-framed sliding window between shelving; the window unit is the clear subject within an interior scene."
+          "reasoning": "Full exterior facade of the modern house with slat screens and balcony glazing, though parked vehicles clutter the foreground."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-1-3.jpg",
           "scores": {
-            "windows": 70,
-            "doors": 20,
-            "interior": 8,
-            "exterior": 90
+            "windows": 20,
+            "doors": 90,
+            "interior": 55,
+            "exterior": 10
           },
-          "reasoning": "Upward exterior shot of the glazed corner volume and balcony against blue sky; excellent facade hero with prominent window wall."
+          "reasoning": "A dark-framed glass swing door to the gym balcony is the unmistakable single subject of this interior shot."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-1-4.jpg",
           "scores": {
-            "windows": 55,
-            "doors": 45,
-            "interior": 92,
-            "exterior": 5
+            "windows": 88,
+            "doors": 5,
+            "interior": 50,
+            "exterior": 8
           },
-          "reasoning": "Editorial interior living room with sheer curtains and a full-height glazed wall opening to a pool; a superb interior hero shot."
+          "reasoning": "A dark-framed sliding window is the centered, dominant subject in a bright nursery/pantry interior."
         },
         {
           "path": "/images/projects-fb/fourlinq-turnover-1-5.jpg",
           "scores": {
-            "windows": 45,
-            "doors": 82,
+            "windows": 60,
+            "doors": 25,
+            "interior": 5,
+            "exterior": 88
+          },
+          "reasoning": "Dramatic upward exterior shot of the facade where the double-height corner glazing, balcony doors, and wood slats star against blue sky."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-6.jpg",
+          "scores": {
+            "windows": 62,
+            "doors": 45,
+            "interior": 80,
+            "exterior": 12
+          },
+          "reasoning": "Airy interior with stone wall and stairs where tall dark-framed glass doors and windows with sheer curtains open to the pool."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-7.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 3,
+            "interior": 58,
+            "exterior": 12
+          },
+          "reasoning": "Stairwell interior where a large fixed window screened by vertical wood baffles is the clear architectural subject."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-8.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 3,
+            "interior": 55,
+            "exterior": 10
+          },
+          "reasoning": "A full wall of open dark-framed awning and casement windows with insect screens dominates this home-office interior."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-9.jpg",
+          "scores": {
+            "windows": 48,
+            "doors": 15,
+            "interior": 3,
+            "exterior": 88
+          },
+          "reasoning": "Straight-on exterior of the full facade with gate, carport, and balcony glazing under clear sky, vehicles partly intruding."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-10.jpg",
+          "scores": {
+            "windows": 95,
+            "doors": 2,
+            "interior": 30,
+            "exterior": 12
+          },
+          "reasoning": "Tight product-style close-up of open casement windows with pleated screens — pure window detail with little room context."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-11.jpg",
+          "scores": {
+            "windows": 78,
+            "doors": 35,
             "interior": 85,
+            "exterior": 15
+          },
+          "reasoning": "Styled living-room interior with wood-slat ceiling where the dark-framed glazed wall and sheer curtains reveal the turquoise pool."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-12.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 85,
+            "interior": 70,
+            "exterior": 15
+          },
+          "reasoning": "Large dark-framed sliding glass doors to the balcony lounge are the main subject of this furnished interior corner."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-13.jpg",
+          "scores": {
+            "windows": 50,
+            "doors": 5,
+            "interior": 72,
             "exterior": 5
           },
-          "reasoning": "Interior dining area looking through a tall black-framed glass sliding/patio door to a balcony; both interior scene and a walk-through door are prominent."
+          "reasoning": "Double-height interior where sheer curtains mostly veil the tall glazing, so the window units read softly rather than prominently."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-14.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 2,
+            "interior": 48,
+            "exterior": 8
+          },
+          "reasoning": "Dark-framed awning windows with screens are the clear subject high on this bathroom wall, though the shot is utilitarian."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-15.jpg",
+          "scores": {
+            "windows": 45,
+            "doors": 75,
+            "interior": 68,
+            "exterior": 12
+          },
+          "reasoning": "Dining-area interior looking through tall dark-framed glass doors with transom windows onto the courtyard seating."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-16.jpg",
+          "scores": {
+            "windows": 15,
+            "doors": 68,
+            "interior": 70,
+            "exterior": 5
+          },
+          "reasoning": "Gym interior where a slim-framed glass sliding door to the balcony shares attention with the mirror wall and equipment."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-17.jpg",
+          "scores": {
+            "windows": 20,
+            "doors": 45,
+            "interior": 75,
+            "exterior": 5
+          },
+          "reasoning": "Styled hallway vignette with mirror and console where a glass door/partition down the corridor is secondary to the interior scene."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-18.jpg",
+          "scores": {
+            "windows": 82,
+            "doors": 3,
+            "interior": 60,
+            "exterior": 12
+          },
+          "reasoning": "Double-height window wall behind vertical wood baffles floods the interior with light and is the clear architectural subject."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-19.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 3,
+            "interior": 58,
+            "exterior": 10
+          },
+          "reasoning": "Wide interior view of the office's full window wall with open casements, awnings, and screens over the garden view."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-20.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 88,
+            "interior": 25,
+            "exterior": 45
+          },
+          "reasoning": "Frontal terrace shot where the large dark-framed sliding glass door system is the dominant subject beside the outdoor daybed."
+        },
+        {
+          "path": "/images/projects-fb/fourlinq-turnover-1-21.jpg",
+          "scores": {
+            "windows": 18,
+            "doors": 90,
+            "interior": 55,
+            "exterior": 8
+          },
+          "reasoning": "Portrait detail of the dark-framed glass swing door with screen opening to the balcony, clearly the sole subject."
         }
       ],
       "quality": {
         "heroImage": "/images/projects-fb/fourlinq-turnover-1.jpg",
-        "heroScore": 52,
+        "heroScore": 74,
         "enhanced": false,
-        "enhancedConfidence": 22,
-        "notes": "Handsome wood-slat modern facade undercut by parked pickup trucks and construction mess in a harsh-sun snapshot."
+        "enhancedConfidence": 75,
+        "notes": "Bright, inviting interior-to-pool composition with sheer curtains works well as a cover, but blown highlights and visible floor clutter read as a decent phone snapshot rather than a professionally graded shoot."
       }
     },
     "cebu-t-residence-cebu-city": {
@@ -2014,50 +3158,50 @@
         {
           "path": "/images/projects-fb/sarangani-s-residence.jpg",
           "scores": {
-            "windows": 78,
-            "doors": 45,
-            "interior": 3,
-            "exterior": 90
+            "windows": 85,
+            "doors": 5,
+            "interior": 55,
+            "exterior": 15
           },
-          "reasoning": "Full rear elevation of the two-storey white house with a large grid of black-framed windows and sliding-door units across the ground floor, so it reads strongly as exterior with prominent windows."
+          "reasoning": "Stairwell interior where the tall dark-framed picture window with palm view is the clear subject beneath a cascading pendant light."
         },
         {
           "path": "/images/projects-fb/sarangani-s-residence-2.jpg",
           "scores": {
             "windows": 40,
-            "doors": 55,
-            "interior": 4,
-            "exterior": 82
+            "doors": 80,
+            "interior": 10,
+            "exterior": 70
           },
-          "reasoning": "Front facade and entry porch with a decorative wrought-iron front door and a side gate, making exterior the primary subject with a visible entry door."
+          "reasoning": "Courtyard shot dominated by three tall dark-framed glazed doors with wrought-iron detailing, with a balcony sliding window above."
         },
         {
           "path": "/images/projects-fb/sarangani-s-residence-3.jpg",
           "scores": {
-            "windows": 72,
-            "doors": 6,
-            "interior": 68,
-            "exterior": 5
+            "windows": 70,
+            "doors": 55,
+            "interior": 5,
+            "exterior": 90
           },
-          "reasoning": "Interior stairwell shot with a chandelier framing a single black-framed fixed window as the focal element, so both interior scene and the window read well."
+          "reasoning": "Full rear-facade inspiration shot across the lawn showing bands of dark-framed windows above and sliding glass doors along the terrace."
         },
         {
           "path": "/images/projects-fb/sarangani-s-residence-4.jpg",
           "scores": {
-            "windows": 68,
-            "doors": 35,
-            "interior": 30,
-            "exterior": 45
+            "windows": 55,
+            "doors": 20,
+            "interior": 5,
+            "exterior": 85
           },
-          "reasoning": "Interior courtyard view of a bank of tall black French-style glazed doors/windows below a wrought-iron balcony, ambiguous inside-out framing with windows most prominent."
+          "reasoning": "Exterior bungalow view with decorative wrought-iron accent windows visible on the white facade above brick steps."
         }
       ],
       "quality": {
         "heroImage": "/images/projects-fb/sarangani-s-residence.jpg",
-        "heroScore": 58,
+        "heroScore": 72,
         "enhanced": false,
-        "enhancedConfidence": 20,
-        "notes": "Clean daytime rear-facade phone shot with a tidy lawn but flat lighting and a FourlinQ logo burned into the corner."
+        "enhancedConfidence": 40,
+        "notes": "Pleasant bright stairwell composition with the window framing tropical greenery, but the slightly washed-out highlights and soft focus suggest a lightly filtered phone photo, not professional retouching."
       }
     },
     "cebu-m-residence-2": {
@@ -2082,16 +3226,6 @@
             "exterior": 90
           },
           "reasoning": "Clean front elevation of the modern two-storey house with gate and carport, a textbook exterior facade shot with windows and entry secondary."
-        },
-        {
-          "path": "/images/projects-fb/cebu-m-residence-2-3.jpg",
-          "scores": {
-            "windows": 55,
-            "doors": 30,
-            "interior": 4,
-            "exterior": 88
-          },
-          "reasoning": "Wider street-level facade with visible awning windows and carport under overcast sky, primarily an exterior elevation with moderately prominent windows."
         }
       ],
       "quality": {
@@ -2154,6 +3288,250 @@
         "enhanced": true,
         "enhancedConfidence": 85,
         "notes": "Warm golden Mediterranean villa against a saturated blue sky, polished and well-composed with a strong editorial feel."
+      }
+    },
+    "nuvali-laguna-residence-b": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 5,
+            "interior": 65,
+            "exterior": 12
+          },
+          "reasoning": "Interior shot where a tall wood-grain framed picture window with mountain and subdivision view is the clear subject, flanked by slat wall and wood flooring."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-2.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 0,
+            "interior": 60,
+            "exterior": 10
+          },
+          "reasoning": "Bright corner room where three wood-framed awning-over-fixed window units dominate the frame with green outdoor views."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-3.jpg",
+          "scores": {
+            "windows": 70,
+            "doors": 5,
+            "interior": 0,
+            "exterior": 88
+          },
+          "reasoning": "Dramatic upward exterior shot of the house corner with open wood-framed awning windows, slat cladding, and deep blue sky."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-4.jpg",
+          "scores": {
+            "windows": 25,
+            "doors": 80,
+            "interior": 55,
+            "exterior": 10
+          },
+          "reasoning": "Interior view centered on a wood-framed sliding balcony door with insect screen as the sole subject in an empty room."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-5.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 85,
+            "interior": 20,
+            "exterior": 48
+          },
+          "reasoning": "Covered terrace elevation showing two large wood-framed sliding door units with screens as the frontal subject."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-6.jpg",
+          "scores": {
+            "windows": 55,
+            "doors": 12,
+            "interior": 0,
+            "exterior": 92
+          },
+          "reasoning": "Full three-story facade shot against blue sky where the modern house exterior with wood-framed glazing and glass balconies is the subject."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-7.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 0,
+            "interior": 55,
+            "exterior": 8
+          },
+          "reasoning": "Interior shot filled edge to edge by a wide wood-framed sliding window band overlooking lush greenery."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-8.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 70,
+            "interior": 60,
+            "exterior": 10
+          },
+          "reasoning": "Wood-paneled interior corridor leading to a slim glazed double balcony door with mountain view as the focal point."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-9.jpg",
+          "scores": {
+            "windows": 75,
+            "doors": 0,
+            "interior": 0,
+            "exterior": 78
+          },
+          "reasoning": "Exterior close-up of open wood-framed awning windows set into a stone-clad corner with slat panels and fence line beyond."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-10.jpg",
+          "scores": {
+            "windows": 25,
+            "doors": 88,
+            "interior": 10,
+            "exterior": 45
+          },
+          "reasoning": "Balcony close-up of an open wood-framed swing door with pleated screen and glazed sidelite as the dominant subject."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-11.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 72,
+            "interior": 65,
+            "exterior": 10
+          },
+          "reasoning": "Wide empty interior room framing a wood-framed sliding balcony door with screen and neighborhood view."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-12.jpg",
+          "scores": {
+            "windows": 30,
+            "doors": 85,
+            "interior": 30,
+            "exterior": 45
+          },
+          "reasoning": "Covered terrace with ceiling fan showcasing a long run of wood-framed sliding glass doors as the main subject."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-b-13.jpg",
+          "scores": {
+            "windows": 60,
+            "doors": 25,
+            "interior": 0,
+            "exterior": 88
+          },
+          "reasoning": "Exterior facade close-up of stacked balconies with glass railings and wood-framed windows and doors under bright sky."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/nuvali-laguna-residence-b.jpg",
+        "heroScore": 80,
+        "enhanced": false,
+        "enhancedConfidence": 60,
+        "notes": "Well-composed, bright interior framing of the signature wood-framed picture window with mountain view, though the punchy saturation reads as phone HDR rather than professional grading."
+      }
+    },
+    "nuvali-laguna-residence-c": {
+      "finished": true,
+      "images": [
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 0,
+            "interior": 50,
+            "exterior": 12
+          },
+          "reasoning": "Interior corner shot where two black-framed awning windows with subdivision street views are the unmistakable subject, with installation tape still visible."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c-2.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 0,
+            "interior": 45,
+            "exterior": 10
+          },
+          "reasoning": "Frontal interior view of a tall black-framed awning window with rain-spotted glass framed neatly in a wall niche."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c-3.jpg",
+          "scores": {
+            "windows": 80,
+            "doors": 0,
+            "interior": 60,
+            "exterior": 5
+          },
+          "reasoning": "Upward interior shot of a double-height space pairing a slat-screened glazed wall with a black-framed sliding window, still mid-construction."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c-4.jpg",
+          "scores": {
+            "windows": 85,
+            "doors": 0,
+            "interior": 60,
+            "exterior": 8
+          },
+          "reasoning": "Mezzanine interior featuring a slat-screened picture window and a black-framed interior sliding window into a bedroom."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c-5.jpg",
+          "scores": {
+            "windows": 90,
+            "doors": 5,
+            "interior": 50,
+            "exterior": 5
+          },
+          "reasoning": "Straight-on shot of a black aluminum sliding window unit filling the frame as an interior pass-through opening."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c-6.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 0,
+            "interior": 50,
+            "exterior": 8
+          },
+          "reasoning": "Frontal interior view of a wide black-framed sliding window assembly with fixed lower lites, scaffolding visible outside."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c-7.jpg",
+          "scores": {
+            "windows": 92,
+            "doors": 0,
+            "interior": 60,
+            "exterior": 10
+          },
+          "reasoning": "Interior corner where large black-framed sliding windows wrap the room with garden and slat-screen views over a window bench."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c-8.jpg",
+          "scores": {
+            "windows": 25,
+            "doors": 85,
+            "interior": 50,
+            "exterior": 10
+          },
+          "reasoning": "Interior view of a black-framed sliding patio door open to a roof terrace, with heavy moire on the screen panel."
+        },
+        {
+          "path": "/images/projects-fb/nuvali-laguna-residence-c-9.jpg",
+          "scores": {
+            "windows": 88,
+            "doors": 0,
+            "interior": 55,
+            "exterior": 10
+          },
+          "reasoning": "Interior shot of a black-framed fixed window behind exterior vertical slats with a street view and built-in bench below."
+        }
+      ],
+      "quality": {
+        "heroImage": "/images/projects-fb/nuvali-laguna-residence-c.jpg",
+        "heroScore": 62,
+        "enhanced": false,
+        "enhancedConfidence": 85,
+        "notes": "Decent corner-window composition with an open subdivision view, but flat overcast light and visible installation tape mark it as a raw in-progress site snapshot."
       }
     }
   }

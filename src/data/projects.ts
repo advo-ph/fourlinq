@@ -74,14 +74,32 @@ const FB = "/images/projects-fb";
 export const projects: Project[] = [
   {
     id: "las-pinas-residence",
-    name: "Las Piñas residence",
+    name: "Las Piñas Residence",
     location: "Las Piñas",
-    image: `${FB}/ttZUwHC9.jpg`,
+    // Full 21-photo album from the FB post (2026-03-27), re-scraped
+    // 2026-07-22 at original 2048px resolution (no enhancement).
+    image: `${FB}/las-pinas-residence-13.jpg`,
     gallery: [
-      `${FB}/DOuJGHUl.jpg`,
-      `${FB}/1624zR2K.jpg`,
-      `${FB}/wmPQfS3V.jpg`,
-      `${FB}/x63pl_14.jpg`,
+      `${FB}/las-pinas-residence.jpg`,
+      `${FB}/las-pinas-residence-2.jpg`,
+      `${FB}/las-pinas-residence-3.jpg`,
+      `${FB}/las-pinas-residence-4.jpg`,
+      `${FB}/las-pinas-residence-5.jpg`,
+      `${FB}/las-pinas-residence-6.jpg`,
+      `${FB}/las-pinas-residence-7.jpg`,
+      `${FB}/las-pinas-residence-8.jpg`,
+      `${FB}/las-pinas-residence-9.jpg`,
+      `${FB}/las-pinas-residence-10.jpg`,
+      `${FB}/las-pinas-residence-11.jpg`,
+      `${FB}/las-pinas-residence-12.jpg`,
+      `${FB}/las-pinas-residence-14.jpg`,
+      `${FB}/las-pinas-residence-15.jpg`,
+      `${FB}/las-pinas-residence-16.jpg`,
+      `${FB}/las-pinas-residence-17.jpg`,
+      `${FB}/las-pinas-residence-18.jpg`,
+      `${FB}/las-pinas-residence-19.jpg`,
+      `${FB}/las-pinas-residence-20.jpg`,
+      `${FB}/las-pinas-residence-21.jpg`,
     ],
     category: "interior",
     tag: ["windows", "doors", "interior"],
@@ -91,14 +109,21 @@ export const projects: Project[] = [
   },
   {
     id: "taytay-rizal-residence",
-    name: "Taytay residence",
+    name: "Taytay Residence",
     location: "Taytay",
-    image: `${FB}/pndqSKzg.jpg`,
+    // Full 10-photo album from the FB post (2026-03-26), re-scraped
+    // 2026-07-22 at original 2048px resolution (no enhancement).
+    image: `${FB}/taytay-rizal-residence-7.jpg`,
     gallery: [
-      `${FB}/emyl2Fwr.jpg`,
-      `${FB}/SKxVxxW4.jpg`,
-      `${FB}/vzSdxxg0.jpg`,
-      `${FB}/K6n763QM.jpg`,
+      `${FB}/taytay-rizal-residence.jpg`,
+      `${FB}/taytay-rizal-residence-2.jpg`,
+      `${FB}/taytay-rizal-residence-3.jpg`,
+      `${FB}/taytay-rizal-residence-4.jpg`,
+      `${FB}/taytay-rizal-residence-5.jpg`,
+      `${FB}/taytay-rizal-residence-6.jpg`,
+      `${FB}/taytay-rizal-residence-8.jpg`,
+      `${FB}/taytay-rizal-residence-9.jpg`,
+      `${FB}/taytay-rizal-residence-10.jpg`,
     ],
     category: "casement",
     tag: ["windows", "doors"],
@@ -108,14 +133,29 @@ export const projects: Project[] = [
   },
   {
     id: "nuvali-laguna-residence",
-    name: "Nuvali residence",
+    name: "Nuvali Residence",
     location: "Nuvali",
-    image: `${FB}/mbArIDA5.jpg`,
+    // Full 18-photo album from the FB turnover post (2025-11-18), re-scraped
+    // 2026-07-22 at the post's original resolution (no enhancement).
+    image: `${FB}/nuvali-laguna-residence-9.jpg`,
     gallery: [
-      `${FB}/u9QGO5wI.jpg`,
-      `${FB}/AOQsrPKg.jpg`,
-      `${FB}/5e9SkvSf.jpg`,
-      `${FB}/gjR_DEfu.jpg`,
+      `${FB}/nuvali-laguna-residence.jpg`,
+      `${FB}/nuvali-laguna-residence-2.jpg`,
+      `${FB}/nuvali-laguna-residence-3.jpg`,
+      `${FB}/nuvali-laguna-residence-4.jpg`,
+      `${FB}/nuvali-laguna-residence-5.jpg`,
+      `${FB}/nuvali-laguna-residence-6.jpg`,
+      `${FB}/nuvali-laguna-residence-7.jpg`,
+      `${FB}/nuvali-laguna-residence-8.jpg`,
+      `${FB}/nuvali-laguna-residence-10.jpg`,
+      `${FB}/nuvali-laguna-residence-11.jpg`,
+      `${FB}/nuvali-laguna-residence-12.jpg`,
+      `${FB}/nuvali-laguna-residence-13.jpg`,
+      `${FB}/nuvali-laguna-residence-14.jpg`,
+      `${FB}/nuvali-laguna-residence-15.jpg`,
+      `${FB}/nuvali-laguna-residence-16.jpg`,
+      `${FB}/nuvali-laguna-residence-17.jpg`,
+      `${FB}/nuvali-laguna-residence-18.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -124,15 +164,71 @@ export const projects: Project[] = [
       "Another milestone achieved. We successfully completed the turnover for the new windows and doors on this project. These installations were more than just openings; they became the new face of the home, immediately providing better efficiency, more natural light, and a boost to curb appeal.",
   },
   {
-    id: "tagaytay-cavite-residence",
-    name: "Tagaytay City residence",
-    location: "Tagaytay City",
-    image: `${FB}/ZzCSzF_o.jpg`,
+    id: "nuvali-laguna-residence-b",
+    name: "Nuvali Residence B",
+    location: "Nuvali",
+    // Full 13-photo album from the FB turn-over post (2025-09-16), scraped
+    // 2026-07-22 at original 2048px resolution (no enhancement). Different
+    // house from nuvali-laguna-residence (wood-grain frames, mountain views).
+    image: `${FB}/nuvali-laguna-residence-b-6.jpg`,
     gallery: [
-      `${FB}/I0S5nOmZ.jpg`,
-      `${FB}/WWWCQcpX.jpg`,
-      `${FB}/Bf8HH614.jpg`,
-      `${FB}/9OqANnRg.jpg`,
+      `${FB}/nuvali-laguna-residence-b.jpg`,
+      `${FB}/nuvali-laguna-residence-b-2.jpg`,
+      `${FB}/nuvali-laguna-residence-b-3.jpg`,
+      `${FB}/nuvali-laguna-residence-b-4.jpg`,
+      `${FB}/nuvali-laguna-residence-b-5.jpg`,
+      `${FB}/nuvali-laguna-residence-b-7.jpg`,
+      `${FB}/nuvali-laguna-residence-b-8.jpg`,
+      `${FB}/nuvali-laguna-residence-b-9.jpg`,
+      `${FB}/nuvali-laguna-residence-b-10.jpg`,
+      `${FB}/nuvali-laguna-residence-b-11.jpg`,
+      `${FB}/nuvali-laguna-residence-b-12.jpg`,
+      `${FB}/nuvali-laguna-residence-b-13.jpg`,
+    ],
+    category: "casement",
+    tag: ["windows", "doors"],
+    caption: "Turn-over achieved for this Nuvali, Laguna project.",
+    description:
+      "Turn-over achieved. Proudly turning over our latest FourlinQ windows and doors project in Nuvali, Laguna. With outstanding design and secure craftsmanship, we've created a space that doesn't just look elegant, it feels like a true safe haven. Style, security, comfort, all in one.",
+  },
+  {
+    id: "nuvali-laguna-residence-c",
+    name: "Nuvali Residence C",
+    location: "Nuvali",
+    // Full 9-photo album from the FB on-going-project post (2025-09-30),
+    // scraped 2026-07-22 at original 2048px resolution (no enhancement).
+    // Different house from nuvali-laguna-residence and -b (black aluminum
+    // frames, flat subdivision views).
+    image: `${FB}/nuvali-laguna-residence-c-3.jpg`,
+    gallery: [
+      `${FB}/nuvali-laguna-residence-c.jpg`,
+      `${FB}/nuvali-laguna-residence-c-2.jpg`,
+      `${FB}/nuvali-laguna-residence-c-4.jpg`,
+      `${FB}/nuvali-laguna-residence-c-5.jpg`,
+      `${FB}/nuvali-laguna-residence-c-6.jpg`,
+      `${FB}/nuvali-laguna-residence-c-7.jpg`,
+      `${FB}/nuvali-laguna-residence-c-8.jpg`,
+      `${FB}/nuvali-laguna-residence-c-9.jpg`,
+    ],
+    category: "casement",
+    tag: ["windows"],
+    caption: "Wide, elegant windows for an on-going Nuvali, Laguna project.",
+    description:
+      "On-going project at Nuvali, Laguna. Make your home extra special and turn it into a true safe haven with wide, elegant windows, where beauty meets protection.",
+  },
+  {
+    id: "tagaytay-cavite-residence",
+    name: "Tagaytay Residence",
+    location: "Tagaytay City",
+    // Full 6-photo album from the FB turn-over post (2025-08-13), re-scraped
+    // 2026-07-22 at the post's original resolution (no enhancement).
+    image: `${FB}/tagaytay-cavite-residence.jpg`,
+    gallery: [
+      `${FB}/tagaytay-cavite-residence-2.jpg`,
+      `${FB}/tagaytay-cavite-residence-3.jpg`,
+      `${FB}/tagaytay-cavite-residence-4.jpg`,
+      `${FB}/tagaytay-cavite-residence-5.jpg`,
+      `${FB}/tagaytay-cavite-residence-6.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -142,18 +238,26 @@ export const projects: Project[] = [
   },
   {
     id: "san-lorenzo-makati-aluminium",
-    name: "San Lorenzo, Makati",
+    name: "Makati San Lorenzo Residence",
     location: "Makati",
-    // Hero swapped to the finished-interior shot. The original hero
-    // (P7DLic-T.jpg) was a construction-deck-with-scaffolding photo that
-    // read as raw; the finished room with the awning-window grid is
-    // editorial.
-    image: `${FB}/P7DLic-T.jpg`,
+    // Full 15-photo album from the FB turn-over post (2025-08-26), re-scraped
+    // 2026-07-22 at the post's original resolution (no enhancement).
+    image: `${FB}/san-lorenzo-makati-aluminium-11.jpg`,
     gallery: [
-      `${FB}/yDrxH9L-.jpg`,
-      `${FB}/P8m34kD5.jpg`,
-      `${FB}/z8K5dOzz.jpg`,
-      `${FB}/2vzBfKBe.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-2.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-3.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-4.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-5.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-6.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-7.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-8.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-9.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-10.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-12.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-13.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-14.jpg`,
+      `${FB}/san-lorenzo-makati-aluminium-15.jpg`,
     ],
     category: "doors",
     tag: ["windows", "doors", "interior"],
@@ -163,7 +267,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-s-residences",
-    name: "F. Residence",
+    name: "Cebu F. Residence B",
     location: "Cebu City",
     // Hero swapped to the enhanced render (TASK1.pdf, 2026-07-22).
     image: `${FB}/cebu-s-residences.jpg`,
@@ -175,7 +279,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-g-residences",
-    name: "G. Residence",
+    name: "Talisay G. Residence",
     location: "Talisay City",
     // Hero swapped to the enhanced render (TASK1.pdf, 2026-07-22): the
     // logo-burned Facebook upload was replaced with the clean, color-graded
@@ -188,7 +292,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-r-residences",
-    name: "R. Residence",
+    name: "Cebu R. Residence",
     location: "Cebu City",
     // Hero swapped to the enhanced render (TASK1.pdf, 2026-07-22).
     image: `${FB}/cebu-r-residences.jpg`,
@@ -200,7 +304,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-a-residences",
-    name: "Ag. Residence",
+    name: "Oslob Ag. Residence",
     location: "Oslob",
     // Hero swapped to the enhanced render (TASK1.pdf, 2026-07-22): the
     // logo-burned Facebook upload was replaced with the clean, blue-sky photo
@@ -213,14 +317,17 @@ export const projects: Project[] = [
   },
   {
     id: "batangas-c-residences",
-    name: "Batangas: C. Residences",
+    name: "Batangas C. Residence",
     location: "Batangas",
-    image: `${FB}/ohQTuBNz.jpg`,
+    // Full 6-photo album from the FB post (2025-05-26), re-scraped 2026-07-22
+    // at original 2048px resolution (no enhancement).
+    image: `${FB}/batangas-c-residences-2.jpg`,
     gallery: [
-      `${FB}/zp4alT38.jpg`,
-      `${FB}/aJiYThAZ.jpg`,
-      `${FB}/6uH-fLmF.jpg`,
-      `${FB}/mw3WVp7m.jpg`,
+      `${FB}/batangas-c-residences.jpg`,
+      `${FB}/batangas-c-residences-3.jpg`,
+      `${FB}/batangas-c-residences-4.jpg`,
+      `${FB}/batangas-c-residences-5.jpg`,
+      `${FB}/batangas-c-residences-6.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -229,12 +336,14 @@ export const projects: Project[] = [
   },
   {
     id: "bulacan-n-residence",
-    name: "N. Residence",
+    name: "Bulacan N. Residence",
     location: "Bulacan",
-    image: `${FB}/S2T-OFy4.jpg`,
+    // Full 3-photo album from the FB post (2025-06-17), re-scraped 2026-07-22
+    // at the post's original resolution (no enhancement).
+    image: `${FB}/bulacan-n-residence-3.jpg`,
     gallery: [
-      `${FB}/ZoZWYiwi.jpg`,
-      `${FB}/-pFxhSkE.jpg`,
+      `${FB}/bulacan-n-residence.jpg`,
+      `${FB}/bulacan-n-residence-2.jpg`,
     ],
     category: "interior",
     tag: ["windows", "doors", "interior"],
@@ -243,12 +352,14 @@ export const projects: Project[] = [
   },
   {
     id: "taguig-g-residence",
-    name: "G. Residence",
+    name: "Taguig G. Residence",
     location: "Taguig City",
-    image: `${FB}/BOyTwrQH.jpg`,
+    // Full 3-photo album from the FB post (2025-06-17), re-scraped 2026-07-22
+    // at the post's original resolution (no enhancement).
+    image: `${FB}/taguig-g-residence.jpg`,
     gallery: [
-      `${FB}/vhoJDNZw.jpg`,
-      `${FB}/UdQMQaA-.jpg`,
+      `${FB}/taguig-g-residence-2.jpg`,
+      `${FB}/taguig-g-residence-3.jpg`,
     ],
     category: "interior",
     tag: ["windows", "doors", "interior"],
@@ -268,7 +379,7 @@ export const projects: Project[] = [
   // location carries the identity on the gallery card.
   {
     id: "cebu-n-residence-pardo",
-    name: "N. Residence",
+    name: "Cebu N. Residence",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-n-residence-pardo-2.jpg`,
@@ -282,7 +393,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-n-residence-pardo-b",
-    name: "N. Residence",
+    name: "Cebu N. Residence B",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable). Second Nardo install at Alta Vista.
     image: `${FB}/cebu-n-residence-pardo-b.jpg`,
@@ -296,7 +407,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-sch-residence-monterrazas",
-    name: "Sch. Residence",
+    name: "Cebu Sch. Residence",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-sch-residence-monterrazas.jpg`,
@@ -310,7 +421,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-s-residence-maria-luisa",
-    name: "S. Residence",
+    name: "Cebu S. Residence",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-s-residence-maria-luisa.jpg`,
@@ -324,7 +435,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-as-residence-consolacion",
-    name: "As. Residence",
+    name: "Consolacion As. Residence",
     location: "Consolacion",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-as-residence-consolacion.jpg`,
@@ -338,7 +449,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-p-residence-kishanta",
-    name: "P. Residence",
+    name: "Talisay P. Residence",
     location: "Talisay City",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-p-residence-kishanta.jpg`,
@@ -352,7 +463,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-m-residence-molave",
-    name: "M. Residence",
+    name: "Consolacion M. Residence",
     location: "Consolacion",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-m-residence-molave.jpg`,
@@ -367,7 +478,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-d-residence-mandaue",
-    name: "D. Residence",
+    name: "Mandaue D. Residence",
     location: "Mandaue City",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-d-residence-mandaue.jpg`,
@@ -381,7 +492,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-es-residence-maria-luisa",
-    name: "E.S. Residence",
+    name: "Cebu E.S. Residence",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-es-residence-maria-luisa-2.jpg`,
@@ -396,7 +507,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-cmsprs",
-    name: "Residence",
+    name: "Cebu Residence",
     location: "Cebu",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-cmsprs-3.jpg`,
@@ -412,13 +523,12 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-m-residence-2",
-    name: "M. Residence",
+    name: "Cebu M. Residence",
     location: "Cebu",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-m-residence-2-2.jpg`,
     gallery: [
       `${FB}/cebu-m-residence-2.jpg`,
-      `${FB}/cebu-m-residence-2-3.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -427,7 +537,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-ta-residence-monterrazas",
-    name: "T.A. Residence",
+    name: "Cebu T.A. Residence",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable).
     image: `${FB}/cebu-ta-residence-monterrazas.jpg`,
@@ -442,7 +552,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-f-residence-fortunado",
-    name: "F.'s Residence",
+    name: "Cebu F. Residence",
     location: "Cebu",
     // Enhanced photo (TASK1 deliverable). Skyframe CM, charcoal gray with
     // reflective grey glass.
@@ -459,19 +569,8 @@ export const projects: Project[] = [
     description: "FourlinQ Skyframe installation, charcoal gray with reflective grey glass, in Cebu.",
   },
   {
-    id: "cebu-b-residence-monterrazas",
-    name: "B. Residence",
-    location: "Cebu City",
-    // Original photo (marked no-enhancement-needed).
-    image: `${FB}/cebu-b-residence-monterrazas.jpg`,
-    category: "exterior",
-    tag: ["windows", "doors", "exterior"],
-    caption: "Cebu City",
-    description: "FourlinQ windows and doors installation in Cebu City.",
-  },
-  {
     id: "cebu-t-residence-cebu-city",
-    name: "T. Residence",
+    name: "Cebu T. Residence",
     location: "Cebu City",
     // Original photo (marked no-enhancement-needed).
     image: `${FB}/cebu-t-residence-cebu-city.jpg`,
@@ -482,7 +581,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-c-residence-amara",
-    name: "C. Residence",
+    name: "Liloan C. Residence",
     location: "Liloan",
     // Original photo (marked no-enhancement-needed).
     image: `${FB}/cebu-c-residence-amara.jpg`,
@@ -493,7 +592,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-ds-residence-talisay",
-    name: "D.S. Residence",
+    name: "Talisay D.S. Residence",
     location: "Talisay City",
     // Original photo (marked no-enhancement-needed).
     image: `${FB}/cebu-ds-residence-talisay.jpg`,
@@ -504,7 +603,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-aa-residence-vista-grande",
-    name: "A.A. Residence",
+    name: "Talisay A.A. Residence",
     location: "Talisay City",
     // Original photo (marked no-enhancement-needed).
     image: `${FB}/cebu-aa-residence-vista-grande.jpg`,
@@ -515,7 +614,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-maratas-residence",
-    name: "M. Residence",
+    name: "Cebu M. Residence B",
     location: "Cebu",
     // Original photo (marked no-enhancement-needed). Walnut laminate profile.
     image: `${FB}/cebu-maratas-residence.jpg`,
@@ -528,30 +627,8 @@ export const projects: Project[] = [
     description: "FourlinQ windows and doors, walnut laminate profile, in Cebu.",
   },
   {
-    id: "cebu-residence-alta-vista",
-    name: "Residence",
-    location: "Cebu",
-    // Original photo (marked no-enhancement-needed).
-    image: `${FB}/cebu-residence-alta-vista.jpg`,
-    category: "exterior",
-    tag: ["windows", "exterior"],
-    caption: "Cebu",
-    description: "FourlinQ windows and doors installation in Cebu.",
-  },
-  {
-    id: "cebu-residence-vista-grande",
-    name: "Residence",
-    location: "Cebu",
-    // Original photo (marked no-enhancement-needed).
-    image: `${FB}/cebu-residence-vista-grande.jpg`,
-    category: "exterior",
-    tag: ["windows", "exterior"],
-    caption: "Cebu",
-    description: "FourlinQ windows and doors installation in Cebu.",
-  },
-  {
     id: "cebu-residence-vista-grande-talisay",
-    name: "Residence",
+    name: "Talisay Vista Grande Residence",
     location: "Talisay",
     // Original photo (marked no-enhancement-needed).
     image: `${FB}/cebu-residence-vista-grande-talisay.jpg`,
@@ -562,7 +639,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-residence-monterrazas",
-    name: "Residence",
+    name: "Cebu Monterrazas Residence",
     location: "Cebu",
     // Original photo (marked no-enhancement-needed).
     image: `${FB}/cebu-residence-monterrazas.jpg`,
@@ -579,15 +656,30 @@ export const projects: Project[] = [
   // undated 2026 turnover posts carry no stated location.
   {
     id: "binan-residence",
-    name: "Residence",
+    name: "Biñan Residence",
     location: "Biñan",
-    // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/binan-residence.jpg`,
+    // Full 19-photo album from the FB turnover post (2026-03-24), re-scraped
+    // 2026-07-22 at original 2048px resolution (no enhancement).
+    image: `${FB}/binan-residence-13.jpg`,
     gallery: [
+      `${FB}/binan-residence.jpg`,
       `${FB}/binan-residence-2.jpg`,
       `${FB}/binan-residence-3.jpg`,
       `${FB}/binan-residence-4.jpg`,
       `${FB}/binan-residence-5.jpg`,
+      `${FB}/binan-residence-6.jpg`,
+      `${FB}/binan-residence-7.jpg`,
+      `${FB}/binan-residence-8.jpg`,
+      `${FB}/binan-residence-9.jpg`,
+      `${FB}/binan-residence-10.jpg`,
+      `${FB}/binan-residence-11.jpg`,
+      `${FB}/binan-residence-12.jpg`,
+      `${FB}/binan-residence-14.jpg`,
+      `${FB}/binan-residence-15.jpg`,
+      `${FB}/binan-residence-16.jpg`,
+      `${FB}/binan-residence-17.jpg`,
+      `${FB}/binan-residence-18.jpg`,
+      `${FB}/binan-residence-19.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -596,15 +688,32 @@ export const projects: Project[] = [
   },
   {
     id: "bataan-s-residence",
-    name: "S. Residence",
+    name: "Bataan S. Residence",
     location: "Bataan",
-    // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/bataan-s-residence.jpg`,
+    // Full 21-photo album from the FB milestone post (2025-11-12), re-scraped
+    // 2026-07-22 at original 2048px resolution (no enhancement).
+    image: `${FB}/bataan-s-residence-20.jpg`,
     gallery: [
+      `${FB}/bataan-s-residence.jpg`,
       `${FB}/bataan-s-residence-2.jpg`,
       `${FB}/bataan-s-residence-3.jpg`,
       `${FB}/bataan-s-residence-4.jpg`,
       `${FB}/bataan-s-residence-5.jpg`,
+      `${FB}/bataan-s-residence-6.jpg`,
+      `${FB}/bataan-s-residence-7.jpg`,
+      `${FB}/bataan-s-residence-8.jpg`,
+      `${FB}/bataan-s-residence-9.jpg`,
+      `${FB}/bataan-s-residence-10.jpg`,
+      `${FB}/bataan-s-residence-11.jpg`,
+      `${FB}/bataan-s-residence-12.jpg`,
+      `${FB}/bataan-s-residence-13.jpg`,
+      `${FB}/bataan-s-residence-14.jpg`,
+      `${FB}/bataan-s-residence-15.jpg`,
+      `${FB}/bataan-s-residence-16.jpg`,
+      `${FB}/bataan-s-residence-17.jpg`,
+      `${FB}/bataan-s-residence-18.jpg`,
+      `${FB}/bataan-s-residence-19.jpg`,
+      `${FB}/bataan-s-residence-21.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -613,13 +722,14 @@ export const projects: Project[] = [
   },
   {
     id: "sarangani-s-residence",
-    name: "S. Residence",
+    name: "Sarangani S. Residence",
     location: "Sarangani",
-    // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/sarangani-s-residence.jpg`,
+    // Full 4-photo album from the FB post (2025-06-18), re-scraped 2026-07-22
+    // at the post's original resolution (no enhancement).
+    image: `${FB}/sarangani-s-residence-3.jpg`,
     gallery: [
+      `${FB}/sarangani-s-residence.jpg`,
       `${FB}/sarangani-s-residence-2.jpg`,
-      `${FB}/sarangani-s-residence-3.jpg`,
       `${FB}/sarangani-s-residence-4.jpg`,
     ],
     category: "exterior",
@@ -629,14 +739,15 @@ export const projects: Project[] = [
   },
   {
     id: "cabanatuan-t-residence",
-    name: "T. Residence",
+    name: "Cabanatuan T. Residence",
     location: "Cabanatuan",
-    // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/cabanatuan-t-residence-3.jpg`,
+    // Full 4-photo album from the FB post (2025-06-16), re-scraped 2026-07-22
+    // at original 2048px resolution (no enhancement).
+    image: `${FB}/cabanatuan-t-residence-4.jpg`,
     gallery: [
       `${FB}/cabanatuan-t-residence.jpg`,
       `${FB}/cabanatuan-t-residence-2.jpg`,
-      `${FB}/cabanatuan-t-residence-4.jpg`,
+      `${FB}/cabanatuan-t-residence-3.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -645,15 +756,32 @@ export const projects: Project[] = [
   },
   {
     id: "fourlinq-turnover-1",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
-    // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/fourlinq-turnover-1-3.jpg`,
+    // Full 21-photo album from the FB turnover post (2026-04-29), re-scraped
+    // 2026-07-22 at original 2048px resolution (no enhancement).
+    image: `${FB}/fourlinq-turnover-1-5.jpg`,
     gallery: [
       `${FB}/fourlinq-turnover-1.jpg`,
       `${FB}/fourlinq-turnover-1-2.jpg`,
+      `${FB}/fourlinq-turnover-1-3.jpg`,
       `${FB}/fourlinq-turnover-1-4.jpg`,
-      `${FB}/fourlinq-turnover-1-5.jpg`,
+      `${FB}/fourlinq-turnover-1-6.jpg`,
+      `${FB}/fourlinq-turnover-1-7.jpg`,
+      `${FB}/fourlinq-turnover-1-8.jpg`,
+      `${FB}/fourlinq-turnover-1-9.jpg`,
+      `${FB}/fourlinq-turnover-1-10.jpg`,
+      `${FB}/fourlinq-turnover-1-11.jpg`,
+      `${FB}/fourlinq-turnover-1-12.jpg`,
+      `${FB}/fourlinq-turnover-1-13.jpg`,
+      `${FB}/fourlinq-turnover-1-14.jpg`,
+      `${FB}/fourlinq-turnover-1-15.jpg`,
+      `${FB}/fourlinq-turnover-1-16.jpg`,
+      `${FB}/fourlinq-turnover-1-17.jpg`,
+      `${FB}/fourlinq-turnover-1-18.jpg`,
+      `${FB}/fourlinq-turnover-1-19.jpg`,
+      `${FB}/fourlinq-turnover-1-20.jpg`,
+      `${FB}/fourlinq-turnover-1-21.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -662,14 +790,26 @@ export const projects: Project[] = [
   },
   {
     id: "fourlinq-turnover-2",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
-    // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/fourlinq-turnover-2.jpg`,
+    // Full 15-photo album from the FB turnover post (2026-04-23), re-scraped
+    // 2026-07-22 at original 2048px resolution (no enhancement).
+    image: `${FB}/fourlinq-turnover-2-4.jpg`,
     gallery: [
+      `${FB}/fourlinq-turnover-2.jpg`,
+      `${FB}/fourlinq-turnover-2-2.jpg`,
       `${FB}/fourlinq-turnover-2-3.jpg`,
-      `${FB}/fourlinq-turnover-2-4.jpg`,
       `${FB}/fourlinq-turnover-2-5.jpg`,
+      `${FB}/fourlinq-turnover-2-6.jpg`,
+      `${FB}/fourlinq-turnover-2-7.jpg`,
+      `${FB}/fourlinq-turnover-2-8.jpg`,
+      `${FB}/fourlinq-turnover-2-9.jpg`,
+      `${FB}/fourlinq-turnover-2-10.jpg`,
+      `${FB}/fourlinq-turnover-2-11.jpg`,
+      `${FB}/fourlinq-turnover-2-12.jpg`,
+      `${FB}/fourlinq-turnover-2-13.jpg`,
+      `${FB}/fourlinq-turnover-2-14.jpg`,
+      `${FB}/fourlinq-turnover-2-15.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -678,15 +818,34 @@ export const projects: Project[] = [
   },
   {
     id: "fourlinq-turnover-3",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
-    // Sourced from the FourlinQ Facebook page turnover post (scrape 2026-07-21).
-    image: `${FB}/fourlinq-turnover-3.jpg`,
+    // Full 23-photo album from the FB on-going-install post (2026-03-31),
+    // re-scraped 2026-07-22 at original 2048px resolution (no enhancement).
+    image: `${FB}/fourlinq-turnover-3-16.jpg`,
     gallery: [
+      `${FB}/fourlinq-turnover-3.jpg`,
       `${FB}/fourlinq-turnover-3-2.jpg`,
       `${FB}/fourlinq-turnover-3-3.jpg`,
       `${FB}/fourlinq-turnover-3-4.jpg`,
       `${FB}/fourlinq-turnover-3-5.jpg`,
+      `${FB}/fourlinq-turnover-3-6.jpg`,
+      `${FB}/fourlinq-turnover-3-7.jpg`,
+      `${FB}/fourlinq-turnover-3-8.jpg`,
+      `${FB}/fourlinq-turnover-3-9.jpg`,
+      `${FB}/fourlinq-turnover-3-10.jpg`,
+      `${FB}/fourlinq-turnover-3-11.jpg`,
+      `${FB}/fourlinq-turnover-3-12.jpg`,
+      `${FB}/fourlinq-turnover-3-13.jpg`,
+      `${FB}/fourlinq-turnover-3-14.jpg`,
+      `${FB}/fourlinq-turnover-3-15.jpg`,
+      `${FB}/fourlinq-turnover-3-17.jpg`,
+      `${FB}/fourlinq-turnover-3-18.jpg`,
+      `${FB}/fourlinq-turnover-3-19.jpg`,
+      `${FB}/fourlinq-turnover-3-20.jpg`,
+      `${FB}/fourlinq-turnover-3-21.jpg`,
+      `${FB}/fourlinq-turnover-3-22.jpg`,
+      `${FB}/fourlinq-turnover-3-23.jpg`,
     ],
     category: "exterior",
     tag: ["windows", "doors", "exterior"],
@@ -695,7 +854,7 @@ export const projects: Project[] = [
   },
   {
     id: "curved-facade-residence",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Enhanced portfolio photo supplied 2026-07-22 (source/location unknown).
     // Hero is the color-graded render; the original photo is kept in gallery.
@@ -714,7 +873,7 @@ export const projects: Project[] = [
   // the source. One card per home; names default to "Residence".
   {
     id: "portfolio-residence-01",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-01.jpg`,
@@ -724,7 +883,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-02",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-02.jpg`,
@@ -734,7 +893,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-03",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-03.jpg`,
@@ -744,7 +903,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-04",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-04.jpg`,
@@ -754,7 +913,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-05",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-05.jpg`,
@@ -764,7 +923,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-06",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-06.jpg`,
@@ -774,7 +933,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-07",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-07.jpg`,
@@ -784,7 +943,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-08",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-08.jpg`,
@@ -794,7 +953,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-09",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-09.jpg`,
@@ -804,7 +963,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-10",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-10.jpg`,
@@ -814,7 +973,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-11",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-11.jpg`,
@@ -824,7 +983,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-12",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-12.jpg`,
@@ -834,7 +993,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-13",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-13.jpg`,
@@ -844,7 +1003,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-14",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-14.jpg`,
@@ -854,7 +1013,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-residence-15",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-residence-15.jpg`,
@@ -864,7 +1023,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-interior-01",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-interior-01.jpg`,
@@ -874,7 +1033,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-interior-02",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-interior-02.jpg`,
@@ -884,7 +1043,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-interior-03",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown), added 2026-07-22.
     image: `${FB}/portfolio-interior-03.jpg`,
@@ -894,7 +1053,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio-interior-04",
-    name: "Residence",
+    name: "Private Residence",
     location: "Philippines",
     // Portfolio image (source/location unknown); split out of portfolio-interior-01
     // on 2026-07-22 — the two photos are different projects.

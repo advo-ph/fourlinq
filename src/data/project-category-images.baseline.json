@@ -1,30 +1,42 @@
 {
   "projectCategoryImages": {
     "las-pinas-residence": {
-      "windows": "/images/projects-fb/1624zR2K.jpg",
-      "doors": "/images/projects-fb/ttZUwHC9.jpg",
-      "interior": "/images/projects-fb/ttZUwHC9.jpg"
+      "windows": "/images/projects-fb/las-pinas-residence-8.jpg",
+      "doors": "/images/projects-fb/las-pinas-residence-6.jpg",
+      "interior": "/images/projects-fb/las-pinas-residence-8.jpg",
+      "exterior": "/images/projects-fb/las-pinas-residence-13.jpg"
     },
     "taytay-rizal-residence": {
-      "windows": "/images/projects-fb/K6n763QM.jpg",
-      "exterior": "/images/projects-fb/pndqSKzg.jpg"
+      "windows": "/images/projects-fb/taytay-rizal-residence-6.jpg",
+      "interior": "/images/projects-fb/taytay-rizal-residence-9.jpg",
+      "exterior": "/images/projects-fb/taytay-rizal-residence-7.jpg"
     },
     "nuvali-laguna-residence": {
-      "windows": "/images/projects-fb/AOQsrPKg.jpg",
-      "doors": "/images/projects-fb/gjR_DEfu.jpg",
-      "interior": "/images/projects-fb/gjR_DEfu.jpg",
-      "exterior": "/images/projects-fb/mbArIDA5.jpg"
+      "windows": "/images/projects-fb/nuvali-laguna-residence-2.jpg",
+      "doors": "/images/projects-fb/nuvali-laguna-residence-13.jpg",
+      "interior": "/images/projects-fb/nuvali-laguna-residence.jpg",
+      "exterior": "/images/projects-fb/nuvali-laguna-residence-9.jpg"
+    },
+    "nuvali-laguna-residence-b": {
+      "windows": "/images/projects-fb/nuvali-laguna-residence-b-7.jpg",
+      "doors": "/images/projects-fb/nuvali-laguna-residence-b-10.jpg",
+      "interior": "/images/projects-fb/nuvali-laguna-residence-b.jpg",
+      "exterior": "/images/projects-fb/nuvali-laguna-residence-b-6.jpg"
+    },
+    "nuvali-laguna-residence-c": {
+      "windows": "/images/projects-fb/nuvali-laguna-residence-c-7.jpg",
+      "doors": "/images/projects-fb/nuvali-laguna-residence-c-8.jpg",
+      "interior": "/images/projects-fb/nuvali-laguna-residence-c-3.jpg"
     },
     "tagaytay-cavite-residence": {
-      "windows": "/images/projects-fb/9OqANnRg.jpg",
-      "interior": "/images/projects-fb/Bf8HH614.jpg",
-      "exterior": "/images/projects-fb/ZzCSzF_o.jpg"
+      "windows": "/images/projects-fb/tagaytay-cavite-residence-4.jpg",
+      "interior": "/images/projects-fb/tagaytay-cavite-residence-5.jpg",
+      "exterior": "/images/projects-fb/tagaytay-cavite-residence.jpg"
     },
     "san-lorenzo-makati-aluminium": {
-      "windows": "/images/projects-fb/P8m34kD5.jpg",
-      "doors": "/images/projects-fb/P7DLic-T.jpg",
-      "interior": "/images/projects-fb/2vzBfKBe.jpg",
-      "exterior": "/images/projects-fb/P7DLic-T.jpg"
+      "windows": "/images/projects-fb/san-lorenzo-makati-aluminium-2.jpg",
+      "doors": "/images/projects-fb/san-lorenzo-makati-aluminium-12.jpg",
+      "interior": "/images/projects-fb/san-lorenzo-makati-aluminium-11.jpg"
     },
     "cebu-s-residences": {
       "windows": "/images/projects-fb/cebu-s-residences.jpg",
@@ -42,21 +54,21 @@
       "exterior": "/images/projects-fb/cebu-a-residences.jpg"
     },
     "batangas-c-residences": {
-      "windows": "/images/projects-fb/zp4alT38.jpg",
-      "doors": "/images/projects-fb/mw3WVp7m.jpg",
-      "interior": "/images/projects-fb/aJiYThAZ.jpg",
-      "exterior": "/images/projects-fb/ohQTuBNz.jpg"
+      "windows": "/images/projects-fb/batangas-c-residences-5.jpg",
+      "doors": "/images/projects-fb/batangas-c-residences-3.jpg",
+      "interior": "/images/projects-fb/batangas-c-residences.jpg",
+      "exterior": "/images/projects-fb/batangas-c-residences-2.jpg"
     },
     "bulacan-n-residence": {
-      "windows": "/images/projects-fb/ZoZWYiwi.jpg",
-      "doors": "/images/projects-fb/ZoZWYiwi.jpg",
-      "exterior": "/images/projects-fb/S2T-OFy4.jpg"
+      "windows": "/images/projects-fb/bulacan-n-residence-2.jpg",
+      "doors": "/images/projects-fb/bulacan-n-residence.jpg",
+      "exterior": "/images/projects-fb/bulacan-n-residence-3.jpg"
     },
     "taguig-g-residence": {
-      "windows": "/images/projects-fb/vhoJDNZw.jpg",
-      "doors": "/images/projects-fb/BOyTwrQH.jpg",
-      "interior": "/images/projects-fb/UdQMQaA-.jpg",
-      "exterior": "/images/projects-fb/BOyTwrQH.jpg"
+      "windows": "/images/projects-fb/taguig-g-residence-2.jpg",
+      "doors": "/images/projects-fb/taguig-g-residence.jpg",
+      "interior": "/images/projects-fb/taguig-g-residence-3.jpg",
+      "exterior": "/images/projects-fb/taguig-g-residence.jpg"
     },
     "cebu-n-residence-pardo": {
       "windows": "/images/projects-fb/cebu-n-residence-pardo-2.jpg",
@@ -114,11 +126,6 @@
       "windows": "/images/projects-fb/cebu-f-residence-fortunado-2.jpg",
       "exterior": "/images/projects-fb/cebu-f-residence-fortunado-3.jpg"
     },
-    "cebu-b-residence-monterrazas": {
-      "windows": "/images/projects-fb/cebu-b-residence-monterrazas.jpg",
-      "doors": "/images/projects-fb/cebu-b-residence-monterrazas.jpg",
-      "exterior": "/images/projects-fb/cebu-b-residence-monterrazas.jpg"
-    },
     "cebu-t-residence-cebu-city": {
       "windows": "/images/projects-fb/cebu-t-residence-cebu-city.jpg",
       "exterior": "/images/projects-fb/cebu-t-residence-cebu-city.jpg"
@@ -140,13 +147,6 @@
       "interior": "/images/projects-fb/cebu-maratas-residence-2.jpg",
       "exterior": "/images/projects-fb/cebu-maratas-residence.jpg"
     },
-    "cebu-residence-alta-vista": {
-      "windows": "/images/projects-fb/cebu-residence-alta-vista.jpg",
-      "exterior": "/images/projects-fb/cebu-residence-alta-vista.jpg"
-    },
-    "cebu-residence-vista-grande": {
-      "exterior": "/images/projects-fb/cebu-residence-vista-grande.jpg"
-    },
     "cebu-residence-vista-grande-talisay": {
       "doors": "/images/projects-fb/cebu-residence-vista-grande-talisay.jpg",
       "interior": "/images/projects-fb/cebu-residence-vista-grande-talisay.jpg"
@@ -156,42 +156,44 @@
       "exterior": "/images/projects-fb/cebu-residence-monterrazas.jpg"
     },
     "binan-residence": {
-      "windows": "/images/projects-fb/binan-residence-5.jpg",
-      "doors": "/images/projects-fb/binan-residence-4.jpg",
-      "exterior": "/images/projects-fb/binan-residence.jpg"
+      "windows": "/images/projects-fb/binan-residence-15.jpg",
+      "doors": "/images/projects-fb/binan-residence-7.jpg",
+      "interior": "/images/projects-fb/binan-residence-11.jpg",
+      "exterior": "/images/projects-fb/binan-residence-13.jpg"
     },
     "bataan-s-residence": {
-      "windows": "/images/projects-fb/bataan-s-residence-5.jpg",
-      "doors": "/images/projects-fb/bataan-s-residence-4.jpg",
-      "exterior": "/images/projects-fb/bataan-s-residence.jpg"
+      "windows": "/images/projects-fb/bataan-s-residence-18.jpg",
+      "doors": "/images/projects-fb/bataan-s-residence-2.jpg",
+      "interior": "/images/projects-fb/bataan-s-residence-6.jpg",
+      "exterior": "/images/projects-fb/bataan-s-residence-20.jpg"
     },
     "sarangani-s-residence": {
       "windows": "/images/projects-fb/sarangani-s-residence.jpg",
       "doors": "/images/projects-fb/sarangani-s-residence-2.jpg",
-      "interior": "/images/projects-fb/sarangani-s-residence-3.jpg",
-      "exterior": "/images/projects-fb/sarangani-s-residence.jpg"
+      "interior": "/images/projects-fb/sarangani-s-residence.jpg",
+      "exterior": "/images/projects-fb/sarangani-s-residence-3.jpg"
     },
     "cabanatuan-t-residence": {
-      "windows": "/images/projects-fb/cabanatuan-t-residence.jpg",
-      "exterior": "/images/projects-fb/cabanatuan-t-residence-2.jpg"
+      "windows": "/images/projects-fb/cabanatuan-t-residence-4.jpg",
+      "exterior": "/images/projects-fb/cabanatuan-t-residence-4.jpg"
     },
     "fourlinq-turnover-1": {
-      "windows": "/images/projects-fb/fourlinq-turnover-1-2.jpg",
-      "doors": "/images/projects-fb/fourlinq-turnover-1-5.jpg",
-      "interior": "/images/projects-fb/fourlinq-turnover-1-4.jpg",
-      "exterior": "/images/projects-fb/fourlinq-turnover-1-3.jpg"
+      "windows": "/images/projects-fb/fourlinq-turnover-1-10.jpg",
+      "doors": "/images/projects-fb/fourlinq-turnover-1-3.jpg",
+      "interior": "/images/projects-fb/fourlinq-turnover-1-11.jpg",
+      "exterior": "/images/projects-fb/fourlinq-turnover-1-5.jpg"
     },
     "fourlinq-turnover-2": {
-      "windows": "/images/projects-fb/fourlinq-turnover-2-3.jpg",
-      "doors": "/images/projects-fb/fourlinq-turnover-2-4.jpg",
-      "interior": "/images/projects-fb/fourlinq-turnover-2-3.jpg",
-      "exterior": "/images/projects-fb/fourlinq-turnover-2.jpg"
+      "windows": "/images/projects-fb/fourlinq-turnover-2-13.jpg",
+      "doors": "/images/projects-fb/fourlinq-turnover-2-5.jpg",
+      "interior": "/images/projects-fb/fourlinq-turnover-2-7.jpg",
+      "exterior": "/images/projects-fb/fourlinq-turnover-2-4.jpg"
     },
     "fourlinq-turnover-3": {
-      "windows": "/images/projects-fb/fourlinq-turnover-3-4.jpg",
-      "doors": "/images/projects-fb/fourlinq-turnover-3-5.jpg",
-      "interior": "/images/projects-fb/fourlinq-turnover-3-3.jpg",
-      "exterior": "/images/projects-fb/fourlinq-turnover-3.jpg"
+      "windows": "/images/projects-fb/fourlinq-turnover-3-5.jpg",
+      "doors": "/images/projects-fb/fourlinq-turnover-3-3.jpg",
+      "interior": "/images/projects-fb/fourlinq-turnover-3.jpg",
+      "exterior": "/images/projects-fb/fourlinq-turnover-3-16.jpg"
     },
     "curved-facade-residence": {
       "windows": "/images/projects-fb/curved-facade-residence.jpg",
@@ -280,10 +282,12 @@
     "las-pinas-residence": [
       "windows",
       "doors",
-      "interior"
+      "interior",
+      "exterior"
     ],
     "taytay-rizal-residence": [
       "windows",
+      "interior",
       "exterior"
     ],
     "nuvali-laguna-residence": [
@@ -291,6 +295,17 @@
       "doors",
       "interior",
       "exterior"
+    ],
+    "nuvali-laguna-residence-b": [
+      "windows",
+      "doors",
+      "interior",
+      "exterior"
+    ],
+    "nuvali-laguna-residence-c": [
+      "windows",
+      "doors",
+      "interior"
     ],
     "tagaytay-cavite-residence": [
       "windows",
@@ -300,8 +315,7 @@
     "san-lorenzo-makati-aluminium": [
       "windows",
       "doors",
-      "interior",
-      "exterior"
+      "interior"
     ],
     "cebu-s-residences": [
       "windows",
@@ -391,11 +405,6 @@
       "windows",
       "exterior"
     ],
-    "cebu-b-residence-monterrazas": [
-      "windows",
-      "doors",
-      "exterior"
-    ],
     "cebu-t-residence-cebu-city": [
       "windows",
       "exterior"
@@ -417,13 +426,6 @@
       "interior",
       "exterior"
     ],
-    "cebu-residence-alta-vista": [
-      "windows",
-      "exterior"
-    ],
-    "cebu-residence-vista-grande": [
-      "exterior"
-    ],
     "cebu-residence-vista-grande-talisay": [
       "doors",
       "interior"
@@ -435,11 +437,13 @@
     "binan-residence": [
       "windows",
       "doors",
+      "interior",
       "exterior"
     ],
     "bataan-s-residence": [
       "windows",
       "doors",
+      "interior",
       "exterior"
     ],
     "sarangani-s-residence": [
@@ -560,7 +564,6 @@
     "portfolio-residence-03",
     "cebu-sch-residence-monterrazas",
     "cebu-ds-residence-talisay",
-    "cebu-residence-alta-vista",
     "cebu-residence-monterrazas",
     "portfolio-residence-05",
     "portfolio-residence-06",
@@ -568,7 +571,6 @@
     "portfolio-residence-04",
     "portfolio-residence-01",
     "cebu-aa-residence-vista-grande",
-    "cebu-residence-vista-grande",
     "portfolio-residence-02",
     "cebu-a-residences",
     "cebu-r-residences",
@@ -577,66 +579,71 @@
     "cebu-f-residence-fortunado",
     "portfolio-interior-04",
     "cebu-ta-residence-monterrazas",
-    "nuvali-laguna-residence",
     "cebu-m-residence-2",
     "cebu-c-residence-amara",
+    "taguig-g-residence",
+    "nuvali-laguna-residence-b",
     "tagaytay-cavite-residence",
-    "las-pinas-residence",
+    "bulacan-n-residence",
+    "fourlinq-turnover-1",
+    "batangas-c-residences",
+    "sarangani-s-residence",
+    "nuvali-laguna-residence",
     "portfolio-residence-15",
     "cebu-g-residences",
     "portfolio-residence-07",
     "portfolio-residence-14",
     "portfolio-interior-02",
     "taytay-rizal-residence",
+    "nuvali-laguna-residence-c",
     "cebu-n-residence-pardo",
+    "binan-residence",
+    "cabanatuan-t-residence",
     "portfolio-interior-01",
+    "san-lorenzo-makati-aluminium",
     "portfolio-residence-11",
     "cebu-residence-vista-grande-talisay",
     "cebu-d-residence-mandaue",
-    "sarangani-s-residence",
+    "fourlinq-turnover-3",
     "portfolio-residence-13",
-    "taguig-g-residence",
     "cebu-s-residence-maria-luisa",
+    "fourlinq-turnover-2",
     "bataan-s-residence",
-    "cebu-b-residence-monterrazas",
-    "fourlinq-turnover-1",
     "portfolio-residence-08",
     "portfolio-residence-09",
     "cebu-maratas-residence",
     "portfolio-residence-10",
-    "cabanatuan-t-residence",
     "portfolio-residence-12",
     "cebu-es-residence-maria-luisa",
-    "bulacan-n-residence",
+    "las-pinas-residence",
     "cebu-t-residence-cebu-city",
-    "batangas-c-residences",
     "portfolio-interior-03",
-    "cebu-cmsprs",
-    "fourlinq-turnover-2",
-    "san-lorenzo-makati-aluminium",
-    "binan-residence",
-    "fourlinq-turnover-3"
+    "cebu-cmsprs"
   ],
   "projectCategoryOrder": {
     "windows": [
-      "binan-residence",
-      "san-lorenzo-makati-aluminium",
-      "las-pinas-residence",
       "fourlinq-turnover-1",
-      "batangas-c-residences",
-      "fourlinq-turnover-3",
-      "taguig-g-residence",
-      "fourlinq-turnover-2",
+      "nuvali-laguna-residence-b",
       "tagaytay-cavite-residence",
+      "taytay-rizal-residence",
+      "nuvali-laguna-residence-c",
+      "binan-residence",
+      "fourlinq-turnover-2",
+      "las-pinas-residence",
+      "taguig-g-residence",
+      "batangas-c-residences",
+      "nuvali-laguna-residence",
+      "fourlinq-turnover-3",
+      "sarangani-s-residence",
+      "san-lorenzo-makati-aluminium",
+      "bataan-s-residence",
       "portfolio-residence-09",
       "portfolio-residence-02",
-      "nuvali-laguna-residence",
-      "taytay-rizal-residence",
       "cebu-t-residence-cebu-city",
       "curved-facade-residence",
       "portfolio-interior-01",
-      "sarangani-s-residence",
       "cebu-c-residence-amara",
+      "bulacan-n-residence",
       "portfolio-residence-11",
       "portfolio-interior-04",
       "cebu-maratas-residence",
@@ -645,7 +652,6 @@
       "cebu-m-residence-2",
       "portfolio-residence-04",
       "portfolio-residence-14",
-      "bataan-s-residence",
       "cebu-es-residence-maria-luisa",
       "portfolio-residence-07",
       "cebu-m-residence-molave",
@@ -660,62 +666,65 @@
       "cebu-p-residence-kishanta",
       "cebu-g-residences",
       "portfolio-residence-13",
-      "cabanatuan-t-residence",
       "portfolio-residence-01",
       "cebu-r-residences",
       "portfolio-residence-03",
       "cebu-sch-residence-monterrazas",
-      "cebu-residence-alta-vista",
       "portfolio-residence-05",
       "portfolio-residence-06",
       "portfolio-interior-02",
       "cebu-n-residence-pardo",
-      "cebu-b-residence-monterrazas",
-      "bulacan-n-residence",
+      "cabanatuan-t-residence",
       "portfolio-interior-03",
       "cebu-ds-residence-talisay"
     ],
     "doors": [
+      "fourlinq-turnover-1",
       "cebu-residence-vista-grande-talisay",
-      "bulacan-n-residence",
       "fourlinq-turnover-2",
+      "nuvali-laguna-residence-b",
+      "bulacan-n-residence",
+      "nuvali-laguna-residence-c",
+      "binan-residence",
       "fourlinq-turnover-3",
       "cebu-cmsprs",
-      "taguig-g-residence",
-      "fourlinq-turnover-1",
-      "batangas-c-residences",
       "bataan-s-residence",
+      "sarangani-s-residence",
+      "taguig-g-residence",
+      "las-pinas-residence",
       "cebu-m-residence-2",
+      "batangas-c-residences",
       "cebu-n-residence-pardo",
-      "cebu-b-residence-monterrazas",
+      "san-lorenzo-makati-aluminium",
       "cebu-maratas-residence",
       "portfolio-residence-03",
       "cebu-n-residence-pardo-b",
       "portfolio-interior-02",
       "cebu-p-residence-kishanta",
       "nuvali-laguna-residence",
-      "las-pinas-residence",
-      "sarangani-s-residence",
-      "san-lorenzo-makati-aluminium",
-      "binan-residence",
       "cebu-ta-residence-monterrazas"
     ],
     "interior": [
       "portfolio-interior-04",
       "portfolio-interior-02",
-      "fourlinq-turnover-1",
       "portfolio-interior-03",
-      "portfolio-interior-01",
       "batangas-c-residences",
+      "portfolio-interior-01",
       "cebu-m-residence-2",
       "cebu-maratas-residence",
+      "fourlinq-turnover-1",
       "nuvali-laguna-residence",
+      "binan-residence",
+      "bataan-s-residence",
       "taguig-g-residence",
       "tagaytay-cavite-residence",
-      "las-pinas-residence",
-      "sarangani-s-residence",
-      "cebu-residence-vista-grande-talisay",
       "san-lorenzo-makati-aluminium",
+      "nuvali-laguna-residence-b",
+      "taytay-rizal-residence",
+      "las-pinas-residence",
+      "cebu-residence-vista-grande-talisay",
+      "nuvali-laguna-residence-c",
+      "sarangani-s-residence",
       "fourlinq-turnover-3",
       "fourlinq-turnover-2"
     ],
@@ -727,55 +736,53 @@
       "portfolio-residence-06",
       "cebu-aa-residence-vista-grande",
       "cebu-f-residence-fortunado",
+      "nuvali-laguna-residence-b",
+      "bulacan-n-residence",
+      "taytay-rizal-residence",
       "portfolio-residence-13",
       "cebu-es-residence-maria-luisa",
       "cebu-s-residences",
       "cebu-sch-residence-monterrazas",
-      "cebu-residence-alta-vista",
       "portfolio-residence-04",
-      "cebu-residence-vista-grande",
       "cebu-a-residences",
       "cebu-r-residences",
       "cebu-p-residence-kishanta",
       "cebu-ta-residence-monterrazas",
-      "nuvali-laguna-residence",
       "cebu-m-residence-2",
+      "sarangani-s-residence",
+      "nuvali-laguna-residence",
       "cebu-g-residences",
       "portfolio-residence-07",
       "portfolio-residence-14",
-      "taytay-rizal-residence",
       "cebu-n-residence-pardo",
-      "sarangani-s-residence",
-      "cebu-b-residence-monterrazas",
-      "fourlinq-turnover-1",
+      "binan-residence",
       "portfolio-residence-08",
       "portfolio-residence-10",
       "portfolio-residence-12",
-      "bulacan-n-residence",
       "curved-facade-residence",
       "cebu-as-residence-consolacion",
       "portfolio-residence-01",
       "portfolio-residence-02",
       "cebu-n-residence-pardo-b",
+      "taguig-g-residence",
       "tagaytay-cavite-residence",
+      "fourlinq-turnover-1",
       "portfolio-residence-15",
+      "cabanatuan-t-residence",
       "portfolio-residence-11",
       "cebu-d-residence-mandaue",
       "cebu-s-residence-maria-luisa",
-      "cebu-maratas-residence",
-      "cabanatuan-t-residence",
-      "binan-residence",
-      "portfolio-residence-03",
       "bataan-s-residence",
+      "cebu-maratas-residence",
+      "las-pinas-residence",
+      "portfolio-residence-03",
       "cebu-t-residence-cebu-city",
       "portfolio-residence-09",
       "cebu-cmsprs",
-      "taguig-g-residence",
       "fourlinq-turnover-2",
-      "san-lorenzo-makati-aluminium",
+      "batangas-c-residences",
       "cebu-c-residence-amara",
-      "fourlinq-turnover-3",
-      "batangas-c-residences"
+      "fourlinq-turnover-3"
     ]
   }
 }

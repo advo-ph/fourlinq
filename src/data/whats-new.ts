@@ -66,7 +66,7 @@ export const whatsNew: WhatsNewEntry[] = [
     category: "project",
     title: "Las Piñas residence completed",
     excerpt: "Another home, ready to be enjoyed. FourlinQ proudly completes this Las Piñas project with modern window and door installations built for durability, style, and everyday comfort.",
-    image: `${FB}/DOuJGHUl.jpg`,
+    image: `${FB}/las-pinas-residence-13.jpg`,
     link: "/projects/las-pinas-residence",
   },
   {
@@ -75,7 +75,7 @@ export const whatsNew: WhatsNewEntry[] = [
     category: "project",
     title: "Taytay, Rizal residence turnover",
     excerpt: "Another milestone reached. Standard is never enough for your dream home. We officially turned over the keys to this project in Taytay, Rizal, featuring our premium windows and doors.",
-    image: `${FB}/pndqSKzg.jpg`,
+    image: `${FB}/taytay-rizal-residence-7.jpg`,
     link: "/projects/taytay-rizal-residence",
   },
   {
@@ -84,7 +84,7 @@ export const whatsNew: WhatsNewEntry[] = [
     category: "project",
     title: "Nuvali, Laguna residence turnover",
     excerpt: "Project turnover complete. We are thrilled to hand over another stunning FourlinQ Windows and Doors project in Nuvali, Laguna, balancing modern design with secure craftsmanship.",
-    image: `${FB}/mbArIDA5.jpg`,
+    image: `${FB}/nuvali-laguna-residence-9.jpg`,
     link: "/projects/nuvali-laguna-residence",
   },
   {
@@ -93,7 +93,9 @@ export const whatsNew: WhatsNewEntry[] = [
     category: "product",
     title: "First aluminium installation, San Lorenzo, Makati",
     excerpt: "Turnover completed. Proud to unveil our first aluminium windows and doors installation at San Lorenzo, Makati, a remarkable milestone made possible by the FourlinQ team.",
-    image: `${FB}/san-lorenzo-first-aluminium.jpg`,
+    // Raw original of the old enhanced render shows scaffolding, so this card
+    // uses the album's stairwell hero instead.
+    image: `${FB}/san-lorenzo-makati-aluminium.jpg`,
     link: "/projects/san-lorenzo-makati-aluminium",
   },
   {
@@ -102,7 +104,7 @@ export const whatsNew: WhatsNewEntry[] = [
     category: "project",
     title: "Tagaytay City residence turnover",
     excerpt: "New views, elegant beginnings. Our windows and doors turnover in Tagaytay City, Cavite is officially complete, framing every breathtaking view with perfection.",
-    image: `${FB}/ZzCSzF_o.jpg`,
+    image: `${FB}/tagaytay-cavite-residence-2.jpg`,
     link: "/projects/tagaytay-cavite-residence",
   },
   {
@@ -111,7 +113,7 @@ export const whatsNew: WhatsNewEntry[] = [
     category: "project",
     title: "G. Residence completed in Taguig",
     excerpt: "The G. Residence in Taguig City. Upgrade your view, elevate your living, with durable, stylish FourlinQ windows and doors.",
-    image: `${FB}/BOyTwrQH.jpg`,
+    image: `${FB}/taguig-g-residence.jpg`,
     link: "/projects/taguig-g-residence",
   },
   {
@@ -120,7 +122,7 @@ export const whatsNew: WhatsNewEntry[] = [
     category: "project",
     title: "N. Residence completed in Bulacan",
     excerpt: "The N. Residence in Bulacan, fitted with modern, high quality FourlinQ windows and doors, tailored to the home's design.",
-    image: `${FB}/ZoZWYiwi.jpg`,
+    image: `${FB}/bulacan-n-residence-2.jpg`,
     link: "/projects/bulacan-n-residence",
   },
   {
@@ -129,7 +131,7 @@ export const whatsNew: WhatsNewEntry[] = [
     category: "project",
     title: "C. Residence completed in Batangas",
     excerpt: "The C. Residence in Batangas. Precise measurement and installation of FourlinQ sliding doors and windows, durable, stylish, and made to last.",
-    image: `${FB}/ohQTuBNz.jpg`,
+    image: `${FB}/batangas-c-residences-2.jpg`,
     link: "/projects/batangas-c-residences",
   },
 
