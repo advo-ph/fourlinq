@@ -41,3 +41,6 @@ server/index.bundle.cjs
 # Generated WebP thumbnails — CI prebuild (npm run projects:thumbs) regenerates these
 # Do not commit; 335 files would bloat the repo unnecessarily
 public/images/projects-fb/thumbs/
+
+# gpt-image script outputs
+scripts/gpt-image-out/
