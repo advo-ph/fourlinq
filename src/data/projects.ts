@@ -165,7 +165,7 @@ export const projects: Project[] = [
   },
   {
     id: "nuvali-laguna-residence-b",
-    name: "Nuvali Residence B",
+    name: "Nuvali Residence",
     location: "Nuvali",
     // Full 13-photo album from the FB turn-over post (2025-09-16), scraped
     // 2026-07-22 at original 2048px resolution (no enhancement). Different
@@ -193,7 +193,7 @@ export const projects: Project[] = [
   },
   {
     id: "nuvali-laguna-residence-c",
-    name: "Nuvali Residence C",
+    name: "Nuvali Residence",
     location: "Nuvali",
     // Full 9-photo album from the FB on-going-project post (2025-09-30),
     // scraped 2026-07-22 at original 2048px resolution (no enhancement).
@@ -267,7 +267,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-s-residences",
-    name: "Cebu F. Residence B",
+    name: "Cebu F. Residence",
     location: "Cebu City",
     // Hero swapped to the enhanced render (TASK1.pdf, 2026-07-22).
     image: `${FB}/cebu-s-residences.jpg`,
@@ -393,7 +393,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-n-residence-pardo-b",
-    name: "Cebu N. Residence B",
+    name: "Cebu N. Residence",
     location: "Cebu City",
     // Enhanced photo (TASK1 deliverable). Second Nardo install at Alta Vista.
     image: `${FB}/cebu-n-residence-pardo-b.jpg`,
@@ -614,7 +614,7 @@ export const projects: Project[] = [
   },
   {
     id: "cebu-maratas-residence",
-    name: "Cebu M. Residence B",
+    name: "Cebu M. Residence",
     location: "Cebu",
     // Original photo (marked no-enhancement-needed). Walnut laminate profile.
     image: `${FB}/cebu-maratas-residence.jpg`,

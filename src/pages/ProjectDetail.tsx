@@ -96,7 +96,6 @@ const ProjectDetail = () => {
         eyebrow={categoryLabel[selectedProject.category] ?? "Project"}
         title={selectedProject.name}
         breadcrumbLabel={selectedProject.name}
-        subtitle={selectedProject.caption ?? selectedProject.location}
       />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
