@@ -15,7 +15,7 @@
  * invalidate the overrides query on success.
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   DndContext,
@@ -43,8 +43,10 @@ import {
   X,
   Loader2,
   ChevronDown,
+  ChevronRight,
   ChevronUp,
   Image,
+  Maximize2,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -123,9 +125,68 @@ function scoreColor(score: number): string {
 
 function ScorePill({ label, score }: { label: string; score: number }) {
   return (
-    <span className={`inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded font-medium ${scoreColor(score)}`}>
+    <span className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded font-medium ${scoreColor(score)}`}>
       {label} {score}
     </span>
+  );
+}
+
+// ── Lightbox overlay (click anywhere or press Escape to close) ─────────────────
+
+interface LightboxData {
+  src: string;
+  filename: string;
+  scores: ScoreMap | null;
+  reasoning: string;
+}
+
+function Lightbox({ data, onClose }: { data: LightboxData; onClose: () => void }) {
+  // Escape closes; body scroll locked while open.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Enlarged view of ${data.filename}. Click anywhere or press Escape to close.`}
+      className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center gap-4 p-4 sm:p-8 cursor-zoom-out"
+      onClick={onClose}
+    >
+      <img
+        src={data.src}
+        alt={data.filename}
+        className="max-h-[78vh] max-w-full object-contain rounded-md shadow-2xl"
+      />
+      {/* Caption strip — filename + scores + reasoning */}
+      <div className="max-w-3xl w-full bg-card/95 border border-border rounded-lg px-4 py-3 shadow-xl">
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          <code className="text-xs text-muted-foreground font-mono">{data.filename}</code>
+          {data.scores &&
+            CATEGORIES.map((cat) => (
+              <ScorePill key={cat} label={CATEGORY_LABELS[cat]} score={data.scores![cat] ?? 0} />
+            ))}
+        </div>
+        {data.reasoning && (
+          <p className="text-xs text-muted-foreground leading-relaxed mt-2 text-center line-clamp-3">
+            {data.reasoning}
+          </p>
+        )}
+      </div>
+      <p className="text-[11px] uppercase tracking-wider text-white/50">
+        Click anywhere or press Esc to close
+      </p>
+    </div>
   );
 }
 
@@ -222,12 +283,12 @@ function SortableRow({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-center gap-2 ${isDragging ? "opacity-50" : ""}`}
+      className={`flex items-stretch gap-2 ${isDragging ? "opacity-50" : ""}`}
     >
       <button
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-muted-foreground p-1 shrink-0 touch-none"
+        className="cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-muted-foreground p-1 shrink-0 touch-none flex items-center rounded hover:bg-muted/60 transition-colors"
         type="button"
         aria-label="Drag to reorder"
       >
@@ -235,6 +296,59 @@ function SortableRow({
       </button>
       <div className="flex-1 min-w-0">{children(isDragging)}</div>
     </div>
+  );
+}
+
+// ── Project order row (click body to open project; drag stays on grip only) ────
+
+function ProjectOrderRow({
+  pid,
+  index,
+  heroPath,
+  isCurrentProject,
+  onOpen,
+}: {
+  pid: string;
+  index: number;
+  heroPath: string | undefined;
+  isCurrentProject: boolean;
+  onOpen: (id: string) => void;
+}) {
+  const name = pid.replace(/-/g, " ");
+  const inner = (
+    <>
+      <span className="text-[10px] text-muted-foreground w-5 text-right shrink-0">{index + 1}</span>
+      {heroPath && <img src={heroPath} alt="" className="h-10 w-14 object-cover rounded shrink-0" loading="lazy" />}
+      <span className={`text-xs capitalize truncate ${isCurrentProject ? "font-medium text-foreground" : "text-muted-foreground"}`}>
+        {name}
+      </span>
+      {isCurrentProject && <span className="text-[9px] bg-primary/20 text-primary px-1 py-0.5 rounded shrink-0">this</span>}
+    </>
+  );
+
+  // The currently open project needs no navigation — keep its highlighted, inert row.
+  if (isCurrentProject) {
+    return (
+      <div className="flex items-center gap-2 py-1 rounded px-1 bg-primary/5 border border-primary/20">
+        {inner}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(pid)}
+      aria-label={`Open ${name}`}
+      className="group/row w-full flex items-center gap-2 py-1 rounded px-1 text-left cursor-pointer hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 transition-colors"
+    >
+      {inner}
+      <ChevronRight
+        size={13}
+        className="ml-auto shrink-0 text-transparent group-hover/row:text-muted-foreground group-focus-visible/row:text-muted-foreground transition-colors"
+        aria-hidden="true"
+      />
+    </button>
   );
 }
 
@@ -277,7 +391,7 @@ function ProjectListView({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {orderedProjects.map((proj) => {
           const heroPath = proj.quality?.heroImage ?? proj.images[0]?.path;
           const overCount = overrideCountPerProject.get(proj.id) ?? 0;
@@ -313,12 +427,12 @@ function ProjectListView({
                 )}
               </div>
               {/* Info */}
-              <div className="px-3 py-2">
-                <p className="text-xs font-medium text-foreground truncate capitalize">{proj.id.replace(/-/g, " ")}</p>
-                <div className="flex gap-1 mt-1 flex-wrap">
+              <div className="px-3.5 py-2.5">
+                <p className="text-sm font-medium text-foreground truncate capitalize">{proj.id.replace(/-/g, " ")}</p>
+                <div className="flex gap-1 mt-1.5 flex-wrap">
                   {proj.derivedTags.map((tag) => (
-                    <span key={tag} className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
-                      {tag[0]}
+                    <span key={tag} className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+                      {tag}
                     </span>
                   ))}
                 </div>
@@ -343,6 +457,7 @@ function ImageRow({
   onUnhide,
   onReplaced,
   onSetBestFor,
+  onOpenLightbox,
 }: {
   projectId: string;
   image: BaselineImage;
@@ -353,37 +468,50 @@ function ImageRow({
   onUnhide: () => void;
   onReplaced: (url: string) => void;
   onSetBestFor: (category: Category) => void;
+  onOpenLightbox: () => void;
 }) {
-  const [showReasoning, setShowReasoning] = useState(false);
+  const [reasoningExpanded, setReasoningExpanded] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
   const [bestCat, setBestCat] = useState<Category>("windows");
 
   const displaySrc = replacedUrl ?? image.path;
+  const filename = image.path.split("/").pop() ?? image.path;
 
   return (
-    <div className={`rounded-lg border p-3 transition-colors ${isHidden ? "border-border/40 opacity-50 bg-muted/20" : "border-border bg-card"}`}>
-      <div className="flex gap-3">
-        {/* Thumbnail */}
-        <div className="relative shrink-0">
+    <div className={`rounded-lg border overflow-hidden transition-colors ${isHidden ? "border-border/40 opacity-60 bg-muted/20" : "border-border bg-card"}`}>
+      <div className="flex flex-col md:flex-row">
+        {/* Large clickable image — opens lightbox */}
+        <button
+          type="button"
+          onClick={onOpenLightbox}
+          aria-label={`View ${filename} larger`}
+          className="relative shrink-0 group/img cursor-zoom-in md:w-80 lg:w-96 bg-muted"
+        >
           <img
             src={displaySrc}
             alt=""
-            className="h-16 w-20 object-cover rounded border border-border/40"
+            className="w-full aspect-[4/3] md:aspect-auto md:h-60 object-cover"
             loading="lazy"
           />
+          {/* Hover zoom affordance */}
+          <span className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/img:bg-black/30 opacity-0 group-hover/img:opacity-100 transition-opacity">
+            <span className="flex items-center gap-1.5 text-white text-xs font-medium bg-black/50 rounded-full px-3 py-1.5">
+              <Maximize2 size={13} /> View larger
+            </span>
+          </span>
           {isHidden && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded">
-              <EyeOff size={16} className="text-white" />
-            </div>
+            <span className="absolute inset-0 flex items-center justify-center bg-black/45 pointer-events-none">
+              <EyeOff size={24} className="text-white" />
+            </span>
           )}
-        </div>
+        </button>
 
         {/* Main content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 p-4 flex flex-col">
           {/* Path + badges */}
-          <div className="flex items-start gap-1 flex-wrap mb-1.5">
-            <code className="text-[10px] text-muted-foreground font-mono truncate max-w-[180px]">
-              {image.path.split("/").pop()}
+          <div className="flex items-start gap-1.5 flex-wrap mb-2">
+            <code className="text-[11px] text-muted-foreground font-mono truncate max-w-[240px]">
+              {filename}
             </code>
             {isHidden && (
               <span className="text-[10px] px-1.5 py-0.5 bg-destructive/10 text-destructive rounded font-medium">Hidden</span>
@@ -402,31 +530,47 @@ function ImageRow({
 
           {/* AI Scores */}
           {image.scores ? (
-            <div className="flex gap-1 flex-wrap mb-2">
+            <div className="flex gap-1.5 flex-wrap mb-3">
               {CATEGORIES.map((cat) => (
-                <ScorePill key={cat} label={CATEGORY_LABELS[cat][0]} score={image.scores![cat] ?? 0} />
+                <ScorePill key={cat} label={CATEGORY_LABELS[cat]} score={image.scores![cat] ?? 0} />
               ))}
             </div>
           ) : (
-            <p className="text-[10px] text-muted-foreground mb-2">No AI scores</p>
+            <p className="text-[11px] text-muted-foreground mb-3">No AI scores</p>
+          )}
+
+          {/* Reasoning — always visible, clamped, expandable */}
+          {image.reasoning && (
+            <div className="mb-3">
+              <p className={`text-xs text-muted-foreground leading-relaxed ${reasoningExpanded ? "" : "line-clamp-3"}`}>
+                {image.reasoning}
+              </p>
+              <button
+                onClick={() => setReasoningExpanded(!reasoningExpanded)}
+                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors mt-1"
+              >
+                {reasoningExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                {reasoningExpanded ? "Show less" : "Show more"}
+              </button>
+            </div>
           )}
 
           {/* Controls */}
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap mt-auto pt-2 border-t border-border/40">
             {/* Hide / Unhide */}
             {isHidden ? (
               <button
                 onClick={onUnhide}
-                className="flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-muted hover:bg-border text-foreground transition-colors"
+                className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-muted hover:bg-border text-foreground transition-colors"
               >
-                <Eye size={12} /> Unhide
+                <Eye size={13} /> Unhide
               </button>
             ) : (
               <button
                 onClick={onHide}
-                className="flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-muted hover:bg-border text-muted-foreground transition-colors"
+                className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-muted hover:bg-border text-muted-foreground transition-colors"
               >
-                <EyeOff size={12} /> Hide
+                <EyeOff size={13} /> Hide
               </button>
             )}
 
@@ -434,9 +578,9 @@ function ImageRow({
             {!isHidden && (
               <button
                 onClick={() => setShowUploader(true)}
-                className="flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-muted hover:bg-border text-muted-foreground transition-colors"
+                className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-muted hover:bg-border text-muted-foreground transition-colors"
               >
-                <Upload size={12} /> Replace
+                <Upload size={13} /> Replace
               </button>
             )}
 
@@ -446,7 +590,7 @@ function ImageRow({
                 <select
                   value={bestCat}
                   onChange={(e) => setBestCat(e.target.value as Category)}
-                  className="text-[11px] bg-background border border-border rounded px-1.5 py-1 text-foreground outline-none focus:border-primary"
+                  className="text-xs bg-background border border-border rounded px-1.5 py-1.5 text-foreground outline-none focus:border-primary"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
@@ -454,31 +598,13 @@ function ImageRow({
                 </select>
                 <button
                   onClick={() => onSetBestFor(bestCat)}
-                  className="flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-muted hover:bg-border text-muted-foreground transition-colors"
+                  className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-muted hover:bg-border text-muted-foreground transition-colors"
                 >
-                  <Star size={12} /> Set best
+                  <Star size={13} /> Set best
                 </button>
               </div>
             )}
-
-            {/* Reasoning toggle */}
-            {image.reasoning && (
-              <button
-                onClick={() => setShowReasoning(!showReasoning)}
-                className="flex items-center gap-1 text-[11px] px-2 py-1 rounded text-muted-foreground hover:text-foreground transition-colors ml-auto"
-              >
-                {showReasoning ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                Reasoning
-              </button>
-            )}
           </div>
-
-          {/* Reasoning text */}
-          {showReasoning && image.reasoning && (
-            <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed border-t border-border/40 pt-2">
-              {image.reasoning}
-            </p>
-          )}
 
           {/* Uploader */}
           {showUploader && (
@@ -505,6 +631,7 @@ function ProjectDetailView({
   baselineData,
   overrides,
   onBack,
+  onSelectProject,
   onAddOverride,
   onDeleteOverride,
 }: {
@@ -512,11 +639,25 @@ function ProjectDetailView({
   baselineData: BaselineResponse;
   overrides: OverrideRow[];
   onBack: () => void;
+  onSelectProject: (id: string) => void;
   onAddOverride: (body: AddOverrideBody) => Promise<void>;
   onDeleteOverride: (id: number) => Promise<void>;
 }) {
   const [orderTab, setOrderTab] = useState<"all" | Category>("all");
   const [imageOrderIds, setImageOrderIds] = useState<string[]>(() => project.images.map((im) => im.path));
+  const [lightbox, setLightbox] = useState<LightboxData | null>(null);
+
+  // The detail view stays mounted when switching projects via the order lists,
+  // so the per-project image order must resync. Done during render (not in an
+  // effect) so the switch commits in a single pass — an effect-based resync
+  // briefly renders an empty images section, and the resulting document
+  // shrink/grow cycle makes Chrome's scroll anchoring fight the scroll-to-top.
+  // Order tab + project order lists are project-independent and persist.
+  const [prevProjectId, setPrevProjectId] = useState(project.id);
+  if (prevProjectId !== project.id) {
+    setPrevProjectId(project.id);
+    setImageOrderIds(project.images.map((im) => im.path));
+  }
 
   // Compute per-image override state
   const projectOverrides = overrides.filter((r) => r.project_id === project.id);
@@ -542,7 +683,8 @@ function ProjectDetailView({
     exterior: categoryProjectOrder("exterior"),
   });
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  // distance: 8 keeps plain clicks (e.g. opening the lightbox) from ever starting a drag
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
   // DnD handlers
   async function handleProjectOrderEnd(event: DragEndEvent, ids: string[], setIds: (ids: string[]) => void, overrideType: "project_order" | "category_order", category?: Category) {
@@ -596,13 +738,30 @@ function ProjectDetailView({
       </button>
 
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-4 mb-6">
         {(project.quality?.heroImage ?? project.images[0]?.path) && (
-          <img
-            src={project.quality?.heroImage ?? project.images[0]?.path}
-            alt=""
-            className="h-12 w-16 object-cover rounded border border-border/40 shrink-0"
-          />
+          <button
+            type="button"
+            onClick={() => {
+              const heroPath = project.quality?.heroImage ?? project.images[0]?.path;
+              if (!heroPath) return;
+              const heroImage = project.images.find((im) => im.path === heroPath);
+              setLightbox({
+                src: heroPath,
+                filename: heroPath.split("/").pop() ?? heroPath,
+                scores: heroImage?.scores ?? null,
+                reasoning: heroImage?.reasoning ?? "",
+              });
+            }}
+            aria-label="View hero image larger"
+            className="shrink-0 cursor-zoom-in rounded overflow-hidden border border-border/40 hover:border-primary/40 transition-colors"
+          >
+            <img
+              src={project.quality?.heroImage ?? project.images[0]?.path}
+              alt=""
+              className="h-20 w-28 object-cover"
+            />
+          </button>
         )}
         <div>
           <h2 className="text-base font-semibold capitalize">{project.id.replace(/-/g, " ")}</h2>
@@ -652,6 +811,15 @@ function ProjectDetailView({
                           onSetBestFor={async (cat) => {
                             await onAddOverride({ project_id: project.id, image_path: image.path, override_type: "best_for_category", category: cat });
                           }}
+                          onOpenLightbox={() => {
+                            const src = replacedMap.get(image.path) ?? image.path;
+                            setLightbox({
+                              src,
+                              filename: image.path.split("/").pop() ?? image.path,
+                              scores: image.scores,
+                              reasoning: image.reasoning,
+                            });
+                          }}
                         />
                       )}
                     </SortableRow>
@@ -669,7 +837,8 @@ function ProjectDetailView({
           Project Order in Gallery
         </h3>
         <p className="text-xs text-muted-foreground mb-3">
-          Drag to reorder where this project appears relative to all others in each view.
+          Drag the handle to reorder where this project appears relative to all others in each view.
+          Click any other project to open it.
         </p>
 
         {/* Order tab selector */}
@@ -695,18 +864,16 @@ function ProjectDetailView({
                 {allOrderIds.map((pid, idx) => {
                   const p = baselineData.projects.find((x) => x.id === pid);
                   const heroPath = p?.quality?.heroImage ?? p?.images[0]?.path;
-                  const isCurrentProject = pid === project.id;
                   return (
                     <SortableRow key={pid} id={pid}>
                       {() => (
-                        <div className={`flex items-center gap-2 py-1 rounded px-1 ${isCurrentProject ? "bg-primary/5 border border-primary/20" : ""}`}>
-                          <span className="text-[10px] text-muted-foreground w-5 text-right shrink-0">{idx + 1}</span>
-                          {heroPath && <img src={heroPath} alt="" className="h-7 w-9 object-cover rounded shrink-0" loading="lazy" />}
-                          <span className={`text-xs capitalize truncate ${isCurrentProject ? "font-medium text-foreground" : "text-muted-foreground"}`}>
-                            {pid.replace(/-/g, " ")}
-                          </span>
-                          {isCurrentProject && <span className="text-[9px] bg-primary/20 text-primary px-1 py-0.5 rounded shrink-0">this</span>}
-                        </div>
+                        <ProjectOrderRow
+                          pid={pid}
+                          index={idx}
+                          heroPath={heroPath}
+                          isCurrentProject={pid === project.id}
+                          onOpen={onSelectProject}
+                        />
                       )}
                     </SortableRow>
                   );
@@ -732,18 +899,16 @@ function ProjectDetailView({
                   const p = baselineData.projects.find((x) => x.id === pid);
                   const catImg = p?.categoryImages[orderTab as Category];
                   const heroPath = catImg ?? p?.quality?.heroImage ?? p?.images[0]?.path;
-                  const isCurrentProject = pid === project.id;
                   return (
                     <SortableRow key={pid} id={pid}>
                       {() => (
-                        <div className={`flex items-center gap-2 py-1 rounded px-1 ${isCurrentProject ? "bg-primary/5 border border-primary/20" : ""}`}>
-                          <span className="text-[10px] text-muted-foreground w-5 text-right shrink-0">{idx + 1}</span>
-                          {heroPath && <img src={heroPath} alt="" className="h-7 w-9 object-cover rounded shrink-0" loading="lazy" />}
-                          <span className={`text-xs capitalize truncate ${isCurrentProject ? "font-medium text-foreground" : "text-muted-foreground"}`}>
-                            {pid.replace(/-/g, " ")}
-                          </span>
-                          {isCurrentProject && <span className="text-[9px] bg-primary/20 text-primary px-1 py-0.5 rounded shrink-0">this</span>}
-                        </div>
+                        <ProjectOrderRow
+                          pid={pid}
+                          index={idx}
+                          heroPath={heroPath}
+                          isCurrentProject={pid === project.id}
+                          onOpen={onSelectProject}
+                        />
                       )}
                     </SortableRow>
                   );
@@ -786,6 +951,9 @@ function ProjectDetailView({
           </div>
         </section>
       )}
+
+      {/* Lightbox overlay */}
+      {lightbox && <Lightbox data={lightbox} onClose={() => setLightbox(null)} />}
     </div>
   );
 }
@@ -796,6 +964,16 @@ export default function ProjectImagesPanel() {
   const queryClient = useQueryClient();
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Whenever a project detail view opens (from the list grid or from another
+  // project's order lists), bring the top of the panel into view. scroll-mt on
+  // the root offsets the sticky admin nav; reduced-motion users get an instant jump.
+  useEffect(() => {
+    if (!selectedProjectId) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    panelRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  }, [selectedProjectId]);
 
   function showToast(msg: string) {
     setToastMsg(msg);
@@ -915,7 +1093,7 @@ export default function ProjectImagesPanel() {
     : null;
 
   return (
-    <div className="relative">
+    <div ref={panelRef} className="relative scroll-mt-20">
       {/* Toast notification */}
       {toastMsg && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-foreground text-background text-xs px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2">
@@ -942,6 +1120,7 @@ export default function ProjectImagesPanel() {
           baselineData={baselineData}
           overrides={overrides}
           onBack={() => setSelectedProjectId(null)}
+          onSelectProject={setSelectedProjectId}
           onAddOverride={addOverride}
           onDeleteOverride={deleteOverride}
         />

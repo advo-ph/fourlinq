@@ -19,13 +19,15 @@ const HIDE_MS = 200; // fast retract-out
 
 /**
  * Thin gray connector lines from Part-2 list items to points on the cutaway
- * still. Endpoints are recomputed every frame from live element rects, so the
- * lines stay anchored even if the text shifts while the image stays put. Each
- * line grows from its list item to the anchor with a slight random speed
- * variance, and retracts quickly when the part is unhighlighted.
+ * still, each tipped with a hollow white endpoint dot. Endpoints are recomputed
+ * every frame from live element rects, so the lines stay anchored even if the
+ * text shifts while the image stays put. Each line grows from its list item to
+ * the anchor with a slight random speed variance, and retracts quickly when the
+ * part is unhighlighted.
  */
 const PhaseCalloutLines = ({ originRef, imageBoxRef, itemRefs, callouts, active }: Props) => {
   const lineRefs = useRef<(SVGLineElement | null)[]>([]);
+  const circleRefs = useRef<(SVGCircleElement | null)[]>([]);
   const tRef = useRef<number[]>([]);
   const showMsRef = useRef<number[]>([]);
 
@@ -64,7 +66,8 @@ const PhaseCalloutLines = ({ originRef, imageBoxRef, itemRefs, callouts, active 
         if (t > 0.001) anyVisible = true;
 
         const itemEl = items[i];
-        if (!itemEl || !origin || !imgBox) { line.style.opacity = "0"; return; }
+        const circle = circleRefs.current[i];
+        if (!itemEl || !origin || !imgBox) { line.style.opacity = "0"; if (circle) circle.style.opacity = "0"; return; }
 
         const ir = itemEl.getBoundingClientRect();
         const x0 = ir.right - origin.left;
@@ -74,11 +77,27 @@ const PhaseCalloutLines = ({ originRef, imageBoxRef, itemRefs, callouts, active 
         const ex = x0 + (x1 - x0) * t;
         const ey = y0 + (y1 - y0) * t;
 
+        // Pull line end back by circle radius so the line doesn't pierce the dot.
+        const r = 3;
+        const dx = ex - x0;
+        const dy = ey - y0;
+        const len = Math.hypot(dx, dy);
+        const lx2 = len > r ? ex - (dx / len) * r : ex;
+        const ly2 = len > r ? ey - (dy / len) * r : ey;
+
         line.setAttribute("x1", String(x0));
         line.setAttribute("y1", String(y0));
-        line.setAttribute("x2", String(ex));
-        line.setAttribute("y2", String(ey));
-        line.style.opacity = t > 0.02 ? "1" : "0";
+        line.setAttribute("x2", String(lx2));
+        line.setAttribute("y2", String(ly2));
+        const vis = t > 0.02 ? "1" : "0";
+        line.style.opacity = vis;
+
+        // Hollow tip circle rides the true tip position.
+        if (circle) {
+          circle.setAttribute("cx", String(ex));
+          circle.setAttribute("cy", String(ey));
+          circle.style.opacity = vis;
+        }
       });
 
       if (active || anyVisible) raf = requestAnimationFrame(draw);
@@ -92,13 +111,23 @@ const PhaseCalloutLines = ({ originRef, imageBoxRef, itemRefs, callouts, active 
   return (
     <svg className="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
       {callouts.map((c, i) => (
-        <line
-          key={c.label + i}
-          ref={(el) => { lineRefs.current[i] = el; }}
-          strokeWidth={0.75}
-          strokeLinecap="round"
-          style={{ stroke: "var(--ink-muted)", opacity: 0 }}
-        />
+        <g key={c.label + i}>
+          <line
+            ref={(el) => { lineRefs.current[i] = el; }}
+            strokeWidth={0.75}
+            strokeLinecap="round"
+            style={{ stroke: "var(--ink-muted)", opacity: 0 }}
+          />
+          {/* Hollow white endpoint dot anchored to the image-side tip. */}
+          <circle
+            ref={(el) => { circleRefs.current[i] = el; }}
+            r={3}
+            fill="none"
+            stroke="white"
+            strokeWidth={1}
+            style={{ opacity: 0 }}
+          />
+        </g>
       ))}
     </svg>
   );
