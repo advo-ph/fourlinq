@@ -289,11 +289,15 @@ const Inspiration = () => {
             <p className="text-body text-[color:var(--ink-muted)]">No projects in this category yet.</p>
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-              {filtered.map((p) => (
+              {filtered.map((p) => {
+                // Apply admin-set ratio override; default is 4:3 (source photo crop)
+                const ratio = mergedData.projectRatios?.[p.id] ?? "4:3";
+                const aspectClass = ratio === "16:9" ? "aspect-[16/9]" : "aspect-[4/3]";
+                return (
                 <li key={p.id}>
                   <Link to={`/projects/${p.id}`} className="group block">
-                    {/* Source photos are 4:3 — match the crop to the material. */}
-                    <div className="relative aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
+                    {/* Aspect ratio: 4:3 by default (source photos); admin can override to 16:9. */}
+                    <div className={`relative ${aspectClass} overflow-hidden bg-[color:var(--canvas-soft)]`}>
                       {/* In a category view, show that project's best image for
                           the active category; "All projects" keeps the hero.
                           CardImage decodes in the background before swapping so
@@ -313,7 +317,8 @@ const Inspiration = () => {
                     </div>
                   </Link>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
         </div>
