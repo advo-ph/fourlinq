@@ -80,6 +80,22 @@ async function migrateProjects() {
     }
   }
   console.log(`📦 cms_project: ${inserted} inserted, ${updated} updated (${PROJECTS.length} total)`);
+
+  // Prune stale rows: delete cms_project rows in this org whose slug no longer
+  // exists in the source data. project_image_override.project_id is a plain TEXT
+  // column with no FK to cms_project, so no dependent-row cleanup is required.
+  const sourceSlugs = PROJECTS.map((p) => p.id);
+  const pruned = await pool.query(
+    `DELETE FROM cms_project
+     WHERE organization_id = $1
+       AND slug <> ALL($2::text[])
+     RETURNING slug`,
+    [ORG_ID, sourceSlugs]
+  );
+  if (pruned.rowCount && pruned.rowCount > 0) {
+    const slugList = pruned.rows.map((r: { slug: string }) => r.slug).join(", ");
+    console.log(`🗑 cms_project: pruned ${pruned.rowCount} stale row(s) (${slugList})`);
+  }
 }
 
 async function migrateNews() {
