@@ -17,6 +17,16 @@ import { toThumbPath } from "@/lib/project-thumbs";
 
 type Filter = "all" | InspirationTag;
 
+/** Returns "Name, Location" only when the location (ignoring a trailing " City")
+ *  is not already present in the project name, and the location is not the
+ *  generic "Philippines" sentinel. */
+function formatProjectTitle(name: string, location: string | undefined): string {
+  if (!location || location === "Philippines") return name;
+  const bare = location.toLowerCase().replace(/\s+city$/i, "");
+  if (name.toLowerCase().includes(bare)) return name;
+  return `${name}, ${location}`;
+}
+
 // The initial merged state comes from the baked static baseline. The runtime API
 // fetch in the component's useEffect updates this with live DB overrides.
 const BASELINE_MERGED: MergedProjectImagesResponse = {
@@ -310,9 +320,7 @@ const Inspiration = () => {
                     </div>
                     <div className="mt-3">
                       <h3 className="font-serif text-body text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                        {p.location && p.location !== "Philippines" && !p.name.toLowerCase().includes(p.location.toLowerCase())
-                          ? `${p.name}, ${p.location}`
-                          : p.name}
+                        {formatProjectTitle(p.name, p.location)}
                       </h3>
                     </div>
                   </Link>
