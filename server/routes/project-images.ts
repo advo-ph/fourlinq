@@ -670,10 +670,13 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
         };
       });
 
-    // Allow the client to cache baseline data for 5 min (matches TanStack Query
-    // staleTime on the admin panel). 'private' ensures this never lands in a
-    // shared/CDN cache — baseline includes AI reasoning intended for admins.
-    res.setHeader("Cache-Control", "private, max-age=300");
+    // 'private, no-cache' tells the browser to always revalidate with the server
+    // before serving this response. The server has its own 60-second in-memory
+    // cache (loadBaseline TTL), so revalidation is fast and override changes
+    // (flag/hide/delete/ratio) are reflected immediately when the admin panel
+    // invalidates and re-fetches. max-age=300 was causing the browser to serve
+    // a stale cached response for 5 minutes, silently ignoring invalidation.
+    res.setHeader("Cache-Control", "private, no-cache");
     res.json({
       projects,
       projectOrder,

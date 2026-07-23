@@ -54,6 +54,7 @@ import {
   Ratio as RatioIcon,
 } from "lucide-react";
 import { toThumbPath } from "@/lib/project-thumbs";
+import { nearestRatioLabel } from "@/lib/image-ratio";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -598,7 +599,7 @@ function ImageRow({
             {/* B1: aspect ratio indicator */}
             {naturalRatio !== null && (
               <span className="text-[10px] px-1.5 py-0.5 bg-muted rounded text-muted-foreground font-mono">
-                {naturalRatio.toFixed(2)}
+                {nearestRatioLabel(naturalRatio)}
               </span>
             )}
             {isHidden && (
@@ -714,10 +715,10 @@ function ImageRow({
               <p className="text-[11px] text-muted-foreground mb-2 font-medium">
                 Override category scores for this image (0–100). Category "best" re-derives automatically.
               </p>
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="grid grid-cols-4 gap-2 mb-3">
                 {CATEGORIES.map((cat) => (
-                  <label key={cat} className="flex flex-col gap-1">
-                    <span className="text-[11px] font-medium text-foreground">{CATEGORY_LABELS[cat]}</span>
+                  <label key={cat} className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">{CATEGORY_LABELS[cat]}</span>
                     <input
                       type="number"
                       min={0}
@@ -1000,7 +1001,7 @@ function ProjectDetailView({
               {project.hidden ? "Unhide" : "Hide project"}
             </button>
 
-            {/* Ratio toggle */}
+            {/* Ratio toggle — shows current ratio; click to switch to the other value */}
             <button
               type="button"
               onClick={() =>
@@ -1010,8 +1011,9 @@ function ProjectDetailView({
                 )
               }
               className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-muted text-muted-foreground hover:bg-border transition-colors"
+              title={`Current: ${project.ratio}. Click to switch to ${project.ratio === "4:3" ? "16:9" : "4:3"}`}
             >
-              <RatioIcon size={13} /> {project.ratio === "4:3" ? "4:3 → 16:9" : "16:9 → 4:3"}
+              <RatioIcon size={13} /> Ratio: {project.ratio}
             </button>
 
             {/* Delete / Restore */}
@@ -1322,6 +1324,14 @@ export default function ProjectImagesPanel() {
 
   // ── Mutations ─────────────────────────────────────────────────────────────────
 
+  // Project-level override types that affect the baseline response
+  // (flagged/hidden/deleted/ratio come from the /baseline endpoint, not /overrides).
+  // Mutations for these types must also invalidate the baseline query so the
+  // UI reflects the new state immediately rather than waiting 5 minutes.
+  const PROJECT_LEVEL_TYPES = new Set([
+    "project_flagged", "project_hidden", "project_deleted", "project_ratio",
+  ]);
+
   const addOverrideMutation = useMutation({
     mutationFn: (body: AddOverrideBody) =>
       fetch("/api/admin/project-images/overrides", {
@@ -1333,8 +1343,13 @@ export default function ProjectImagesPanel() {
         if (!r.ok) return r.json().then((d: { error?: string }) => Promise.reject(new Error(d.error ?? `Save failed: ${r.status}`)));
         return r.json();
       }),
-    onSuccess: () => {
+    onSuccess: (_data, body) => {
       queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
+      // Project-level overrides (flag/hide/delete/ratio) are reflected in the baseline
+      // endpoint — invalidate it too so the UI updates immediately.
+      if (PROJECT_LEVEL_TYPES.has(body.override_type)) {
+        queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "baseline"] });
+      }
     },
     onError: (err) => {
       showToast(`Error: ${String(err)}`);
@@ -1351,7 +1366,11 @@ export default function ProjectImagesPanel() {
         return r.json();
       }),
     onSuccess: () => {
+      // Always invalidate both — we don't know here whether the deleted row was
+      // a project-level type (flag/hide/delete/ratio). The baseline refresh is
+      // cheap (private, 5 min browser TTL, re-served from file) so this is safe.
       queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "baseline"] });
     },
     onError: (err) => {
       showToast(`Error: ${String(err)}`);
