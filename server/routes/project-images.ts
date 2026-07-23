@@ -85,6 +85,10 @@ export interface MergedResponse {
   hiddenImages: Record<string, string[]>;
   replacedImages: Record<string, Record<string, string>>;
   overrideCount: number;
+  flaggedProjects: string[];
+  hiddenProjects: string[];
+  deletedProjects: string[];
+  projectRatios: Record<string, string>;
 }
 
 interface OverrideRow {
@@ -183,6 +187,19 @@ function loadBaseline(forceRefresh = false): BaselineData {
   return baselineCache;
 }
 
+// ── Score override helper ──────────────────────────────────────────────────────
+
+function getEffectiveScore(
+  projectId: string,
+  imagePath: string,
+  cat: Category,
+  baseScores: ImageScore | null,
+  scoreOverrideMap: Map<string, Map<string, number>>
+): number {
+  const override = scoreOverrideMap.get(`${projectId}|${imagePath}`)?.get(cat);
+  return override !== undefined ? override : (baseScores?.[cat] ?? 0);
+}
+
 // ── Merge algorithm ───────────────────────────────────────────────────────────
 
 function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): MergedResponse {
@@ -195,6 +212,11 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
   const projectOrderMap = new Map<string, number>(); // projectId → value_int
   const categoryOrderMap = new Map<string, Map<string, number>>(); // category → projectId → value_int
   const imageOrderMap = new Map<string, Map<string, number>>(); // projectId → imagePath → value_int
+  const flaggedSet = new Set<string>(); // projectIds with project_flagged override
+  const hiddenProjectSet = new Set<string>(); // projectIds with project_hidden override
+  const deletedProjectSet = new Set<string>(); // projectIds with project_deleted override
+  const projectRatioMap = new Map<string, string>(); // projectId → value_text ('16:9' | '4:3')
+  const scoreOverrideMap = new Map<string, Map<string, number>>(); // "projectId|imagePath" → category → value_int
 
   for (const row of overrides) {
     switch (row.override_type) {
@@ -222,6 +244,26 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
           imageOrderMap.get(row.project_id)!.set(row.image_path, row.value_int);
         }
         break;
+      case "project_flagged":
+        flaggedSet.add(row.project_id);
+        break;
+      case "project_hidden":
+        hiddenProjectSet.add(row.project_id);
+        break;
+      case "project_deleted":
+        deletedProjectSet.add(row.project_id);
+        break;
+      case "project_ratio":
+        if (row.value_text) projectRatioMap.set(row.project_id, row.value_text);
+        break;
+      case "score_override":
+        if (row.category && row.value_int !== null) {
+          const key = `${row.project_id}|${row.image_path}`;
+          if (!scoreOverrideMap.has(key)) scoreOverrideMap.set(key, new Map());
+          scoreOverrideMap.get(key)!.set(row.category, row.value_int);
+        }
+        break;
+      // image_flagged: no server-side action needed; purely a visual marker for admin
     }
   }
 
@@ -232,6 +274,11 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
   const replacedImages: Record<string, Record<string, string>> = {};
 
   const coveredIds = canon.filter((c) => manifest.projects[c.id]?.finished).map((c) => c.id);
+
+  // For public response: exclude deleted + hidden projects
+  const publicCoveredIds = coveredIds.filter(
+    (id) => !deletedProjectSet.has(id) && !hiddenProjectSet.has(id)
+  );
 
   for (const projectId of coveredIds) {
     const baseImages = projectCategoryImages[projectId] ?? {};
@@ -295,19 +342,33 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     if (Object.keys(projReplaced).length > 0) replacedImages[projectId] = projReplaced;
   }
 
-  // ── Sort projectOrder with overrides ──────────────────────────────────────
+  // ── Sort projectOrder with overrides (public: exclude hidden + deleted) ──────
   // Projects with explicit position override land at their value_int slot;
   // the rest fill in the remaining slots in baseline order.
-  const effectiveProjectOrder = applyOrderOverrides(projectOrder, projectOrderMap);
+  const publicIdSet = new Set(publicCoveredIds);
+  const basePublicOrder = projectOrder.filter((id) => publicIdSet.has(id));
+  // Also filter the override map so deleted/hidden projects with project_order
+  // overrides cannot be re-inserted into the public order by applyOrderOverrides.
+  const publicProjectOrderMap = new Map([...projectOrderMap.entries()].filter(([id]) => publicIdSet.has(id)));
+  const effectiveProjectOrder = applyOrderOverrides(basePublicOrder, publicProjectOrderMap);
 
-  // ── Sort projectCategoryOrder with overrides ──────────────────────────────
+  // ── Sort projectCategoryOrder with overrides (public: exclude hidden + deleted) ──
   const effectiveProjectCategoryOrder: Record<Category, string[]> = {} as Record<Category, string[]>;
   for (const cat of CATEGORIES) {
-    const baseOrder = projectCategoryOrder[cat] ?? [];
+    const baseOrder = (projectCategoryOrder[cat] ?? []).filter((id) => publicIdSet.has(id));
     const overMap = categoryOrderMap.get(cat);
-    effectiveProjectCategoryOrder[cat] = overMap
-      ? applyOrderOverrides(baseOrder, overMap)
+    const publicCatOverMap = overMap
+      ? new Map([...overMap.entries()].filter(([id]) => publicIdSet.has(id)))
+      : undefined;
+    effectiveProjectCategoryOrder[cat] = publicCatOverMap
+      ? applyOrderOverrides(baseOrder, publicCatOverMap)
       : baseOrder;
+  }
+
+  // Build projectRatios for public payload
+  const projectRatios: Record<string, string> = {};
+  for (const [id, ratio] of projectRatioMap.entries()) {
+    projectRatios[id] = ratio;
   }
 
   return {
@@ -318,6 +379,10 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     hiddenImages,
     replacedImages,
     overrideCount: overrides.length,
+    flaggedProjects: [...flaggedSet],
+    hiddenProjects: [...hiddenProjectSet],
+    deletedProjects: [...deletedProjectSet],
+    projectRatios,
   };
 }
 
@@ -431,7 +496,12 @@ projectImagesAdmin.post("/overrides", async (req, res) => {
       return res.status(400).json({ error: "project_id, image_path, and override_type are required" });
     }
 
-    const validTypes = ["hidden", "replaced", "best_for_category", "project_order", "category_order", "image_order"];
+    const validTypes = [
+      "hidden", "replaced", "best_for_category",
+      "project_order", "category_order", "image_order",
+      "project_flagged", "project_hidden", "project_deleted",
+      "project_ratio", "score_override", "image_flagged",
+    ];
     if (!validTypes.includes(override_type)) {
       return res.status(400).json({ error: `Invalid override_type: ${override_type}` });
     }
@@ -522,6 +592,8 @@ projectImagesAdmin.delete("/overrides", async (req, res) => {
 /**
  * GET /api/admin/project-images/baseline
  * Returns the current baseline with all image paths, AI scores, and reasoning.
+ * Also includes per-project flag/hidden/deleted/ratio state and per-image
+ * effective scores (baseline scores merged with score_override rows).
  * Used by the admin UI to display AI context alongside overrides.
  */
 projectImagesAdmin.get("/baseline", async (req, res) => {
@@ -531,7 +603,43 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
 
     const { manifest, canon, projectCategoryImages, projectDerivedTags, projectOrder, projectCategoryOrder } = baseline;
 
-    // Build enriched project list with all images + scores + reasoning
+    // Load all override rows to build project-level state maps and score overrides
+    const { rows: overrideRows } = await pool.query<OverrideRow>(
+      `SELECT * FROM project_image_override WHERE organization_id = 1`
+    );
+
+    // Build lookup maps from override rows
+    const baselineFlaggedSet = new Set<string>();
+    const baselineHiddenProjectSet = new Set<string>();
+    const baselineDeletedProjectSet = new Set<string>();
+    const baselineProjectRatioMap = new Map<string, string>();
+    const baselineScoreOverrideMap = new Map<string, Map<string, number>>();
+
+    for (const row of overrideRows) {
+      switch (row.override_type) {
+        case "project_flagged":
+          baselineFlaggedSet.add(row.project_id);
+          break;
+        case "project_hidden":
+          baselineHiddenProjectSet.add(row.project_id);
+          break;
+        case "project_deleted":
+          baselineDeletedProjectSet.add(row.project_id);
+          break;
+        case "project_ratio":
+          if (row.value_text) baselineProjectRatioMap.set(row.project_id, row.value_text);
+          break;
+        case "score_override":
+          if (row.category && row.value_int !== null) {
+            const key = `${row.project_id}|${row.image_path}`;
+            if (!baselineScoreOverrideMap.has(key)) baselineScoreOverrideMap.set(key, new Map());
+            baselineScoreOverrideMap.get(key)!.set(row.category, row.value_int);
+          }
+          break;
+      }
+    }
+
+    // Build enriched project list with all images + scores + reasoning + new fields
     const projects = canon
       .filter((c) => manifest.projects[c.id]?.finished)
       .map((c) => {
@@ -542,10 +650,23 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
             path: im.path,
             scores: im.scores,
             reasoning: im.reasoning ?? "",
+            effectiveScores: im.scores
+              ? Object.fromEntries(
+                  CATEGORIES.map((cat) => [
+                    cat,
+                    baselineScoreOverrideMap.get(`${c.id}|${im.path}`)?.get(cat)
+                      ?? im.scores![cat] ?? 0,
+                  ])
+                ) as ImageScore
+              : null,
           })),
           quality: rec.quality ?? null,
           categoryImages: projectCategoryImages[c.id] ?? {},
           derivedTags: projectDerivedTags[c.id] ?? [],
+          flagged: baselineFlaggedSet.has(c.id),
+          hidden: baselineHiddenProjectSet.has(c.id),
+          deleted: baselineDeletedProjectSet.has(c.id),
+          ratio: baselineProjectRatioMap.get(c.id) ?? "16:9",
         };
       });
 
@@ -561,5 +682,78 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
   } catch (err) {
     console.error("[project-images] GET /baseline error:", err instanceof Error ? err.message : err);
     res.status(500).json({ error: "Failed to load baseline" });
+  }
+});
+
+/**
+ * POST /api/admin/project-images/apply-exterior-first
+ * Computes best-exterior-first image order for each project and bulk-UPSERTs
+ * image_order override rows — only for projects that have no existing manual
+ * image_order rows (to respect user reorders from the drag UI).
+ */
+projectImagesAdmin.post("/apply-exterior-first", async (_req, res) => {
+  try {
+    const baseline = loadBaseline();
+    const { manifest, canon } = baseline;
+
+    // Find which projects already have any image_order overrides (manual reorders)
+    const { rows: existingOrder } = await pool.query<{ project_id: string }>(
+      `SELECT DISTINCT project_id FROM project_image_override
+       WHERE organization_id = 1 AND override_type = 'image_order'`
+    );
+    const alreadyOrdered = new Set(existingOrder.map((r) => r.project_id));
+
+    let applied = 0;
+    let skipped = 0;
+
+    for (const c of canon) {
+      if (alreadyOrdered.has(c.id)) { skipped++; continue; }
+      const rec = manifest.projects[c.id];
+      if (!rec?.finished || c.webPaths.length <= 1) continue;
+
+      const scored = rec.images.filter((im) => im.scores);
+      if (scored.length === 0) continue;
+
+      // Compute best-exterior-first order (mirrors reorder-project-images.mjs logic)
+      const exteriorCandidates = scored.filter((im) => (im.scores!.exterior ?? 0) >= THRESHOLD);
+      let bestFirst: string | null = null;
+      if (exteriorCandidates.length > 0) {
+        bestFirst = exteriorCandidates.reduce((a, b) => {
+          const extA = a.scores!.exterior ?? 0, extB = b.scores!.exterior ?? 0;
+          if (extB !== extA) return extB > extA ? b : a;
+          const intA = a.scores!.interior ?? 0, intB = b.scores!.interior ?? 0;
+          return intB > intA ? b : a;
+        }).path;
+      } else {
+        // Fallback: highest interior
+        const byInterior = [...scored].sort((a, b) => (b.scores!.interior ?? 0) - (a.scores!.interior ?? 0));
+        if (byInterior.length > 0) bestFirst = byInterior[0].path;
+      }
+
+      if (!bestFirst) continue;
+
+      // Build ordered path list: bestFirst first, then remaining in original order
+      const otherPaths = c.webPaths.filter((p) => p !== bestFirst);
+      const orderedPaths = [bestFirst, ...otherPaths];
+
+      // Bulk UPSERT image_order rows for this project
+      const values = orderedPaths
+        .map((p, idx) => `(1, '${c.id.replace(/'/g, "''")}', '${p.replace(/'/g, "''")}', 'image_order', NULL, NULL, ${idx})`)
+        .join(",\n");
+
+      await pool.query(
+        `INSERT INTO project_image_override
+           (organization_id, project_id, image_path, override_type, category, value_text, value_int)
+         VALUES ${values}
+         ON CONFLICT (organization_id, project_id, image_path, override_type, COALESCE(category, ''))
+         DO UPDATE SET value_int = EXCLUDED.value_int, updated_at = NOW()`
+      );
+      applied++;
+    }
+
+    res.json({ applied, skipped, message: `Applied exterior-first order to ${applied} projects; skipped ${skipped} already-ordered projects.` });
+  } catch (err) {
+    console.error("[project-images] apply-exterior-first error:", err instanceof Error ? err.message : err);
+    res.status(500).json({ error: "Failed to apply exterior-first order" });
   }
 });

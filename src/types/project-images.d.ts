@@ -28,4 +28,16 @@ export interface MergedProjectImagesResponse {
 
   /** Total number of active override rows (used for admin badge). */
   overrideCount: number;
+
+  /** projectId → aspect ratio string ('16:9' | '4:3'). Used by /inspiration card thumbnails. */
+  projectRatios?: Record<string, string>;
+
+  /** projectIds with project_flagged override. Public payload only — no automation. */
+  flaggedProjects?: string[];
+
+  /** projectIds excluded from public site (project_hidden override). Server already excludes from ordering. */
+  hiddenProjects?: string[];
+
+  /** projectIds soft-deleted (project_deleted override). Server already excludes from ordering. */
+  deletedProjects?: string[];
 }

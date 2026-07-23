@@ -38,7 +38,6 @@ import {
   Eye,
   EyeOff,
   Upload,
-  Star,
   GripVertical,
   X,
   Loader2,
@@ -47,6 +46,12 @@ import {
   ChevronUp,
   Image,
   Maximize2,
+  Flag,
+  Trash2,
+  RotateCcw,
+  Sliders,
+  ArrowUpDown,
+  Ratio as RatioIcon,
 } from "lucide-react";
 import { toThumbPath } from "@/lib/project-thumbs";
 
@@ -73,6 +78,7 @@ interface ScoreMap {
 interface BaselineImage {
   path: string;
   scores: ScoreMap | null;
+  effectiveScores: ScoreMap | null;
   reasoning: string;
 }
 
@@ -82,6 +88,10 @@ interface BaselineProject {
   quality: { heroImage: string; heroScore: number; enhanced: boolean } | null;
   categoryImages: Partial<Record<Category, string>>;
   derivedTags: Category[];
+  flagged: boolean;
+  hidden: boolean;
+  deleted: boolean;
+  ratio: string;
 }
 
 interface BaselineResponse {
@@ -307,12 +317,14 @@ function ProjectOrderRow({
   index,
   heroPath,
   isCurrentProject,
+  flagged,
   onOpen,
 }: {
   pid: string;
   index: number;
   heroPath: string | undefined;
   isCurrentProject: boolean;
+  flagged: boolean;
   onOpen: (id: string) => void;
 }) {
   const name = pid.replace(/-/g, " ");
@@ -323,6 +335,7 @@ function ProjectOrderRow({
       <span className={`text-xs capitalize truncate ${isCurrentProject ? "font-medium text-foreground" : "text-muted-foreground"}`}>
         {name}
       </span>
+      {flagged && <Flag size={10} className="text-orange-500 shrink-0" />}
       {isCurrentProject && <span className="text-[9px] bg-primary/20 text-primary px-1 py-0.5 rounded shrink-0">this</span>}
     </>
   );
@@ -355,6 +368,8 @@ function ProjectOrderRow({
 
 // ── Project List View (grid of projects with override badges) ──────────────────
 
+type ViewMode = "active" | "hidden" | "deleted";
+
 function ProjectListView({
   baselineData,
   overrides,
@@ -364,19 +379,32 @@ function ProjectListView({
   overrides: OverrideRow[];
   onSelectProject: (id: string) => void;
 }) {
+  const [viewMode, setViewMode] = useState<ViewMode>("active");
+
   const overrideCountPerProject = new Map<string, number>();
   for (const row of overrides) {
     overrideCountPerProject.set(row.project_id, (overrideCountPerProject.get(row.project_id) ?? 0) + 1);
   }
 
   // Order by baseline projectOrder
-  const orderedProjects = [...baselineData.projects].sort((a, b) => {
+  const allOrderedProjects = [...baselineData.projects].sort((a, b) => {
     const ai = baselineData.projectOrder.indexOf(a.id);
     const bi = baselineData.projectOrder.indexOf(b.id);
     return (ai === -1 ? 9999 : ai) - (bi === -1 ? 9999 : bi);
   });
 
+  // Filter by view mode
+  const orderedProjects = allOrderedProjects.filter((proj) => {
+    if (viewMode === "active") return !proj.deleted && !proj.hidden;
+    if (viewMode === "hidden") return proj.hidden && !proj.deleted;
+    if (viewMode === "deleted") return proj.deleted;
+    return true;
+  });
+
   const staleCount = overrides.filter((r) => r.stale).length;
+  const activeCount = allOrderedProjects.filter((p) => !p.deleted && !p.hidden).length;
+  const hiddenCount = allOrderedProjects.filter((p) => p.hidden && !p.deleted).length;
+  const deletedCount = allOrderedProjects.filter((p) => p.deleted).length;
 
   return (
     <div>
@@ -392,57 +420,88 @@ function ProjectListView({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {orderedProjects.map((proj) => {
-          const heroPath = proj.quality?.heroImage ?? proj.images[0]?.path;
-          const overCount = overrideCountPerProject.get(proj.id) ?? 0;
-          const hasStale = overrides.some((r) => r.project_id === proj.id && r.stale);
-
+      {/* View mode tabs */}
+      <div className="flex gap-1 mb-4">
+        {(["active", "hidden", "deleted"] as const).map((mode) => {
+          const count = mode === "active" ? activeCount : mode === "hidden" ? hiddenCount : deletedCount;
           return (
             <button
-              key={proj.id}
-              onClick={() => onSelectProject(proj.id)}
-              className="group text-left bg-card border border-border rounded-lg overflow-hidden hover:border-primary/30 hover:shadow-sm transition-all"
+              key={mode}
+              type="button"
+              onClick={() => setViewMode(mode)}
+              className={`text-xs px-3 py-1.5 rounded-md transition-colors capitalize ${
+                viewMode === mode
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {/* Thumbnail */}
-              <div className="relative aspect-[4/3] bg-muted overflow-hidden">
-                {heroPath ? (
-                  <img
-                    src={toThumbPath(heroPath)}
-                    alt=""
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = heroPath; }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Image size={24} className="text-muted-foreground/30" />
-                  </div>
-                )}
-                {/* Override badge */}
-                {overCount > 0 && (
-                  <div className={`absolute top-1.5 right-1.5 text-[10px] font-medium px-1.5 py-0.5 rounded-full shadow-sm ${
-                    hasStale ? "bg-yellow-500 text-white" : "bg-primary text-primary-foreground"
-                  }`}>
-                    {overCount}
-                  </div>
-                )}
-              </div>
-              {/* Info */}
-              <div className="px-3.5 py-2.5">
-                <p className="text-sm font-medium text-foreground truncate capitalize">{proj.id.replace(/-/g, " ")}</p>
-                <div className="flex gap-1 mt-1.5 flex-wrap">
-                  {proj.derivedTags.map((tag) => (
-                    <span key={tag} className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              {mode} {count > 0 && <span className="opacity-70">({count})</span>}
             </button>
           );
         })}
       </div>
+
+      {orderedProjects.length === 0 ? (
+        <p className="text-xs text-muted-foreground py-8 text-center">No {viewMode} projects.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {orderedProjects.map((proj) => {
+            const heroPath = proj.quality?.heroImage ?? proj.images[0]?.path;
+            const overCount = overrideCountPerProject.get(proj.id) ?? 0;
+            const hasStale = overrides.some((r) => r.project_id === proj.id && r.stale);
+
+            return (
+              <button
+                key={proj.id}
+                onClick={() => onSelectProject(proj.id)}
+                className="group text-left bg-card border border-border rounded-lg overflow-hidden hover:border-primary/30 hover:shadow-sm transition-all"
+              >
+                {/* Thumbnail */}
+                <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+                  {heroPath ? (
+                    <img
+                      src={toThumbPath(heroPath)}
+                      alt=""
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = heroPath; }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Image size={24} className="text-muted-foreground/30" />
+                    </div>
+                  )}
+                  {/* Flagged badge */}
+                  {proj.flagged && (
+                    <span className="absolute top-1.5 left-1.5 bg-orange-500 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full shadow-sm flex items-center gap-0.5">
+                      <Flag size={9} /> Flagged
+                    </span>
+                  )}
+                  {/* Override count badge */}
+                  {overCount > 0 && (
+                    <div className={`absolute top-1.5 right-1.5 text-[10px] font-medium px-1.5 py-0.5 rounded-full shadow-sm ${
+                      hasStale ? "bg-yellow-500 text-white" : "bg-primary text-primary-foreground"
+                    }`}>
+                      {overCount}
+                    </div>
+                  )}
+                </div>
+                {/* Info */}
+                <div className="px-3.5 py-2.5">
+                  <p className="text-sm font-medium text-foreground truncate capitalize">{proj.id.replace(/-/g, " ")}</p>
+                  <div className="flex gap-1 mt-1.5 flex-wrap">
+                    {proj.derivedTags.map((tag) => (
+                      <span key={tag} className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -455,10 +514,13 @@ function ImageRow({
   isHidden,
   replacedUrl,
   bestForCategories,
+  flagged,
   onHide,
   onUnhide,
   onReplaced,
-  onSetBestFor,
+  onFlag,
+  onUnflag,
+  onSaveScores,
   onOpenLightbox,
 }: {
   projectId: string;
@@ -466,15 +528,26 @@ function ImageRow({
   isHidden: boolean;
   replacedUrl: string | null;
   bestForCategories: Category[];
+  flagged: boolean;
   onHide: () => void;
   onUnhide: () => void;
   onReplaced: (url: string) => void;
-  onSetBestFor: (category: Category) => void;
+  onFlag: () => void;
+  onUnflag: () => void;
+  onSaveScores: (scores: Record<Category, number>) => Promise<void>;
   onOpenLightbox: () => void;
 }) {
   const [reasoningExpanded, setReasoningExpanded] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
-  const [bestCat, setBestCat] = useState<Category>("windows");
+  const [showScoreEditor, setShowScoreEditor] = useState(false);
+  const [naturalRatio, setNaturalRatio] = useState<number | null>(null);
+  const [editScores, setEditScores] = useState<Record<Category, number>>(
+    () =>
+      CATEGORIES.reduce(
+        (acc, cat) => ({ ...acc, [cat]: image.effectiveScores?.[cat] ?? 0 }),
+        {} as Record<Category, number>
+      )
+  );
 
   const displaySrc = replacedUrl ?? image.path;
   const filename = image.path.split("/").pop() ?? image.path;
@@ -494,6 +567,12 @@ function ImageRow({
             alt=""
             className="w-full aspect-[4/3] md:aspect-auto md:h-60 object-cover"
             loading="lazy"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              if (img.naturalWidth && img.naturalHeight) {
+                setNaturalRatio(img.naturalWidth / img.naturalHeight);
+              }
+            }}
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = displaySrc; }}
           />
           {/* Hover zoom affordance */}
@@ -516,6 +595,12 @@ function ImageRow({
             <code className="text-[11px] text-muted-foreground font-mono truncate max-w-[240px]">
               {filename}
             </code>
+            {/* B1: aspect ratio indicator */}
+            {naturalRatio !== null && (
+              <span className="text-[10px] px-1.5 py-0.5 bg-muted rounded text-muted-foreground font-mono">
+                {naturalRatio.toFixed(2)}
+              </span>
+            )}
             {isHidden && (
               <span className="text-[10px] px-1.5 py-0.5 bg-destructive/10 text-destructive rounded font-medium">Hidden</span>
             )}
@@ -535,7 +620,7 @@ function ImageRow({
           {image.scores ? (
             <div className="flex gap-1.5 flex-wrap mb-3">
               {CATEGORIES.map((cat) => (
-                <ScorePill key={cat} label={CATEGORY_LABELS[cat]} score={image.scores![cat] ?? 0} />
+                <ScorePill key={cat} label={CATEGORY_LABELS[cat]} score={image.effectiveScores?.[cat] ?? image.scores![cat] ?? 0} />
               ))}
             </div>
           ) : (
@@ -587,25 +672,26 @@ function ImageRow({
               </button>
             )}
 
-            {/* Set best for category */}
+            {/* B2: Per-image Flag */}
+            <button
+              onClick={flagged ? onUnflag : onFlag}
+              className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded transition-colors ${
+                flagged
+                  ? "bg-orange-500/15 text-orange-700 hover:bg-orange-500/25"
+                  : "bg-muted text-muted-foreground hover:bg-border"
+              }`}
+            >
+              <Flag size={13} /> {flagged ? "Flagged" : "Flag"}
+            </button>
+
+            {/* B3: Modify values (replaces Set best) */}
             {!isHidden && (
-              <div className="flex items-center gap-1">
-                <select
-                  value={bestCat}
-                  onChange={(e) => setBestCat(e.target.value as Category)}
-                  className="text-xs bg-background border border-border rounded px-1.5 py-1.5 text-foreground outline-none focus:border-primary"
-                >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={() => onSetBestFor(bestCat)}
-                  className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-muted hover:bg-border text-muted-foreground transition-colors"
-                >
-                  <Star size={13} /> Set best
-                </button>
-              </div>
+              <button
+                onClick={() => setShowScoreEditor(!showScoreEditor)}
+                className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-muted hover:bg-border text-muted-foreground transition-colors"
+              >
+                <Sliders size={13} /> Modify values
+              </button>
             )}
           </div>
 
@@ -621,10 +707,80 @@ function ImageRow({
               />
             </div>
           )}
+
+          {/* B3: Score editor popup */}
+          {showScoreEditor && (
+            <div className="mt-2 border-t border-border/40 pt-2">
+              <p className="text-[11px] text-muted-foreground mb-2 font-medium">
+                Override category scores for this image (0–100). Category "best" re-derives automatically.
+              </p>
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                {CATEGORIES.map((cat) => (
+                  <label key={cat} className="flex flex-col gap-1">
+                    <span className="text-[11px] font-medium text-foreground">{CATEGORY_LABELS[cat]}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={editScores[cat]}
+                      onChange={(e) =>
+                        setEditScores((prev) => ({ ...prev, [cat]: parseInt(e.target.value, 10) || 0 }))
+                      }
+                      className="border border-border rounded px-2 py-1 text-xs bg-background text-foreground w-full outline-none focus:border-primary"
+                    />
+                    {image.scores?.[cat] !== editScores[cat] && (
+                      <span className="text-[10px] text-muted-foreground">
+                        base: {image.scores?.[cat] ?? 0}
+                      </span>
+                    )}
+                  </label>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={async () => {
+                    await onSaveScores(editScores);
+                    setShowScoreEditor(false);
+                  }}
+                  className="text-xs px-3 py-1.5 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
+                >
+                  Save scores
+                </button>
+                <button
+                  onClick={() => setShowScoreEditor(false)}
+                  className="text-xs px-2.5 py-1.5 rounded bg-muted text-muted-foreground hover:bg-border transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
+}
+
+// ── computeImageOrder: apply image_order overrides to produce correct initial path order ──
+
+function computeImageOrder(
+  baseImages: BaselineImage[],
+  projectOverrides: OverrideRow[],
+): string[] {
+  const orderOverrides = projectOverrides
+    .filter((r) => r.override_type === "image_order")
+    .sort((a, b) => (a.value_int ?? 0) - (b.value_int ?? 0));
+
+  if (orderOverrides.length === 0) return baseImages.map((im) => im.path);
+
+  // Build ordered set: overridden paths in their value_int positions,
+  // unordered paths appended in original order at the end.
+  const overriddenPaths = new Set(orderOverrides.map((r) => r.image_path));
+  const unordered = baseImages.map((im) => im.path).filter((p) => !overriddenPaths.has(p));
+  return [
+    ...orderOverrides.map((r) => r.image_path).filter((p) => baseImages.some((im) => im.path === p)),
+    ...unordered,
+  ];
 }
 
 // ── Project Detail View ─────────────────────────────────────────────────────────
@@ -647,8 +803,14 @@ function ProjectDetailView({
   onDeleteOverride: (id: number) => Promise<void>;
 }) {
   const [orderTab, setOrderTab] = useState<"all" | Category>("all");
-  const [imageOrderIds, setImageOrderIds] = useState<string[]>(() => project.images.map((im) => im.path));
   const [lightbox, setLightbox] = useState<LightboxData | null>(null);
+
+  // Compute per-image override state early — needed for computeImageOrder
+  const projectOverrides = overrides.filter((r) => r.project_id === project.id);
+
+  const [imageOrderIds, setImageOrderIds] = useState<string[]>(() =>
+    computeImageOrder(project.images, projectOverrides)
+  );
 
   // The detail view stays mounted when switching projects via the order lists,
   // so the per-project image order must resync. Done during render (not in an
@@ -659,11 +821,11 @@ function ProjectDetailView({
   const [prevProjectId, setPrevProjectId] = useState(project.id);
   if (prevProjectId !== project.id) {
     setPrevProjectId(project.id);
-    setImageOrderIds(project.images.map((im) => im.path));
+    setImageOrderIds(computeImageOrder(
+      project.images,
+      overrides.filter((r) => r.project_id === project.id),
+    ));
   }
-
-  // Compute per-image override state
-  const projectOverrides = overrides.filter((r) => r.project_id === project.id);
   const hiddenSet = new Set(projectOverrides.filter((r) => r.override_type === "hidden").map((r) => r.image_path));
   const replacedMap = new Map(projectOverrides.filter((r) => r.override_type === "replaced").map((r) => [r.image_path, r.value_text ?? ""]));
   const bestForCatMap = new Map<string, Category[]>();
@@ -671,6 +833,11 @@ function ProjectDetailView({
     const existing = bestForCatMap.get(r.image_path) ?? [];
     bestForCatMap.set(r.image_path, [...existing, r.category as Category]);
   }
+  const imageFlaggedSet = new Set(
+    projectOverrides
+      .filter((r) => r.override_type === "image_flagged" && r.image_path !== "__project__")
+      .map((r) => r.image_path)
+  );
 
   const staleOverrides = projectOverrides.filter((r) => r.stale);
 
@@ -730,6 +897,23 @@ function ProjectDetailView({
     );
   }
 
+  // Project-level action helpers
+  async function handleAddProjectOverride(type: string, valueText: string | null = null) {
+    await onAddOverride({
+      project_id: project.id,
+      image_path: "__project__",
+      override_type: type,
+      value_text: valueText,
+    });
+  }
+
+  async function handleDeleteProjectOverride(type: string) {
+    const row = projectOverrides.find(
+      (r) => r.override_type === type && r.image_path === "__project__"
+    );
+    if (row) await onDeleteOverride(row.project_image_override_id);
+  }
+
   return (
     <div>
       {/* Back button */}
@@ -778,6 +962,85 @@ function ProjectDetailView({
               <> · {project.derivedTags.map((t) => CATEGORY_LABELS[t]).join(", ")}</>
             )}
           </p>
+
+          {/* Project-level action bar (Feature A) */}
+          <div className="flex items-center gap-2 flex-wrap mt-3">
+            {/* Flag toggle */}
+            <button
+              type="button"
+              onClick={() =>
+                project.flagged
+                  ? handleDeleteProjectOverride("project_flagged")
+                  : handleAddProjectOverride("project_flagged")
+              }
+              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors ${
+                project.flagged
+                  ? "bg-orange-500/15 text-orange-700 hover:bg-orange-500/25"
+                  : "bg-muted text-muted-foreground hover:bg-border"
+              }`}
+            >
+              <Flag size={13} /> {project.flagged ? "Flagged" : "Flag"}
+            </button>
+
+            {/* Hide toggle */}
+            <button
+              type="button"
+              onClick={() =>
+                project.hidden
+                  ? handleDeleteProjectOverride("project_hidden")
+                  : handleAddProjectOverride("project_hidden")
+              }
+              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors ${
+                project.hidden
+                  ? "bg-muted border border-border text-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-border"
+              }`}
+            >
+              {project.hidden ? <Eye size={13} /> : <EyeOff size={13} />}
+              {project.hidden ? "Unhide" : "Hide project"}
+            </button>
+
+            {/* Ratio toggle */}
+            <button
+              type="button"
+              onClick={() =>
+                handleAddProjectOverride(
+                  "project_ratio",
+                  project.ratio === "4:3" ? "16:9" : "4:3"
+                )
+              }
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-muted text-muted-foreground hover:bg-border transition-colors"
+            >
+              <RatioIcon size={13} /> {project.ratio === "4:3" ? "4:3 → 16:9" : "16:9 → 4:3"}
+            </button>
+
+            {/* Delete / Restore */}
+            {project.deleted ? (
+              <button
+                type="button"
+                onClick={() => handleDeleteProjectOverride("project_deleted")}
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-green-500/10 text-green-700 hover:bg-green-500/20 transition-colors"
+              >
+                <RotateCcw size={13} /> Restore
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (
+                    !window.confirm(
+                      `Soft-delete "${project.id.replace(/-/g, " ")}"? It will disappear from the public site and admin default view. You can restore it from the Deleted tab.`
+                    )
+                  )
+                    return;
+                  handleAddProjectOverride("project_deleted");
+                }}
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors ml-auto"
+              >
+                <Trash2 size={13} /> Delete project
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -805,6 +1068,7 @@ function ProjectDetailView({
                           isHidden={hiddenSet.has(image.path)}
                           replacedUrl={replacedMap.get(image.path) ?? null}
                           bestForCategories={bestForCatMap.get(image.path) ?? []}
+                          flagged={imageFlaggedSet.has(image.path)}
                           onHide={async () => {
                             await onAddOverride({ project_id: project.id, image_path: image.path, override_type: "hidden" });
                           }}
@@ -815,8 +1079,25 @@ function ProjectDetailView({
                           onReplaced={async (url) => {
                             await onAddOverride({ project_id: project.id, image_path: image.path, override_type: "replaced", value_text: url });
                           }}
-                          onSetBestFor={async (cat) => {
-                            await onAddOverride({ project_id: project.id, image_path: image.path, override_type: "best_for_category", category: cat });
+                          onFlag={async () => {
+                            await onAddOverride({ project_id: project.id, image_path: image.path, override_type: "image_flagged" });
+                          }}
+                          onUnflag={async () => {
+                            const row = projectOverrides.find((r) => r.override_type === "image_flagged" && r.image_path === image.path);
+                            if (row) await onDeleteOverride(row.project_image_override_id);
+                          }}
+                          onSaveScores={async (scores) => {
+                            await Promise.all(
+                              CATEGORIES.map((cat) =>
+                                onAddOverride({
+                                  project_id: project.id,
+                                  image_path: image.path,
+                                  override_type: "score_override",
+                                  category: cat,
+                                  value_int: scores[cat],
+                                })
+                              )
+                            );
                           }}
                           onOpenLightbox={() => {
                             const src = replacedMap.get(image.path) ?? image.path;
@@ -879,6 +1160,7 @@ function ProjectDetailView({
                           index={idx}
                           heroPath={heroPath}
                           isCurrentProject={pid === project.id}
+                          flagged={p?.flagged ?? false}
                           onOpen={onSelectProject}
                         />
                       )}
@@ -914,6 +1196,7 @@ function ProjectDetailView({
                           index={idx}
                           heroPath={heroPath}
                           isCurrentProject={pid === project.id}
+                          flagged={p?.flagged ?? false}
                           onOpen={onSelectProject}
                         />
                       )}
@@ -982,9 +1265,36 @@ export default function ProjectImagesPanel() {
     panelRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
   }, [selectedProjectId]);
 
+  const [applyingExterior, setApplyingExterior] = useState(false);
+
   function showToast(msg: string) {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 4000);
+  }
+
+  async function handleApplyExteriorFirst() {
+    if (
+      !window.confirm(
+        "Apply best-exterior-first image order to all projects that haven't been manually reordered? " +
+        "This cannot be undone automatically — you can manually reorder afterward."
+      )
+    )
+      return;
+    setApplyingExterior(true);
+    try {
+      const res = await fetch("/api/admin/project-images/apply-exterior-first", {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json() as { applied?: number; skipped?: number; message?: string; error?: string };
+      if (!res.ok) throw new Error(data.error ?? "Failed");
+      queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
+      showToast(`Done: ${data.message}`);
+    } catch (e) {
+      showToast(`Error: ${String(e)}`);
+    } finally {
+      setApplyingExterior(false);
+    }
   }
 
   // ── Data queries ──────────────────────────────────────────────────────────────
@@ -1112,11 +1422,24 @@ export default function ProjectImagesPanel() {
       {/* Panel header */}
       {!selectedProject && (
         <div className="mb-6 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground leading-relaxed">
-          <p className="font-medium text-foreground mb-1">Project Images</p>
-          <p>
-            Manage the AI-selected images that appear in the /inspiration gallery. Hide, replace, or
-            reorder images without touching the codebase. Changes take effect within 30 seconds.
-          </p>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <p className="font-medium text-foreground mb-1">Project Images</p>
+              <p>
+                Manage the AI-selected images that appear in the /inspiration gallery. Hide, replace, or
+                reorder images without touching the codebase. Changes take effect within 30 seconds.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleApplyExteriorFirst}
+              disabled={applyingExterior}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-muted border border-border text-muted-foreground hover:bg-border transition-colors disabled:opacity-50 shrink-0"
+            >
+              {applyingExterior ? <Loader2 size={13} className="animate-spin" /> : <ArrowUpDown size={13} />}
+              Apply exterior-first order
+            </button>
+          </div>
         </div>
       )}
 
