@@ -56,6 +56,18 @@ import {
 } from "lucide-react";
 import { toThumbPath } from "@/lib/project-thumbs";
 import { nearestRatioLabel } from "@/lib/image-ratio";
+import { projects as staticProjects } from "@/data/projects";
+
+// ── Project id → display name map ─────────────────────────────────────────────
+const PROJECT_NAMES: Record<string, string> = Object.fromEntries(
+  staticProjects.map((p) => [p.id, p.name])
+);
+
+/** Returns the real project display name for a known id, falling back to the
+ *  prettified-slug format for any id not present in the static catalog. */
+function projectDisplayName(id: string): string {
+  return PROJECT_NAMES[id] ?? id.replace(/-/g, " ");
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -332,13 +344,13 @@ function ProjectOrderRow({
   checked: boolean;
   onOpen: (id: string) => void;
 }) {
-  const name = pid.replace(/-/g, " ");
+  const displayName = projectDisplayName(pid);
   const inner = (
     <>
       <span className="text-[10px] text-muted-foreground w-5 text-right shrink-0">{index + 1}</span>
       {heroPath && <img src={toThumbPath(heroPath)} alt="" className="h-10 w-14 object-cover rounded shrink-0" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).src = heroPath; }} />}
-      <span className={`text-xs capitalize truncate ${isCurrentProject ? "font-medium text-foreground" : "text-muted-foreground"}`}>
-        {name}
+      <span className={`text-xs truncate ${isCurrentProject ? "font-medium text-foreground" : "text-muted-foreground"}`}>
+        {displayName}
       </span>
       {flagged && <Flag size={10} className="text-orange-500 shrink-0" />}
       {checked && <Check size={10} className="text-green-600 shrink-0" />}
@@ -359,7 +371,7 @@ function ProjectOrderRow({
     <button
       type="button"
       onClick={() => onOpen(pid)}
-      aria-label={`Open ${name}`}
+      aria-label={`Open ${displayName}`}
       className="group/row w-full flex items-center gap-2 py-1 rounded px-1 text-left cursor-pointer hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 transition-colors"
     >
       {inner}
@@ -494,7 +506,8 @@ function ProjectListView({
                 </div>
                 {/* Info */}
                 <div className="px-3.5 py-2.5">
-                  <p className="text-sm font-medium text-foreground truncate capitalize">{proj.id.replace(/-/g, " ")}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{projectDisplayName(proj.id)}</p>
+                  <p className="text-xs text-muted-foreground truncate font-mono">{proj.id}</p>
                   <div className="flex gap-1 mt-1.5 flex-wrap">
                     {proj.derivedTags.map((tag) => (
                       <span key={tag} className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
@@ -961,7 +974,8 @@ function ProjectDetailView({
           </button>
         )}
         <div>
-          <h2 className="text-base font-semibold capitalize">{project.id.replace(/-/g, " ")}</h2>
+          <h2 className="text-base font-semibold">{projectDisplayName(project.id)}</h2>
+          <p className="text-xs text-muted-foreground font-mono">{project.id}</p>
           <p className="text-xs text-muted-foreground">
             {project.images.length} images · {projectOverrides.length} override{projectOverrides.length !== 1 ? "s" : ""}
             {project.derivedTags.length > 0 && (
