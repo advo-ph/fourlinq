@@ -14,6 +14,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
  *     before the CMS request had settled.
  *
  * These assert the page's routing outcome, not the merge helper's return value.
+ *
+ * NOTE 2026-07-25: ProjectHeroGallery renders two <h1> elements in the DOM
+ * simultaneously (one for the desktop layout, one for mobile) using the
+ * dual-panel responsive pattern. Tests use getAllByRole to accommodate this.
  */
 
 const cmsRow = {
@@ -64,7 +68,8 @@ afterEach(cleanup);
 describe("/projects/:slug reachability", () => {
   it("resolves the published British slug even though the CMS stores the American one", async () => {
     renderAt("san-lorenzo-makati-aluminium");
-    await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument());
+    // ProjectHeroGallery renders two h1s (desktop + mobile panels), use getAllByRole.
+    await waitFor(() => expect(screen.getAllByRole("heading", { level: 1 }).length).toBeGreaterThan(0));
     expect(screen.queryByText("INSPIRATION GALLERY")).not.toBeInTheDocument();
   });
 
@@ -72,13 +77,13 @@ describe("/projects/:slug reachability", () => {
     renderAt("san-lorenzo-makati-aluminum");
     // The pre-settle frame must NOT already be the gallery.
     expect(screen.queryByText("INSPIRATION GALLERY")).not.toBeInTheDocument();
-    await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByRole("heading", { level: 1 }).length).toBeGreaterThan(0));
     expect(screen.queryByText("INSPIRATION GALLERY")).not.toBeInTheDocument();
   });
 
   it("keeps a fallback project the CMS response omits", async () => {
     renderAt("cebu-s-residences"); // present in the fallback, absent from the mocked CMS
-    await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByRole("heading", { level: 1 }).length).toBeGreaterThan(0));
     expect(screen.queryByText("INSPIRATION GALLERY")).not.toBeInTheDocument();
   });
 
@@ -90,7 +95,7 @@ describe("/projects/:slug reachability", () => {
   it("survives a failed CMS request by keeping the verified fallback", async () => {
     fetchProjects.mockImplementation(() => Promise.reject(new Error("network")));
     renderAt("san-lorenzo-makati-aluminium");
-    await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByRole("heading", { level: 1 }).length).toBeGreaterThan(0));
     expect(screen.queryByText("INSPIRATION GALLERY")).not.toBeInTheDocument();
   });
 });

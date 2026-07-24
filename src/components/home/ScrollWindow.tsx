@@ -61,12 +61,14 @@ const ScrollWindow = () => {
 
   // ── Gesture refs (unconditional — Rules of Hooks) ──────────
   const engagedRef = useRef(false);        // true only while section is engaged in-view (sticky-pin)
+  const exitingRef = useRef(false);        // true while a boundary-exit glide is in progress; suppresses re-engagement
   const touchStartYRef = useRef(0);
   const touchLastYRef = useRef(0);
   const touchSamplesRef = useRef<Array<{ y: number; t: number }>>([]);
   const gestureDirectionRef = useRef<'up' | 'down' | null>(null);
   const gestureCapturedRef = useRef(false);
   const dragBaseYRef = useRef(0);          // card Y at direction-lock time (mid-spring capture)
+  const lastInSectionFlagRef = useRef<boolean | null>(null); // shared dedupe flag for fq-hide-header / fq-scrollwindow-inview dispatches
 
   const [nearViewport, setNearViewport] = useState(false);
   const [isDesktop, setIsDesktop] = useState(
@@ -163,11 +165,10 @@ const ScrollWindow = () => {
     const el = containerRef.current;
     if (!el) return;
 
-    // Dedupe dispatches — only emit when flag actually changes
-    let lastDispatchFlag: boolean | null = null;
+    // Dedupe dispatches — only emit when flag actually changes (shared ref with touch engine)
     const dispatchInSection = (flag: boolean) => {
-      if (flag === lastDispatchFlag) return;
-      lastDispatchFlag = flag;
+      if (flag === lastInSectionFlagRef.current) return;
+      lastInSectionFlagRef.current = flag;
       window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: flag }));
       window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView: flag } }));
     };
@@ -194,7 +195,17 @@ const ScrollWindow = () => {
     function tick() {
       const rect = el.getBoundingClientRect();
       if (!engagedRef.current) {
-        if (isPinned()) {
+        if (isFullyOut()) {
+          // Track has left the viewport — clear any pending exit suppression
+          // so that a re-entry from either direction re-engages cleanly.
+          if (exitingRef.current) {
+            exitingRef.current = false;
+          }
+          consecutivePinCount = 0;
+          prevTop = rect.top;
+        } else if (isPinned() && !exitingRef.current) {
+          // Only count pinned frames if we are NOT in an exit glide.
+          // exitingRef suppresses re-engagement during the smooth scroll out.
           consecutivePinCount++;
           if (consecutivePinCount >= 2) {
             // Engage: determine entry direction from last known prevTop
@@ -208,12 +219,15 @@ const ScrollWindow = () => {
             dispatchInSection(true);
           }
         } else {
+          // Pinned but exitingRef is true, OR not pinned and not fully out:
+          // hold the count and update prevTop so re-entry direction is correct.
           consecutivePinCount = 0;
           prevTop = rect.top;
         }
       } else {
         if (isFullyOut()) {
           engagedRef.current = false;
+          exitingRef.current = false;
           el.style.touchAction = "";
           dispatchInSection(false);
           consecutivePinCount = 0;
@@ -254,11 +268,10 @@ const ScrollWindow = () => {
     const el = containerRef.current;
     if (!el) return;
 
-    // Fix B2: dedupe dispatches — only emit when flag actually changes
-    let lastDispatchFlag: boolean | null = null;
+    // Dedupe dispatches — only emit when flag actually changes (shared ref with pin loop)
     const dispatchInSection = (flag: boolean) => {
-      if (flag === lastDispatchFlag) return;
-      lastDispatchFlag = flag;
+      if (flag === lastInSectionFlagRef.current) return;
+      lastInSectionFlagRef.current = flag;
       window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: flag }));
       window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView: flag } }));
     };
@@ -279,14 +292,19 @@ const ScrollWindow = () => {
       cardY.set(entryY);
       cardOpacity.set(0);
       // 3. Spring in
-      animate(cardY, 0, { type: "spring", stiffness: 300, damping: 30 });
+      animate(cardY, 0, { type: "spring", stiffness: 300, damping: 30, velocity: 0 });
       animate(cardOpacity, 1, { duration: 0.28 });
     };
 
     const onTouchStart = (e: TouchEvent) => {
-      // Immediately freeze any in-progress spring so dragBaseYRef captures a stable position.
+      // Stop any in-progress spring and snap the card back to neutral (y=0, opacity=1).
+      // Without this reset, an underdamped entry spring can overshoot far past its
+      // target (e.g. -107px at 120ms for a spring starting at -36), leaving the
+      // effective drag displacement well below the commit threshold (Bug 2 fix).
       cardY.stop();
       cardOpacity.stop();
+      cardY.set(0);
+      cardOpacity.set(1);
 
       if (e.touches.length > 1) {
         touchStartYRef.current = 0;
@@ -325,7 +343,7 @@ const ScrollWindow = () => {
           return;
         }
 
-        // Capture drag baseline at direction-lock time (card may be mid-spring)
+        // Capture drag baseline at direction-lock time (always 0 after touchstart snap)
         dragBaseYRef.current = cardY.get();
 
         if (dy < 0) {
@@ -335,6 +353,7 @@ const ScrollWindow = () => {
             gestureDirectionRef.current = "up";
             gestureCapturedRef.current = false;
             engagedRef.current = false;
+            exitingRef.current = true;  // suppress pin-loop re-engagement during glide
             el.style.touchAction = "";
             dispatchInSection(false);
             const trackRect = el.getBoundingClientRect();
@@ -352,6 +371,7 @@ const ScrollWindow = () => {
             gestureDirectionRef.current = "down";
             gestureCapturedRef.current = false;
             engagedRef.current = false;
+            exitingRef.current = true;  // suppress pin-loop re-engagement during glide
             el.style.touchAction = "";
             dispatchInSection(false);
             const trackRect = el.getBoundingClientRect();

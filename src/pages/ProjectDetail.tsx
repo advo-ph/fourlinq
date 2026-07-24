@@ -1,8 +1,7 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import { useMemo, useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
-import PageHeader from "@/components/shared/PageHeader";
-import ProjectPhotoSwitcher, { type ProjectPhoto } from "@/components/shared/ProjectPhotoSwitcher";
+import ProjectHeroGallery from "@/components/shared/ProjectHeroGallery";
 import EditorialButton from "@/components/primitives/Button";
 import { projects as fallbackProject, type Project } from "@/data/projects";
 import { products } from "@/data/products";
@@ -38,6 +37,10 @@ const ProjectDetail = () => {
   // projectRatios from the merged API — same endpoint as Inspiration.tsx.
   // Defaults to empty so the hero falls back to 16:9 while the request is in flight.
   const [projectRatios, setProjectRatios] = useState<MergedProjectImagesResponse["projectRatios"]>({});
+  // Hidden/deleted state from the merged API. Used to filter gallery images and
+  // exclude hidden/deleted projects from the "Adjacent projects" section.
+  const [hiddenImages, setHiddenImages] = useState<MergedProjectImagesResponse["hiddenImages"]>({});
+  const [hiddenProjectIds, setHiddenProjectIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let active = true;
@@ -51,9 +54,9 @@ const ProjectDetail = () => {
     return () => { active = false; };
   }, []);
 
-  // Fetch merged project-images data for per-project ratio. Uses the same
-  // /api/project-images/merged endpoint as Inspiration.tsx; TanStack is not
-  // used here so we mirror the plain-fetch pattern from that page.
+  // Fetch merged project-images data for per-project ratio, hidden images, and
+  // hidden/deleted project IDs. Uses the same /api/project-images/merged endpoint
+  // as Inspiration.tsx; TanStack is not used here so we mirror the plain-fetch pattern.
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/project-images/merged", { signal: controller.signal })
@@ -63,9 +66,13 @@ const ProjectDetail = () => {
       })
       .then((data) => {
         setProjectRatios(data.projectRatios ?? {});
+        setHiddenImages(data.hiddenImages ?? {});
+        setHiddenProjectIds(
+          new Set([...(data.hiddenProjects ?? []), ...(data.deletedProjects ?? [])])
+        );
       })
       .catch(() => {
-        // Swallow — hero defaults to 16:9 on failure
+        // Swallow — hero defaults to 16:9, no images hidden on failure
       });
     return () => { controller.abort(); };
   }, []);
@@ -76,8 +83,11 @@ const ProjectDetail = () => {
   const selectedProject = project.find((p) => p.id === canonicalSlug);
 
   const otherProjects = useMemo(
-    () => project.filter((p) => p.id !== canonicalSlug).slice(0, 3),
-    [canonicalSlug, project]
+    () =>
+      project
+        .filter((p) => p.id !== canonicalSlug && !hiddenProjectIds.has(p.id))
+        .slice(0, 3),
+    [canonicalSlug, project, hiddenProjectIds]
   );
 
   // Map systemsUsed slugs to product entries for cross-links
@@ -104,34 +114,39 @@ const ProjectDetail = () => {
     return <Navigate to="/inspiration" replace />;
   }
 
-  const galleryPhotos: ProjectPhoto[] = [
-    { src: selectedProject.image, alt: selectedProject.name, caption: selectedProject.location },
+  // Build a Set of hidden image paths for the current project so we can
+  // filter them out of the gallery without a per-image linear scan.
+  // Paths in hiddenImages already carry a leading slash (e.g. /images/projects-fb/…)
+  // which matches the paths stored in projects.ts, so no normalization is needed.
+  const projectHiddenSet = new Set(hiddenImages[selectedProject.id] ?? []);
+
+  // Build the full gallery list (hero + extras), filtering out hidden images.
+  const visibleGalleryPhotos: Array<{ src: string; alt: string }> = [
+    { src: selectedProject.image, alt: selectedProject.name },
     ...(selectedProject.gallery ?? []).map((src, i) => ({
       src,
       alt: `${selectedProject.name} detail ${i + 1}`,
-      caption: selectedProject.location,
     })),
-  ];
+  ].filter((photo) => !projectHiddenSet.has(photo.src));
+
+  // If the hero image was hidden and filtered out, fall back to the first
+  // remaining gallery photo so we never show a blank first slide.
+  // If everything is hidden, render a single placeholder to avoid an empty gallery.
+  const galleryPhotos: Array<{ src: string; alt: string }> =
+    visibleGalleryPhotos.length > 0
+      ? visibleGalleryPhotos
+      : [{ src: selectedProject.image, alt: selectedProject.name }];
 
   return (
     <Layout>
-      <PageHeader
-        eyebrow={categoryLabel[selectedProject.category] ?? "Project"}
+      {/* Full-width immersive hero gallery — outside container-editorial */}
+      <ProjectHeroGallery
+        photos={galleryPhotos}
         title={selectedProject.name}
-        breadcrumbLabel={selectedProject.name}
       />
 
-      <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
+      <section className="pt-section-mobile md:pt-section-tablet lg:pt-section-desktop pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
-          {/* Photo gallery. Uses the cursor-switching component */}
-          <div className="mb-20 lg:mb-28">
-            <ProjectPhotoSwitcher
-              photos={galleryPhotos}
-              eyebrow="The project"
-              ratio={projectRatios?.[selectedProject.id] === "4:3" ? "4:3" : "16:9"}
-            />
-          </div>
-
           {/* Project meta + description */}
           <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-20 lg:mb-28 border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16">
             <div className="lg:col-span-7">

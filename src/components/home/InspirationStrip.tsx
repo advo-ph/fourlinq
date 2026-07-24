@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import FeatureLink from "@/components/primitives/FeatureLink";
-import { projects } from "@/data/projects";
+import { projects as allProjects } from "@/data/projects";
 import { toThumbPath } from "@/lib/project-thumbs";
 import { cn } from "@/lib/utils";
+import type { MergedProjectImagesResponse } from "@/types/project-images";
 
 const FB = "/images/projects-fb";
 
@@ -54,6 +55,32 @@ const InspirationStrip = () => {
   const panelRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  // Start with the full project list; filter out hidden/deleted projects once
+  // the merged API response arrives. Until then, all projects are visible
+  // (same baseline behaviour as before this fix).
+  const [projects, setProjects] = useState(allProjects);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/project-images/merged", { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<MergedProjectImagesResponse>;
+      })
+      .then((data) => {
+        const hiddenSet = new Set([
+          ...(data.hiddenProjects ?? []),
+          ...(data.deletedProjects ?? []),
+        ]);
+        if (hiddenSet.size > 0) {
+          setProjects(allProjects.filter((p) => !hiddenSet.has(p.id)));
+        }
+      })
+      .catch(() => {
+        // Swallow — keep showing the full project list on failure
+      });
+    return () => { controller.abort(); };
+  }, []);
 
   useEffect(() => {
     const track = trackRef.current;

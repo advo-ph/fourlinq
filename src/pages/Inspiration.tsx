@@ -169,16 +169,28 @@ const Inspiration = () => {
   const [mergedData, setMergedData] = useState<MergedProjectImagesResponse>(BASELINE_MERGED);
   const [items, setItems] = useState<ViewProject[]>(() => fallbackProject.map((p) => toView(p, BASELINE_MERGED)));
 
-  // CMS projects fetch (project names, locations, hero images) — unchanged
+  // CMS projects fetch (project names, locations, hero images).
+  // Re-runs when mergedData changes so the latest overrides (including the
+  // hidden/deleted set) are applied on top of CMS names/images each time.
   useEffect(() => {
     let live = true;
     fetchProjects()
       .then((row) => {
-        if (live) setItems(mergeProject(fallbackProject, row).map((p) => toView(p, mergedData)));
+        if (!live) return;
+        // Exclude projects the admin has hidden or deleted so they never appear
+        // on the public gallery even when re-derived from the CMS waterfall.
+        const hiddenSet = new Set([
+          ...(mergedData.hiddenProjects ?? []),
+          ...(mergedData.deletedProjects ?? []),
+        ]);
+        setItems(
+          mergeProject(fallbackProject, row)
+            .filter((p) => !hiddenSet.has(p.id))
+            .map((p) => toView(p, mergedData))
+        );
       })
       .catch(() => { /* keep fallback */ });
     return () => { live = false; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mergedData]);
 
   // Runtime merge fetch — background; on success updates ordering and category images;
@@ -192,13 +204,24 @@ const Inspiration = () => {
       })
       .then((data) => {
         setMergedData(data);
-        // Re-derive items with new merged category images and derived tags
+        // Build a set of project IDs that should not appear on the public site.
+        // The server already excludes them from projectOrder/projectCategoryOrder,
+        // but items is derived from the full fallback project list, so we must
+        // filter here too or they will still render (just sorted to the bottom).
+        const hiddenSet = new Set([
+          ...(data.hiddenProjects ?? []),
+          ...(data.deletedProjects ?? []),
+        ]);
+        // Re-derive items with new merged category images and derived tags,
+        // and exclude any project the admin has hidden or deleted.
         setItems((prev) =>
-          prev.map((vp) => ({
-            ...vp,
-            tag: data.projectDerivedTags[vp.id] ?? vp.tag,
-            categoryImages: data.projectCategoryImages[vp.id] ?? vp.categoryImages,
-          }))
+          prev
+            .filter((vp) => !hiddenSet.has(vp.id))
+            .map((vp) => ({
+              ...vp,
+              tag: data.projectDerivedTags[vp.id] ?? vp.tag,
+              categoryImages: data.projectCategoryImages[vp.id] ?? vp.categoryImages,
+            }))
         );
       })
       .catch(() => {

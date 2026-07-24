@@ -89,7 +89,20 @@ app.use("/api", (_req, res) => {
 // Serve frontend in production
 if (isProd) {
   const distPath = path.resolve(import.meta.dirname, "../dist");
-  app.use(express.static(distPath, { maxAge: "30d", immutable: true }));
+  app.use(
+    express.static(distPath, {
+      maxAge: "30d",
+      immutable: true,
+      setHeaders(res, filePath) {
+        if (filePath.includes("/images/")) {
+          res.setHeader(
+            "Cache-Control",
+            "public, max-age=3600, stale-while-revalidate=86400"
+          );
+        }
+      },
+    })
+  );
   app.use((req, res) => {
     res.status(spaStatusForPath(req.path)).sendFile(path.join(distPath, "index.html"));
   });
