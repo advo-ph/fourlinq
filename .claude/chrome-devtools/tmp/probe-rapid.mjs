@@ -5,7 +5,7 @@ const require = createRequire(
   "/Users/princewagan/.claude/skills/vc-chrome-devtools/scripts/lib/browser.js",
 );
 const puppeteer = require("puppeteer");
-const BASE = "http://localhost:8081";
+const BASE = "http://localhost:8080";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const watchdog = setTimeout(() => {
   console.log("WATCHDOG");

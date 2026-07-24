@@ -6,7 +6,7 @@ const require = createRequire(
 );
 const puppeteer = require("puppeteer");
 
-const BASE = "http://localhost:8081";
+const BASE = "http://localhost:8080";
 const SHOTS = "/Users/princewagan/fourlinq/.claude/chrome-devtools/screenshots";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = {};
