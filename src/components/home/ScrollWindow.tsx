@@ -21,6 +21,34 @@ import MaterialToggle from "./ThermalSystemToggle";
 import PhaseCalloutLines from "./PhaseCalloutLines";
 import PhaseCalloutMarkers from "./PhaseCalloutMarkers";
 
+// ── fqdebug HUD helpers ────────────────────────────────────────────────────
+// Temporary debug overlay, visible only when ?fqdebug is present in the URL.
+// Remove after on-device confirmation (orchestrator closeout).
+const FQ_DEBUG = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("fqdebug");
+
+function getOrCreateHud(): HTMLDivElement | null {
+  if (!FQ_DEBUG) return null;
+  let el = document.getElementById("fq-hud") as HTMLDivElement | null;
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "fq-hud";
+    el.style.cssText = [
+      "position:fixed", "top:6px", "left:6px", "z-index:9999",
+      "pointer-events:none", "font:10px/1.4 monospace", "color:#0f0",
+      "background:rgba(0,0,0,0.72)", "padding:4px 6px", "border-radius:4px",
+      "max-width:220px", "white-space:pre", "text-shadow:0 0 2px #000",
+    ].join(";");
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+function writeHud(lines: Record<string, string | number | boolean | null>) {
+  const el = getOrCreateHud();
+  if (!el) return;
+  el.textContent = Object.entries(lines).map(([k, v]) => `${k}: ${v}`).join("\n");
+}
+
 const THERMAL_INDEX = WINDOW_PARTS.findIndex((p) => p.id === THERMAL_PART_ID);
 const POSTER = FRAME_PATH_TEMPLATE.replace("{index}", "0001");
 const ALU_IMAGE = WINDOW_MATERIALS.find((m) => m.id === "alu")?.image ?? "";
@@ -68,6 +96,7 @@ const ScrollWindow = () => {
   const gestureDirectionRef = useRef<'up' | 'down' | null>(null);
   const gestureCapturedRef = useRef(false);
   const dragBaseYRef = useRef(0);          // card Y at direction-lock time (mid-spring capture)
+  const pendingExitRef = useRef<null | "down" | "up">(null); // deferred boundary-exit glide direction; fired on touchend
   const lastInSectionFlagRef = useRef<boolean | null>(null); // shared dedupe flag for fq-hide-header / fq-scrollwindow-inview dispatches
 
   const [nearViewport, setNearViewport] = useState(false);
@@ -183,7 +212,7 @@ const ScrollWindow = () => {
     // top is scrolled past (negative) and bottom is still below viewport bottom.
     function isPinned(): boolean {
       const rect = el.getBoundingClientRect();
-      return rect.top <= -8 && rect.bottom >= window.innerHeight + 8;
+      return rect.top <= -2 && rect.bottom >= window.innerHeight + 2;
     }
 
     // Track is fully out when neither edge is within the viewport straddle.
@@ -233,6 +262,22 @@ const ScrollWindow = () => {
           consecutivePinCount = 0;
         }
       }
+
+      // HUD: refresh pin state every rAF (cheap — direct DOM write)
+      if (FQ_DEBUG) {
+        const r = el.getBoundingClientRect();
+        writeHud({
+          engaged: engagedRef.current,
+          ta: (el.style.touchAction || "auto"),
+          step: stepRef.current,
+          captured: "-",
+          pinTop: Math.round(r.top),
+          pinBot: Math.round(r.bottom - window.innerHeight),
+          exiting: exitingRef.current,
+          evt: "raf",
+        });
+      }
+
       raf = requestAnimationFrame(tick);
     }
 
@@ -312,6 +357,7 @@ const ScrollWindow = () => {
         touchSamplesRef.current = [];
         gestureDirectionRef.current = null;
         gestureCapturedRef.current = false;
+        pendingExitRef.current = null;
         return;
       }
       touchStartYRef.current = e.touches[0].clientY;
@@ -319,6 +365,17 @@ const ScrollWindow = () => {
       touchSamplesRef.current = [];
       gestureDirectionRef.current = null;
       gestureCapturedRef.current = false;
+      pendingExitRef.current = null;
+
+      writeHud({
+        engaged: engagedRef.current,
+        ta: (el.style.touchAction || "auto"),
+        step: stepRef.current,
+        captured: false,
+        dir: "null",
+        dy: 0,
+        evt: "start",
+      });
     };
 
     const onTouchMove = (e: TouchEvent) => {
@@ -333,6 +390,30 @@ const ScrollWindow = () => {
 
       const currentY = e.touches[0].clientY;
       const dy = currentY - touchStartYRef.current;
+
+      // ── iOS early-preventDefault (FIX) ──────────────────────────────────────
+      // iOS Safari uses async off-main-thread scrolling: the scroll claim is
+      // decided at the FIRST touchmove, before direction-lock completes. When the
+      // section is engaged we must preventDefault on EVERY touchmove (including the
+      // first) so iOS never claims the scroll. The !engaged path stays untouched
+      // (native scroll permitted). This is belt-and-braces alongside touchAction
+      // which may not propagate to the async arbiter from a rAF tick in time.
+      // Also covers the pendingExitRef window: once engagedRef is cleared by a
+      // boundary exit we still own the touch (touchend fires the glide), so we must
+      // continue preventing native scroll until the finger lifts.
+      if (engagedRef.current || pendingExitRef.current !== null) {
+        e.preventDefault();
+      }
+
+      writeHud({
+        engaged: engagedRef.current,
+        ta: (el.style.touchAction || "auto"),
+        step: stepRef.current,
+        captured: gestureCapturedRef.current,
+        dir: gestureDirectionRef.current ?? "null",
+        dy: Math.round(dy),
+        evt: "move",
+      });
 
       // Direction lock after 6px movement
       if (gestureDirectionRef.current === null && Math.abs(dy) > 6) {
@@ -349,17 +430,15 @@ const ScrollWindow = () => {
         if (dy < 0) {
           // Swipe up
           if (stepRef.current === STEP_COUNT - 1) {
-            // EXIT GLIDE (swipe up at last step) — glide page to just past track bottom
+            // EXIT GLIDE (swipe up at last step) — defer glide to touchend so iOS
+            // does not cancel the programmatic smooth scroll mid-gesture.
             gestureDirectionRef.current = "up";
             gestureCapturedRef.current = false;
             engagedRef.current = false;
             exitingRef.current = true;  // suppress pin-loop re-engagement during glide
             el.style.touchAction = "";
             dispatchInSection(false);
-            const trackRect = el.getBoundingClientRect();
-            const trackTopAbs = trackRect.top + window.scrollY;
-            const trackHeight = trackRect.height;
-            window.scrollTo({ top: trackTopAbs + trackHeight - window.innerHeight * 0.5, behavior: "smooth" });
+            pendingExitRef.current = "down"; // "down" = exit downward (page scrolls down past track)
           } else {
             gestureDirectionRef.current = "up";
             gestureCapturedRef.current = true;
@@ -367,16 +446,15 @@ const ScrollWindow = () => {
         } else {
           // Swipe down
           if (stepRef.current === 0) {
-            // EXIT GLIDE (swipe down at step 0) — glide page to just above track top
+            // EXIT GLIDE (swipe down at step 0) — defer glide to touchend so iOS
+            // does not cancel the programmatic smooth scroll mid-gesture.
             gestureDirectionRef.current = "down";
             gestureCapturedRef.current = false;
             engagedRef.current = false;
             exitingRef.current = true;  // suppress pin-loop re-engagement during glide
             el.style.touchAction = "";
             dispatchInSection(false);
-            const trackRect = el.getBoundingClientRect();
-            const trackTopAbs = trackRect.top + window.scrollY;
-            window.scrollTo({ top: trackTopAbs - window.innerHeight * 0.5, behavior: "smooth" });
+            pendingExitRef.current = "up"; // "up" = exit upward (page scrolls up above track)
           } else {
             gestureDirectionRef.current = "down";
             gestureCapturedRef.current = true;
@@ -404,6 +482,33 @@ const ScrollWindow = () => {
     };
 
     const onTouchEnd = () => {
+      writeHud({
+        engaged: engagedRef.current,
+        ta: (el.style.touchAction || "auto"),
+        step: stepRef.current,
+        captured: gestureCapturedRef.current,
+        dir: gestureDirectionRef.current ?? "null",
+        dy: Math.round(touchLastYRef.current - touchStartYRef.current),
+        pend: pendingExitRef.current,
+        evt: "end",
+      });
+
+      // ── Deferred boundary-exit glide ────────────────────────────────────────
+      // iOS cancels programmatic smooth scrolls during an active touch. The glide
+      // target was recorded in pendingExitRef at direction-lock time; fire it now
+      // that the finger has lifted so iOS honors the scroll.
+      if (pendingExitRef.current !== null) {
+        const trackRect = el.getBoundingClientRect();
+        const trackTopAbs = trackRect.top + window.scrollY;
+        const trackHeight = trackRect.height;
+        const top = pendingExitRef.current === "down"
+          ? trackTopAbs + trackHeight - window.innerHeight * 0.5   // exit downward (swipe up at last step)
+          : trackTopAbs - window.innerHeight * 0.5;                // exit upward (swipe down at step 0)
+        pendingExitRef.current = null;
+        window.scrollTo({ top, behavior: "smooth" });
+        return;
+      }
+
       if (!gestureCapturedRef.current) return;
 
       const effectiveDy = dragBaseYRef.current + (touchLastYRef.current - touchStartYRef.current);
@@ -427,6 +532,19 @@ const ScrollWindow = () => {
     };
 
     const onTouchCancel = () => {
+      // If a deferred exit glide was pending, fire it on cancel too
+      // (finger was interrupted — e.g. phone call — but we still want to exit).
+      if (pendingExitRef.current !== null) {
+        const trackRect = el.getBoundingClientRect();
+        const trackTopAbs = trackRect.top + window.scrollY;
+        const trackHeight = trackRect.height;
+        const top = pendingExitRef.current === "down"
+          ? trackTopAbs + trackHeight - window.innerHeight * 0.5
+          : trackTopAbs - window.innerHeight * 0.5;
+        pendingExitRef.current = null;
+        window.scrollTo({ top, behavior: "smooth" });
+        return;
+      }
       if (!gestureCapturedRef.current) return;
       springBack();
     };

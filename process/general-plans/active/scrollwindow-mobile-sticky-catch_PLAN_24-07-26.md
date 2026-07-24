@@ -628,3 +628,33 @@ Phases C (delete settle useEffect, add sticky-pin engagement) and D (rewrite com
 - `npm test`: 109/109 passed.
 
 **Status:** Ready for UPDATE PROCESS archival (browser verification still pending per plan section H browser checklist).
+
+---
+
+## Amendment: iOS gesture arbitration fix
+
+**Date:** 2026-07-25 by vc-execute-agent.
+
+**Root cause addressed:** Real iOS Safari arbitrates scroll-vs-JS at the first `touchmove`. Because our `el.style.touchAction = "none"` is set from a rAF tick (async), iOS's cached touch-action region does not reflect it in time, so iOS claims the scroll. Additionally, iOS cancels in-progress programmatic `window.scrollTo({ behavior:"smooth" })` calls while a touch is active, so boundary-exit glides fired mid-gesture were silently ignored.
+
+**Changes applied to `src/components/home/ScrollWindow.tsx`:**
+
+1. **Change 1 — Early preventDefault (line 404):** `if (engagedRef.current || pendingExitRef.current !== null)` — prevents iOS from claiming the scroll on the first touchmove. The `pendingExitRef` branch covers the window between direction-lock (engagedRef cleared) and touchend (glide fires).
+
+2. **Change 2 — Defer boundary-exit glides to touchend:** Added `const pendingExitRef = useRef<null | "down" | "up">(null)` (line 99). Direction-lock boundary branches now set `pendingExitRef.current` instead of calling `window.scrollTo` inline. `onTouchEnd` and `onTouchCancel` both check `pendingExitRef.current` first (before `!gestureCapturedRef` early-return), compute the track-relative glide target, fire `window.scrollTo`, and return. `onTouchStart` resets `pendingExitRef.current = null` in both the multi-touch and single-touch reset paths.
+
+3. **Change 3 — Relaxed pin thresholds (line 215):** `isPinned()` now uses `rect.top <= -2 && rect.bottom >= window.innerHeight + 2` (was -8/+8). Allows engagement when the track rests exactly at the pin edge.
+
+4. **Change 4 — fqdebug HUD (already present from prior session):** Mobile-only debug overlay gated on `?fqdebug` URL param, using direct DOM writes (zero overhead when flag absent).
+
+**Grep-proofs:**
+- `pendingExitRef`: present at ref declaration (×1), touchstart reset (×2), direction-lock (×2), touchmove condition (×1), touchend handler (×3), touchcancel handler (×3).
+- Engaged-preventDefault appears before direction lock at line 404.
+- `-2` thresholds in `isPinned` at line 215.
+- `fqdebug` read once at module level with `typeof window` SSR guard.
+
+**Verification:**
+- `npm run build`: zero TypeScript errors.
+- `npm test`: 109/109 passed.
+- `node .claude/chrome-devtools/tmp/verify-sticky-catch.mjs`: ALL 13 verdicts PASS (TRACK_AND_ASPECT_OK, PINNED_THROUGHOUT_TRACK, FLUSH, ENGAGED_STEP0, FADES_FAST, COMMITS_AT_50PX, NO_DEBOUNCE_ALL_LAND, GLIDES_OUT_DOWN, ENGAGED_LAST_STEP, GLIDES_OUT_UP, NATIVE, NO_STUCK_HEADER, UNCHANGED; consoleErrors 0).
+- `node .claude/chrome-devtools/tmp/probe-rapid.mjs`: full ladder clean (3 rapid-ups land steps 1→2→3, all settle to activeY:0).
