@@ -27,7 +27,7 @@ const STICKY_TOP = 88;
 // natural aspect ratio (no cropping); the left column is a sticky feature that
 // crossfades through five heroes as you scroll, with a thin top line tracking
 // scroll position within the current part. (Per Prince, 2026-07-22.)
-const ProjectTile = ({ project }: { project: (typeof projects)[number] }) => (
+const ProjectTile = ({ project }: { project: (typeof allProjects)[number] }) => (
   <Link
     to={`/projects/${project.id}`}
     className="group block overflow-hidden rounded-sm bg-[color:var(--canvas-soft)]"

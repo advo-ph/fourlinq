@@ -170,5 +170,4 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
   );
 };
 
-export type { ProjectHeroGalleryProps };
 export default ProjectHeroGallery;
