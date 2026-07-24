@@ -1,16 +1,16 @@
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Cursor-switching project photo gallery — Tita's §2.1.3 verbatim ask.
+ * Project photo gallery with thumbnail rail.
  *
  * Behavior:
  *  - Large hero image + thumbnail rail underneath.
- *  - Hovering anywhere along the WIDTH of the hero image switches which
- *    project photo is shown — divides the hero width into N equal zones
- *    (one per photo) and shows the photo for whichever zone the cursor is in.
- *    Marvin/Pella hover-swap PDP pattern, but proportional rather than discrete.
- *  - Thumbnail clicks lock the selection until cursor re-enters the hero.
+ *  - Hovering a thumbnail temporarily previews that photo; moving away
+ *    restores the pinned (last-clicked) image.
+ *  - Clicking a thumbnail permanently pins that photo as the hero.
+ *  - The hero is stable — moving the mouse over the big image does NOT
+ *    change the photo. Only thumbnail hover/click drives the selection.
  *  - On touch (no hover), the thumbnails act as a discrete tab strip.
  */
 
@@ -25,27 +25,16 @@ interface ProjectPhotoSwitcherProps {
   photos: ProjectPhoto[];
   eyebrow?: string;
   className?: string;
+  /** Hero aspect ratio. Defaults to "16:9". Thumbnails always stay 5:4. */
+  ratio?: "16:9" | "4:3";
 }
 
-const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }: ProjectPhotoSwitcherProps) => {
+const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className, ratio = "16:9" }: ProjectPhotoSwitcherProps) => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [pinnedIdx, setPinnedIdx] = useState(0);
-  const heroRef = useRef<HTMLDivElement>(null);
 
   const activeIdx = hoveredIdx ?? pinnedIdx;
   const active = photos[activeIdx] ?? photos[0];
-
-  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!heroRef.current || photos.length <= 1) return;
-    const rect = heroRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const zone = Math.min(photos.length - 1, Math.max(0, Math.floor((x / rect.width) * photos.length)));
-    setHoveredIdx(zone);
-  }, [photos.length]);
-
-  const handleLeave = useCallback(() => {
-    setHoveredIdx(null);
-  }, []);
 
   if (photos.length === 0) return null;
 
@@ -55,12 +44,9 @@ const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }
         <p className="eyebrow mb-5">{eyebrow}</p>
       )}
 
-      {/* Hero image — cursor switches between photos along the X-axis */}
+      {/* Hero image */}
       <div
-        ref={heroRef}
-        onMouseMove={handleMove}
-        onMouseLeave={handleLeave}
-        className="relative aspect-[16/9] overflow-hidden bg-[color:var(--canvas-soft)]"
+        className={cn("relative overflow-hidden bg-[color:var(--canvas-soft)]", ratio === "4:3" ? "aspect-[4/3]" : "aspect-[16/9]")}
       >
         {photos.map((photo, i) => (
           <img
@@ -101,9 +87,14 @@ const ProjectPhotoSwitcher = ({ photos, eyebrow = "Project gallery", className }
         )}
       </div>
 
-      {/* Thumbnail rail — click-to-pin + tab strip on touch */}
+      {/* Thumbnail rail — click-to-pin + tab strip on touch.
+          onMouseLeave restores the pinned image when the cursor leaves
+          the entire rail (moving between thumbnails does not flicker). */}
       {photos.length > 1 && (
-        <ul className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+        <ul
+          className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2"
+          onMouseLeave={() => setHoveredIdx(null)}
+        >
           {photos.map((photo, i) => (
             <li key={photo.src}>
               <button

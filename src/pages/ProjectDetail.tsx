@@ -7,6 +7,7 @@ import EditorialButton from "@/components/primitives/Button";
 import { projects as fallbackProject, type Project } from "@/data/projects";
 import { products } from "@/data/products";
 import { fetchProjects, mergeProject, canonicalProjectSlug } from "@/lib/cms-api";
+import type { MergedProjectImagesResponse } from "@/types/project-images";
 
 /**
  * /projects/:slug. Individual project detail page.
@@ -34,6 +35,9 @@ const ProjectDetail = () => {
   // page used to redirect on the very first render, which made any project
   // that exists ONLY in the CMS unreachable by direct URL or refresh.
   const [cmsSettled, setCmsSettled] = useState(false);
+  // projectRatios from the merged API — same endpoint as Inspiration.tsx.
+  // Defaults to empty so the hero falls back to 16:9 while the request is in flight.
+  const [projectRatios, setProjectRatios] = useState<MergedProjectImagesResponse["projectRatios"]>({});
 
   useEffect(() => {
     let active = true;
@@ -45,6 +49,25 @@ const ProjectDetail = () => {
       .catch(() => { /* keep fallback */ })
       .finally(() => { if (active) setCmsSettled(true); });
     return () => { active = false; };
+  }, []);
+
+  // Fetch merged project-images data for per-project ratio. Uses the same
+  // /api/project-images/merged endpoint as Inspiration.tsx; TanStack is not
+  // used here so we mirror the plain-fetch pattern from that page.
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/project-images/merged", { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<MergedProjectImagesResponse>;
+      })
+      .then((data) => {
+        setProjectRatios(data.projectRatios ?? {});
+      })
+      .catch(() => {
+        // Swallow — hero defaults to 16:9 on failure
+      });
+    return () => { controller.abort(); };
   }, []);
 
   // The published URL uses the British spelling; the CMS row uses the
@@ -102,7 +125,11 @@ const ProjectDetail = () => {
         <div className="container-editorial">
           {/* Photo gallery. Uses the cursor-switching component */}
           <div className="mb-20 lg:mb-28">
-            <ProjectPhotoSwitcher photos={galleryPhotos} eyebrow="The project" />
+            <ProjectPhotoSwitcher
+              photos={galleryPhotos}
+              eyebrow="The project"
+              ratio={projectRatios?.[selectedProject.id] === "4:3" ? "4:3" : "16:9"}
+            />
           </div>
 
           {/* Project meta + description */}
