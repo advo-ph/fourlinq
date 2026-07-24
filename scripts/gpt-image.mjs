@@ -191,7 +191,8 @@ const tool = {
   size: opts.size,
   quality: opts.quality,
   output_format: "png",
-  ...(opts.refs.length > 0 ? { input_fidelity: "high" } : {}),
+  // input_fidelity is a gpt-image-1-only param; gpt-image-2 rejects it with a 400.
+  ...(opts.refs.length > 0 && opts.imageModel === "gpt-image-1" ? { input_fidelity: "high" } : {}),
 };
 
 const content = [
@@ -207,7 +208,7 @@ for (const ref of opts.refs) {
 }
 
 console.log(`🎨 ${opts.model} (effort: ${opts.effort}) → ${opts.imageModel} (${opts.quality}, ${opts.size})`);
-if (opts.refs.length) console.log(`   refs: ${opts.refs.join(", ")} (input_fidelity: high)`);
+if (opts.refs.length) console.log(`   refs: ${opts.refs.join(", ")}`);
 
 console.log(`\n▶ Round 1: generate`);
 let resp = await createAndPoll({

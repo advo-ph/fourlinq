@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
+    "dev:web": "vite",
     "projects:thumbs": "node scripts/generate-project-thumbs.mjs",
     "prebuild": "node scripts/generate-project-thumbs.mjs",
     "build": "vite build",
@@ -26,7 +27,7 @@
     "projects:ratios": "node scripts/derive-project-ratios.mjs",
     "preview": "vite preview",
     "dev:api": "tsx watch server/index.ts",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
+    "dev:all": "npm run dev",
     "start": "NODE_ENV=production node --import tsx server/index.ts",
     "deploy": "./deploy.sh",
     "deploy:status": "ssh advo \"cat /opt/fourlinq/deployed-from.txt\"",
