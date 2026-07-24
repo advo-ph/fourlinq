@@ -46,6 +46,11 @@ const INACTIVE_OPACITY = 0.28;
 // highlight advances). Swipe down: fades down, the previous returns.
 const STEP_COUNT = WINDOW_PARTS.length + 1; // intro + parts
 
+// Swipe feel tuning — v3
+const FADE_DISTANCE_PX = 120;   // cardOpacity = max(0, 1 - |dy| / 120)
+const COMMIT_DISTANCE_PX = 44;  // displacement threshold for commit
+const COMMIT_VELOCITY = 0.35;   // px/ms threshold for velocity commit
+
 const ScrollWindow = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
@@ -55,13 +60,13 @@ const ScrollWindow = () => {
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
 
   // ── Gesture refs (unconditional — Rules of Hooks) ──────────
-  const animatingRef = useRef(false);
-  const engagedRef = useRef(false);        // true only while section is fully settled in-view
+  const engagedRef = useRef(false);        // true only while section is engaged in-view (sticky-pin)
   const touchStartYRef = useRef(0);
   const touchLastYRef = useRef(0);
   const touchSamplesRef = useRef<Array<{ y: number; t: number }>>([]);
   const gestureDirectionRef = useRef<'up' | 'down' | null>(null);
   const gestureCapturedRef = useRef(false);
+  const dragBaseYRef = useRef(0);          // card Y at direction-lock time (mid-spring capture)
 
   const [nearViewport, setNearViewport] = useState(false);
   const [isDesktop, setIsDesktop] = useState(
@@ -147,24 +152,18 @@ const ScrollWindow = () => {
     };
   }, [isDesktop]);
 
-  // ── Mobile: scroll-settle engagement state machine ─────────────────────────
-  // Replaces the v1 IntersectionObserver approach. Dispatches fq-hide-header
-  // and fq-scrollwindow-inview based on scroll settle position, not IO threshold.
-  // Also handles orientation change reset.
+  // ── Mobile: sticky-pin engagement via rAF geometry ────────────────────────
+  // The outer container is a 260lvh scroll track; the inner layout div is CSS
+  // sticky top-0 on mobile. This loop detects when the track is pinned (fully
+  // straddling the viewport) and engages/disengages the touch capture accordingly.
+  // Replaces the v2 scroll-settle state machine entirely.
   useEffect(() => {
     if (isDesktop) return;
 
     const el = containerRef.current;
     if (!el) return;
 
-    // Cache section height once on mount — not re-read on toolbar resize.
-    const cachedHeight = el.getBoundingClientRect().height;
-
-    let armedRef = true;
-    let prevSectionTopRef = 0;
-    let settleTimerRef: ReturnType<typeof setTimeout> | null = null;
-
-    // Fix B2: dedupe dispatches — only emit when flag actually changes
+    // Dedupe dispatches — only emit when flag actually changes
     let lastDispatchFlag: boolean | null = null;
     const dispatchInSection = (flag: boolean) => {
       if (flag === lastDispatchFlag) return;
@@ -173,92 +172,78 @@ const ScrollWindow = () => {
       window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView: flag } }));
     };
 
-    const onSettle = () => {
-      const top = el.getBoundingClientRect().top;
-      if (armedRef && Math.abs(top) <= 48) {
-        // Fix B3: skip smooth-align glide when already aligned (avoids settle churn)
-        if (Math.abs(top) >= 1) {
-          window.scrollTo({ top: window.scrollY + top, behavior: "smooth" });
+    // Consecutive pinned-frame counter — requires 2 frames before engaging
+    // to prevent fling-through from momentarily triggering engagement.
+    let consecutivePinCount = 0;
+    let raf = 0;
+    let prevTop = el.getBoundingClientRect().top;
+
+    // Track is "pinned" when the 260lvh outer container straddles the viewport:
+    // top is scrolled past (negative) and bottom is still below viewport bottom.
+    function isPinned(): boolean {
+      const rect = el.getBoundingClientRect();
+      return rect.top <= -8 && rect.bottom >= window.innerHeight + 8;
+    }
+
+    // Track is fully out when neither edge is within the viewport straddle.
+    function isFullyOut(): boolean {
+      const rect = el.getBoundingClientRect();
+      return rect.top > 0 || rect.bottom < window.innerHeight;
+    }
+
+    function tick() {
+      const rect = el.getBoundingClientRect();
+      if (!engagedRef.current) {
+        if (isPinned()) {
+          consecutivePinCount++;
+          if (consecutivePinCount >= 2) {
+            // Engage: determine entry direction from last known prevTop
+            engagedRef.current = true;
+            el.style.touchAction = "none";
+            const entryStep = prevTop > 0 ? 0 : STEP_COUNT - 1;
+            setStep(entryStep);
+            stepRef.current = entryStep;
+            cardY.set(0);
+            cardOpacity.set(1);
+            dispatchInSection(true);
+          }
+        } else {
+          consecutivePinCount = 0;
+          prevTop = rect.top;
         }
-        armedRef = false;
-        engagedRef.current = true;          // Bug A fix: mark section as engaged
-        el.style.touchAction = "none";      // Fix A1: deterministic capture — no race with browser
-        // Approaching from above (top was positive before) → step 0; from below → last step
-        setStep(prevSectionTopRef > 0 ? 0 : STEP_COUNT - 1);
-        stepRef.current = prevSectionTopRef > 0 ? 0 : STEP_COUNT - 1;
-        dispatchInSection(true);
-        cardY.set(0);
-        cardOpacity.set(1);
       } else {
-        // Fix B1: loose bounds with epsilon — sub-pixel fractional top won't false-disengage
-        const stillIn = top <= 56 && top + cachedHeight >= window.innerHeight - 56;
-        if (!stillIn) {
+        if (isFullyOut()) {
+          engagedRef.current = false;
+          el.style.touchAction = "";
           dispatchInSection(false);
+          consecutivePinCount = 0;
         }
       }
-    };
+      raf = requestAnimationFrame(tick);
+    }
 
-    const clearSettle = () => {
-      if (settleTimerRef !== null) {
-        clearTimeout(settleTimerRef);
-        settleTimerRef = null;
-      }
-    };
-
-    const scheduleSettle = () => {
-      clearSettle();
-      settleTimerRef = setTimeout(onSettle, 120);
-    };
-
-    const onScroll = () => {
-      const top = el.getBoundingClientRect().top;
-      prevSectionTopRef = top;
-      // Re-arm when far from section so the next approach can engage
-      if (Math.abs(top) > 80) {
-        armedRef = true;
-        engagedRef.current = false;         // Bug A fix: disengage when user scrolls away
-        el.style.touchAction = "";          // Fix A2: restore native scroll on disengage
-      }
-      if ("onscrollend" in window) {
-        // scheduleSettle acts as fallback; scrollend fires the settle directly
-        scheduleSettle();
-      } else {
-        scheduleSettle();
-      }
-    };
-
-    const onScrollEnd = () => {
-      clearSettle();
-      onSettle();
-    };
+    raf = requestAnimationFrame(tick);
 
     const onOrientationChange = () => {
-      engagedRef.current = false;           // Bug A fix: disengage on rotation
-      el.style.touchAction = "";            // Fix A3: restore native scroll on rotation
+      engagedRef.current = false;
+      el.style.touchAction = "";
       dispatchInSection(false);
       cardY.set(0);
       cardOpacity.set(1);
       setStep(0);
       stepRef.current = 0;
-      armedRef = true;
+      consecutivePinCount = 0;
+      prevTop = el.getBoundingClientRect().top;
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    if ("onscrollend" in window) {
-      window.addEventListener("scrollend", onScrollEnd);
-    }
     window.addEventListener("orientationchange", onOrientationChange);
 
     return () => {
-      clearSettle();
-      engagedRef.current = false;           // Bug A fix: disengage on unmount/isDesktop change
-      el.style.touchAction = "";            // Fix A4: restore native scroll on cleanup
-      window.removeEventListener("scroll", onScroll);
-      if ("onscrollend" in window) {
-        window.removeEventListener("scrollend", onScrollEnd);
-      }
-      window.removeEventListener("orientationchange", onOrientationChange);
+      cancelAnimationFrame(raf);
+      engagedRef.current = false;
+      el.style.touchAction = "";
       dispatchInSection(false);
+      window.removeEventListener("orientationchange", onOrientationChange);
     };
   }, [isDesktop, cardY, cardOpacity]);
 
@@ -284,38 +269,25 @@ const ScrollWindow = () => {
     };
 
     const commitCard = (direction: "up" | "down") => {
-      animatingRef.current = true;
-      const exitY = direction === "up" ? -140 : 140;
-      animate(cardY, exitY, { duration: 0.16, ease: "easeOut" });
-      animate(cardOpacity, 0, {
-        duration: 0.14,
-        onComplete: () => {
-          const current = stepRef.current;
-          const next = Math.max(0, Math.min(STEP_COUNT - 1, direction === "up" ? current + 1 : current - 1));
-          stepRef.current = next;
-          setStep(next);
-          // Entry pose for incoming card
-          cardY.set(direction === "up" ? 36 : -36);
-          cardOpacity.set(0);
-          // Spring in
-          animate(cardY, 0, {
-            type: "spring",
-            stiffness: 300,
-            damping: 30,
-            onComplete: () => {
-              animatingRef.current = false;
-            },
-          });
-          animate(cardOpacity, 1, { duration: 0.28 });
-        },
-      });
+      const current = stepRef.current;
+      const next = Math.max(0, Math.min(STEP_COUNT - 1, direction === "up" ? current + 1 : current - 1));
+      // 1. Advance step synchronously — React binds the new card immediately
+      stepRef.current = next;
+      setStep(next);
+      // 2. Set entry pose for incoming card (old card is inactive → opacity 0 via style binding)
+      const entryY = direction === "up" ? 36 : -36;
+      cardY.set(entryY);
+      cardOpacity.set(0);
+      // 3. Spring in
+      animate(cardY, 0, { type: "spring", stiffness: 300, damping: 30 });
+      animate(cardOpacity, 1, { duration: 0.28 });
     };
 
     const onTouchStart = (e: TouchEvent) => {
-      // Bug B fix: ALWAYS reset gesture refs for ref hygiene, even during animation.
-      // onTouchMove already returns early while animatingRef is true, so a gesture that
-      // starts mid-animation will correctly re-lock from the current finger position
-      // once the animation finishes (dy is measured from this touchstart's clientY).
+      // Immediately freeze any in-progress spring so dragBaseYRef captures a stable position.
+      cardY.stop();
+      cardOpacity.stop();
+
       if (e.touches.length > 1) {
         touchStartYRef.current = 0;
         touchLastYRef.current = 0;
@@ -329,18 +301,9 @@ const ScrollWindow = () => {
       touchSamplesRef.current = [];
       gestureDirectionRef.current = null;
       gestureCapturedRef.current = false;
-      if (animatingRef.current) {
-        // During commit animation — refs are clean; let native events propagate
-        return;
-      }
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (animatingRef.current) {
-        // During commit animation — do not prevent default; let native scroll happen
-        return;
-      }
-
       // Multi-touch: release capture if it was grabbed
       if (e.touches.length > 1) {
         if (gestureCapturedRef.current) {
@@ -355,25 +318,29 @@ const ScrollWindow = () => {
 
       // Direction lock after 6px movement
       if (gestureDirectionRef.current === null && Math.abs(dy) > 6) {
-        // Bug A fix: if section is not engaged (e.g. partially scrolled into view),
-        // immediately lock the gesture as pass-through so native scroll is not hijacked.
+        // If section is not engaged, lock as pass-through — do not hijack native scroll.
         if (!engagedRef.current) {
           gestureDirectionRef.current = "down"; // any non-null value to prevent re-evaluation
           gestureCapturedRef.current = false;
           return;
         }
+
+        // Capture drag baseline at direction-lock time (card may be mid-spring)
+        dragBaseYRef.current = cardY.get();
+
         if (dy < 0) {
           // Swipe up
           if (stepRef.current === STEP_COUNT - 1) {
-            // Fix A3/A5: EXIT GLIDE — touch-action:none means native scroll won't fire;
-            // instead we programmatically glide the page out of the section.
-            // Guard: mark direction non-null so this fires at most once per gesture.
+            // EXIT GLIDE (swipe up at last step) — glide page to just past track bottom
             gestureDirectionRef.current = "up";
             gestureCapturedRef.current = false;
-            engagedRef.current = false;           // disengage
-            el.style.touchAction = "";            // Fix A5: restore on boundary exit
+            engagedRef.current = false;
+            el.style.touchAction = "";
             dispatchInSection(false);
-            window.scrollBy({ top: window.innerHeight * 0.55, behavior: "smooth" });
+            const trackRect = el.getBoundingClientRect();
+            const trackTopAbs = trackRect.top + window.scrollY;
+            const trackHeight = trackRect.height;
+            window.scrollTo({ top: trackTopAbs + trackHeight - window.innerHeight * 0.5, behavior: "smooth" });
           } else {
             gestureDirectionRef.current = "up";
             gestureCapturedRef.current = true;
@@ -381,13 +348,15 @@ const ScrollWindow = () => {
         } else {
           // Swipe down
           if (stepRef.current === 0) {
-            // Fix A3/A5: EXIT GLIDE — symmetric for swipe-down at first step.
+            // EXIT GLIDE (swipe down at step 0) — glide page to just above track top
             gestureDirectionRef.current = "down";
             gestureCapturedRef.current = false;
-            engagedRef.current = false;           // disengage
-            el.style.touchAction = "";            // Fix A5: restore on boundary exit
+            engagedRef.current = false;
+            el.style.touchAction = "";
             dispatchInSection(false);
-            window.scrollBy({ top: -(window.innerHeight * 0.55), behavior: "smooth" });
+            const trackRect = el.getBoundingClientRect();
+            const trackTopAbs = trackRect.top + window.scrollY;
+            window.scrollTo({ top: trackTopAbs - window.innerHeight * 0.5, behavior: "smooth" });
           } else {
             gestureDirectionRef.current = "down";
             gestureCapturedRef.current = true;
@@ -409,14 +378,15 @@ const ScrollWindow = () => {
         touchSamplesRef.current.shift();
       }
 
-      cardY.set(currentDy);
-      cardOpacity.set(Math.max(0, 1 - Math.abs(currentDy) / 260));
+      const effectiveDy = dragBaseYRef.current + currentDy;
+      cardY.set(effectiveDy);
+      cardOpacity.set(Math.max(0, 1 - Math.abs(effectiveDy) / FADE_DISTANCE_PX));
     };
 
     const onTouchEnd = () => {
       if (!gestureCapturedRef.current) return;
 
-      const dy = touchLastYRef.current - touchStartYRef.current;
+      const effectiveDy = dragBaseYRef.current + (touchLastYRef.current - touchStartYRef.current);
       const samples = touchSamplesRef.current;
       let v = 0;
       if (samples.length >= 2) {
@@ -428,9 +398,9 @@ const ScrollWindow = () => {
         }
       }
 
-      const shouldCommit = (Math.abs(dy) > 60 || Math.abs(v) > 0.5);
+      const shouldCommit = (Math.abs(effectiveDy) > COMMIT_DISTANCE_PX || Math.abs(v) > COMMIT_VELOCITY);
       if (shouldCommit) {
-        commitCard(dy < 0 ? "up" : "down");
+        commitCard(effectiveDy < 0 ? "up" : "down");
       } else {
         springBack();
       }
@@ -523,18 +493,18 @@ const ScrollWindow = () => {
   return (
     <div
       ref={containerRef}
-      className="relative bg-[color:var(--canvas)]"
+      className="relative bg-[color:var(--canvas)] max-lg:h-[260lvh]"
     >
       {/* FULL-WIDTH layout — sticky on desktop, static full-screen on mobile */}
       <div
         ref={stickyRef}
         className={cn(
           !isDesktop
-            ? "flex w-full h-[100lvh] overflow-hidden bg-[color:var(--canvas)] items-end"
+            ? "sticky top-0 flex w-full h-[100lvh] overflow-hidden bg-[color:var(--canvas)] items-end"
             : "sticky top-0 flex h-screen w-full overflow-hidden bg-[color:var(--canvas)] lg:items-center lg:pb-0"
         )}
       >
-        <div ref={mediaBoxRef} className="relative w-full aspect-square lg:aspect-[1920/1080]">
+        <div ref={mediaBoxRef} className="relative w-full aspect-[4/3] lg:aspect-[1920/1080]">
           {/* Instant poster */}
           <img
             src={POSTER}
