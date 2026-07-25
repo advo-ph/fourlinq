@@ -154,11 +154,20 @@ const run = async () => {
       });
 
     // ── Engage from ABOVE: jump from well above into the track → step 0 ──
+    // The stray-momentum clamp in onScrollDelta prevents a bare programmatic
+    // window.scrollTo from carrying the page out while the section is engaged.
+    // Workaround: fire a zero-move gesture (touchStart→touchEnd immediately) which
+    // sets burstLockRef=true for 150ms. During burst lock, scroll events are absorbed
+    // (timer reset) instead of clamped, so the subsequent programmatic scroll to
+    // trackTop−700 reaches the browser and the rAF loop sees isFullyOut()→disengage.
+    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 195, y: 500 }] });
+    await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await sleep(30); // allow burstLock to be set (synchronous in onTouchEnd, but rAF may need a frame)
     await page.evaluate((y) => window.scrollTo(0, y), trackTop - 700);
-    await sleep(400);
+    await sleep(500); // allow rAF to detect isFullyOut → disengage
     await page.evaluate(() => (window.__fq.length = 0));
     await page.evaluate((y) => window.scrollTo(0, y), trackTop + 150);
-    await sleep(500);
+    await sleep(600);
     const evAbove = await page.evaluate(() => window.__fq.slice());
     results.engageFromAbove = {
       cards: await cardOpacities(),
@@ -237,9 +246,15 @@ const run = async () => {
     // ── Exit glide DOWN: self-contained — re-establish engagement first, then
     // navigate to step 3 cleanly, then perform a deliberate finger-down drag exit.
     // This prevents inheriting stale state from the rapid-swipe test above.
-    // Step 1: scroll fully out of the track (above it) so exitingRef resets.
+    // Step 1: use a zero-move gesture to set burstLock=true, then scroll out.
+    // Without burst lock, onScrollDelta clamps the programmatic scroll back to anchor
+    // while the section is still engaged (stray-momentum guard). With burst lock active,
+    // the scroll event is absorbed (not clamped) so the rAF sees isFullyOut()→disengage.
+    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 195, y: 500 }] });
+    await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await sleep(30); // allow burstLock to be set
     await page.evaluate((y) => window.scrollTo(0, y), trackTop - 700);
-    await sleep(400);
+    await sleep(500); // allow rAF to detect isFullyOut → disengage + exitingRef to reset
     // Step 2: scroll into the track to engage at step 0.
     await page.evaluate(() => (window.__fq.length = 0));
     await page.evaluate((y) => window.scrollTo(0, y), trackTop + 150);
