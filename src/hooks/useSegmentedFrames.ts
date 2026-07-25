@@ -2,10 +2,13 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { REVERSE_PIVOT_FRAME, PLAYBACK_FPS, type WindowPart } from "@/data/scroll-window-phases";
 
 const FRAME_MS = 1000 / PLAYBACK_FPS;
-// A "fast" (catch-up) sweep advances several frames per tick so an unfinished
-// segment finishes ASAP before the next one plays. Kept modest so the fast
-// morph still reads as motion rather than a choppy jump.
-const FAST_STEP = 5;
+// Catch-up sweeps run at this rate regardless of display refresh frequency.
+const FAST_FPS = 200;
+const FAST_FRAME_MS = 1000 / FAST_FPS;
+// If more than this many milliseconds have elapsed since the last step (e.g.
+// the tab was backgrounded), snap the clock forward rather than dumping a
+// burst of frames all at once.
+const MAX_CATCHUP_MS = FRAME_MS * 8;
 
 interface Options {
   /** Index of the part whose text is currently centered (-1 = none yet). */
@@ -150,16 +153,24 @@ export function useSegmentedFrames({ activeIndex, parts, enabled }: Options): Re
           const dir = Math.sign(head.to - current);
           if (dir === 0) {
             q.shift();
-          } else if (head.fast) {
-            // Catch up ASAP — several frames per tick.
-            current += dir * Math.min(FAST_STEP, Math.abs(head.to - current));
-            lastStepRef.current = ts;
-            if (current === head.to) q.shift();
-          } else if (ts - lastStepRef.current >= FRAME_MS) {
-            // Native-rate playback — one frame per tick.
-            current += dir;
-            lastStepRef.current = ts;
-            if (current === head.to) q.shift();
+          } else {
+            // Time-based advance: carries the remainder so effective rate is
+            // independent of display refresh frequency (60 Hz, 120 Hz, etc.).
+            const frameMs = head.fast ? FAST_FRAME_MS : FRAME_MS;
+            let elapsed = ts - lastStepRef.current;
+            // Resync guard: if the tab was backgrounded and elapsed is huge,
+            // snap the clock instead of releasing a burst of frames.
+            if (!head.fast && elapsed > MAX_CATCHUP_MS) {
+              lastStepRef.current = ts;
+              elapsed = 0;
+            }
+            if (elapsed >= frameMs) {
+              const remaining = Math.abs(head.to - current);
+              const steps = Math.min(Math.floor(elapsed / frameMs), remaining);
+              current += dir * steps;
+              lastStepRef.current += steps * frameMs;
+              if (current === head.to) q.shift();
+            }
           }
         }
         if (current !== displayedRef.current) {

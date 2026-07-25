@@ -11,9 +11,9 @@ export const FRAME_PATH_TEMPLATE = "/images/scroll-window-webp/frame_{index}.web
 export const FRAME_PAD_LENGTH = 4;
 
 // ── Playback tuning ────────────────────────────────────────
-/** Frames play at their native rate — the source video is 30fps, already the
- *  intended speed. No compression/speed-up. */
-export const PLAYBACK_FPS = 30;
+/** Source video is 30fps; playback runs above native for a faster read.
+ *  This is real wall-clock fps — identical on every display refresh rate. */
+export const PLAYBACK_FPS = 36;
 /** Part 2 → Part 1 (backward) reverses to this frame, then jumps to frame 1. */
 export const REVERSE_PIVOT_FRAME = 83;
 
