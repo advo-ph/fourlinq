@@ -7,6 +7,7 @@ import { projects as fallbackProject, type Project } from "@/data/projects";
 import { products } from "@/data/products";
 import { fetchProjects, mergeProject, canonicalProjectSlug } from "@/lib/cms-api";
 import { versionedImage } from "@/lib/image-version";
+import { fetchMergedProjectImagesFresh } from "@/lib/merged-project-images";
 import type { MergedProjectImagesResponse } from "@/types/project-images";
 
 /**
@@ -59,29 +60,42 @@ const ProjectDetail = () => {
   // (hero) photo in the gallery. Falls back to the project's baseline hero.
   const [projectCoverImages, setProjectCoverImages] = useState<MergedProjectImagesResponse["projectCoverImages"]>({});
 
+  // Authoritative gallery image lists keyed by projectId.
+  // When present, this is the single source of truth for the gallery — it
+  // reflects admin image_order, hidden, and replaced state exactly.
+  const [projectGalleryImages, setProjectGalleryImages] = useState<NonNullable<MergedProjectImagesResponse["projectGalleryImages"]>>({});
+
+  // True while the merged API fetch is in flight.  We hold the gallery render
+  // until this settles so we never flash static-derived images before the
+  // admin-curated list arrives (live-first idiom, mirrors Inspiration.tsx).
+  const [mergedSettled, setMergedSettled] = useState(false);
+
   // Fetch merged project-images data for per-project ratio, hidden images,
-  // hidden/deleted project IDs, and cover image overrides.
-  // Uses the same /api/project-images/merged endpoint as Inspiration.tsx;
-  // TanStack is not used here so we mirror the plain-fetch pattern.
+  // hidden/deleted project IDs, cover image overrides, and gallery image lists.
+  // Uses fetchMergedProjectImagesFresh (bypasses 60 s module cache + HTTP cache)
+  // so a stale SWR copy cannot serve stale admin state.
   useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/project-images/merged", { signal: controller.signal })
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json() as Promise<MergedProjectImagesResponse>;
-      })
+    let active = true;
+    fetchMergedProjectImagesFresh()
       .then((data) => {
+        if (!active) return;
         setProjectRatios(data.projectRatios ?? {});
         setHiddenImages(data.hiddenImages ?? {});
         setHiddenProjectIds(
           new Set([...(data.hiddenProjects ?? []), ...(data.deletedProjects ?? [])])
         );
         setProjectCoverImages(data.projectCoverImages ?? {});
+        setProjectGalleryImages(data.projectGalleryImages ?? {});
       })
       .catch(() => {
-        // Swallow — hero defaults to 16:9, no images hidden on failure
+        // Fetch failed — fall back to static gallery composition.
+        // hiddenImages/projectCoverImages remain empty; static path applies.
+        console.warn("[ProjectDetail] /api/project-images/merged fetch failed — using static gallery fallback");
+      })
+      .finally(() => {
+        if (active) setMergedSettled(true);
       });
-    return () => { controller.abort(); };
+    return () => { active = false; };
   }, []);
 
   // The published URL uses the British spelling; the CMS row uses the
@@ -122,46 +136,84 @@ const ProjectDetail = () => {
   }
 
   // Build a Set of hidden image paths for the current project so we can
-  // filter them out of the gallery without a per-image linear scan.
+  // filter them out of the static gallery fallback without a per-image linear scan.
   // Paths in hiddenImages already carry a leading slash (e.g. /images/projects-fb/…)
   // which matches the paths stored in projects.ts, so no normalization is needed.
   const projectHiddenSet = new Set(hiddenImages[selectedProject.id] ?? []);
 
-  // Admin-set cover path for this project. The server already excludes covers
-  // pointing at hidden images, but we also guard here defensively.
-  const adminCoverPath = (() => {
-    const c = projectCoverImages?.[selectedProject.id];
-    return c && !projectHiddenSet.has(c) ? c : null;
-  })();
+  // --- Gallery source of truth ---
+  //
+  // Live-first: if the merged API has resolved and returned a gallery list for
+  // this project, use it directly — it already reflects admin image_order, hidden,
+  // and replaced state.  If the API has not yet settled, show a skeleton (no
+  // flash of stale static images).  On API failure, fall back to the static
+  // composition (selectedProject.image + gallery), filtering hidden images.
+  //
+  // Static fallback path (API failure only):
+  //   - Build the list from selectedProject.image + selectedProject.gallery.
+  //   - Filter paths present in hiddenImages.
+  //   - If an admin cover override arrived despite the gallery list not arriving
+  //     (edge case: shouldn't happen because both come from the same endpoint),
+  //     inject it first.
 
-  // Build the full gallery list (hero + extras), filtering out hidden images.
-  // If a cover override exists, place it first; then the remaining baseline
-  // images (hero + gallery), deduplicating the cover if it appears in that list.
-  const baseGalleryPhotos: Array<{ src: string; alt: string }> = [
-    { src: selectedProject.image, alt: selectedProject.name },
-    ...(selectedProject.gallery ?? []).map((src, i) => ({
+  // Show skeleton while the merged API is in flight so we never paint the
+  // static gallery before the admin-curated list is available.
+  if (!mergedSettled) {
+    return (
+      <Layout>
+        <section className="min-h-[60vh]" aria-busy="true" aria-label="Loading project gallery" />
+      </Layout>
+    );
+  }
+
+  // Authoritative live gallery from API (when available for this project).
+  const liveGalleryPaths: string[] | null = projectGalleryImages[selectedProject.id] ?? null;
+
+  let visibleGalleryPhotos: Array<{ src: string; alt: string }>;
+
+  if (liveGalleryPaths) {
+    // Happy path: use the server-computed list directly.
+    // alt text: first image is the project name; subsequent images are numbered.
+    visibleGalleryPhotos = liveGalleryPaths.map((src, i) => ({
       src,
-      alt: `${selectedProject.name} detail ${i + 1}`,
-    })),
-  ].filter((photo) => !projectHiddenSet.has(photo.src));
+      alt: i === 0 ? selectedProject.name : `${selectedProject.name} detail ${i}`,
+    }));
+  } else {
+    // Static fallback: API responded but this project is not in projectGalleryImages
+    // (CMS-only projects or projects not in the finished manifest).
+    // Admin cover override and hidden image filtering still apply here.
+    const adminCoverPath = (() => {
+      const c = projectCoverImages?.[selectedProject.id];
+      return c && !projectHiddenSet.has(c) ? c : null;
+    })();
 
-  const visibleGalleryPhotos: Array<{ src: string; alt: string }> = adminCoverPath
-    ? [
-        { src: adminCoverPath, alt: selectedProject.name },
-        ...baseGalleryPhotos.filter((p) => p.src !== adminCoverPath),
-      ]
-    : baseGalleryPhotos;
+    const baseGalleryPhotos: Array<{ src: string; alt: string }> = [
+      { src: selectedProject.image, alt: selectedProject.name },
+      ...(selectedProject.gallery ?? []).map((src, i) => ({
+        src,
+        alt: `${selectedProject.name} detail ${i + 1}`,
+      })),
+    ].filter((photo) => !projectHiddenSet.has(photo.src));
 
-  // If the hero image was hidden and filtered out, fall back to the first
-  // remaining gallery photo so we never show a blank first slide.
-  // If everything is hidden, render a single placeholder to avoid an empty gallery.
+    visibleGalleryPhotos = adminCoverPath
+      ? [
+          { src: adminCoverPath, alt: selectedProject.name },
+          ...baseGalleryPhotos.filter((p) => p.src !== adminCoverPath),
+        ]
+      : baseGalleryPhotos;
+  }
+
+  // Guard: if everything is hidden/empty, keep at least the baseline hero so
+  // we never render a blank gallery.
+  if (visibleGalleryPhotos.length === 0) {
+    visibleGalleryPhotos = [{ src: selectedProject.image, alt: selectedProject.name }];
+  }
+
   // versionedImage appends ?v=<hash> to bust stale cached copies after a
   // regeneration deploy. Paths not in the manifest (uploads, external) pass through.
-  const galleryPhotos: Array<{ src: string; alt: string }> = (
-    visibleGalleryPhotos.length > 0
-      ? visibleGalleryPhotos
-      : [{ src: selectedProject.image, alt: selectedProject.name }]
-  ).map((p) => ({ ...p, src: versionedImage(p.src) }));
+  const galleryPhotos: Array<{ src: string; alt: string }> = visibleGalleryPhotos.map(
+    (p) => ({ ...p, src: versionedImage(p.src) })
+  );
 
   // Per-project aspect ratio from the merged API ('16:9' | '4:3') converted to
   // CSS form. Defaults to 4/3 when the API has no entry for this project, which

@@ -49,4 +49,11 @@ export interface MergedProjectImagesResponse {
    *  ProjectDetail hero. A cover pointing at a hidden image is omitted by the server;
    *  clients should also guard defensively. */
   projectCoverImages?: Record<string, string>;
+
+  /** projectId → ordered, visible image paths for the project-detail gallery.
+   *  Admin state mirrored exactly: image_order applied, hidden images excluded,
+   *  replaced paths substituted. First entry equals projectCoverImages[projectId].
+   *  Only present for projects covered by the manifest (finished = true).
+   *  ProjectDetail uses this as the single source of truth for the gallery list. */
+  projectGalleryImages?: Record<string, string[]>;
 }

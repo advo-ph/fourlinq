@@ -97,6 +97,13 @@ export interface MergedResponse {
    *  admin automatically changes the cover. Populated for every project that has at least one
    *  non-hidden image. */
   projectCoverImages: Record<string, string>;
+  /** projectId → ordered, visible image paths for the project-detail gallery.
+   *  Reflects admin state exactly: image_order overrides applied, hidden images excluded,
+   *  replaced paths substituted. First entry equals projectCoverImages[projectId].
+   *  Populated only for projects covered by the manifest (finished = true).
+   *  Public-site ProjectDetail uses this as the authoritative gallery list so the
+   *  displayed images always match what the admin configured. */
+  projectGalleryImages: Record<string, string[]>;
 }
 
 interface OverrideRow {
@@ -432,12 +439,22 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     projectRatios[id] = ratio;
   }
 
-  // Derive projectCoverImages for public payload.
-  // Cover = first non-hidden image in the project's effective image_order (with
-  // replaced mapping applied). This is computed for EVERY project so that
-  // reordering images in admin instantly changes the cover everywhere without
-  // any manual "Set as Preview" step.
+  // Derive projectCoverImages and projectGalleryImages for public payload.
+  //
+  // For each covered project the server builds an "effective image list" that:
+  //   1. Applies image_order overrides (explicit positions first, then manifest order
+  //      for any unranked images — mirrors computeImageOrder in the admin panel).
+  //   2. Excludes images marked hidden.
+  //   3. Substitutes replaced paths.
+  //
+  // projectCoverImages[id]     = first path from the effective list (the hero).
+  // projectGalleryImages[id]   = the full effective list (cover-to-last).
+  //
+  // Reordering images in admin instantly changes both the cover and the gallery
+  // everywhere without any manual "Set as Preview" step.
   const projectCoverImages: Record<string, string> = {};
+  const projectGalleryImages: Record<string, string[]> = {};
+
   for (const projectId of coveredIds) {
     const rec = manifest.projects[projectId];
     if (!rec) continue;
@@ -461,12 +478,16 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
       orderedPaths = rec.images.map((im) => im.path);
     }
 
-    // First non-hidden image is the cover (with replaced mapping applied)
+    // Build the visible list: exclude hidden, apply replaced paths
+    const visiblePaths: string[] = [];
     for (const imgPath of orderedPaths) {
       if (hiddenSet.has(`${projectId}|${imgPath}`)) continue;
-      const effectivePath = replacedMap.get(`${projectId}|${imgPath}`) ?? imgPath;
-      projectCoverImages[projectId] = effectivePath;
-      break;
+      visiblePaths.push(replacedMap.get(`${projectId}|${imgPath}`) ?? imgPath);
+    }
+
+    if (visiblePaths.length > 0) {
+      projectCoverImages[projectId] = visiblePaths[0];
+      projectGalleryImages[projectId] = visiblePaths;
     }
   }
 
@@ -484,6 +505,7 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     deletedProjects: [...deletedProjectSet],
     projectRatios,
     projectCoverImages,
+    projectGalleryImages,
   };
 }
 

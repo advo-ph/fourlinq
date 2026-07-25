@@ -44,6 +44,29 @@ vi.mock("@/lib/cms-api", async () => {
   return { ...actual, fetchProjects: () => fetchProjects() };
 });
 
+// fetchMergedProjectImagesFresh is called by ProjectDetail to get the authoritative
+// gallery list.  Resolve immediately with empty data so mergedSettled becomes true
+// and the gallery renders in tests without hitting the real network.
+vi.mock("@/lib/merged-project-images", () => ({
+  fetchMergedProjectImagesFresh: vi.fn(() =>
+    Promise.resolve({
+      projectCategoryImages: {},
+      projectDerivedTags: {},
+      projectOrder: [],
+      projectCategoryOrder: { windows: [], doors: [], interior: [], exterior: [] },
+      hiddenImages: {},
+      replacedImages: {},
+      overrideCount: 0,
+      projectRatios: {},
+      hiddenProjects: [],
+      deletedProjects: [],
+      projectCoverImages: {},
+      projectGalleryImages: {},
+    })
+  ),
+  fetchMergedProjectImages: vi.fn(() => Promise.resolve({})),
+}));
+
 const { default: ProjectDetail } = await import("@/pages/ProjectDetail");
 
 function renderAt(slug: string) {
