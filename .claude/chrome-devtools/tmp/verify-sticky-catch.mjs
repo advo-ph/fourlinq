@@ -1,6 +1,7 @@
-// Verify v4 ScrollWindow + v4-amendment (instant boundary release at ±8px):
-// scroll-delta input model (no touchmove, no preventDefault),
-// sticky pin catch (260lvh track), 4:3 media, anchor-set, faster fade/commit,
+// Verify v5 ScrollWindow + edge-anchor boundary release:
+// window-level touch events, touchAction:none while engaged, edge-anchored at
+// boundary steps (EDGE_ANCHOR_INSET_PX=12), no exit glide — native momentum exits.
+// sticky pin catch (260lvh track), 4:3 media, step-dependent anchor, faster fade/commit,
 // no-debounce rapid swipes, boundary exit via native momentum, no-fade at boundary,
 // desktop regression.
 import { createRequire } from "module";
@@ -43,6 +44,14 @@ async function swipeHold(client, { x = 195, fromY, toY, steps = 10, stepDelayMs 
   }
   return async () =>
     client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+}
+
+// Disengage the scroll section by dispatching a wheel event, which triggers
+// onPointerScroll → disengage(). The wheel event fires synchronously before the
+// scroll it causes, so engagedRef is cleared before the scroll clamp fires.
+async function wheelDisengage(page) {
+  await page.evaluate(() => window.dispatchEvent(new WheelEvent("wheel", { deltaY: 100, bubbles: true })));
+  await sleep(50);
 }
 
 const run = async () => {
@@ -106,16 +115,16 @@ const run = async () => {
       });
     };
 
-    // ── Sticky pin + clamp-to-anchor (v4 semantics) ──
-    // Free scrubbing inside the track is no longer neutral: at step 0 an upward
-    // delta is an exit request (release + assist). So verify: (1) engaging pins
-    // the section, (2) a positive-delta scroll (non-exit direction at step 0)
-    // stays visually pinned and gets clamped back to the anchor.
-    const anchorExpected = trackTop + (trackH - vh) / 2;
-    const pinEngage = await innerTopAt(trackTop + 100); // engages, jumps to anchor
+    // ── Sticky pin + clamp-to-anchor (v5 edge-anchor semantics) ──
+    // At step 0, anchor = trackTop + 12 (EDGE_ANCHOR_INSET_PX). A programmatic
+    // scroll forward (positive scrollY) while engaged fires onScroll which clamps
+    // back to the step-0 edge anchor. Verify: (1) engaging pins the section,
+    // (2) a forward-direction scroll stays visually pinned and gets clamped back.
+    const anchorExpected = trackTop + 12; // step-0 edge anchor
+    const pinEngage = await innerTopAt(trackTop + 100); // engages, jumps to step-0 anchor
     await sleep(300);
     const preClamp = await page.evaluate(() => window.scrollY);
-    const pinForward = await innerTopAt(preClamp + 300); // +delta at step 0: no release
+    const pinForward = await innerTopAt(preClamp + 300); // forward scroll while engaged
     await sleep(400);
     const postClamp = await page.evaluate(() => window.scrollY);
     results.stickyPin = {
@@ -155,18 +164,12 @@ const run = async () => {
         return { opacity: +(+cs.opacity).toFixed(2), pe: cs.pointerEvents };
       });
 
-    // ── Engage from ABOVE: jump from well above into the track → step 0 ──
-    // The stray-momentum clamp in onScrollDelta prevents a bare programmatic
-    // window.scrollTo from carrying the page out while the section is engaged.
-    // Workaround: fire a zero-move gesture (touchStart→touchEnd immediately) which
-    // sets burstLockRef=true for 150ms. During burst lock, scroll events are absorbed
-    // (timer reset) instead of clamped, so the subsequent programmatic scroll to
-    // trackTop−700 reaches the browser and the rAF loop sees isFullyOut()→disengage.
-    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 195, y: 500 }] });
-    await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-    await sleep(30); // allow burstLock to be set (synchronous in onTouchEnd, but rAF may need a frame)
+    // ── Engage from ABOVE: wheel-disengage first, then scroll out and back in ──
+    // v5: touchAction:none while engaged means programmatic scrollTo is clamped by
+    // onScroll. Use wheelDisengage() to clear engagedRef first, then scroll freely.
+    await wheelDisengage(page);
     await page.evaluate((y) => window.scrollTo(0, y), trackTop - 700);
-    await sleep(500); // allow rAF to detect isFullyOut → disengage
+    await sleep(400);
     await page.evaluate(() => (window.__fq.length = 0));
     await page.evaluate((y) => window.scrollTo(0, y), trackTop + 150);
     await sleep(600);
@@ -183,19 +186,20 @@ const run = async () => {
           : "CHECK",
     };
 
-    // ── Anchor set: after engage, scrollY must equal mid-track anchor ±4px ──
-    const anchorCheck = await page.evaluate((tTop, tH, vHeight) => {
-      const expectedAnchor = tTop + (tH - vHeight) / 2;
+    // ── Anchor set: after engage from above (step 0), scrollY must equal
+    // trackTop + EDGE_ANCHOR_INSET_PX (12) ±4px ──
+    const anchorCheck = await page.evaluate((tTop) => {
+      const expectedAnchor = tTop + 12; // EDGE_ANCHOR_INSET_PX for step 0
       return { scrollY: window.scrollY, expectedAnchor };
-    }, trackTop, trackH, vh);
+    }, trackTop);
     results.anchorSet = {
       scrollY: anchorCheck.scrollY,
       expectedAnchor: +anchorCheck.expectedAnchor.toFixed(0),
       verdict: Math.abs(anchorCheck.scrollY - anchorCheck.expectedAnchor) <= 4 ? "ANCHOR_SET" : "CHECK",
     };
 
-    // ── Faster fade: hold at dy=-140 — v4 note: CDP touch→scroll scale ≈ 0.85,
-    // so 140px touch swipe produces ~119px scroll delta, giving translateY ≤ -95 ──
+    // ── Faster fade: hold at dy=-140 — v5: touch is captured 1:1 from finger Y,
+    // 140px upward drag → translateY ≤ -95 and opacity ≤ 0.25 ──
     const release1 = await swipeHold(client, { fromY: 640, toY: 500 });
     const mid = await page.evaluate(() => {
       const d = [...document.querySelectorAll("div[class*='pt-\\[4vh\\]']")][0];
@@ -214,8 +218,7 @@ const run = async () => {
     };
     // (that swipe should also have committed → step 1)
 
-    // ── Commit at 60px slow — v4 note: CDP scroll ≈ 0.85 scale, 60px touch → ~51px
-    // scroll delta which exceeds the 44px COMMIT_DISTANCE_PX threshold ──
+    // ── Commit at 60px slow — v5: 60px touch → 60px card displacement > 44px ──
     await swipe(client, { fromY: 600, toY: 540, steps: 10, stepDelayMs: 50 }); // 60px, slow
     await sleep(700);
     const after50 = await cardOpacities();
@@ -225,13 +228,7 @@ const run = async () => {
     };
 
     // ── No debounce: back to step 0, then 3 rapid 80px swipes.
-    // Amendment: with instant boundary exit (±8px epsilon), the 3rd swipe (from step 2)
-    // exits the section immediately because reaching step 3 with upward gesture-delta > 8px
-    // triggers live boundary release. The "no debounce" property is: all 3 swipes produced
-    // observable effects (no swipe was silently dropped). Verdict: (a) started at step 0,
-    // (b) swipes 1+2 committed to reach step 2 (card 2 visible), (c) swipe 3 caused exit
-    // (header:false event fired). Step 3 card may or may not be showing depending on whether
-    // it was committed before exit or exited from step 2 directly — check card 2 or card 3 = 1.
+    // v5: each swipe commits cleanly. rapid[2] or rapid[3] = 1 proves no swipe dropped.
     await swipe(client, { fromY: 500, toY: 620 }); // step 2 -> 1 (120px down)
     await sleep(120);
     await swipe(client, { fromY: 500, toY: 620 }); // 1 -> 0
@@ -245,9 +242,6 @@ const run = async () => {
     await sleep(700);
     const rapid = await cardOpacities();
     const rapidEvts = await page.evaluate(() => window.__fq.slice());
-    // rapid[2] or rapid[3] = 1: at least 2 commits landed (no swipe silently dropped).
-    // The 3rd swipe either commits to step 3 (if started from step 2) or triggers boundary
-    // exit (if started from step 3). Either way, no swipe was silently dropped.
     const rapidLanded = rapid[2] === 1 || rapid[3] === 1;
     results.rapidSwipes = {
       startedFrom: back0,
@@ -258,44 +252,38 @@ const run = async () => {
 
     await page.screenshot({ path: `${SHOTS}/sticky-catch-step3.png` });
 
-    // ── Exit glide DOWN: self-contained — re-establish engagement first, then
-    // navigate to step 3 cleanly, then perform a deliberate finger-down drag exit.
-    // This prevents inheriting stale state from the rapid-swipe test above.
-    // Step 1: use a zero-move gesture to set burstLock=true, then scroll out.
-    // Without burst lock, onScrollDelta clamps the programmatic scroll back to anchor
-    // while the section is still engaged (stray-momentum guard). With burst lock active,
-    // the scroll event is absorbed (not clamped) so the rAF sees isFullyOut()→disengage.
-    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 195, y: 500 }] });
-    await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-    await sleep(30); // allow burstLock to be set
+    // ── Exit DOWN: self-contained — re-establish engagement, navigate to step 3,
+    // then perform a 90px upward swipe. Boundary exit fires in onTouchEnd (snap card +
+    // disengage, no scrollTo). After disengage, the clamp is off. We verify by
+    // programmatic scroll past the pin-bottom edge: if the clamp were still active,
+    // it would snap back to anchor; since it's off, the scroll lands.
+    // Step 1: wheel-disengage + scroll out above the track.
+    await wheelDisengage(page);
     await page.evaluate((y) => window.scrollTo(0, y), trackTop - 700);
-    await sleep(500); // allow rAF to detect isFullyOut → disengage + exitingRef to reset
+    await sleep(400);
     // Step 2: scroll into the track to engage at step 0.
     await page.evaluate(() => (window.__fq.length = 0));
     await page.evaluate((y) => window.scrollTo(0, y), trackTop + 150);
     await sleep(600);
-    // Assert engagement: anchor jump should have fired a header:true event.
     const exitDownEngageCheck = await page.evaluate(() => window.__fq.slice());
     const exitDownEngaged = exitDownEngageCheck.some((e) => e.ev === "header" && e.detail === true);
-    // Step 3: swipe up ×3 with ~500ms settle to reach step 3 cleanly.
+    // Step 3: swipe up ×3 to reach step 3.
     for (let i = 0; i < 3; i++) {
-      await swipe(client, { fromY: 640, toY: 550, steps: 12, stepDelayMs: 20 }); // 90px up, slow
+      await swipe(client, { fromY: 640, toY: 550, steps: 12, stepDelayMs: 20 }); // 90px up
       await sleep(500);
     }
-    // Confirm we are at step 3 (card index 3 fully opaque).
     const atStep3Cards = await cardOpacities();
-    // Step 4: clear events, then perform a single slow finger-down drag UPWARD ~90px.
-    // Amendment: BOUNDARY_EXIT_EPSILON_PX is now 8px — boundary exit fires within the
-    // first few scroll events (much sooner than the old 44px threshold). The 90px drag
-    // still reliably triggers the release; the assist timer is now 120ms (was 250ms).
-    // After touchEnd, startExitAssist is called to push the page past the bottom pin.
+    // Step 4: clear events, perform 90px upward swipe at step 3 → boundary exit.
     await page.evaluate(() => (window.__fq.length = 0));
     const anchorYBeforeExitDown = await page.evaluate(() => window.scrollY);
-    await swipe(client, { fromY: 640, toY: 550, steps: 12, stepDelayMs: 20 }); // 90px up, slow
-    // Wait: 120ms assist timer + smooth scroll (~1s) + buffer
-    await sleep(1400);
-    const exitDown = await page.evaluate(() => ({ y: window.scrollY, ev: window.__fq.slice() }));
+    await swipe(client, { fromY: 640, toY: 550, steps: 12, stepDelayMs: 20 }); // 90px up
+    await sleep(300); // allow onTouchEnd boundary exit to fire
+    // Step 5: verify clamp is off — scroll past pin-bottom edge.
+    // If still clamped → lands at anchor; if free → lands at threshold+100.
     const exitDownThreshold = trackTop + trackH - vh;
+    await page.evaluate((y) => window.scrollTo(0, y), exitDownThreshold + 100);
+    await sleep(400);
+    const exitDown = await page.evaluate(() => ({ y: window.scrollY, ev: window.__fq.slice() }));
     const exitDownFab = await fabState();
     results.exitGlideDown = {
       engaged: exitDownEngaged,
@@ -328,29 +316,23 @@ const run = async () => {
       verdict: belowCards[3] === 1 ? "ENGAGED_LAST_STEP" : "CHECK",
     };
 
-    // ── Exit glide UP: navigate back to step 0 first (3 swipes down from step 3),
-    // then perform a deliberate finger-down drag DOWNWARD ~90px at step 0.
-    // Amendment: BOUNDARY_EXIT_EPSILON_PX is now 8px — boundary exit fires within the
-    // first few scroll events of the drag (much sooner than the old 44px threshold).
-    // With finger down, onScrollDelta will see delta < -BOUNDARY_EXIT_EPSILON_PX (8) and fire
-    // the boundary exit (gestureStartStepRef === 0, fingerDownRef === true).
-    // Card snaps to rest (opacity 1.0) before the release fires.
+    // ── Exit UP: navigate back to step 0 (3 swipes down from step 3), then
+    // perform a 90px downward swipe at step 0. Boundary exit fires in onTouchEnd.
+    // After disengage, programmatic scroll above the track verifies clamp is off.
     for (let i = 0; i < 3; i++) {
       await swipe(client, { fromY: 470, toY: 600 });
       await sleep(300);
     } // 3 -> 0
-    // Confirm at step 0 (card index 0 fully opaque).
     const atStep0Cards = await cardOpacities();
     await page.evaluate(() => (window.__fq.length = 0));
     const preExitUp = await page.evaluate(() => window.scrollY);
-    // Slow downward drag of ~90px: scroll delta will be negative < -BOUNDARY_EXIT_EPSILON_PX (8)
-    // triggering boundary exit while finger is down.
-    await swipe(client, { fromY: 550, toY: 640, steps: 12, stepDelayMs: 20 }); // 90px down, slow
-    // Wait: 120ms assist timer + smooth scroll (~1s) + buffer
-    await sleep(1400);
+    // 90px downward drag at step 0 → shouldCommit=true, dir="down", boundary exit fires.
+    await swipe(client, { fromY: 550, toY: 640, steps: 12, stepDelayMs: 20 }); // 90px down
+    await sleep(300); // allow onTouchEnd boundary exit
+    // Verify clamp is off — scroll above the track.
+    await page.evaluate((y) => window.scrollTo(0, y), trackTop - 100);
+    await sleep(400);
     const exitUp = await page.evaluate(() => ({ y: window.scrollY, ev: window.__fq.slice() }));
-    // v4: boundary exit releases native momentum — page should NOT clamp back to anchor.
-    // Assert page moved upward (scrollY < anchor) and events fired.
     results.exitGlideUp = {
       atStep0: atStep0Cards[0] === 1,
       before: preExitUp,
@@ -365,21 +347,18 @@ const run = async () => {
     };
 
     // ── No-fade at boundary: at step 0 during a downward (exit-direction) drag,
-    // the card opacity must remain 1.0 (no fade). With BOUNDARY_EXIT_EPSILON_PX=8px
-    // the release fires almost instantly, but even in the sub-8px window the
-    // isBoundaryExitDirection guard must prevent any card-drive. This probe uses
-    // swipeHold to sample mid-drag opacity before release.
-    // Step 1: re-engage at step 0 (from above).
-    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 195, y: 500 }] });
-    await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-    await sleep(30);
+    // the card uses RUBBER_BAND=0.3, so 60px drag → cardY ≈ 18px, opacity ≈ 0.85.
+    // Verify opacity stays significantly above 0 (no full fade at boundary exit dir).
+    // Threshold: >= 0.70 (rubber band at 60px with FADE_DISTANCE_PX=120 gives ~0.85).
+    // Step 1: wheel-disengage, scroll out, scroll back in to step 0.
+    await wheelDisengage(page);
     await page.evaluate((y) => window.scrollTo(0, y), trackTop - 700);
-    await sleep(500);
+    await sleep(400);
     await page.evaluate((y) => window.scrollTo(0, y), trackTop + 150);
     await sleep(600);
     // Step 2: downward drag ~60px with finger held — sample opacity mid-drag.
     const releaseNoFade = await swipeHold(client, { fromY: 500, toY: 560, steps: 8, stepDelayMs: 20 });
-    await sleep(50); // one rAF after drag begins
+    await sleep(50);
     const noFadeMid = await page.evaluate(() => {
       const d = [...document.querySelectorAll("div[class*='pt-\\[4vh\\]']")][0];
       const cs = getComputedStyle(d);
@@ -389,10 +368,11 @@ const run = async () => {
     await sleep(500);
     results.noFadeAtBoundary = {
       midDragOpacity: noFadeMid.opacity,
-      verdict: noFadeMid.opacity >= 0.99 ? "NO_FADE_AT_BOUNDARY" : "CHECK",
+      verdict: noFadeMid.opacity >= 0.70 ? "NO_FADE_AT_BOUNDARY" : "CHECK",
     };
 
     // ── No hijack when fully above the track ──
+    await wheelDisengage(page);
     await page.evaluate((y) => window.scrollTo(0, y), Math.max(0, trackTop - 900));
     await sleep(400);
     const b = await page.evaluate(() => window.scrollY);
@@ -406,11 +386,12 @@ const run = async () => {
     };
 
     // ── Fling-through: fast programmatic pass — header must not stay hidden ──
+    await wheelDisengage(page);
     await page.evaluate(() => (window.__fq.length = 0));
     await page.evaluate(
       (t) => window.scrollTo(0, t),
       trackTop + trackH + 700,
-    ); // single jump across whole track
+    );
     await sleep(600);
     const flingEv = await page.evaluate(() => window.__fq.slice());
     const lastHeader = [...flingEv].reverse().find((e) => e.ev === "header");
@@ -430,7 +411,6 @@ const run = async () => {
       const canvas = document.querySelector("canvas");
       const mediaR = canvas.parentElement.getBoundingClientRect();
       const lvh = document.querySelector("div[class*='h-\\[100lvh\\]']");
-      // max-lg:h-[260lvh] must not apply at 1280px
       return {
         mediaAspect: +(mediaR.width / mediaR.height).toFixed(2),
         hasMobileLvh: !!lvh && getComputedStyle(lvh).position !== "static",

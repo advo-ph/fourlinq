@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { motion, useMotionValue, animate, type AnimationPlaybackControls } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
 import { useSegmentedFrames } from "@/hooks/useSegmentedFrames";
@@ -80,9 +80,7 @@ const COMMIT_DISTANCE_PX = 44;  // displacement threshold for commit
 const COMMIT_VELOCITY = 0.35;   // px/ms threshold for velocity commit
 const RUBBER_BAND = 0.3;        // drag resistance at boundary steps in the exit direction
 const VELOCITY_STALE_MS = 80;   // pause longer than this before release → drag, not flick
-const EXIT_OVERSHOOT_VH = 0.35; // exit glide lands this far past the pin edge
-const EXIT_EDGE_RUNWAY_PX = 24; // exit glide starts this far inside the pin edge (invisible) — not from the anchor
-const GLIDE_CANCEL_REVERSAL_PX = 12; // finger reversal against a live glide reclaims control at this distance
+const EDGE_ANCHOR_INSET_PX = 12; // boundary steps anchor this far inside the pin edge — keeps pin condition satisfied while sitting effectively at the edge
 const POINTER_SCROLL_COOLDOWN_MS = 400; // wheel/keyboard scrolling suppresses engagement for this long
 
 const ScrollWindow = () => {
@@ -103,10 +101,6 @@ const ScrollWindow = () => {
   const gestureBaseOpacityRef = useRef(1); // cardOpacity at the baseline — keeps the fade continuous when grabbing mid-animation
   const nativePanRef = useRef(false);      // this gesture is a browser-owned native scroll (non-cancelable moves) — clamp holds the page, exits defer to touchend
   const touchSamplesRef = useRef<Array<{ y: number; t: number }>>([]); // last ≤5 touchmove samples for flick velocity
-  const exitAnimRef = useRef<AnimationPlaybackControls | null>(null);  // in-flight exit glide; non-null suppresses re-engagement, any touchstart cancels it
-  const glideScrollYRef = useRef(0);       // last scrollY the glide wrote — re-asserted by onScroll so nothing else can fight the glide
-  const glideDirRef = useRef<"up" | "down">("down"); // live glide direction — a finger reversal against it reclaims control
-  const glideStartTouchYRef = useRef(0);   // finger Y when the glide started — baseline for the reversal check
   const pointerScrollUntilRef = useRef(0); // wheel/keyboard scroll seen until this timestamp — engagement suppressed (no touch = no way to swipe out)
   const lastInSectionFlagRef = useRef<boolean | null>(null); // shared dedupe flag for fq-hide-header / fq-scrollwindow-inview dispatches
 
@@ -250,21 +244,25 @@ const ScrollWindow = () => {
       return rect.top > 0 || rect.bottom < window.innerHeight;
     };
 
-    const cancelExitGlide = () => {
-      if (exitAnimRef.current !== null) {
-        exitAnimRef.current.stop();
-        exitAnimRef.current = null;
-      }
+    // Step-dependent anchor: boundary steps sit EDGE_ANCHOR_INSET_PX inside the
+    // pin edge so the page is already at the edge — native momentum exits instantly.
+    // Middle steps sit at mid-track for symmetric clamp room in both directions.
+    const anchorForStep = (s: number): number => {
+      const rect = el.getBoundingClientRect();
+      const trackTopAbs = rect.top + window.scrollY;
+      const trackHeight = rect.height;
+      const innerHeight = window.innerHeight;
+      if (s === 0) return trackTopAbs + EDGE_ANCHOR_INSET_PX;
+      if (s === STEP_COUNT - 1) return trackTopAbs + trackHeight - innerHeight - EDGE_ANCHOR_INSET_PX;
+      return trackTopAbs + (trackHeight - innerHeight) / 2;
     };
 
     const engage = (entryStep: number) => {
-      cancelExitGlide();
       engagedRef.current = true;
       stepRef.current = entryStep;
       setStep(entryStep);
-      // Anchor: mid-track position so parasitic scroll has clamp room both ways
-      const rect = el.getBoundingClientRect();
-      anchorYRef.current = rect.top + window.scrollY + (rect.height - window.innerHeight) / 2;
+      // Anchor: step-dependent — boundary steps sit at the edge, middle at mid-track.
+      anchorYRef.current = anchorForStep(entryStep);
       window.scrollTo(0, anchorYRef.current);
       cardY.stop();
       cardOpacity.stop();
@@ -293,45 +291,11 @@ const ScrollWindow = () => {
       dispatchInSection(false);
     };
 
-    // Boundary exit: deterministic scroll glide past the pin edge. "down" leaves
-    // past the bottom edge (swiped up on the last step), "up" past the top edge
-    // (swiped down on the intro). Cancelable — a touchstart mid-glide re-engages,
-    // and a still-down finger reversing against it reclaims control (onTouchMove).
-    // The glide snaps to just inside the pin edge first (invisible under the pin)
-    // so visible motion starts immediately instead of easing through ~80lvh of
-    // hidden track. While it runs, onScroll re-asserts the glide's position —
-    // single-writer discipline so native pan/momentum can't fight it.
-    const startExitGlide = (dir: "up" | "down") => {
-      disengage(); // also snaps the card to rest
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const trackTopAbs = rect.top + window.scrollY;
-      // scrollY at which the pin edge is crossed
-      const edgeY = dir === "down" ? trackTopAbs + rect.height - vh : trackTopAbs;
-      const start =
-        dir === "down"
-          ? Math.max(window.scrollY, edgeY - EXIT_EDGE_RUNWAY_PX)
-          : Math.min(window.scrollY, edgeY + EXIT_EDGE_RUNWAY_PX);
-      const target = dir === "down" ? edgeY + vh * EXIT_OVERSHOOT_VH : edgeY - vh * EXIT_OVERSHOOT_VH;
-      cancelExitGlide();
-      glideDirRef.current = dir;
-      glideStartTouchYRef.current = lastTouchYRef.current;
-      glideScrollYRef.current = start;
-      window.scrollTo(0, start);
-      exitAnimRef.current = animate(start, target, {
-        duration: 0.45,
-        ease: [0.16, 1, 0.3, 1],
-        onUpdate: (v) => {
-          glideScrollYRef.current = v;
-          window.scrollTo(0, v);
-        },
-        onComplete: () => {
-          exitAnimRef.current = null;
-        },
-      });
-    };
-
     const springBack = () => {
+      // Clamp to current step's anchor for consistency — anchor is already set
+      // correctly, so this is just a safety re-assert.
+      anchorYRef.current = anchorForStep(stepRef.current);
+      window.scrollTo(0, anchorYRef.current);
       animate(cardY, 0, { type: "spring", stiffness: 380, damping: 32 });
       animate(cardOpacity, 1, { duration: 0.18 });
     };
@@ -342,11 +306,14 @@ const ScrollWindow = () => {
       // 1. Advance step synchronously — React binds the new card immediately
       stepRef.current = next;
       setStep(next);
-      // 2. Set entry pose for incoming card (old card is inactive → opacity 0 via style binding)
+      // 2. Re-anchor to the new step's position (edge anchor for boundary steps)
+      anchorYRef.current = anchorForStep(next);
+      window.scrollTo(0, anchorYRef.current);
+      // 3. Set entry pose for incoming card (old card is inactive → opacity 0 via style binding)
       const entryY = direction === "up" ? 36 : -36;
       cardY.set(entryY);
       cardOpacity.set(0);
-      // 3. Spring in — interruptible: the next touchstart stops and rebases
+      // 4. Spring in — interruptible: the next touchstart stops and rebases
       animate(cardY, 0, { type: "spring", stiffness: 300, damping: 30, velocity: 0 });
       animate(cardOpacity, 1, { duration: 0.28 });
     };
@@ -361,14 +328,10 @@ const ScrollWindow = () => {
       if (!engagedRef.current) {
         if (
           isPinned() &&
-          exitAnimRef.current === null &&
           performance.now() > pointerScrollUntilRef.current
         ) {
-          // Not during an exit glide — the glide's own scroll through the pin
-          // range must not re-engage. (Suppression dies with the glide handle,
-          // so it can never strand the section in a frozen state.)
-          // Not during pointer scrolling either — wheel/keyboard users have no
-          // touch gestures to swipe out with, so engaging would trap them.
+          // Not during pointer scrolling — wheel/keyboard users have no touch
+          // gestures to swipe out with, so engaging would trap them.
           consecutivePinCount++;
           if (consecutivePinCount >= 2) {
             consecutivePinCount = 0;
@@ -398,7 +361,6 @@ const ScrollWindow = () => {
           cardY: Math.round(cardY.get()),
           touch: touchActiveRef.current,
           pan: nativePanRef.current,
-          glide: exitAnimRef.current !== null,
           anchor: Math.round(anchorYRef.current),
           off: Math.round(window.scrollY - anchorYRef.current),
           pinTop: Math.round(r.top),
@@ -420,12 +382,6 @@ const ScrollWindow = () => {
       if (!touch) return;
       touchActiveRef.current = true;
       lastTouchYRef.current = touch.clientY;
-      // Grabbing the page mid-exit-glide: cancel the glide; if the section is
-      // still pinned re-engage on the same card, otherwise native scroll resumes.
-      if (exitAnimRef.current !== null) {
-        cancelExitGlide();
-        if (isPinned()) engage(stepRef.current);
-      }
       if (!engagedRef.current) return;
       // Zero-delay chaining: stop in-flight springs, rebase from the current pose.
       cardY.stop();
@@ -457,24 +413,6 @@ const ScrollWindow = () => {
       const y = touch.clientY;
       lastTouchYRef.current = y;
 
-      // A still-down finger reversing against a live exit glide reclaims control:
-      // cancel the glide and re-engage on the same card — but ONLY while the pin
-      // still holds. Cancelling without re-engaging would strand the page
-      // mid-glide with a dead (captured) finger; once the pin edge has crossed,
-      // the exit is already visibly animating — let it finish. (Co-directional
-      // motion must NOT cancel — the same gesture's next move would otherwise
-      // kill every mid-gesture exit instantly.)
-      if (exitAnimRef.current !== null && touchActiveRef.current) {
-        const d = y - glideStartTouchYRef.current;
-        const reversed =
-          glideDirRef.current === "up" ? d < -GLIDE_CANCEL_REVERSAL_PX : d > GLIDE_CANCEL_REVERSAL_PX;
-        if (reversed && isPinned()) {
-          cancelExitGlide();
-          engage(stepRef.current);
-          lastEvt = "glide-cancel";
-        }
-      }
-
       if (!engagedRef.current) return;
       // Mid-gesture captures may be an active native scroll (non-cancelable) —
       // the scroll clamp below holds the page for those; the card still follows.
@@ -491,16 +429,10 @@ const ScrollWindow = () => {
       const exitDrag = (atFirst && dy > 0) || (atLast && dy < 0);
 
       if (exitDrag) {
-        // Past the commit distance the gesture leaves the section immediately —
-        // no waiting for the finger to lift. ONLY for fully captured gestures:
-        // a native-pan capture has a live scroll writer, so starting the glide
-        // now would drop the clamp and fight it — those exit at touchend instead.
-        if (Math.abs(dy) > COMMIT_DISTANCE_PX && !nativePanRef.current) {
-          lastEvt = "exit-drag";
-          startExitGlide(atLast ? "down" : "up");
-          return;
-        }
-        // Under it (or a native pan): rubber-band resistance.
+        // Exit-direction drag at a boundary step: rubber-band only. The page is
+        // already edge-anchored (EDGE_ANCHOR_INSET_PX from the pin edge), so
+        // lifting the finger lets native momentum carry the page out naturally —
+        // no programmatic assist needed.
         const ry = gestureBaseCardYRef.current + dy * RUBBER_BAND;
         cardY.set(ry);
         cardOpacity.set(fadeFrom(ry));
@@ -542,15 +474,29 @@ const ScrollWindow = () => {
       // Flick direction wins over net displacement (drag down, flick up → up).
       const dir: "up" | "down" = flick ? (v < 0 ? "up" : "down") : dy < 0 ? "up" : "down";
 
-      if (!shouldCommit) {
+      const atBoundaryExit =
+        (dir === "up" && stepRef.current === STEP_COUNT - 1) ||
+        (dir === "down" && stepRef.current === 0);
+
+      if (atBoundaryExit && shouldCommit) {
+        // Snap the card to rest, disengage, and let native momentum carry the
+        // page out. The page is already edge-anchored (EDGE_ANCHOR_INSET_PX from
+        // the pin edge) — no assist scroll needed; the finger's own gesture has
+        // enough energy to cross the remaining 12px + continue naturally.
+        // Suppress re-engagement for 400ms so the rAF loop doesn't re-engage while
+        // the user's momentum is carrying the page the last 12px + beyond.
+        cardY.stop();
+        cardOpacity.stop();
+        cardY.set(0);
+        cardOpacity.set(1);
+        engagedRef.current = false;
+        el.style.touchAction = "";
+        pointerScrollUntilRef.current = performance.now() + 400;
+        dispatchInSection(false);
+        lastEvt = dir === "up" ? "te-exit-dn" : "te-exit-up";
+      } else if (!shouldCommit) {
         springBack();
         lastEvt = "te-spring";
-      } else if (dir === "up" && stepRef.current === STEP_COUNT - 1) {
-        startExitGlide("down");
-        lastEvt = "te-exit-dn";
-      } else if (dir === "down" && stepRef.current === 0) {
-        startExitGlide("up");
-        lastEvt = "te-exit-up";
       } else {
         commitCard(dir);
         lastEvt = "te-commit";
@@ -558,7 +504,7 @@ const ScrollWindow = () => {
     };
 
     // A canceled gesture (system UI stole the touch — notification shade, edge
-    // gesture, incoming call) must never commit a step or fire an exit glide.
+    // gesture, incoming call) must never commit a step or fire an exit.
     const onTouchCancel = (e: TouchEvent) => {
       if (e.touches.length > 0) {
         // A finger remains — hand the gesture to it, same as touchend.
@@ -577,17 +523,10 @@ const ScrollWindow = () => {
       lastEvt = "tc";
     };
 
-    // Single scroll writer at all times:
-    //  • glide live → re-assert the glide's last written position, so a captured
-    //    native pan or its fling momentum can't fight the exit;
-    //  • engaged → re-clamp to the anchor (invisible under the sticky pin).
+    // Clamp to anchor while engaged (invisible under the sticky pin).
+    // When disengaged (boundary exit fired), do NOT clamp — native momentum
+    // carries the page out past the edge.
     const onScroll = () => {
-      if (exitAnimRef.current !== null) {
-        if (Math.abs(window.scrollY - glideScrollYRef.current) > 0.5) {
-          window.scrollTo(0, glideScrollYRef.current);
-        }
-        return;
-      }
       if (!engagedRef.current) return;
       if (Math.abs(window.scrollY - anchorYRef.current) > 0.5) {
         window.scrollTo(0, anchorYRef.current);
@@ -612,7 +551,6 @@ const ScrollWindow = () => {
     };
 
     const onOrientationChange = () => {
-      cancelExitGlide();
       disengage();
       setStep(0);
       stepRef.current = 0;
@@ -638,7 +576,6 @@ const ScrollWindow = () => {
       window.removeEventListener("wheel", onPointerScroll);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("orientationchange", onOrientationChange);
-      cancelExitGlide();
       engagedRef.current = false;
       touchActiveRef.current = false;
       el.style.touchAction = "";
@@ -976,7 +913,7 @@ const PartBody = ({
               >
                 {/* Matches the numbered pin on the still — mobile only */}
                 <span
-                  className="mt-px flex h-5 w-5 flex-none items-center justify-center rounded-full bg-[color:var(--accent)] text-[0.65rem] font-semibold leading-none text-white lg:hidden"
+                  className="mt-px flex h-3.5 w-3.5 flex-none items-center justify-center rounded-full bg-[color:var(--accent)] text-[0.5rem] font-semibold leading-none text-white lg:hidden"
                   aria-hidden="true"
                 >
                   {ci + 1}
