@@ -141,6 +141,9 @@ interface AddOverrideBody {
   category?: string | null;
   value_text?: string | null;
   value_int?: number | null;
+  /** Client-only flag. When true the mutation's onSuccess skips invalidateQueries
+   *  so the caller can batch-invalidate once after all POSTs complete. */
+  _skipInvalidate?: boolean;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -826,6 +829,8 @@ function ProjectDetailView({
   onSelectProject,
   onAddOverride,
   onDeleteOverride,
+  queryClient,
+  onShowToast,
 }: {
   project: BaselineProject;
   baselineData: BaselineResponse;
@@ -834,6 +839,8 @@ function ProjectDetailView({
   onSelectProject: (id: string) => void;
   onAddOverride: (body: AddOverrideBody) => Promise<void>;
   onDeleteOverride: (id: number) => Promise<void>;
+  queryClient: ReturnType<typeof useQueryClient>;
+  onShowToast: (msg: string, kind?: "success" | "error") => void;
 }) {
   const [orderTab, setOrderTab] = useState<"all" | Category>("all");
   const [lightbox, setLightbox] = useState<LightboxData | null>(null);
@@ -898,8 +905,12 @@ function ProjectDetailView({
     exterior: categoryProjectOrder("exterior"),
   });
 
-  // FIX 4: Drag guard — prevents resync effects from clobbering an in-progress drag.
+  // FIX 1/4: Drag guard — prevents resync effects from clobbering an in-progress drag
+  // or overlapping drag-end saves.
   const isDraggingRef = useRef(false);
+  // FIX 4: Tracks whether a drag-end save batch is currently in flight so a second
+  // drag that completes before the first save finishes is rejected gracefully.
+  const isSavingRef = useRef(false);
 
   // FIX 4: Resync allOrderIds / catOrderIds whenever baselineData changes (e.g. after
   // a save mutation causes TanStack to refetch). Skip if a drag is in progress so
@@ -935,45 +946,115 @@ function ProjectDetailView({
 
   // DnD handlers
   async function handleProjectOrderEnd(event: DragEndEvent, ids: string[], setIds: (ids: string[]) => void, overrideType: "project_order" | "category_order", category?: Category) {
-    isDraggingRef.current = false;
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    // No-op drag (dropped in place or missed target) — release guard immediately.
+    if (!over || active.id === over.id) {
+      isDraggingRef.current = false;
+      return;
+    }
+
+    // FIX 4: Block overlapping saves — a previous save batch is still in flight.
+    if (isSavingRef.current) {
+      isDraggingRef.current = false;
+      onShowToast("Previous order save still in progress — please wait and try again.");
+      return;
+    }
+
     const oldIdx = ids.indexOf(String(active.id));
     const newIdx = ids.indexOf(String(over.id));
     const newIds = arrayMove(ids, oldIdx, newIdx);
     setIds(newIds);
-    // Save position overrides for all items
-    await Promise.all(
-      newIds.map((pid, pos) =>
-        onAddOverride({
-          project_id: pid,
-          image_path: "__project__",
-          override_type: overrideType,
-          category: category ?? null,
-          value_int: pos,
-        })
-      )
-    );
+
+    // FIX 2: Keep the drag guard true through the entire save so resync effects
+    // don't clobber the optimistic order while POSTs are in flight.
+    isSavingRef.current = true;
+    let saveError = false;
+    try {
+      // FIX 2: Skip per-row invalidation; batch-invalidate ONCE below.
+      await Promise.all(
+        newIds.map((pid, pos) =>
+          onAddOverride({
+            project_id: pid,
+            image_path: "__project__",
+            override_type: overrideType,
+            category: category ?? null,
+            value_int: pos,
+            _skipInvalidate: true,
+          })
+        )
+      );
+      // FIX 2: Single invalidation after all POSTs succeed. project_order also
+      // affects the baseline order so invalidate both.
+      queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "baseline"] });
+      // FIX 3: Success toast.
+      onShowToast("Project order saved", "success");
+    } catch {
+      saveError = true;
+      onShowToast("Order may be partially saved — please re-drag to fix.");
+    } finally {
+      // FIX 1: Release the guard only after all POSTs have completed (or failed).
+      isSavingRef.current = false;
+      isDraggingRef.current = false;
+      if (saveError) {
+        // Revert optimistic state so the UI reflects actual DB state after refetch.
+        queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
+        queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "baseline"] });
+      }
+    }
   }
 
   async function handleImageOrderEnd(event: DragEndEvent) {
-    isDraggingRef.current = false;
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    // No-op drag — release guard immediately.
+    if (!over || active.id === over.id) {
+      isDraggingRef.current = false;
+      return;
+    }
+
+    // FIX 4: Block overlapping saves.
+    if (isSavingRef.current) {
+      isDraggingRef.current = false;
+      onShowToast("Previous order save still in progress — please wait and try again.");
+      return;
+    }
+
     const oldIdx = imageOrderIds.indexOf(String(active.id));
     const newIdx = imageOrderIds.indexOf(String(over.id));
     const newIds = arrayMove(imageOrderIds, oldIdx, newIdx);
     setImageOrderIds(newIds);
-    await Promise.all(
-      newIds.map((imgPath, pos) =>
-        onAddOverride({
-          project_id: project.id,
-          image_path: imgPath,
-          override_type: "image_order",
-          value_int: pos,
-        })
-      )
-    );
+
+    // FIX 1: Keep the drag guard true through the entire save.
+    isSavingRef.current = true;
+    let saveError = false;
+    try {
+      // FIX 2: Skip per-row invalidation; batch-invalidate ONCE below.
+      await Promise.all(
+        newIds.map((imgPath, pos) =>
+          onAddOverride({
+            project_id: project.id,
+            image_path: imgPath,
+            override_type: "image_order",
+            value_int: pos,
+            _skipInvalidate: true,
+          })
+        )
+      );
+      // FIX 2: Single invalidation after all POSTs succeed.
+      queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
+      // FIX 3: Success toast.
+      onShowToast("Image order saved", "success");
+    } catch {
+      saveError = true;
+      onShowToast("Order may be partially saved — please re-drag to fix.");
+    } finally {
+      // FIX 1: Release only after all POSTs complete.
+      isSavingRef.current = false;
+      isDraggingRef.current = false;
+      if (saveError) {
+        queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
+      }
+    }
   }
 
   // Project-level action helpers
@@ -1370,6 +1451,7 @@ export default function ProjectImagesPanel() {
   const queryClient = useQueryClient();
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [toastKind, setToastKind] = useState<"success" | "error">("error");
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Whenever a project detail view opens (from the list grid or from another
@@ -1383,8 +1465,9 @@ export default function ProjectImagesPanel() {
 
   const [applyingExterior, setApplyingExterior] = useState(false);
 
-  function showToast(msg: string) {
+  function showToast(msg: string, kind: "success" | "error" = "error") {
     setToastMsg(msg);
+    setToastKind(kind);
     setTimeout(() => setToastMsg(null), 4000);
   }
 
@@ -1447,17 +1530,23 @@ export default function ProjectImagesPanel() {
   ]);
 
   const addOverrideMutation = useMutation({
-    mutationFn: (body: AddOverrideBody) =>
-      fetch("/api/admin/project-images/overrides", {
+    mutationFn: (body: AddOverrideBody) => {
+      // Strip client-only fields before sending to the server.
+      const { _skipInvalidate: _omit, ...serverBody } = body;
+      return fetch("/api/admin/project-images/overrides", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(serverBody),
       }).then((r) => {
         if (!r.ok) return r.json().then((d: { error?: string }) => Promise.reject(new Error(d.error ?? `Save failed: ${r.status}`)));
         return r.json();
-      }),
+      });
+    },
     onSuccess: (_data, body) => {
+      // Skip per-row invalidation when the caller will batch-invalidate at the end
+      // (e.g. drag-reorder saves all positions then invalidates once).
+      if (body._skipInvalidate) return;
       queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
       // Project-level overrides (flag/hide/delete/ratio) are reflected in the baseline
       // endpoint — invalidate it too so the UI updates immediately.
@@ -1546,8 +1635,12 @@ export default function ProjectImagesPanel() {
     <div ref={panelRef} className="relative scroll-mt-20">
       {/* Toast notification */}
       {toastMsg && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-foreground text-background text-xs px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2">
-          <AlertTriangle size={13} />
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 text-xs px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2 ${
+          toastKind === "success"
+            ? "bg-green-700 text-white"
+            : "bg-foreground text-background"
+        }`}>
+          {toastKind === "success" ? <Check size={13} /> : <AlertTriangle size={13} />}
           {toastMsg}
         </div>
       )}
@@ -1586,6 +1679,8 @@ export default function ProjectImagesPanel() {
           onSelectProject={setSelectedProjectId}
           onAddOverride={addOverride}
           onDeleteOverride={deleteOverride}
+          queryClient={queryClient}
+          onShowToast={showToast}
         />
       ) : (
         <ProjectListView
