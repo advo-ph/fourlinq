@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { versionedImage } from "@/lib/image-version";
 
 /**
  * Scroll-driven editorial showcase. Four scenes, each pairing one real
@@ -132,7 +133,7 @@ const HeroScroll3D = () => {
           {SCENES.map((s, i) => (
             <img
               key={i}
-              src={s.imageSrc}
+              src={versionedImage(s.imageSrc)}
               alt={s.imageAlt}
               loading={i === 0 ? "eager" : "lazy"}
               decoding="async"

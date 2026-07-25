@@ -14,6 +14,7 @@ import { fetchProjects, mergeProject } from "@/lib/cms-api";
 import { cn } from "@/lib/utils";
 import type { MergedProjectImagesResponse } from "@/types/project-images";
 import { toThumbPath } from "@/lib/project-thumbs";
+import { versionedImage } from "@/lib/image-version";
 import { fetchMergedProjectImages } from "@/lib/merged-project-images";
 
 type Filter = "all" | InspirationTag;
@@ -83,7 +84,8 @@ interface CardImageProps {
 
 function CardImage({ src, alt, className }: CardImageProps) {
   // thumbSrc is the preferred small variant; falls back to src on error.
-  const thumbSrc = toThumbPath(src);
+  // versionedImage appends ?v=<hash> so browsers bypass stale cached copies.
+  const thumbSrc = versionedImage(toThumbPath(src));
 
   // displayedSrc is what the <img> actually renders; it trails the target by
   // one async decode cycle so the tile always shows a complete image.
@@ -93,7 +95,7 @@ function CardImage({ src, alt, className }: CardImageProps) {
   const pendingRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const target = toThumbPath(src);
+    const target = versionedImage(toThumbPath(src));
     // Nothing to do when the target matches what's already painted.
     if (target === displayedSrc) return;
 
@@ -113,7 +115,7 @@ function CardImage({ src, alt, className }: CardImageProps) {
     const fallback = () => {
       // Thumb failed (missing variant) — decode the full-res instead and display that.
       if (pendingRef.current !== target) return;
-      setDisplayedSrc(src);
+      setDisplayedSrc(versionedImage(src));
     };
 
     // img.decode() returns a Promise; fall back to onload for environments
@@ -123,7 +125,7 @@ function CardImage({ src, alt, className }: CardImageProps) {
         // decode() rejected — this can mean network error OR browser limitation.
         // Attempt a plain load; if the image already cached it fires immediately.
         const fallbackImg = new window.Image();
-        fallbackImg.src = src;
+        fallbackImg.src = versionedImage(src);
         fallbackImg.onload = () => commit();
         fallbackImg.onerror = () => commit(); // show something rather than staying stale
       });
@@ -149,8 +151,9 @@ function CardImage({ src, alt, className }: CardImageProps) {
       className={className}
       onError={(e) => {
         // If the displayed thumb fails to load (e.g. cleared dist), swap to full-res.
-        if (displayedSrc !== src) {
-          (e.currentTarget as HTMLImageElement).src = src;
+        const vSrc = versionedImage(src);
+        if (displayedSrc !== vSrc) {
+          (e.currentTarget as HTMLImageElement).src = vSrc;
         }
       }}
     />
@@ -242,7 +245,7 @@ const Inspiration = () => {
     const urls = new Set<string>();
     for (const catImages of Object.values(mergedData.projectCategoryImages)) {
       for (const url of Object.values(catImages)) {
-        if (url) urls.add(toThumbPath(url));
+        if (url) urls.add(versionedImage(toThumbPath(url)));
       }
     }
     if (urls.size === 0) return;

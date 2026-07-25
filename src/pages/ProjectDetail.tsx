@@ -6,6 +6,7 @@ import EditorialButton from "@/components/primitives/Button";
 import { projects as fallbackProject, type Project } from "@/data/projects";
 import { products } from "@/data/products";
 import { fetchProjects, mergeProject, canonicalProjectSlug } from "@/lib/cms-api";
+import { versionedImage } from "@/lib/image-version";
 import type { MergedProjectImagesResponse } from "@/types/project-images";
 
 /**
@@ -154,10 +155,18 @@ const ProjectDetail = () => {
   // If the hero image was hidden and filtered out, fall back to the first
   // remaining gallery photo so we never show a blank first slide.
   // If everything is hidden, render a single placeholder to avoid an empty gallery.
-  const galleryPhotos: Array<{ src: string; alt: string }> =
+  // versionedImage appends ?v=<hash> to bust stale cached copies after a
+  // regeneration deploy. Paths not in the manifest (uploads, external) pass through.
+  const galleryPhotos: Array<{ src: string; alt: string }> = (
     visibleGalleryPhotos.length > 0
       ? visibleGalleryPhotos
-      : [{ src: selectedProject.image, alt: selectedProject.name }];
+      : [{ src: selectedProject.image, alt: selectedProject.name }]
+  ).map((p) => ({ ...p, src: versionedImage(p.src) }));
+
+  // Per-project aspect ratio from the merged API ('16:9' | '4:3') converted to
+  // CSS form. Defaults to 4/3 when the API has no entry for this project, which
+  // keeps the mobile hero landscape instead of the old portrait h-[68svh].
+  const heroRatio = (projectRatios?.[selectedProject.id] ?? "4:3").replace(":", "/");
 
   return (
     <Layout>
@@ -165,6 +174,7 @@ const ProjectDetail = () => {
       <ProjectHeroGallery
         photos={galleryPhotos}
         title={selectedProject.name}
+        ratio={heroRatio}
       />
 
       <section className="pt-section-mobile md:pt-section-tablet lg:pt-section-desktop pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
@@ -286,7 +296,7 @@ const ProjectDetail = () => {
                     <Link to={`/projects/${other.id}`} className="group block">
                       <div className="aspect-[4/3] bg-[color:var(--canvas-soft)] overflow-hidden">
                         <img
-                          src={other.image}
+                          src={versionedImage(other.image)}
                           alt={other.name}
                           loading="lazy"
                           decoding="async"

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import FeatureLink from "@/components/primitives/FeatureLink";
 import { projects as allProjects } from "@/data/projects";
 import { toThumbPath } from "@/lib/project-thumbs";
+import { versionedImage } from "@/lib/image-version";
 import { cn } from "@/lib/utils";
 import { fetchMergedProjectImages } from "@/lib/merged-project-images";
 
@@ -16,15 +17,15 @@ const FEATURE_HEROES: { src: string; alt: string }[] = [
   { src: `${FB}/home-feature-1.jpg`, alt: "Curved-glass modern residence with FourlinQ windows and dark louvered gate" },
   { src: `${FB}/home-feature-2.jpg`, alt: "Modernist white hillside residence with FourlinQ glazing and elevator tower" },
   { src: `${FB}/home-feature-3.jpg`, alt: "Multi-storey contemporary home at dusk with full-height FourlinQ glazing" },
-  { src: `${FB}/home-feature-4.jpg`, alt: "Stone-clad residence with FourlinQ windows overlooking an infinity pool" },
   { src: `${FB}/home-feature-5.jpg`, alt: "Two-storey modern home with FourlinQ windows and wood-slat gate" },
+  { src: `${FB}/home-feature-4.jpg`, alt: "Stone-clad residence with FourlinQ windows overlooking an infinity pool" },
 ];
 
 // Header is 72px (--header-h); leave a little air so the pinned feature clears it.
 const STICKY_TOP = 88;
 
-// Full-bleed "Our Projects" gallery. Right column scrolls the ENTIRE catalog at
-// natural aspect ratio (no cropping); the left column is a sticky feature that
+// Full-bleed "Our Projects" gallery. Right column scrolls the ENTIRE catalog as
+// 4:3 cropped tiles; the left column is a sticky feature that
 // crossfades through five heroes as you scroll, with a thin top line tracking
 // scroll position within the current part. (Per Prince, 2026-07-22.)
 const ProjectTile = ({ project, coverSrc }: { project: (typeof allProjects)[number]; coverSrc?: string }) => {
@@ -33,19 +34,20 @@ const ProjectTile = ({ project, coverSrc }: { project: (typeof allProjects)[numb
   return (
     <Link
       to={`/projects/${project.id}`}
-      className="group block overflow-hidden rounded-sm bg-[color:var(--canvas-soft)]"
+      className="group block overflow-hidden bg-[color:var(--canvas-soft)]"
     >
       <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
         <img
-          src={toThumbPath(imageSrc)}
+          src={versionedImage(toThumbPath(imageSrc))}
           alt={project.name}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.04]"
           onError={(e) => {
             // Thumb missing (e.g. newly added image) — fall back to full-res.
-            if ((e.currentTarget as HTMLImageElement).src !== imageSrc) {
-              (e.currentTarget as HTMLImageElement).src = imageSrc;
+            const vFull = versionedImage(imageSrc);
+            if ((e.currentTarget as HTMLImageElement).src !== vFull) {
+              (e.currentTarget as HTMLImageElement).src = vFull;
             }
           }}
         />
@@ -189,7 +191,7 @@ const InspirationStrip = () => {
               {FEATURE_HEROES.map((hero, i) => (
                 <img
                   key={hero.src}
-                  src={hero.src}
+                  src={versionedImage(hero.src)}
                   alt={hero.alt}
                   loading={i === 0 ? "eager" : "lazy"}
                   decoding="async"
@@ -201,16 +203,18 @@ const InspirationStrip = () => {
               ))}
             </div>
 
-            {/* Title + subtitle under the feature. Copy is real: the regions
-                and systems reflect the actual installs in projects.ts. */}
+            {/* Title + subtitle under the feature. The headline echoes
+                BRAND.promise ("A Lifetime of Satisfaction and Peace of Mind")
+                so it bookends BrandCTA lower on the page. Subtitle carries the
+                factual load: the systems listed are the actual installs in
+                projects.ts. */}
             <div className="mt-6">
               <h3 className="font-serif font-normal tracking-tight leading-[1.15] text-h4 lg:text-h3 text-[color:var(--ink-primary)]">
-                From Luzon to Mindanao
+                Built to your satisfaction.
               </h3>
               <p className="mt-3 max-w-[32rem] text-body text-[color:var(--ink-secondary)] leading-[1.6]">
-                Documented FourlinQ installations across the Philippines —
-                casement and sliding windows, entrance doors, and full aluminium
-                systems.
+                FourlinQ installations across the Philippines. Casement and
+                sliding windows, entrance doors, and full aluminium systems.
               </p>
               <div className="mt-5">
                 <FeatureLink to="/inspiration">View full gallery</FeatureLink>
@@ -218,10 +222,10 @@ const InspirationStrip = () => {
             </div>
           </div>
 
-          {/* The full catalog — every project, natural ratio, masonry columns. */}
-          <div className="columns-2 xl:columns-3 gap-3 lg:gap-4">
+          {/* The full catalog: every project, 4:3 tiles, masonry columns. */}
+          <div className="columns-2 xl:columns-3 gap-1.5 lg:gap-2">
             {projects.map((p) => (
-              <div key={p.id} className="mb-3 lg:mb-4 break-inside-avoid">
+              <div key={p.id} className="mb-1.5 lg:mb-2 break-inside-avoid">
                 <ProjectTile project={p} coverSrc={coverImages[p.id]} />
               </div>
             ))}

@@ -53,9 +53,10 @@ import {
   Sliders,
   ArrowUpDown,
   Ratio as RatioIcon,
-  Star,
+  Bookmark,
 } from "lucide-react";
 import { toThumbPath } from "@/lib/project-thumbs";
+import { versionedImage } from "@/lib/image-version";
 import { nearestRatioLabel } from "@/lib/image-ratio";
 import { projects as staticProjects } from "@/data/projects";
 
@@ -353,7 +354,7 @@ function ProjectOrderRow({
   const inner = (
     <>
       <span className="text-[10px] text-muted-foreground w-5 text-right shrink-0">{index + 1}</span>
-      {heroPath && <img src={toThumbPath(heroPath)} alt="" className="h-10 w-14 object-cover rounded shrink-0" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).src = heroPath; }} />}
+      {heroPath && <img src={versionedImage(toThumbPath(heroPath))} alt="" className="h-10 w-14 object-cover rounded shrink-0" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).src = versionedImage(heroPath); }} />}
       <span className={`text-xs truncate ${isCurrentProject ? "font-medium text-foreground" : "text-muted-foreground"}`}>
         {displayName}
       </span>
@@ -485,11 +486,11 @@ function ProjectListView({
                 <div className="relative aspect-[4/3] bg-muted overflow-hidden">
                   {heroPath ? (
                     <img
-                      src={toThumbPath(heroPath)}
+                      src={versionedImage(toThumbPath(heroPath))}
                       alt=""
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = heroPath; }}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = versionedImage(heroPath); }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -535,7 +536,6 @@ function ProjectListView({
 // ── Image Row (single image with AI scores + controls) ─────────────────────────
 
 function ImageRow({
-  projectId,
   image,
   isHidden,
   replacedUrl,
@@ -547,25 +547,21 @@ function ImageRow({
   onReplaced,
   onFlag,
   onUnflag,
-  onSetCover,
-  onUnsetCover,
   onSaveScores,
   onOpenLightbox,
 }: {
-  projectId: string;
   image: BaselineImage;
   isHidden: boolean;
   replacedUrl: string | null;
   bestForCategories: Category[];
   flagged: boolean;
+  /** True when this image is currently first in the project's image order (auto-derived cover). */
   isCover: boolean;
   onHide: () => void;
   onUnhide: () => void;
   onReplaced: (url: string) => void;
   onFlag: () => void;
   onUnflag: () => void;
-  onSetCover: () => void;
-  onUnsetCover: () => void;
   onSaveScores: (scores: Record<Category, number>) => Promise<void>;
   onOpenLightbox: () => void;
 }) {
@@ -595,7 +591,7 @@ function ImageRow({
           className="relative shrink-0 group/img cursor-zoom-in md:w-80 lg:w-96 bg-muted"
         >
           <img
-            src={toThumbPath(displaySrc)}
+            src={versionedImage(toThumbPath(displaySrc))}
             alt=""
             className="w-full aspect-[4/3] md:aspect-auto md:h-60 object-cover"
             loading="lazy"
@@ -605,7 +601,7 @@ function ImageRow({
                 setNaturalRatio(img.naturalWidth / img.naturalHeight);
               }
             }}
-            onError={(e) => { (e.currentTarget as HTMLImageElement).src = displaySrc; }}
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = versionedImage(displaySrc); }}
           />
           {/* Hover zoom affordance */}
           <span className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/img:bg-black/30 opacity-0 group-hover/img:opacity-100 transition-opacity">
@@ -647,8 +643,8 @@ function ImageRow({
               </span>
             ))}
             {isCover && (
-              <span className="text-[10px] px-1.5 py-0.5 bg-primary/15 text-primary rounded font-medium flex items-center gap-0.5">
-                <Star size={9} className="fill-primary" /> Preview
+              <span className="text-[10px] px-1.5 py-0.5 bg-primary/15 text-primary rounded font-medium flex items-center gap-0.5" title="This image is automatically used as the project cover (first in order)">
+                <Bookmark size={9} className="fill-primary" /> Cover
               </span>
             )}
           </div>
@@ -720,22 +716,6 @@ function ImageRow({
             >
               <Flag size={13} /> {flagged ? "Flagged" : "Flag"}
             </button>
-
-            {/* Set as Preview (project cover) */}
-            {!isHidden && (
-              <button
-                onClick={isCover ? onUnsetCover : onSetCover}
-                className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded transition-colors ${
-                  isCover
-                    ? "bg-primary/15 text-primary hover:bg-primary/25"
-                    : "bg-muted text-muted-foreground hover:bg-border"
-                }`}
-                title={isCover ? "Remove as project preview (cover) image" : "Set as project preview (cover) image"}
-              >
-                <Star size={13} className={isCover ? "fill-primary" : ""} />
-                {isCover ? "Preview" : "Set as Preview"}
-              </button>
-            )}
 
             {/* B3: Modify values (replaces Set best) */}
             {!isHidden && (
@@ -892,12 +872,17 @@ function ProjectDetailView({
       .map((r) => r.image_path)
   );
 
-  // Derive the current project cover path from overrides.
-  // Storage: image_path = '__project__', value_text = the cover image path.
-  const coverRow = projectOverrides.find(
-    (r) => r.override_type === "project_cover" && r.image_path === "__project__"
-  );
-  const coverPath = coverRow?.value_text ?? null;
+  // Derive the cover image: the first non-hidden image in the current image order.
+  // This mirrors the server-side derivation in buildMergedResponse so admin always
+  // sees the same cover the public site will display.
+  const coverPath = (() => {
+    for (const imgPath of imageOrderIds) {
+      if (!hiddenSet.has(imgPath)) {
+        return replacedMap.get(imgPath) ?? imgPath;
+      }
+    }
+    return null;
+  })();
 
   const staleOverrides = projectOverrides.filter((r) => r.stale);
 
@@ -1009,7 +994,10 @@ function ProjectDetailView({
   }
 
   return (
-    <div>
+    <div className="flex gap-0 items-start min-h-screen">
+      {/* ── Left column: back nav + header + images ── */}
+      <div className="flex-1 min-w-0 pr-4 xl:pr-6">
+
       {/* Back button */}
       <button
         onClick={onBack}
@@ -1041,13 +1029,13 @@ function ProjectDetailView({
             className="shrink-0 cursor-zoom-in rounded overflow-hidden border border-border/40 hover:border-primary/40 transition-colors"
           >
             <img
-              src={toThumbPath(replacedMap.get(project.quality?.heroImage ?? project.images[0]?.path ?? "") ?? (project.quality?.heroImage ?? project.images[0]?.path ?? ""))}
+              src={versionedImage(toThumbPath(replacedMap.get(project.quality?.heroImage ?? project.images[0]?.path ?? "") ?? (project.quality?.heroImage ?? project.images[0]?.path ?? "")))}
               alt=""
               className="h-20 w-28 object-cover"
               onError={(e) => {
                 const heroPath = project.quality?.heroImage ?? project.images[0]?.path;
                 const full = heroPath ? (replacedMap.get(heroPath) ?? heroPath) : undefined;
-                if (full) (e.currentTarget as HTMLImageElement).src = full;
+                if (full) (e.currentTarget as HTMLImageElement).src = versionedImage(full);
               }}
             />
           </button>
@@ -1180,13 +1168,12 @@ function ProjectDetailView({
                     <SortableRow key={imgPath} id={imgPath}>
                       {() => (
                         <ImageRow
-                          projectId={project.id}
                           image={image}
                           isHidden={hiddenSet.has(image.path)}
                           replacedUrl={replacedMap.get(image.path) ?? null}
                           bestForCategories={bestForCatMap.get(image.path) ?? []}
                           flagged={imageFlaggedSet.has(image.path)}
-                          isCover={coverPath === image.path}
+                          isCover={imageOrderIds.indexOf(image.path) === imageOrderIds.findIndex((p) => !hiddenSet.has(p))}
                           onHide={async () => {
                             await onAddOverride({ project_id: project.id, image_path: image.path, override_type: "hidden" });
                           }}
@@ -1203,20 +1190,6 @@ function ProjectDetailView({
                           onUnflag={async () => {
                             const row = projectOverrides.find((r) => r.override_type === "image_flagged" && r.image_path === image.path);
                             if (row) await onDeleteOverride(row.project_image_override_id);
-                          }}
-                          onSetCover={async () => {
-                            // UPSERT: image_path = '__project__', value_text = the chosen image path.
-                            // The uq_pio_coalesce index on (org, project_id, '__project__', 'project_cover', '')
-                            // ensures only one cover row per project; the ON CONFLICT DO UPDATE replaces it.
-                            await onAddOverride({
-                              project_id: project.id,
-                              image_path: "__project__",
-                              override_type: "project_cover",
-                              value_text: image.path,
-                            });
-                          }}
-                          onUnsetCover={async () => {
-                            if (coverRow) await onDeleteOverride(coverRow.project_image_override_id);
                           }}
                           onSaveScores={async (scores) => {
                             await Promise.all(
@@ -1249,103 +1222,6 @@ function ProjectDetailView({
             </SortableContext>
           </DndContext>
         </div>
-      </section>
-
-      {/* Section E + F — Project order drag */}
-      <section className="mb-8">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-          Project Order in Gallery
-        </h3>
-        <p className="text-xs text-muted-foreground mb-3">
-          Drag the handle to reorder where this project appears relative to all others in each view.
-          Click any other project to open it.
-        </p>
-
-        {/* Order tab selector */}
-        <div className="flex gap-1 mb-3 flex-wrap">
-          {(["all", ...CATEGORIES] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setOrderTab(tab)}
-              className={`text-xs px-3 py-1.5 rounded-md transition-colors ${
-                orderTab === tab ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab === "all" ? "All projects" : CATEGORY_LABELS[tab]}
-            </button>
-          ))}
-        </div>
-
-        {/* Section E — All-projects order */}
-        {orderTab === "all" && (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleProjectOrderEnd(e, allOrderIds, setAllOrderIds, "project_order")}>
-            <SortableContext items={allOrderIds} strategy={verticalListSortingStrategy}>
-              <div className="space-y-1 max-h-80 overflow-y-auto rounded border border-border p-2">
-                {allOrderIds.map((pid, idx) => {
-                  const p = baselineData.projects.find((x) => x.id === pid);
-                  const heroPath = p?.quality?.heroImage ?? p?.images[0]?.path;
-                  return (
-                    <SortableRow key={pid} id={pid}>
-                      {() => (
-                        <ProjectOrderRow
-                          pid={pid}
-                          index={idx}
-                          heroPath={heroPath}
-                          isCurrentProject={pid === project.id}
-                          flagged={p?.flagged ?? false}
-                          checked={p?.checked ?? false}
-                          hidden={p?.hidden ?? false}
-                          deleted={p?.deleted ?? false}
-                          onOpen={onSelectProject}
-                        />
-                      )}
-                    </SortableRow>
-                  );
-                })}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
-
-        {/* Section F — Per-category order */}
-        {orderTab !== "all" && (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={(e) => {
-              const cat = orderTab as Category;
-              handleProjectOrderEnd(e, catOrderIds[cat], (ids) => setCatOrderIds((prev) => ({ ...prev, [cat]: ids })), "category_order", cat);
-            }}
-          >
-            <SortableContext items={catOrderIds[orderTab]} strategy={verticalListSortingStrategy}>
-              <div className="space-y-1 max-h-80 overflow-y-auto rounded border border-border p-2">
-                {catOrderIds[orderTab].map((pid, idx) => {
-                  const p = baselineData.projects.find((x) => x.id === pid);
-                  const catImg = p?.categoryImages[orderTab as Category];
-                  const heroPath = catImg ?? p?.quality?.heroImage ?? p?.images[0]?.path;
-                  return (
-                    <SortableRow key={pid} id={pid}>
-                      {() => (
-                        <ProjectOrderRow
-                          pid={pid}
-                          index={idx}
-                          heroPath={heroPath}
-                          isCurrentProject={pid === project.id}
-                          flagged={p?.flagged ?? false}
-                          checked={p?.checked ?? false}
-                          hidden={p?.hidden ?? false}
-                          deleted={p?.deleted ?? false}
-                          onOpen={onSelectProject}
-                        />
-                      )}
-                    </SortableRow>
-                  );
-                })}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
       </section>
 
       {/* Section H — Stale overrides */}
@@ -1383,6 +1259,107 @@ function ProjectDetailView({
 
       {/* Lightbox overlay */}
       {lightbox && <Lightbox data={lightbox} onClose={() => setLightbox(null)} />}
+
+      {/* ── End left column ── */}
+      </div>
+
+      {/* ── Right column: sticky "Project Order in Gallery" panel ── */}
+      <div className="hidden xl:flex flex-col w-72 2xl:w-80 shrink-0 sticky top-20 self-start h-[calc(100vh-5rem)] border-l border-border pl-4 xl:pl-6">
+        {/* Panel header */}
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 shrink-0">
+          Project Order in Gallery
+        </h3>
+        <p className="text-[11px] text-muted-foreground mb-3 shrink-0 leading-relaxed">
+          Drag to reorder. Click any project to open it.
+          Reorder = cover changes.
+        </p>
+
+        {/* Order tab selector */}
+        <div className="flex gap-1 mb-3 flex-wrap shrink-0">
+          {(["all", ...CATEGORIES] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setOrderTab(tab)}
+              className={`text-[11px] px-2 py-1 rounded transition-colors ${
+                orderTab === tab ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {tab === "all" ? "All" : CATEGORY_LABELS[tab]}
+            </button>
+          ))}
+        </div>
+
+        {/* Scrollable drag list */}
+        <div className="flex-1 overflow-y-auto min-h-0">
+          {orderTab === "all" ? (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleProjectOrderEnd(e, allOrderIds, setAllOrderIds, "project_order")}>
+              <SortableContext items={allOrderIds} strategy={verticalListSortingStrategy}>
+                <div className="space-y-1 p-1">
+                  {allOrderIds.map((pid, idx) => {
+                    const p = baselineData.projects.find((x) => x.id === pid);
+                    const heroPath = p?.quality?.heroImage ?? p?.images[0]?.path;
+                    return (
+                      <SortableRow key={pid} id={pid}>
+                        {() => (
+                          <ProjectOrderRow
+                            pid={pid}
+                            index={idx}
+                            heroPath={heroPath}
+                            isCurrentProject={pid === project.id}
+                            flagged={p?.flagged ?? false}
+                            checked={p?.checked ?? false}
+                            hidden={p?.hidden ?? false}
+                            deleted={p?.deleted ?? false}
+                            onOpen={onSelectProject}
+                          />
+                        )}
+                      </SortableRow>
+                    );
+                  })}
+                </div>
+              </SortableContext>
+            </DndContext>
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={(e) => {
+                const cat = orderTab as Category;
+                handleProjectOrderEnd(e, catOrderIds[cat], (ids) => setCatOrderIds((prev) => ({ ...prev, [cat]: ids })), "category_order", cat);
+              }}
+            >
+              <SortableContext items={catOrderIds[orderTab]} strategy={verticalListSortingStrategy}>
+                <div className="space-y-1 p-1">
+                  {catOrderIds[orderTab].map((pid, idx) => {
+                    const p = baselineData.projects.find((x) => x.id === pid);
+                    const catImg = p?.categoryImages[orderTab as Category];
+                    const heroPath = catImg ?? p?.quality?.heroImage ?? p?.images[0]?.path;
+                    return (
+                      <SortableRow key={pid} id={pid}>
+                        {() => (
+                          <ProjectOrderRow
+                            pid={pid}
+                            index={idx}
+                            heroPath={heroPath}
+                            isCurrentProject={pid === project.id}
+                            flagged={p?.flagged ?? false}
+                            checked={p?.checked ?? false}
+                            hidden={p?.hidden ?? false}
+                            deleted={p?.deleted ?? false}
+                            onOpen={onSelectProject}
+                          />
+                        )}
+                      </SortableRow>
+                    );
+                  })}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
+      </div>
+
     </div>
   );
 }

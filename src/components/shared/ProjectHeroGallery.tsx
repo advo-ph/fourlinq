@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /**
  * Immersive full-screen-height project gallery.
  *
  * Desktop (lg+): left large-photo panel + right vertical thumbnail rail.
- * Mobile (<lg):  stacked — hero image at 68svh + horizontal 4-column thumbnail strip below.
+ * Mobile (<lg):  stacked — hero image at the caller's ratio (default 4:3) +
+ *                horizontal 4-column thumbnail strip below.
+ *
+ * Scroll behavior: the whole section (photo + thumbnails) scales down, drifts
+ * downward, and gains corner radius as it scrolls through. The effect completes
+ * at 55% of the section's scroll-through and then holds — useTransform clamps —
+ * after which the section scrolls away normally. No sticky/pinned positioning.
  *
  * Hover behavior:
  *  - Hovering a thumbnail temporarily previews that photo; moving away restores the pinned image.
@@ -19,17 +26,46 @@ export interface ProjectHeroGalleryProps {
   photos: Array<{ src: string; alt: string }>;
   title: string;
   className?: string;
+  /** CSS aspect-ratio for the mobile hero panel, e.g. "4/3" or "16/9". Defaults to 4/3. */
+  ratio?: string;
 }
 
 const isHoverDevice = () =>
   typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProps) => {
+const ProjectHeroGallery = ({ photos, title, className, ratio = "4/3" }: ProjectHeroGalleryProps) => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [pinnedIdx, setPinnedIdx] = useState(0);
 
   const activeIdx = hoveredIdx ?? pinnedIdx;
 
+  // Breakpoint flag drives the shrink intensity — desktop is pronounced, mobile softer.
+  // Tracked in state (not a Tailwind class) because the values feed motion transforms.
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
+
+  // Effect completes at 55% of the section's scroll-through, then holds
+  // (useTransform clamps by default).
+  const END = 0.55;
+  const endScale = reduced ? 1 : isDesktop ? 0.85 : 0.92;
+  const endY = reduced ? 0 : isDesktop ? 80 : 40;
+  const endRadius = reduced ? 0 : isDesktop ? 16 : 12;
+
+  const scale = useTransform(scrollYProgress, [0, END], [1, endScale]);
+  const y = useTransform(scrollYProgress, [0, END], [0, endY]);
+  const radius = useTransform(scrollYProgress, [0, END], [0, endRadius]);
+
+  // NOTE: every hook above must stay above this early return (rules of hooks).
   if (photos.length === 0) return null;
 
   const handleMouseEnter = (i: number) => {
@@ -70,7 +106,12 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
   );
 
   const titleOverlay = (
-    <div className="absolute inset-x-0 bottom-0 pointer-events-none bg-gradient-to-t from-black/70 via-black/30 to-transparent pt-20 sm:pt-24 lg:pt-32 px-5 pb-5 sm:px-8 sm:pb-7 lg:px-12 lg:pb-10">
+    /* Measured 2026-07-25: the old 3-stop `to-t from-black/70 via-black/30` put
+       54% of the scrim ABOVE the text and landed peak darkness 40px BELOW it,
+       leaving only 0.34–0.56 alpha across the title's own band. These explicit
+       stops hold a dark plateau (0.78→0.70) across the text and collapse the
+       falloff into the top third so no grey haze floats above the title. */
+    <div className="absolute inset-x-0 bottom-0 pointer-events-none bg-[linear-gradient(to_top,rgba(0,0,0,0.78)_0%,rgba(0,0,0,0.70)_38%,rgba(0,0,0,0.40)_64%,rgba(0,0,0,0.12)_86%,rgba(0,0,0,0)_100%)] pt-14 sm:pt-16 lg:pt-20 px-5 pb-5 sm:px-8 sm:pb-7 lg:px-12 lg:pb-10">
       <h1 className="font-serif text-h4 sm:text-h3 lg:text-h2 xl:text-h1 tracking-tight text-white text-balance max-w-[20ch] drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)]">
         {title}
       </h1>
@@ -78,7 +119,10 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
   );
 
   return (
-    <>
+    /* ONE wrapper for both layouts, so there is only one useScroll instance.
+       The two sections are mutually exclusive (`hidden lg:flex` / `lg:hidden`),
+       so the wrapper's height always equals whichever one is visible. */
+    <motion.div ref={wrapRef} style={{ scale, y, willChange: "transform" }}>
       {/* ── Desktop layout (lg+) ── */}
       <section
         aria-label={title}
@@ -88,10 +132,13 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
         )}
       >
         {/* Left: large photo panel */}
-        <div className="relative flex-1 overflow-hidden bg-[color:var(--canvas-soft)]">
+        <motion.div
+          style={{ borderRadius: radius }}
+          className="relative flex-1 overflow-hidden bg-[color:var(--canvas-soft)]"
+        >
           {photoStack}
           {titleOverlay}
-        </div>
+        </motion.div>
 
         {/* Right: vertical thumbnail rail */}
         <div
@@ -126,11 +173,16 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
         aria-label={title}
         className={cn("flex flex-col p-3 gap-3 lg:hidden", className)}
       >
-        {/* Hero image */}
-        <div className="relative h-[68svh] overflow-hidden w-full bg-[color:var(--canvas-soft)]">
+        {/* Hero image — ratio comes from the caller (default 4:3). Applied as an
+            inline style, NOT `aspect-[${ratio}]`: Tailwind cannot JIT-compile a
+            class name built from a runtime value. */}
+        <motion.div
+          style={{ aspectRatio: ratio.replace("/", " / "), borderRadius: radius }}
+          className="relative overflow-hidden w-full bg-[color:var(--canvas-soft)]"
+        >
           {photoStack}
           {titleOverlay}
-        </div>
+        </motion.div>
 
         {/* Horizontal 4-column thumbnail strip */}
         {photos.length > 1 && (
@@ -155,7 +207,7 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
           </div>
         )}
       </section>
-    </>
+    </motion.div>
   );
 };
 
