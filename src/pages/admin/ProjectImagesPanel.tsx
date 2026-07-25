@@ -51,7 +51,6 @@ import {
   Trash2,
   RotateCcw,
   Sliders,
-  ArrowUpDown,
   Ratio as RatioIcon,
   Bookmark,
   RefreshCw,
@@ -1659,37 +1658,10 @@ export default function ProjectImagesPanel() {
     panelRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
   }, [selectedProjectId]);
 
-  const [applyingExterior, setApplyingExterior] = useState(false);
-
   function showToast(msg: string, kind: "success" | "error" = "error") {
     setToastMsg(msg);
     setToastKind(kind);
     setTimeout(() => setToastMsg(null), 4000);
-  }
-
-  async function handleApplyExteriorFirst() {
-    if (
-      !window.confirm(
-        "Apply best-exterior-first image order to all projects that haven't been manually reordered? " +
-        "This cannot be undone automatically — you can manually reorder afterward."
-      )
-    )
-      return;
-    setApplyingExterior(true);
-    try {
-      const res = await fetch("/api/admin/project-images/apply-exterior-first", {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await res.json() as { applied?: number; skipped?: number; message?: string; error?: string };
-      if (!res.ok) throw new Error(data.error ?? "Failed");
-      queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
-      showToast(`Done: ${data.message}`);
-    } catch (e) {
-      showToast(`Error: ${String(e)}`);
-    } finally {
-      setApplyingExterior(false);
-    }
   }
 
   // ── Data queries ──────────────────────────────────────────────────────────────
@@ -1838,30 +1810,6 @@ export default function ProjectImagesPanel() {
         }`}>
           {toastKind === "success" ? <Check size={13} /> : <AlertTriangle size={13} />}
           {toastMsg}
-        </div>
-      )}
-
-      {/* Panel header */}
-      {!selectedProject && (
-        <div className="mb-6 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground leading-relaxed">
-          <div className="flex items-start justify-between gap-3 flex-wrap">
-            <div>
-              <p className="font-medium text-foreground mb-1">Project Images</p>
-              <p>
-                Manage the AI-selected images that appear in the /inspiration gallery. Hide, replace, or
-                reorder images without touching the codebase. Changes take effect within 30 seconds.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleApplyExteriorFirst}
-              disabled={applyingExterior}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-muted border border-border text-muted-foreground hover:bg-border transition-colors disabled:opacity-50 shrink-0"
-            >
-              {applyingExterior ? <Loader2 size={13} className="animate-spin" /> : <ArrowUpDown size={13} />}
-              Apply exterior-first order
-            </button>
-          </div>
         </div>
       )}
 
