@@ -20,12 +20,15 @@ const ChatBubble = () => {
   }, []);
 
   useEffect(() => {
-    // Only respond to the event on mobile viewports
+    // Only hide on mobile viewports — but always accept inView:false, so a
+    // disengage that lands after the viewport crosses 1024px (rotate/resize
+    // while the section is engaged) can never leave the bubble stuck hidden.
     const mq = window.matchMedia("(min-width: 1024px)");
     const onInView = (event: Event) => {
-      if (mq.matches) return; // desktop: ignore
       const detail = (event as CustomEvent<{ inView: boolean }>).detail;
-      setScrollWindowInView(detail?.inView === true);
+      const inView = detail?.inView === true;
+      if (inView && mq.matches) return; // desktop: never hide
+      setScrollWindowInView(inView);
     };
     window.addEventListener("fq-scrollwindow-inview", onInView);
     return () => window.removeEventListener("fq-scrollwindow-inview", onInView);
