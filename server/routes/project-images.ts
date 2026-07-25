@@ -91,9 +91,11 @@ export interface MergedResponse {
   hiddenProjects: string[];
   deletedProjects: string[];
   projectRatios: Record<string, string>;
-  /** projectId → admin-chosen cover image path for All-projects cards, project hero,
-   *  and InspirationStrip tiles. A cover pointing at a hidden image is omitted
-   *  (falls back to normal logic on the client). */
+  /** projectId → cover image path for All-projects cards, project hero, and InspirationStrip tiles.
+   *  Derived server-side as the first non-hidden image in the project's effective image_order
+   *  (with replaced value applied). Never requires a manual override — reordering images in
+   *  admin automatically changes the cover. Populated for every project that has at least one
+   *  non-hidden image. */
   projectCoverImages: Record<string, string>;
 }
 
@@ -224,7 +226,6 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
   const deletedProjectSet = new Set<string>(); // projectIds with project_deleted override
   const projectRatioMap = new Map<string, string>(); // projectId → value_text ('16:9' | '4:3')
   const scoreOverrideMap = new Map<string, Map<string, number>>(); // "projectId|imagePath" → category → value_int
-  const projectCoverMap = new Map<string, string>(); // projectId → cover image path (value_text)
 
   for (const row of overrides) {
     switch (row.override_type) {
@@ -274,12 +275,7 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
           scoreOverrideMap.get(key)!.set(row.category, row.value_int);
         }
         break;
-      case "project_cover":
-        // image_path = '__project__', value_text = the chosen cover image path.
-        // One row per project enforced by the uq_pio_coalesce unique index.
-        if (row.value_text) projectCoverMap.set(row.project_id, row.value_text);
-        break;
-      // image_flagged: no server-side action needed; purely a visual marker for admin
+      // image_flagged, project_cover (removed): no server-side action needed
     }
   }
 
@@ -387,14 +383,42 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     projectRatios[id] = ratio;
   }
 
-  // Build projectCoverImages for public payload.
-  // A cover path that is hidden (via the hiddenSet) is excluded so the client
-  // never inadvertently renders a hidden image.
+  // Derive projectCoverImages for public payload.
+  // Cover = first non-hidden image in the project's effective image_order (with
+  // replaced mapping applied). This is computed for EVERY project so that
+  // reordering images in admin instantly changes the cover everywhere without
+  // any manual "Set as Preview" step.
   const projectCoverImages: Record<string, string> = {};
-  for (const [projectId, coverPath] of projectCoverMap.entries()) {
-    // Skip if the cover image itself is hidden
-    if (hiddenSet.has(`${projectId}|${coverPath}`)) continue;
-    projectCoverImages[projectId] = coverPath;
+  for (const projectId of coveredIds) {
+    const rec = manifest.projects[projectId];
+    if (!rec) continue;
+
+    // Build the effective image order for this project, mirroring computeImageOrder
+    // in the admin panel. image_order overrides provide explicit positions; images
+    // not in the override set are appended in their baseline (manifest) order.
+    const orderOverrides = imageOrderMap.get(projectId);
+    let orderedPaths: string[];
+
+    if (orderOverrides && orderOverrides.size > 0) {
+      // Sort paths by their assigned value_int positions
+      const ranked = [...orderOverrides.entries()].sort((a, b) => a[1] - b[1]).map(([p]) => p);
+      // Filter to only paths that actually exist in the manifest
+      const existing = new Set(rec.images.map((im) => im.path));
+      const validRanked = ranked.filter((p) => existing.has(p));
+      const rankedSet = new Set(validRanked);
+      const unranked = rec.images.map((im) => im.path).filter((p) => !rankedSet.has(p));
+      orderedPaths = [...validRanked, ...unranked];
+    } else {
+      orderedPaths = rec.images.map((im) => im.path);
+    }
+
+    // First non-hidden image is the cover (with replaced mapping applied)
+    for (const imgPath of orderedPaths) {
+      if (hiddenSet.has(`${projectId}|${imgPath}`)) continue;
+      const effectivePath = replacedMap.get(`${projectId}|${imgPath}`) ?? imgPath;
+      projectCoverImages[projectId] = effectivePath;
+      break;
+    }
   }
 
   return {
@@ -529,7 +553,7 @@ projectImagesAdmin.post("/overrides", async (req, res) => {
       "hidden", "replaced", "best_for_category",
       "project_order", "category_order", "image_order",
       "project_flagged", "project_checked", "project_hidden", "project_deleted",
-      "project_ratio", "score_override", "image_flagged", "project_cover",
+      "project_ratio", "score_override", "image_flagged",
     ];
     if (!validTypes.includes(override_type)) {
       return res.status(400).json({ error: `Invalid override_type: ${override_type}` });

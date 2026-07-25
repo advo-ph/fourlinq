@@ -91,7 +91,10 @@ if (isProd) {
   const distPath = path.resolve(import.meta.dirname, "../dist");
   app.use(
     express.static(distPath, {
-      maxAge: "30d",
+      // Default: long-lived immutable cache for Vite-hashed JS/CSS assets
+      // (e.g. /assets/index-abc123.js). These filenames are content-addressable
+      // so they are safe to cache forever.
+      maxAge: "365d",
       immutable: true,
       setHeaders(res, filePath) {
         // HTML files must never be served from a long-lived cache — the browser
@@ -101,12 +104,26 @@ if (isProd) {
           res.setHeader("Cache-Control", "no-store");
           return;
         }
+        // Images under /images/ are replaced in-place across deploys, so they
+        // must NOT be cached immutably. We use a short TTL (5 min) with
+        // stale-while-revalidate so the browser revalidates often. The frontend
+        // appends ?v=<contenthash> to image URLs (via src/lib/image-version.ts)
+        // so a freshly regenerated image will load immediately even for users
+        // who have a stale cached copy — the new ?v= parameter produces a
+        // cache-miss on the old entry.
+        //
+        // Thumbs (/images/projects-fb/thumbs/) and originals share this same
+        // policy so the two variants are never cached for different durations,
+        // which was the root cause of the mismatched thumbnail/lightbox bug.
         if (filePath.includes("/images/")) {
           res.setHeader(
             "Cache-Control",
-            "public, max-age=3600, stale-while-revalidate=86400"
+            "public, max-age=300, stale-while-revalidate=86400"
           );
+          return;
         }
+        // All other static assets (fonts, icons, manifest.json, etc.) inherit
+        // the top-level maxAge + immutable set above — no override needed.
       },
     })
   );
