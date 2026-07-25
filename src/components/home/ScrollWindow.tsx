@@ -78,7 +78,7 @@ const STEP_COUNT = WINDOW_PARTS.length + 1; // intro + parts
 const FADE_DISTANCE_PX = 120;   // cardOpacity = max(0, 1 - |dy| / 120)
 const COMMIT_DISTANCE_PX = 44;  // displacement threshold for commit
 const COMMIT_VELOCITY = 0.35;   // px/ms threshold for velocity commit
-const EXIT_RELEASE_PX = 44;     // scroll delta to trigger boundary exit release
+const BOUNDARY_EXIT_EPSILON_PX = 8; // jitter guard for instant boundary exit release
 
 const ScrollWindow = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -95,6 +95,7 @@ const ScrollWindow = () => {
   const anchorYRef = useRef(0);            // the scrollY the component clamps to while engaged
   const gestureBaseCardYRef = useRef(0);   // cardY.get() at the moment this gesture's first scroll event fires
   const gestureStartStepRef = useRef(0);   // stepRef.current captured at onTouchStart; guards boundary releases
+  const gestureStartDeltaRef = useRef(0);  // delta (scrollY - anchor) at touchStart; guards epsilon against anchor drift
   const deltaSamplesRef = useRef<Array<{ d: number; t: number }>>([]);  // last ≤4 {delta, timestamp} samples for velocity
   const burstLockRef = useRef(false);      // true after touchend; absorbs momentum-leak scroll events
   const burstTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null); // 150ms quiet-gap timer to clear burstLock
@@ -358,9 +359,11 @@ const ScrollWindow = () => {
       cardOpacity.stop();
       fingerDownRef.current = true;
       gestureBaseCardYRef.current = cardY.get();
-      // Capture which step this gesture started at — used by onScrollDelta to guard
-      // boundary releases so momentum-leak events (finger already up) cannot release.
+      // Capture which step and delta this gesture started at — used by onScrollDelta to
+      // guard boundary releases so momentum-leak events (finger already up) cannot release,
+      // and to measure gesture-relative delta (ignores anchor drift from prior touchEnd clamps).
       gestureStartStepRef.current = stepRef.current;
+      gestureStartDeltaRef.current = window.scrollY - anchorYRef.current;
       deltaSamplesRef.current = [];
       burstLockRef.current = false;
       if (burstTimerRef.current !== null) {
@@ -373,7 +376,7 @@ const ScrollWindow = () => {
         clearTimeout(exitAssistTimerRef.current);
         exitAssistTimerRef.current = null;
       }
-      if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: 0, fgr: true, burst: false, assist: null, evt: "ts" });
+      if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(gestureStartDeltaRef.current), fgr: true, burst: false, assist: null, evt: "ts" });
     };
 
     // ── Post-release exit assist ───────────────────────────────────────────────
@@ -410,7 +413,7 @@ const ScrollWindow = () => {
           : trackTopAbs - vh * 0.5;                 // well past the top pin edge
         if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(window.scrollY - anchorYRef.current), fgr: false, burst: false, assist: assistDir, evt: "assist-fire" });
         window.scrollTo({ top: target, behavior: "smooth" });
-      }, 250);
+      }, 120);
     };
 
     const onTouchEnd = () => {
@@ -438,16 +441,14 @@ const ScrollWindow = () => {
       // ── onTouchEnd decision tree ──────────────────────────────────────────────
       // Evaluated in order; first matching branch wins.
       //
-      // A. BOUNDARY FLICK EXIT (checked before normal commit/springback):
-      //    Conditions: still engaged AND gesture started at a boundary step AND the
-      //    drag direction points past that boundary AND velocity qualifies as a flick
-      //    (|v| > COMMIT_VELOCITY) even though |finalCardY| ≤ COMMIT_DISTANCE_PX
-      //    (a short-but-fast gesture that wouldn't normally commit a step).
-      //    Also catches the dead-commit case: where commitCard would be called with a
-      //    direction past the boundary (e.g. "up" at step STEP_COUNT-1) — commitCard
-      //    clamps next via min/max into a no-op re-commit of the same step. Route that
-      //    here instead so the user exits rather than being silently stuck.
-      //    Result: release engagement, set exit direction, start assist, do NOT clamp.
+      // A. BOUNDARY EXIT (backstop — checked before normal commit/springback):
+      //    With live release at ±BOUNDARY_EXIT_EPSILON_PX (8px), this branch is
+      //    rarely hit. It catches: a boundary-start gesture ending in the exit direction
+      //    that somehow never released live (delta stayed under epsilon throughout),
+      //    OR the dead-commit case where commitCard would be a no-op (already at boundary).
+      //    No velocity requirement — any exit-direction drag from a boundary step exits.
+      //    Result: snap card to rest, release engagement, set exit direction, start assist,
+      //    do NOT clamp.
       //
       // B. NORMAL COMMIT: |finalCardY| > COMMIT_DISTANCE_PX OR |v| > COMMIT_VELOCITY.
       //    commitCard() advances the step (clamped to 0..STEP_COUNT-1 by min/max).
@@ -458,9 +459,10 @@ const ScrollWindow = () => {
       //
       // Non-exit paths (B, C) always clamp + burstLock at the end.
 
-      const isBoundaryFlick =
-        gestureStartStepRef.current === STEP_COUNT - 1 && gestureDir === "up" && Math.abs(v) > COMMIT_VELOCITY ||
-        gestureStartStepRef.current === 0 && gestureDir === "down" && Math.abs(v) > COMMIT_VELOCITY;
+      // Branch A: boundary-start gesture in exit direction (any distance — instant exit semantic)
+      const isBoundaryExit =
+        (gestureStartStepRef.current === STEP_COUNT - 1 && gestureDir === "up") ||
+        (gestureStartStepRef.current === 0 && gestureDir === "down");
 
       // Dead-commit: would commit past boundary into clamped no-op
       const isDeadCommit =
@@ -469,12 +471,14 @@ const ScrollWindow = () => {
           (gestureDir === "down" && stepRef.current === 0)
         );
 
-      if (isBoundaryFlick || isDeadCommit) {
-        // A. Boundary flick exit (finger is down → about to lift, assist fires via onTouchEnd path).
+      if (isBoundaryExit || isDeadCommit) {
+        // A. Boundary exit backstop (finger is down → about to lift, assist fires via onTouchEnd path).
         // Direction: at step STEP_COUNT-1, swiping up exits downward (past bottom pin edge).
         //            at step 0, swiping down exits upward (past top pin edge).
         const boundaryExitDir: "up" | "down" =
           gestureStartStepRef.current === STEP_COUNT - 1 ? "down" : "up";
+        // Snap card to rest before releasing — no residual fade while scrolling away
+        cardY.stop(); cardOpacity.stop(); cardY.set(0); cardOpacity.set(1);
         engagedRef.current = false;
         exitingRef.current = true;
         exitAssistRef.current = boundaryExitDir;
@@ -482,7 +486,7 @@ const ScrollWindow = () => {
         // Do NOT clamp — let native momentum carry the page out.
         // startExitAssist fires immediately because this IS onTouchEnd (finger already up).
         startExitAssist();
-        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(finalDelta), fgr: false, burst: false, assist: boundaryExitDir, evt: "te-flick-exit" });
+        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(finalDelta), fgr: false, burst: false, assist: boundaryExitDir, evt: "te-boundary-exit" });
         return;
       }
 
@@ -515,12 +519,20 @@ const ScrollWindow = () => {
       //         (2) this gesture must have STARTED at the boundary step — a rapid swipe
       //         that commits INTO step 0/3 cannot release via its own momentum tail,
       //         because gestureStartStepRef was set to the prior step at onTouchStart.
+      //
+      // Epsilon measured as GESTURE-RELATIVE delta (delta - gestureStartDeltaRef) to
+      // ignore anchor drift (page settled slightly off-anchor from prior touchEnd clamp).
+      // This ensures a swipe in the non-exit direction cannot trigger a release merely
+      // because the page started a few px below/above the anchor.
+      const gestureDelta = delta - gestureStartDeltaRef.current;
       if (
         fingerDownRef.current &&
         gestureStartStepRef.current === 0 &&
         stepRef.current === 0 &&
-        delta < -EXIT_RELEASE_PX
+        gestureDelta < -BOUNDARY_EXIT_EPSILON_PX
       ) {
+        // Snap card to rest before releasing so no residual fade shows while scrolling away
+        cardY.stop(); cardOpacity.stop(); cardY.set(0); cardOpacity.set(1);
         engagedRef.current = false;
         exitingRef.current = true;
         exitAssistRef.current = "up";
@@ -535,8 +547,10 @@ const ScrollWindow = () => {
         fingerDownRef.current &&
         gestureStartStepRef.current === STEP_COUNT - 1 &&
         stepRef.current === STEP_COUNT - 1 &&
-        delta > EXIT_RELEASE_PX
+        gestureDelta > BOUNDARY_EXIT_EPSILON_PX
       ) {
+        // Snap card to rest before releasing so no residual fade shows while scrolling away
+        cardY.stop(); cardOpacity.stop(); cardY.set(0); cardOpacity.set(1);
         engagedRef.current = false;
         exitingRef.current = true;
         exitAssistRef.current = "down";
@@ -548,7 +562,16 @@ const ScrollWindow = () => {
         return; // Do NOT clamp — let native momentum exit downward
       }
 
-      if (fingerDownRef.current && !burstLockRef.current) {
+      // Requirement 4: skip card-drive for exit-direction deltas at boundary steps.
+      // The release fires at ±BOUNDARY_EXIT_EPSILON_PX (8px) on gesture-relative delta,
+      // but the first 1-2 scroll events under that threshold must also not flash a fade.
+      // Use gestureDelta (gesture-relative) so anchor drift doesn't block card-drive in
+      // the non-exit direction.
+      const isBoundaryExitDirection =
+        (gestureStartStepRef.current === 0 && stepRef.current === 0 && gestureDelta < 0) ||
+        (gestureStartStepRef.current === STEP_COUNT - 1 && stepRef.current === STEP_COUNT - 1 && gestureDelta > 0);
+
+      if (fingerDownRef.current && !burstLockRef.current && !isBoundaryExitDirection) {
         // Mid-gesture: drive card from scroll delta
         const liveCardY = gestureBaseCardYRef.current - delta;
         cardY.set(liveCardY);
