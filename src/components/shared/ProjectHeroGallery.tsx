@@ -1,12 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-  useMotionValueEvent,
-  type MotionValue,
-} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /**
@@ -16,22 +9,31 @@ import { cn } from "@/lib/utils";
  * Mobile (<lg):  stacked — hero image at the caller's ratio (default 4:3) +
  *                horizontal 4-column thumbnail strip below.
  *
- * Scroll behavior: the whole section (photo + thumbnails) scales down, drifts
- * downward, and gains corner radius as it scrolls through. The effect completes
- * at 30% of the section's scroll-through and then holds — useTransform clamps —
- * after which the section scrolls away normally. No sticky/pinned positioning.
+ * Scroll behavior: the whole section — photo AND thumbnail rail together — scales
+ * down as one unit, drifts downward, and gains corner radius as it scrolls through.
+ * The effect completes at 30% of the section's scroll-through and then holds
+ * (useTransform clamps), after which the section scrolls away normally. No sticky
+ * or pinned positioning.
  *
- * Desktop-only recession (see HAZARD note below): in the back half of that same
- * range the thumbnail rail cascades out (staggered per-thumb fade/slide) and its
- * width collapses to 0, while the section's side padding widens — so the large
- * photo ends up narrower and horizontally centred rather than merely wider.
+ * USER AMENDMENT 2026-07-25: the rail must NOT fade, cascade, or collapse on the
+ * way out — an earlier revision staggered the thumbnails to opacity 0, animated the
+ * rail width to 0, and widened the section padding to 12%, which left the hero at
+ * roughly 0.65× viewport. Both panels now recede together at a single scale and the
+ * rail stays fully visible for the whole range.
  *
- * HAZARD — none of the collapse behaviour may be applied to mobile. The mobile
- * thumbnail strip sits BELOW the hero inside the same element useScroll measures,
- * so collapsing it would change the wrapper's height, which changes
- * scrollYProgress, which re-drives the collapse — a feedback loop that produces
- * scroll jitter. The desktop section is safe only because it is fixed-height
- * (h-[calc(100dvh-72px)]) and the rail collapses horizontally.
+ * Desktop scale target: the shrunken section lands on the same measure as
+ * `.container-editorial` (max-width 1400px minus its side padding — see
+ * index.css:149-160), so the gallery's left and right edges line up with the copy
+ * below it instead of stopping at an arbitrary ratio. That makes the scale
+ * viewport-dependent, hence the tracked width rather than a constant.
+ *
+ * HAZARD — no layout-affecting property may be animated here, on either breakpoint.
+ * Both sections sit inside the element useScroll measures, so animating anything
+ * that changes the wrapper's height would change scrollYProgress, which re-drives
+ * the animation — a feedback loop that produces scroll jitter. Only transforms
+ * (scale/translate) and borderRadius are safe; they never affect layout. For the
+ * same reason section height is read from offsetHeight, not getBoundingClientRect,
+ * which would report the already-transformed box.
  *
  * Hover behavior:
  *  - Hovering a thumbnail temporarily previews that photo; moving away restores the pinned image.
@@ -40,6 +42,23 @@ import { cn } from "@/lib/utils";
  *
  * USER AMENDMENT 2026-07-25: No AccentStripe in the hero overlay. Scrim + serif white title only.
  */
+
+/** `--container-max` in index.css:46. */
+const CONTAINER_MAX = 1400;
+/** `.container-editorial` padding-inline across its two media queries. */
+const containerPadding = (vw: number) => (vw >= 1400 ? 64 : vw >= 992 ? 48 : 20);
+/** The desktop section's own gutter (`lg:p-4`), already inset from the viewport. */
+const SECTION_PAD = 16;
+
+/**
+ * Scale that makes the section's visible width equal the editorial container's
+ * content width, so the receded gallery shares the page's text measure.
+ */
+const contentMatchScale = (vw: number) => {
+  const current = vw - SECTION_PAD * 2;
+  if (current <= 0) return 1;
+  return (Math.min(CONTAINER_MAX, vw) - containerPadding(vw) * 2) / current;
+};
 
 export interface ProjectHeroGalleryProps {
   photos: Array<{ src: string; alt: string }>;
@@ -52,148 +71,55 @@ export interface ProjectHeroGalleryProps {
 const isHoverDevice = () =>
   typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-interface RailThumbProps {
-  index: number;
-  count: number;
-  progress: MotionValue<number>;
-  end: number;
-  reduced: boolean;
-  className: string;
-  onClick: () => void;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  ariaLabel: string;
-  pressed: boolean;
-  tabIndex: number;
-  children: ReactNode;
-}
-
-/**
- * One desktop-rail thumbnail with its own scroll sub-range, so the rail cascades
- * top→bottom on the way out and reverses on the way back in.
- *
- * Extracted into its own component because useTransform cannot be called inside
- * a .map() — that would break the rules of hooks.
- */
-const RailThumb = ({
-  index,
-  count,
-  progress,
-  end,
-  reduced,
-  className,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-  ariaLabel,
-  pressed,
-  tabIndex,
-  children,
-}: RailThumbProps) => {
-  // Thumb 0 leaves first, last thumb starts at 45% of the range; each fades over 35%.
-  const lead = count > 1 ? (index / (count - 1)) * (end * 0.45) : 0;
-  const span = end * 0.35;
-  const range = reduced ? [0, 1] : [lead, lead + span];
-  const opacity = useTransform(progress, range, reduced ? [1, 1] : [1, 0]);
-  const x = useTransform(progress, range, reduced ? [0, 0] : [0, 28]);
-  const scale = useTransform(progress, range, reduced ? [1, 1] : [1, 0.94]);
-  const pointerEvents = useTransform(opacity, (v) => (v < 0.05 ? "none" : "auto"));
-
-  return (
-    <motion.button
-      style={{ opacity, x, scale, pointerEvents }}
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      aria-label={ariaLabel}
-      aria-pressed={pressed}
-      tabIndex={tabIndex}
-      className={className}
-    >
-      {children}
-    </motion.button>
-  );
-};
-
 const ProjectHeroGallery = ({ photos, title, className, ratio = "4/3" }: ProjectHeroGalleryProps) => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [pinnedIdx, setPinnedIdx] = useState(0);
 
   const activeIdx = hoveredIdx ?? pinnedIdx;
 
-  // Breakpoint flags drive the shrink intensity — desktop is pronounced, mobile softer —
-  // and the rail's start width (w-[280px] xl:w-[320px]). Tracked in state (not Tailwind
-  // classes) because the values feed motion transforms.
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [isXl, setIsXl] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Viewport width drives the desktop end-scale (see contentMatchScale above), so
+  // the raw width is tracked rather than a boolean breakpoint. clientWidth, not
+  // innerWidth: innerWidth includes a classic scrollbar, which the layout does not.
+  const [vw, setVw] = useState(0);
+  // The section's laid-out height, used to derive the downward drift below.
+  const [sectionH, setSectionH] = useState(0);
   useEffect(() => {
-    const lg = window.matchMedia("(min-width: 1024px)");
-    const xl = window.matchMedia("(min-width: 1280px)");
+    const el = wrapRef.current;
     const sync = () => {
-      setIsDesktop(lg.matches);
-      setIsXl(xl.matches);
+      setVw(document.documentElement.clientWidth);
+      if (el) setSectionH(el.offsetHeight);
     };
     sync();
-    lg.addEventListener("change", sync);
-    xl.addEventListener("change", sync);
+    const ro = new ResizeObserver(sync);
+    if (el) ro.observe(el);
+    window.addEventListener("resize", sync);
     return () => {
-      lg.removeEventListener("change", sync);
-      xl.removeEventListener("change", sync);
+      ro.disconnect();
+      window.removeEventListener("resize", sync);
     };
   }, []);
+  const isDesktop = vw >= 1024;
 
-  const wrapRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
 
   // Effect completes at 30% of the section's scroll-through, then holds
   // (useTransform clamps by default).
   const END = 0.3;
-  const endScale = reduced ? 1 : isDesktop ? 0.85 : 0.92;
-  const endY = reduced ? 0 : isDesktop ? 80 : 40;
+  // Desktop settles at the editorial container's measure; mobile keeps its softer
+  // fixed shrink, since there is no side-by-side layout to align there.
+  const endScale = reduced ? 1 : isDesktop ? contentMatchScale(vw) : 0.92;
+  // Shrinking about the centre lifts the bottom edge by half the lost height, which
+  // is what opened the gap above the rule below. Drift down by exactly that much so
+  // the bottom edge stays where layout puts it and only the top pulls away.
+  const endY = reduced ? 0 : (sectionH * (1 - endScale)) / 2;
   const endRadius = reduced ? 0 : isDesktop ? 16 : 12;
 
   const scale = useTransform(scrollYProgress, [0, END], [1, endScale]);
   const y = useTransform(scrollYProgress, [0, END], [0, endY]);
   const radius = useTransform(scrollYProgress, [0, END], [0, endRadius]);
-
-  // Rail collapse runs in the BACK HALF of the scroll range, after the thumb cascade.
-  // Desktop only — see the HAZARD note in the file header.
-  const railW = isXl ? 320 : 280;
-  const railWidth = useTransform(
-    scrollYProgress,
-    [END * 0.5, END],
-    reduced ? [railW, railW] : [railW, 0]
-  );
-  // px STRINGS, not numbers: `columnGap` is absent from framer-motion's
-  // numberValueTypes map, so a numeric motion value is written to style as a raw
-  // unitless number — invalid CSS for a length, so the declaration is dropped and
-  // the `lg:gap-4` class wins. The gap would then hold at 16px and only snap to 0
-  // at the very end (unitless zero being the one legal case). Verified 2026-07-25.
-  const railGap = useTransform(
-    scrollYProgress,
-    [END * 0.5, END],
-    reduced ? ["16px", "16px"] : ["16px", "0px"]
-  );
-  // Percentage padding stays responsive and narrows the photo as it centres, so the
-  // collapsed state reads as "receded" rather than just "wider".
-  const sidePad = useTransform(
-    scrollYProgress,
-    [END * 0.5, END],
-    reduced ? ["1.1%", "1.1%"] : ["1.1%", "12%"]
-  );
-
-  // Once the rail has collapsed its buttons are visually gone but still focusable,
-  // so mirror the collapse into the a11y tree. Guarded by a ref so the state only
-  // flips at the threshold instead of re-rendering on every scroll frame.
-  const [railHidden, setRailHidden] = useState(false);
-  const railHiddenRef = useRef(false);
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const next = !reduced && v > END * 0.9;
-    if (railHiddenRef.current === next) return;
-    railHiddenRef.current = next;
-    setRailHidden(next);
-  });
 
   // NOTE: every hook above must stay above this early return (rules of hooks).
   if (photos.length === 0) return null;
@@ -254,11 +180,8 @@ const ProjectHeroGallery = ({ photos, title, className, ratio = "4/3" }: Project
        so the wrapper's height always equals whichever one is visible. */
     <motion.div ref={wrapRef} style={{ scale, y, willChange: "transform" }}>
       {/* ── Desktop layout (lg+) ── */}
-      {/* The inline paddingInline intentionally overrides the horizontal half of
-          `p-3 lg:p-4`; the vertical half still comes from the class. */}
-      <motion.section
+      <section
         aria-label={title}
-        style={{ columnGap: railGap, paddingInline: sidePad }}
         className={cn(
           "hidden lg:flex flex-row h-[calc(100dvh-72px)] p-3 lg:p-4 gap-3 lg:gap-4",
           className
@@ -273,29 +196,18 @@ const ProjectHeroGallery = ({ photos, title, className, ratio = "4/3" }: Project
           {titleOverlay}
         </motion.div>
 
-        {/* Right: vertical thumbnail rail. Width is owned by the motion value
-            (the w-[280px] xl:w-[320px] class moved to the inner grid) so the
-            thumbnails clip out cleanly instead of reflowing as it narrows. */}
-        <motion.div
-          style={{ width: railWidth }}
-          aria-hidden={railHidden}
-          className="h-full overflow-y-auto no-scrollbar"
-        >
+        {/* Right: vertical thumbnail rail. Fixed width — it recedes with the photo
+            under the wrapper's shared scale, never on its own. */}
+        <div className="h-full overflow-y-auto no-scrollbar">
           <div className={cn("w-[280px] xl:w-[320px]", railGridClass)}>
             {photos.map((photo, i) => (
-              <RailThumb
+              <button
                 key={photo.src}
-                index={i}
-                count={photos.length}
-                progress={scrollYProgress}
-                end={END}
-                reduced={!!reduced}
                 onClick={() => setPinnedIdx(i)}
                 onMouseEnter={() => handleMouseEnter(i)}
                 onMouseLeave={handleMouseLeave}
-                ariaLabel={`Show photo ${i + 1} of ${photos.length}`}
-                pressed={i === activeIdx}
-                tabIndex={railHidden ? -1 : 0}
+                aria-label={`Show photo ${i + 1} of ${photos.length}`}
+                aria-pressed={i === activeIdx}
                 className={thumbButtonClass(i)}
               >
                 <img
@@ -305,11 +217,11 @@ const ProjectHeroGallery = ({ photos, title, className, ratio = "4/3" }: Project
                   decoding="async"
                   className="w-full h-full object-cover"
                 />
-              </RailThumb>
+              </button>
             ))}
           </div>
-        </motion.div>
-      </motion.section>
+        </div>
+      </section>
 
       {/* ── Mobile layout (<lg) ── */}
       <section

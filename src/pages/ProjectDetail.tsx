@@ -177,7 +177,11 @@ const ProjectDetail = () => {
         ratio={heroRatio}
       />
 
-      <section className="pt-section-mobile md:pt-section-tablet lg:pt-section-desktop pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
+      {/* Top padding is deliberately tighter than the section-* scale: the gallery
+          above recedes on scroll but keeps its bottom edge anchored to its layout
+          box, so this padding IS the visible gap to the rule below it. At the full
+          section-desktop 120px that gap read as dead space. */}
+      <section className="pt-10 md:pt-12 lg:pt-16 pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
           {/* Project meta + description */}
           <div className="grid lg:grid-cols-12 gap-x-8 gap-y-12 mb-20 lg:mb-28 border-t border-[color:var(--rule-soft)] pt-12 lg:pt-16">
