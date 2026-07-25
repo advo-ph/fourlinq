@@ -54,6 +54,7 @@ import {
   ArrowUpDown,
   Ratio as RatioIcon,
   Bookmark,
+  RefreshCw,
 } from "lucide-react";
 import { toThumbPath } from "@/lib/project-thumbs";
 import { versionedImage } from "@/lib/image-version";
@@ -475,7 +476,7 @@ function ProjectListView({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {orderedProjects.map((proj) => {
-            const heroPath = proj.quality?.heroImage ?? proj.images[0]?.path;
+            const heroPath = computeCoverPathForProject(proj, overrides);
             const overCount = overrideCountPerProject.get(proj.id) ?? 0;
             const hasStale = overrides.some((r) => r.project_id === proj.id && r.stale);
 
@@ -586,17 +587,30 @@ function ImageRow({
   return (
     <div className={`rounded-lg border overflow-hidden transition-colors ${isHidden ? "border-border/40 opacity-60 bg-muted/20" : "border-border bg-card"}`}>
       <div className="flex flex-col md:flex-row">
-        {/* Large clickable image — opens lightbox */}
+        {/* Large clickable image — opens lightbox. Uses blurred letterbox fill
+            so portrait/landscape images never crop: the foreground uses
+            object-contain (uncropped), the background is a blurred+scaled copy
+            of the same image that fills any letterbox gaps. */}
         <button
           type="button"
           onClick={onOpenLightbox}
           aria-label={`View ${filename} larger`}
-          className="relative shrink-0 group/img cursor-zoom-in md:w-80 lg:w-96 bg-muted"
+          className="relative shrink-0 group/img cursor-zoom-in md:w-80 lg:w-96 bg-muted overflow-hidden"
         >
+          {/* Blurred fill layer — covers letterbox areas with a scaled copy */}
           <img
             src={versionedImage(toThumbPath(displaySrc))}
             alt=""
-            className="w-full aspect-[4/3] md:aspect-auto md:h-60 object-cover"
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover scale-110 blur-md brightness-75 pointer-events-none"
+            loading="lazy"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = versionedImage(displaySrc); }}
+          />
+          {/* Foreground layer — uncropped, always fully visible */}
+          <img
+            src={versionedImage(toThumbPath(displaySrc))}
+            alt=""
+            className="relative w-full aspect-[4/3] md:aspect-auto md:h-60 object-contain"
             loading="lazy"
             onLoad={(e) => {
               const img = e.currentTarget;
@@ -817,6 +831,31 @@ function computeImageOrder(
     ...orderOverrides.map((r) => r.image_path).filter((p) => baseImages.some((im) => im.path === p)),
     ...unordered,
   ];
+}
+
+// ── computeCoverPathForProject: derive the cover (first non-hidden image) for
+//    ANY project using the same logic as the server-side buildMergedResponse.
+//    Used for list-grid thumbnails and right-panel order row thumbnails where we
+//    only have baseline + overrides — not the computed coverPath from
+//    ProjectDetailView (which is only available for the currently-open project).
+function computeCoverPathForProject(
+  proj: BaselineProject,
+  allOverrides: OverrideRow[],
+): string | undefined {
+  const projectOverrides = allOverrides.filter((r) => r.project_id === proj.id);
+  const orderedPaths = computeImageOrder(proj.images, projectOverrides);
+  const hiddenSet = new Set(
+    projectOverrides.filter((r) => r.override_type === "hidden").map((r) => r.image_path)
+  );
+  const replacedMap = new Map(
+    projectOverrides.filter((r) => r.override_type === "replaced").map((r) => [r.image_path, r.value_text ?? ""])
+  );
+  for (const imgPath of orderedPaths) {
+    if (!hiddenSet.has(imgPath)) {
+      return replacedMap.get(imgPath) ?? imgPath;
+    }
+  }
+  return undefined;
 }
 
 // ── Project Detail View ─────────────────────────────────────────────────────────
@@ -1089,34 +1128,30 @@ function ProjectDetailView({
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
-        {(project.quality?.heroImage ?? project.images[0]?.path) && (
+        {coverPath && (
           <button
             type="button"
             onClick={() => {
-              const heroPath = project.quality?.heroImage ?? project.images[0]?.path;
-              if (!heroPath) return;
-              const heroImage = project.images.find((im) => im.path === heroPath);
-              // FIX 3: use the replaced URL if one exists, so the lightbox shows the
-              // actual current image rather than the original (replaced) path.
-              const heroSrc = replacedMap.get(heroPath) ?? heroPath;
+              // coverPath is already the effective display path (replaced URL applied).
+              // Find the underlying base image for scores/reasoning metadata.
+              const baseImagePath = imageOrderIds.find((p) => !hiddenSet.has(p)) ?? coverPath;
+              const coverImage = project.images.find((im) => im.path === baseImagePath);
               setLightbox({
-                src: heroSrc,
-                filename: heroPath.split("/").pop() ?? heroPath,
-                scores: heroImage?.scores ?? null,
-                reasoning: heroImage?.reasoning ?? "",
+                src: coverPath,
+                filename: (baseImagePath).split("/").pop() ?? baseImagePath,
+                scores: coverImage?.scores ?? null,
+                reasoning: coverImage?.reasoning ?? "",
               });
             }}
-            aria-label="View hero image larger"
+            aria-label="View cover image larger"
             className="shrink-0 cursor-zoom-in rounded overflow-hidden border border-border/40 hover:border-primary/40 transition-colors"
           >
             <img
-              src={versionedImage(toThumbPath(replacedMap.get(project.quality?.heroImage ?? project.images[0]?.path ?? "") ?? (project.quality?.heroImage ?? project.images[0]?.path ?? "")))}
+              src={versionedImage(toThumbPath(coverPath))}
               alt=""
               className="h-20 w-28 object-cover"
               onError={(e) => {
-                const heroPath = project.quality?.heroImage ?? project.images[0]?.path;
-                const full = heroPath ? (replacedMap.get(heroPath) ?? heroPath) : undefined;
-                if (full) (e.currentTarget as HTMLImageElement).src = versionedImage(full);
+                (e.currentTarget as HTMLImageElement).src = versionedImage(coverPath);
               }}
             />
           </button>
@@ -1167,6 +1202,49 @@ function ProjectDetailView({
               <Flag size={13} /> {project.flagged ? "Flagged" : "Flag"}
             </button>
 
+            {/* Refresh Cover — forces a fresh re-derivation + display sync */}
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  // Invalidate both queries so local state re-derives cover.
+                  queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "baseline"] });
+                  queryClient.invalidateQueries({ queryKey: ["admin", "project-images", "overrides"] });
+                  // Also bypass server-side cache so we get the latest DB state.
+                  const res = await fetch(`/api/project-images/merged?_r=1`, { cache: "no-cache" });
+                  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                  const data = await res.json() as { projectCoverImages?: Record<string, string> };
+                  const coverFile = data.projectCoverImages?.[project.id];
+                  const coverFilename = coverFile ? coverFile.split("/").pop() ?? coverFile : null;
+                  onShowToast(
+                    coverFilename ? `Cover: ${coverFilename}` : "Cover refreshed (no override set)",
+                    "success"
+                  );
+                } catch {
+                  onShowToast("Refresh Cover failed — check network", "error");
+                }
+              }}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-muted text-muted-foreground hover:bg-border transition-colors"
+              title="Force re-derive cover from current image order and show a toast naming the cover file"
+            >
+              <RefreshCw size={13} /> Refresh Cover
+            </button>
+
+            {/* Ratio toggle — shows current ratio; click to switch to the other value */}
+            <button
+              type="button"
+              onClick={() =>
+                handleAddProjectOverride(
+                  "project_ratio",
+                  project.ratio === "4:3" ? "16:9" : "4:3"
+                )
+              }
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-muted text-muted-foreground hover:bg-border transition-colors"
+              title={`Current: ${project.ratio}. Click to switch to ${project.ratio === "4:3" ? "16:9" : "4:3"}`}
+            >
+              <RatioIcon size={13} /> Ratio: {project.ratio}
+            </button>
+
             {/* Hide toggle */}
             <button
               type="button"
@@ -1183,21 +1261,6 @@ function ProjectDetailView({
             >
               {project.hidden ? <Eye size={13} /> : <EyeOff size={13} />}
               {project.hidden ? "Unhide" : "Hide project"}
-            </button>
-
-            {/* Ratio toggle — shows current ratio; click to switch to the other value */}
-            <button
-              type="button"
-              onClick={() =>
-                handleAddProjectOverride(
-                  "project_ratio",
-                  project.ratio === "4:3" ? "16:9" : "4:3"
-                )
-              }
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-muted text-muted-foreground hover:bg-border transition-colors"
-              title={`Current: ${project.ratio}. Click to switch to ${project.ratio === "4:3" ? "16:9" : "4:3"}`}
-            >
-              <RatioIcon size={13} /> Ratio: {project.ratio}
             </button>
 
             {/* Delete / Restore */}
@@ -1378,7 +1441,7 @@ function ProjectDetailView({
                 <div className="space-y-1 p-1">
                   {allOrderIds.map((pid, idx) => {
                     const p = baselineData.projects.find((x) => x.id === pid);
-                    const heroPath = p?.quality?.heroImage ?? p?.images[0]?.path;
+                    const heroPath = p ? computeCoverPathForProject(p, overrides) : undefined;
                     return (
                       <SortableRow key={pid} id={pid}>
                         {() => (
@@ -1415,7 +1478,9 @@ function ProjectDetailView({
                   {catOrderIds[orderTab].map((pid, idx) => {
                     const p = baselineData.projects.find((x) => x.id === pid);
                     const catImg = p?.categoryImages[orderTab as Category];
-                    const heroPath = catImg ?? p?.quality?.heroImage ?? p?.images[0]?.path;
+                    // Use category-specific best image if available; otherwise fall
+                    // back to the derived cover (same source the public site uses).
+                    const heroPath = catImg ?? (p ? computeCoverPathForProject(p, overrides) : undefined);
                     return (
                       <SortableRow key={pid} id={pid}>
                         {() => (

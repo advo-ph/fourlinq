@@ -4,6 +4,7 @@ import { ArrowUpRight, Search, X } from "lucide-react";
 import { products } from "@/data/products";
 import { projects } from "@/data/projects";
 import { DOCUMENT_FALLBACK } from "@/hooks/useDocument";
+import { fetchMergedProjectImages } from "@/lib/merged-project-images";
 
 /**
  * Site search flyout, patterned on marvin.com's header search: a full-width
@@ -53,6 +54,22 @@ const NavSearch = ({ open, onClose }: NavSearchProps) => {
   const [debounced, setDebounced] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  // Admin-set cover images: projectId → cover image path.
+  // Fetched once per session via the shared merged-project-images cache.
+  const [coverImages, setCoverImages] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let live = true;
+    fetchMergedProjectImages()
+      .then((data) => {
+        if (!live) return;
+        if (data.projectCoverImages && Object.keys(data.projectCoverImages).length > 0) {
+          setCoverImages(data.projectCoverImages);
+        }
+      })
+      .catch(() => { /* keep p.image fallback */ });
+    return () => { live = false; };
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -272,7 +289,7 @@ const NavSearch = ({ open, onClose }: NavSearchProps) => {
                         <Link to={`/projects/${p.id}`} onClick={onClose} className="group block">
                           <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
                             <img
-                              src={p.image}
+                              src={coverImages[p.id] ?? p.image}
                               alt={p.name}
                               loading="lazy"
                               className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.04]"
