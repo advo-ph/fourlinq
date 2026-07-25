@@ -1,0 +1,116 @@
+{
+  "timestamp": "2026-07-25T15:07:01.109Z",
+  "commit": "3d3197e",
+  "results": [
+    {
+      "name": "2a: No FB sarangani src ever appeared in DOM (no stale flash)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "2b: No FB sarangani network requests (browser never fetched original)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "2c: Final rendered gallery has no FB srcs",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "2d: Final rendered gallery = exactly 2 CMS images",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/uploads/cms/20260725-347a9254ad.png, https://fourlinq.ph/uploads/cms/20260725-d32199ea8e.png"
+    },
+    {
+      "name": "2e: HTTP 200 for 20260725-347a9254ad.png",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/uploads/cms/20260725-347a9254ad.png"
+    },
+    {
+      "name": "2e: HTTP 200 for 20260725-d32199ea8e.png",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/uploads/cms/20260725-d32199ea8e.png"
+    },
+    {
+      "name": "2f: Zero console errors on sarangani detail",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "3: Las Pinas Residence — all 14 API gallery images found in DOM",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "3: Las Pinas Residence",
+      "status": "warn",
+      "reason": "No obvious prev/next buttons found (may use scroll or swipe)"
+    },
+    {
+      "name": "3: Las Pinas Residence — zero console errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "3: Nuvali Laguna Residence — all 17 API gallery images found in DOM",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "3: Nuvali Laguna Residence",
+      "status": "warn",
+      "reason": "No obvious prev/next buttons found (may use scroll or swipe)"
+    },
+    {
+      "name": "3: Nuvali Laguna Residence — zero console errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "4a: Sarangani card on /inspiration shows replacement cover",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/uploads/cms/20260725-347a9254ad.png"
+    },
+    {
+      "name": "4b: /inspiration zero console errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "4c: Home page loaded",
+      "status": "pass",
+      "detail": "title=\"FourlinQ — Custom-made uPVC Windows & Doors | Philippines\""
+    },
+    {
+      "name": "4d: Home zero console errors",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5: Zero console errors — sarangani detail",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5: Zero console errors — las-pinas detail",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5: Zero console errors — nuvali detail",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5: Zero console errors — /inspiration",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5: Zero console errors — home",
+      "status": "pass",
+      "detail": ""
+    }
+  ]
+}
