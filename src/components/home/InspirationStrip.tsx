@@ -169,16 +169,18 @@ const InspirationStrip = () => {
         {/* Left: sticky crossfading feature. Right: the full catalog, scrolling. */}
         <div
           ref={trackRef}
-          className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr),minmax(0,1.15fr)] gap-3 lg:gap-8 items-start"
+          className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr),minmax(0,1.15fr)] gap-3 lg:gap-4 items-start"
         >
-          {/* Sticky feature — desktop only. */}
+          {/* Sticky feature. On mobile the panel still renders so the heading
+              and subtitle sit above the grid; only the scroll line and the
+              crossfading hero are desktop-only. */}
           <div
             ref={panelRef}
-            className="hidden lg:block lg:sticky lg:self-start"
+            className="mb-5 lg:mb-0 lg:sticky lg:self-start"
             style={{ top: STICKY_TOP }}
           >
             {/* Thin scroll-position line: fills across a part, then the hero turns over. */}
-            <div className="relative h-[1.5px] w-full overflow-hidden bg-[color:var(--rule-soft)]">
+            <div className="relative hidden h-[1.5px] w-full overflow-hidden bg-[color:var(--rule-soft)] lg:block">
               <div
                 ref={lineRef}
                 className="absolute inset-y-0 left-0 bg-[color:var(--accent)]"
@@ -187,7 +189,7 @@ const InspirationStrip = () => {
             </div>
 
             {/* Crossfading hero stack. object-cover so any source ratio overlays cleanly. */}
-            <div className="relative mt-3 aspect-[3/2] overflow-hidden bg-neutral-100">
+            <div className="relative hidden mt-3 aspect-[3/2] overflow-hidden bg-neutral-100 lg:block">
               {FEATURE_HEROES.map((hero, i) => (
                 <img
                   key={hero.src}
@@ -208,7 +210,7 @@ const InspirationStrip = () => {
                 so it bookends BrandCTA lower on the page. Subtitle carries the
                 factual load: the systems listed are the actual installs in
                 projects.ts. */}
-            <div className="mt-6">
+            <div className="lg:mt-6">
               <h3 className="font-serif font-normal tracking-tight leading-[1.15] text-h4 lg:text-h3 text-[color:var(--ink-primary)]">
                 Built to your satisfaction.
               </h3>
