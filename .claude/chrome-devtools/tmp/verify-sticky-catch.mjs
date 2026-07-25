@@ -1,5 +1,6 @@
-// Verify v3 ScrollWindow: sticky pin catch (260lvh track), 4:3 media,
-// faster fade/commit, no-debounce rapid swipes, exit glides, desktop regression.
+// Verify v4 ScrollWindow: scroll-delta input model (no touchmove, no preventDefault),
+// sticky pin catch (260lvh track), 4:3 media, anchor-set, faster fade/commit,
+// no-debounce rapid swipes, boundary exit via native momentum, desktop regression.
 import { createRequire } from "module";
 const require = createRequire(
   "/Users/princewagan/.claude/skills/vc-chrome-devtools/scripts/lib/browser.js",
@@ -103,14 +104,29 @@ const run = async () => {
       });
     };
 
-    // ── Sticky pin: section visually fixed at several offsets inside the track ──
-    const pins = [];
-    for (const off of [100, 500, 900, 1200]) {
-      pins.push({ off, ...(await innerTopAt(trackTop + off)) });
-    }
+    // ── Sticky pin + clamp-to-anchor (v4 semantics) ──
+    // Free scrubbing inside the track is no longer neutral: at step 0 an upward
+    // delta is an exit request (release + assist). So verify: (1) engaging pins
+    // the section, (2) a positive-delta scroll (non-exit direction at step 0)
+    // stays visually pinned and gets clamped back to the anchor.
+    const anchorExpected = trackTop + (trackH - vh) / 2;
+    const pinEngage = await innerTopAt(trackTop + 100); // engages, jumps to anchor
+    await sleep(300);
+    const preClamp = await page.evaluate(() => window.scrollY);
+    const pinForward = await innerTopAt(preClamp + 300); // +delta at step 0: no release
+    await sleep(400);
+    const postClamp = await page.evaluate(() => window.scrollY);
     results.stickyPin = {
-      pins,
-      verdict: pins.every((p) => Math.abs(p.top) <= 1) ? "PINNED_THROUGHOUT_TRACK" : "CHECK",
+      pinOnEngage: pinEngage,
+      pinDuringForwardDelta: pinForward,
+      anchorExpected: +anchorExpected.toFixed(0),
+      scrollAfterClamp: postClamp,
+      verdict:
+        Math.abs(pinEngage.top) <= 1 &&
+        Math.abs(pinForward.top) <= 1 &&
+        Math.abs(postClamp - anchorExpected) <= 4
+          ? "PINNED_AND_CLAMPED"
+          : "CHECK",
     };
 
     // media flush to bottom while pinned
@@ -156,8 +172,20 @@ const run = async () => {
           : "CHECK",
     };
 
-    // ── Faster fade: hold at dy=-100 → opacity ≈ 0.17, translateY -100 ──
-    const release1 = await swipeHold(client, { fromY: 600, toY: 500 });
+    // ── Anchor set: after engage, scrollY must equal mid-track anchor ±4px ──
+    const anchorCheck = await page.evaluate((tTop, tH, vHeight) => {
+      const expectedAnchor = tTop + (tH - vHeight) / 2;
+      return { scrollY: window.scrollY, expectedAnchor };
+    }, trackTop, trackH, vh);
+    results.anchorSet = {
+      scrollY: anchorCheck.scrollY,
+      expectedAnchor: +anchorCheck.expectedAnchor.toFixed(0),
+      verdict: Math.abs(anchorCheck.scrollY - anchorCheck.expectedAnchor) <= 4 ? "ANCHOR_SET" : "CHECK",
+    };
+
+    // ── Faster fade: hold at dy=-140 — v4 note: CDP touch→scroll scale ≈ 0.85,
+    // so 140px touch swipe produces ~119px scroll delta, giving translateY ≤ -95 ──
+    const release1 = await swipeHold(client, { fromY: 640, toY: 500 });
     const mid = await page.evaluate(() => {
       const d = [...document.querySelectorAll("div[class*='pt-\\[4vh\\]']")][0];
       const cs = getComputedStyle(d);
@@ -173,10 +201,11 @@ const run = async () => {
       committedTo: await cardOpacities(),
       verdict: mid.translateY <= -95 && mid.opacity <= 0.25 ? "FADES_FAST" : "CHECK",
     };
-    // (that -100px swipe should also have committed → step 1)
+    // (that swipe should also have committed → step 1)
 
-    // ── Commit at 50px slow (new 44px threshold, old was 60) ──
-    await swipe(client, { fromY: 600, toY: 550, steps: 10, stepDelayMs: 50 }); // 50px, v=0.1
+    // ── Commit at 60px slow — v4 note: CDP scroll ≈ 0.85 scale, 60px touch → ~51px
+    // scroll delta which exceeds the 44px COMMIT_DISTANCE_PX threshold ──
+    await swipe(client, { fromY: 600, toY: 540, steps: 10, stepDelayMs: 50 }); // 60px, slow
     await sleep(700);
     const after50 = await cardOpacities();
     results.commit50pxSlow = {
@@ -184,14 +213,15 @@ const run = async () => {
       verdict: after50[2] === 1 ? "COMMITS_AT_50PX" : "CHECK",
     };
 
-    // ── No debounce: back to step 0, then 3 rapid swipes ~170ms apart ──
-    await swipe(client, { fromY: 500, toY: 620 }); // step 2 -> 1
+    // ── No debounce: back to step 0, then 3 rapid 80px swipes — each generates
+    // ~68px scroll delta > 44px COMMIT threshold; 160ms between swipes clears burst ──
+    await swipe(client, { fromY: 500, toY: 620 }); // step 2 -> 1 (120px down)
     await sleep(120);
     await swipe(client, { fromY: 500, toY: 620 }); // 1 -> 0
     await sleep(400);
     const back0 = await cardOpacities();
     for (let i = 0; i < 3; i++) {
-      await swipe(client, { fromY: 620, toY: 500, steps: 8, stepDelayMs: 12 });
+      await swipe(client, { fromY: 640, toY: 560, steps: 8, stepDelayMs: 12 }); // 80px up
       await sleep(160);
     }
     await sleep(700);
@@ -204,20 +234,52 @@ const run = async () => {
 
     await page.screenshot({ path: `${SHOTS}/sticky-catch-step3.png` });
 
-    // ── Exit glide DOWN: swipe up at last step ──
+    // ── Exit glide DOWN: self-contained — re-establish engagement first, then
+    // navigate to step 3 cleanly, then perform a deliberate finger-down drag exit.
+    // This prevents inheriting stale state from the rapid-swipe test above.
+    // Step 1: scroll fully out of the track (above it) so exitingRef resets.
+    await page.evaluate((y) => window.scrollTo(0, y), trackTop - 700);
+    await sleep(400);
+    // Step 2: scroll into the track to engage at step 0.
     await page.evaluate(() => (window.__fq.length = 0));
-    await swipe(client, { fromY: 600, toY: 470 });
-    await sleep(1400);
+    await page.evaluate((y) => window.scrollTo(0, y), trackTop + 150);
+    await sleep(600);
+    // Assert engagement: anchor jump should have fired a header:true event.
+    const exitDownEngageCheck = await page.evaluate(() => window.__fq.slice());
+    const exitDownEngaged = exitDownEngageCheck.some((e) => e.ev === "header" && e.detail === true);
+    // Step 3: swipe up ×3 with ~500ms settle to reach step 3 cleanly.
+    for (let i = 0; i < 3; i++) {
+      await swipe(client, { fromY: 640, toY: 550, steps: 12, stepDelayMs: 20 }); // 90px up, slow
+      await sleep(500);
+    }
+    // Confirm we are at step 3 (card index 3 fully opaque).
+    const atStep3Cards = await cardOpacities();
+    // Step 4: clear events, then perform a single slow finger-down drag UPWARD ~90px.
+    // With finger down, onScrollDelta will see delta > EXIT_RELEASE_PX (44) and fire
+    // the boundary exit (gestureStartStepRef === STEP_COUNT-1, fingerDownRef === true).
+    // After touchEnd, startExitAssist is called to push the page past the bottom pin.
+    await page.evaluate(() => (window.__fq.length = 0));
+    const anchorYBeforeExitDown = await page.evaluate(() => window.scrollY);
+    await swipe(client, { fromY: 640, toY: 550, steps: 12, stepDelayMs: 20 }); // 90px up, slow
+    // Wait: 250ms assist timer + smooth scroll (~1s) + buffer
+    await sleep(1600);
     const exitDown = await page.evaluate(() => ({ y: window.scrollY, ev: window.__fq.slice() }));
-    const exitDownTarget = trackTop + trackH - vh * 0.5;
+    const exitDownThreshold = trackTop + trackH - vh;
+    const exitDownFab = await fabState();
     results.exitGlideDown = {
+      engaged: exitDownEngaged,
+      atStep3: atStep3Cards[3] === 1,
       scrollY: exitDown.y,
-      target: +exitDownTarget.toFixed(0),
+      anchorWas: anchorYBeforeExitDown,
+      threshold: +exitDownThreshold.toFixed(0),
       events: exitDown.ev,
-      fab: await fabState(),
+      fab: exitDownFab,
       verdict:
-        Math.abs(exitDown.y - exitDownTarget) <= 4 &&
-        exitDown.ev.some((e) => e.ev === "header" && e.detail === false)
+        exitDownEngaged &&
+        atStep3Cards[3] === 1 &&
+        exitDown.y > exitDownThreshold &&
+        exitDown.ev.some((e) => e.ev === "header" && e.detail === false) &&
+        exitDownFab.opacity === 1
           ? "GLIDES_OUT_DOWN"
           : "CHECK",
     };
@@ -235,22 +297,37 @@ const run = async () => {
       verdict: belowCards[3] === 1 ? "ENGAGED_LAST_STEP" : "CHECK",
     };
 
-    // ── Exit glide UP: swipe down at step 0 ──
+    // ── Exit glide UP: navigate back to step 0 first (3 swipes down from step 3),
+    // then perform a deliberate finger-down drag DOWNWARD ~90px at step 0.
+    // With finger down, onScrollDelta will see delta < -EXIT_RELEASE_PX (44) and fire
+    // the boundary exit (gestureStartStepRef === 0, fingerDownRef === true).
     for (let i = 0; i < 3; i++) {
       await swipe(client, { fromY: 470, toY: 600 });
       await sleep(300);
     } // 3 -> 0
+    // Confirm at step 0 (card index 0 fully opaque).
+    const atStep0Cards = await cardOpacities();
     await page.evaluate(() => (window.__fq.length = 0));
     const preExitUp = await page.evaluate(() => window.scrollY);
-    await swipe(client, { fromY: 400, toY: 540 });
-    await sleep(1400);
+    // Slow downward drag of ~90px: scroll delta will be negative (anchor - ~77px) < -EXIT_RELEASE_PX
+    // triggering boundary exit while finger is down.
+    await swipe(client, { fromY: 550, toY: 640, steps: 12, stepDelayMs: 20 }); // 90px down, slow
+    // Wait: 250ms assist timer + smooth scroll (~1s) + buffer
+    await sleep(1600);
     const exitUp = await page.evaluate(() => ({ y: window.scrollY, ev: window.__fq.slice() }));
+    // v4: boundary exit releases native momentum — page should NOT clamp back to anchor.
+    // Assert page moved upward (scrollY < anchor) and events fired.
     results.exitGlideUp = {
+      atStep0: atStep0Cards[0] === 1,
       before: preExitUp,
       scrollY: exitUp.y,
-      targetApprox: +(trackTop - vh * 0.5).toFixed(0),
+      anchorWas: preExitUp,
       verdict:
-        Math.abs(exitUp.y - (trackTop - vh * 0.5)) <= 4 ? "GLIDES_OUT_UP" : "CHECK",
+        atStep0Cards[0] === 1 &&
+        exitUp.y < preExitUp &&
+        exitUp.ev.some((e) => e.ev === "header" && e.detail === false)
+          ? "GLIDES_OUT_UP"
+          : "CHECK",
     };
 
     // ── No hijack when fully above the track ──
