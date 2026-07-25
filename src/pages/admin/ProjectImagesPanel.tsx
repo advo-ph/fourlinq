@@ -881,7 +881,7 @@ function ProjectDetailView({
   queryClient: ReturnType<typeof useQueryClient>;
   onShowToast: (msg: string, kind?: "success" | "error") => void;
 }) {
-  const [orderTab, setOrderTab] = useState<"all" | Category>("all");
+  const [orderTab, setOrderTab] = useState<"all" | Category | "hidden">("all");
   const [lightbox, setLightbox] = useState<LightboxData | null>(null);
 
   // Compute per-image override state early — needed for computeImageOrder
@@ -984,7 +984,19 @@ function ProjectDetailView({
   }
 
   // DnD handlers
-  async function handleProjectOrderEnd(event: DragEndEvent, ids: string[], setIds: (ids: string[]) => void, overrideType: "project_order" | "category_order", category?: Category) {
+  //
+  // visibleIds — the filtered (non-hidden, non-deleted) subset that the DnD list
+  // was rendered from. When provided, only these IDs get their position rows
+  // written on save; hidden/deleted projects' existing rows are left untouched.
+  // When omitted (backward-compat), all newIds are saved as before.
+  async function handleProjectOrderEnd(
+    event: DragEndEvent,
+    ids: string[],
+    setIds: (ids: string[]) => void,
+    overrideType: "project_order" | "category_order",
+    category?: Category,
+    visibleIds?: string[],
+  ) {
     const { active, over } = event;
     // No-op drag (dropped in place or missed target) — release guard immediately.
     if (!over || active.id === over.id) {
@@ -1004,6 +1016,11 @@ function ProjectDetailView({
     const newIds = arrayMove(ids, oldIdx, newIdx);
     setIds(newIds);
 
+    // Determine which IDs to persist. When a filtered visibleIds list is active
+    // (hidden/deleted excluded from the drag surface), only write positions for
+    // those IDs so hidden projects' existing order rows stay untouched.
+    const idsToSave = visibleIds ? newIds.filter((pid) => visibleIds.includes(pid)) : newIds;
+
     // FIX 2: Keep the drag guard true through the entire save so resync effects
     // don't clobber the optimistic order while POSTs are in flight.
     isSavingRef.current = true;
@@ -1011,7 +1028,7 @@ function ProjectDetailView({
     try {
       // FIX 2: Skip per-row invalidation; batch-invalidate ONCE below.
       await Promise.all(
-        newIds.map((pid, pos) =>
+        idsToSave.map((pid, pos) =>
           onAddOverride({
             project_id: pid,
             image_path: "__project__",
@@ -1419,89 +1436,203 @@ function ProjectDetailView({
         </p>
 
         {/* Order tab selector */}
-        <div className="flex gap-1 mb-3 flex-wrap shrink-0">
-          {(["all", ...CATEGORIES] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setOrderTab(tab)}
-              className={`text-[11px] px-2 py-1 rounded transition-colors ${
-                orderTab === tab ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab === "all" ? "All" : CATEGORY_LABELS[tab]}
-            </button>
-          ))}
-        </div>
+        {(() => {
+          const hiddenCount = baselineData.projects.filter((p) => p.hidden || p.deleted).length;
+          return (
+            <div className="flex gap-1 mb-3 flex-wrap shrink-0">
+              {(["all", ...CATEGORIES, "hidden"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setOrderTab(tab)}
+                  className={`text-[11px] px-2 py-1 rounded transition-colors ${
+                    orderTab === tab ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab === "all"
+                    ? "All"
+                    : tab === "hidden"
+                    ? hiddenCount > 0
+                      ? `Hidden (${hiddenCount})`
+                      : "Hidden"
+                    : CATEGORY_LABELS[tab]}
+                </button>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Scrollable drag list */}
         <div className="flex-1 overflow-y-auto min-h-0">
-          {orderTab === "all" ? (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleProjectOrderEnd(e, allOrderIds, setAllOrderIds, "project_order")}>
-              <SortableContext items={allOrderIds} strategy={verticalListSortingStrategy}>
+          {orderTab === "hidden" ? (
+            /* ── Hidden tab: no drag, no DnD context ── */
+            (() => {
+              const hiddenProjects = baselineData.projects.filter((p) => p.hidden || p.deleted);
+              if (hiddenProjects.length === 0) {
+                return (
+                  <p className="text-[11px] text-muted-foreground px-2 py-4 text-center">
+                    No hidden or deleted projects.
+                  </p>
+                );
+              }
+              return (
                 <div className="space-y-1 p-1">
-                  {allOrderIds.map((pid, idx) => {
-                    const p = baselineData.projects.find((x) => x.id === pid);
-                    const heroPath = p ? computeCoverPathForProject(p, overrides) : undefined;
+                  {hiddenProjects.map((p, idx) => {
+                    const heroPath = computeCoverPathForProject(p, overrides);
                     return (
-                      <SortableRow key={pid} id={pid}>
-                        {() => (
+                      <div key={p.id} className="flex items-stretch gap-2">
+                        {/* Spacer where grip would be — keeps row alignment consistent */}
+                        <div className="w-[22px] shrink-0" />
+                        <div className="flex-1 min-w-0">
                           <ProjectOrderRow
-                            pid={pid}
+                            pid={p.id}
                             index={idx}
                             heroPath={heroPath}
-                            isCurrentProject={pid === project.id}
-                            flagged={p?.flagged ?? false}
-                            checked={p?.checked ?? false}
-                            hidden={p?.hidden ?? false}
-                            deleted={p?.deleted ?? false}
+                            isCurrentProject={p.id === project.id}
+                            flagged={p.flagged}
+                            checked={p.checked}
+                            hidden={p.hidden}
+                            deleted={p.deleted}
                             onOpen={onSelectProject}
                           />
-                        )}
-                      </SortableRow>
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
-              </SortableContext>
-            </DndContext>
+              );
+            })()
+          ) : orderTab === "all" ? (
+            /* ── All tab: filter out hidden/deleted at render; full state preserved ── */
+            (() => {
+              const visibleIds = allOrderIds.filter((pid) => {
+                const p = baselineData.projects.find((x) => x.id === pid);
+                return p && !p.hidden && !p.deleted;
+              });
+              return (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={(e) =>
+                    handleProjectOrderEnd(
+                      e,
+                      visibleIds,
+                      (newVisibleIds) => {
+                        // Merge the reordered visible slice back into allOrderIds,
+                        // preserving hidden/deleted IDs at their existing positions
+                        // in the full array so the underlying state stays stable.
+                        let vIdx = 0;
+                        setAllOrderIds(
+                          allOrderIds.map((pid) => {
+                            const p = baselineData.projects.find((x) => x.id === pid);
+                            if (p && !p.hidden && !p.deleted) {
+                              return newVisibleIds[vIdx++] ?? pid;
+                            }
+                            return pid;
+                          })
+                        );
+                      },
+                      "project_order",
+                      undefined,
+                      visibleIds,
+                    )
+                  }
+                >
+                  <SortableContext items={visibleIds} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-1 p-1">
+                      {visibleIds.map((pid, idx) => {
+                        const p = baselineData.projects.find((x) => x.id === pid);
+                        const heroPath = p ? computeCoverPathForProject(p, overrides) : undefined;
+                        return (
+                          <SortableRow key={pid} id={pid}>
+                            {() => (
+                              <ProjectOrderRow
+                                pid={pid}
+                                index={idx}
+                                heroPath={heroPath}
+                                isCurrentProject={pid === project.id}
+                                flagged={p?.flagged ?? false}
+                                checked={p?.checked ?? false}
+                                hidden={p?.hidden ?? false}
+                                deleted={p?.deleted ?? false}
+                                onOpen={onSelectProject}
+                              />
+                            )}
+                          </SortableRow>
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              );
+            })()
           ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragEnd={(e) => {
-                const cat = orderTab as Category;
-                handleProjectOrderEnd(e, catOrderIds[cat], (ids) => setCatOrderIds((prev) => ({ ...prev, [cat]: ids })), "category_order", cat);
-              }}
-            >
-              <SortableContext items={catOrderIds[orderTab]} strategy={verticalListSortingStrategy}>
-                <div className="space-y-1 p-1">
-                  {catOrderIds[orderTab].map((pid, idx) => {
-                    const p = baselineData.projects.find((x) => x.id === pid);
-                    const catImg = p?.categoryImages[orderTab as Category];
-                    // Use category-specific best image if available; otherwise fall
-                    // back to the derived cover (same source the public site uses).
-                    const heroPath = catImg ?? (p ? computeCoverPathForProject(p, overrides) : undefined);
-                    return (
-                      <SortableRow key={pid} id={pid}>
-                        {() => (
-                          <ProjectOrderRow
-                            pid={pid}
-                            index={idx}
-                            heroPath={heroPath}
-                            isCurrentProject={pid === project.id}
-                            flagged={p?.flagged ?? false}
-                            checked={p?.checked ?? false}
-                            hidden={p?.hidden ?? false}
-                            deleted={p?.deleted ?? false}
-                            onOpen={onSelectProject}
-                          />
-                        )}
-                      </SortableRow>
+            /* ── Category tabs: filter out hidden/deleted at render ── */
+            (() => {
+              const cat = orderTab as Category;
+              const allCatIds = catOrderIds[cat];
+              const visibleCatIds = allCatIds.filter((pid) => {
+                const p = baselineData.projects.find((x) => x.id === pid);
+                return p && !p.hidden && !p.deleted;
+              });
+              return (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={(e) => {
+                    handleProjectOrderEnd(
+                      e,
+                      visibleCatIds,
+                      (newVisibleIds) => {
+                        // Merge reordered visible slice back into the full cat order array.
+                        let vIdx = 0;
+                        const merged = allCatIds.map((pid) => {
+                          const p = baselineData.projects.find((x) => x.id === pid);
+                          if (p && !p.hidden && !p.deleted) {
+                            return newVisibleIds[vIdx++] ?? pid;
+                          }
+                          return pid;
+                        });
+                        setCatOrderIds((prev) => ({ ...prev, [cat]: merged }));
+                      },
+                      "category_order",
+                      cat,
+                      visibleCatIds,
                     );
-                  })}
-                </div>
-              </SortableContext>
-            </DndContext>
+                  }}
+                >
+                  <SortableContext items={visibleCatIds} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-1 p-1">
+                      {visibleCatIds.map((pid, idx) => {
+                        const p = baselineData.projects.find((x) => x.id === pid);
+                        const catImg = p?.categoryImages[cat];
+                        // Use category-specific best image if available; otherwise fall
+                        // back to the derived cover (same source the public site uses).
+                        const heroPath = catImg ?? (p ? computeCoverPathForProject(p, overrides) : undefined);
+                        return (
+                          <SortableRow key={pid} id={pid}>
+                            {() => (
+                              <ProjectOrderRow
+                                pid={pid}
+                                index={idx}
+                                heroPath={heroPath}
+                                isCurrentProject={pid === project.id}
+                                flagged={p?.flagged ?? false}
+                                checked={p?.checked ?? false}
+                                hidden={p?.hidden ?? false}
+                                deleted={p?.deleted ?? false}
+                                onOpen={onSelectProject}
+                              />
+                            )}
+                          </SortableRow>
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              );
+            })()
           )}
         </div>
       </div>
