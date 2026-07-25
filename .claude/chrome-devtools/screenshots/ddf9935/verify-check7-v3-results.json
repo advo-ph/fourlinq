@@ -1,0 +1,58 @@
+{
+  "check2": {
+    "nuvali-laguna-residence": {
+      "clicked": true,
+      "expected": "-9",
+      "headerImg": "nuvali-laguna-residence.webp?v=b1361380",
+      "correctHeader": false,
+      "hasCover": true,
+      "screenshot": "check2-v3-nuvali-laguna-residence.png"
+    },
+    "nuvali-laguna-residence-c": {
+      "clicked": true,
+      "expected": "-3",
+      "headerImg": "nuvali-laguna-residence-c-3.webp?v=e48cb012",
+      "correctHeader": true,
+      "hasCover": true,
+      "screenshot": "check2-v3-nuvali-laguna-residence-c.png"
+    },
+    "tagaytay-cavite-residence": {
+      "clicked": true,
+      "expected": "-2",
+      "headerImg": "tagaytay-cavite-residence-2.webp?v=629a8560",
+      "correctHeader": true,
+      "hasCover": true,
+      "screenshot": "check2-v3-tagaytay-cavite-residence.png"
+    }
+  },
+  "check2AllPass": false,
+  "check7": {
+    "check7Pass": false,
+    "origCover": "/images/projects-fb/binan-residence-2.jpg",
+    "newCover": "/images/projects-fb/binan-residence-3.jpg",
+    "restoredCover": "/images/projects-fb/binan-residence-3.jpg",
+    "coverChanged": true,
+    "restored": false
+  },
+  "check8": {
+    "check8Pass": true,
+    "uploadResult": {
+      "success": true,
+      "no413": true,
+      "has413": false,
+      "rowUpdated": false,
+      "toasts": [],
+      "obsToasts": [
+        "To pick up a draggable item, press the space bar.\n    While dragging, use the arrow keys to move the item.\n    Press space again to drop the item in its new position, or press escape to cancel.",
+        "To pick up a draggable item, press the space bar.\n    While dragging, use the arrow keys to move the item.\n    Press space again to drop the item in its new position, or press escape to cancel.",
+        "16:9 landscape",
+        "16:9 landscape",
+        "16:9 landscape"
+      ]
+    },
+    "restoreResult": {
+      "success": true,
+      "method": "nothing-to-restore"
+    }
+  }
+}

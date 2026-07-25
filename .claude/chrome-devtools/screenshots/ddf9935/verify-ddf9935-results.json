@@ -1,0 +1,574 @@
+{
+  "check1": {
+    "label": "Admin all-projects grid thumbnails",
+    "status": "FAIL",
+    "details": [
+      {
+        "project": "nuvali-laguna-residence",
+        "expected_suffix": "-9.jpg",
+        "found_imgs": [],
+        "has_correct_cover": false,
+        "has_wrong_cover": false,
+        "pass": false
+      },
+      {
+        "project": "nuvali-laguna-residence-c",
+        "expected_suffix": "-3.jpg",
+        "found_imgs": [],
+        "has_correct_cover": false,
+        "has_wrong_cover": false,
+        "pass": false
+      },
+      {
+        "project": "tagaytay-cavite-residence",
+        "expected_suffix": "-2.jpg",
+        "found_imgs": [],
+        "has_correct_cover": false,
+        "has_wrong_cover": false,
+        "pass": false
+      }
+    ],
+    "screenshot": "check1-admin-projects-list.png"
+  },
+  "check2": {
+    "label": "Admin project detail header covers",
+    "status": "FAIL",
+    "details": {
+      "nuvali-laguna-residence": {
+        "headerSrcs": [],
+        "firstImgSrc": "https://fourlinq.ph/images/wp-export/casement.webp",
+        "coverImgSrc": "",
+        "hasCoverBadge": false,
+        "coverBadgeCount": 0,
+        "allImgCount": 18,
+        "allImgSrcs": [
+          "https://fourlinq.ph/images/wp-export/casement.webp",
+          "https://fourlinq.ph/images/wp-export/slidingwindow.webp",
+          "https://fourlinq.ph/images/wp-export/awning.webp",
+          "https://fourlinq.ph/images/wp-export/specialshapes.webp",
+          "https://fourlinq.ph/images/wp-export/slidingdoor.webp",
+          "https://fourlinq.ph/images/wp-export/slideandfold.webp",
+          "https://fourlinq.ph/images/wp-export/casement-door.webp",
+          "https://fourlinq.ph/images/wp-export/frenchdoor.webp",
+          "https://fourlinq.ph/images/wp-export/largepanel.webp",
+          "https://fourlinq.ph/images/wp-export/liftandslide.webp",
+          "https://fourlinq.ph/images/wp-export/90series.webp",
+          "https://fourlinq.ph/images/wp-export/FQC-Project-17.jpg",
+          "https://fourlinq.ph/images/products/real/sliding-door.webp",
+          "https://fourlinq.ph/images/projects/real/interior-living-panel-windows.webp",
+          "https://fourlinq.ph/images/projects/real/exterior-curved-residence.webp",
+          "https://fourlinq.ph/images/nav-whatsnew/products.jpg",
+          "https://fourlinq.ph/images/nav-whatsnew/projects.jpg",
+          "https://fourlinq.ph/images/nav-whatsnew/events.jpg"
+        ],
+        "expected": "-9.jpg",
+        "headerHasCorrect": false,
+        "pass": false,
+        "screenshot": "check2-nuvali-laguna-residence-detail.png"
+      },
+      "nuvali-laguna-residence-c": {
+        "headerSrcs": [],
+        "firstImgSrc": "https://fourlinq.ph/images/wp-export/casement.webp",
+        "coverImgSrc": "",
+        "hasCoverBadge": false,
+        "coverBadgeCount": 0,
+        "allImgCount": 18,
+        "allImgSrcs": [
+          "https://fourlinq.ph/images/wp-export/casement.webp",
+          "https://fourlinq.ph/images/wp-export/slidingwindow.webp",
+          "https://fourlinq.ph/images/wp-export/awning.webp",
+          "https://fourlinq.ph/images/wp-export/specialshapes.webp",
+          "https://fourlinq.ph/images/wp-export/slidingdoor.webp",
+          "https://fourlinq.ph/images/wp-export/slideandfold.webp",
+          "https://fourlinq.ph/images/wp-export/casement-door.webp",
+          "https://fourlinq.ph/images/wp-export/frenchdoor.webp",
+          "https://fourlinq.ph/images/wp-export/largepanel.webp",
+          "https://fourlinq.ph/images/wp-export/liftandslide.webp",
+          "https://fourlinq.ph/images/wp-export/90series.webp",
+          "https://fourlinq.ph/images/wp-export/FQC-Project-17.jpg",
+          "https://fourlinq.ph/images/products/real/sliding-door.webp",
+          "https://fourlinq.ph/images/projects/real/interior-living-panel-windows.webp",
+          "https://fourlinq.ph/images/projects/real/exterior-curved-residence.webp",
+          "https://fourlinq.ph/images/nav-whatsnew/products.jpg",
+          "https://fourlinq.ph/images/nav-whatsnew/projects.jpg",
+          "https://fourlinq.ph/images/nav-whatsnew/events.jpg"
+        ],
+        "expected": "-3.jpg",
+        "headerHasCorrect": false,
+        "pass": false,
+        "screenshot": "check2-nuvali-laguna-residence-c-detail.png"
+      },
+      "tagaytay-cavite-residence": {
+        "headerSrcs": [],
+        "firstImgSrc": "https://fourlinq.ph/images/wp-export/casement.webp",
+        "coverImgSrc": "",
+        "hasCoverBadge": false,
+        "coverBadgeCount": 0,
+        "allImgCount": 18,
+        "allImgSrcs": [
+          "https://fourlinq.ph/images/wp-export/casement.webp",
+          "https://fourlinq.ph/images/wp-export/slidingwindow.webp",
+          "https://fourlinq.ph/images/wp-export/awning.webp",
+          "https://fourlinq.ph/images/wp-export/specialshapes.webp",
+          "https://fourlinq.ph/images/wp-export/slidingdoor.webp",
+          "https://fourlinq.ph/images/wp-export/slideandfold.webp",
+          "https://fourlinq.ph/images/wp-export/casement-door.webp",
+          "https://fourlinq.ph/images/wp-export/frenchdoor.webp",
+          "https://fourlinq.ph/images/wp-export/largepanel.webp",
+          "https://fourlinq.ph/images/wp-export/liftandslide.webp",
+          "https://fourlinq.ph/images/wp-export/90series.webp",
+          "https://fourlinq.ph/images/wp-export/FQC-Project-17.jpg",
+          "https://fourlinq.ph/images/products/real/sliding-door.webp",
+          "https://fourlinq.ph/images/projects/real/interior-living-panel-windows.webp",
+          "https://fourlinq.ph/images/projects/real/exterior-curved-residence.webp",
+          "https://fourlinq.ph/images/nav-whatsnew/products.jpg",
+          "https://fourlinq.ph/images/nav-whatsnew/projects.jpg",
+          "https://fourlinq.ph/images/nav-whatsnew/events.jpg"
+        ],
+        "expected": "-2.jpg",
+        "headerHasCorrect": false,
+        "pass": false,
+        "screenshot": "check2-tagaytay-cavite-residence-detail.png"
+      }
+    }
+  },
+  "check3": {
+    "label": "Button order in project header action row",
+    "status": "PASS",
+    "details": {
+      "allButtons": [
+        "Systems",
+        "Our Projects",
+        "What's New",
+        "Chat with LinQ",
+        "Decline",
+        "Accept"
+      ],
+      "expectedOrder": [
+        "Mark as Checked",
+        "Flag",
+        "Refresh Cover",
+        "Ratio",
+        "Hide Project",
+        "Delete Project"
+      ],
+      "foundSequence": [],
+      "sequenceStart": -1,
+      "pass": true
+    },
+    "screenshot": "check3-button-order.png"
+  },
+  "check4": {
+    "label": "Refresh Cover button",
+    "status": "FAIL",
+    "details": {
+      "btnFound": false,
+      "toasts": [],
+      "visibleToasts": [],
+      "expectedCoverFile": "-9.jpg",
+      "toastHasCoverFile": false
+    },
+    "screenshot": "check4-refresh-cover-toast.png"
+  },
+  "check5": {
+    "label": "Blurred letterbox portrait+landscape",
+    "status": "PARTIAL",
+    "details": {
+      "imageRowData": [],
+      "portraitRows": [],
+      "landscapeRows": [],
+      "portraitCheck": false,
+      "landscapeCheck": false
+    }
+  },
+  "check6": {
+    "label": "Public surfaces covers + NavSearch + console errors",
+    "status": "FAIL",
+    "details": {
+      "home_nuvali-laguna-residence": {
+        "imgs": [
+          "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-9.webp?v=38832d8d",
+          "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-b-6.webp?v=7fd67bd9",
+          "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-c-3.webp?v=e48cb012"
+        ],
+        "hasCorrect": false,
+        "hasVParam": true
+      },
+      "home_nuvali-laguna-residence-c": {
+        "imgs": [
+          "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-c-3.webp?v=e48cb012"
+        ],
+        "hasCorrect": false,
+        "hasVParam": true
+      },
+      "home_tagaytay-cavite-residence": {
+        "imgs": [
+          "https://fourlinq.ph/images/projects-fb/thumbs/tagaytay-cavite-residence-2.webp?v=629a8560"
+        ],
+        "hasCorrect": false,
+        "hasVParam": true
+      },
+      "homeConsoleErrors": [],
+      "gallery_nuvali-laguna-residence": {
+        "imgs": [
+          "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-b-6.webp?v=7fd67bd9",
+          "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-9.webp?v=38832d8d",
+          "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-c-3.webp?v=e48cb012"
+        ],
+        "hasCorrect": false,
+        "hasVParam": true
+      },
+      "gallery_nuvali-laguna-residence-c": {
+        "imgs": [
+          "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-c-3.webp?v=e48cb012"
+        ],
+        "hasCorrect": false,
+        "hasVParam": true
+      },
+      "gallery_tagaytay-cavite-residence": {
+        "imgs": [
+          "https://fourlinq.ph/images/projects-fb/thumbs/tagaytay-cavite-residence-2.webp?v=629a8560"
+        ],
+        "hasCorrect": false,
+        "hasVParam": true
+      },
+      "galleryConsoleErrors": [],
+      "navSearch": {
+        "opened": true,
+        "results": [],
+        "hasImages": false
+      },
+      "searchConsoleErrors": [],
+      "adminConsoleErrors": [
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects/nuvali-laguna-residence",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects/nuvali-laguna-residence-c",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects/tagaytay-cavite-residence",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects/nuvali-laguna-residence",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects/nuvali-laguna-residence",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects/nuvali-laguna-residence",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects/binan-residence",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[error] 404 Error: User attempted to access non-existent route: /admin/projects/binan-residence"
+      ]
+    }
+  },
+  "check7": {
+    "label": "REVERSIBLE reorder e2e",
+    "status": "FAIL",
+    "details": {
+      "snapshot": {
+        "originalOrderRows": [
+          {
+            "project_image_override_id": "229",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-2.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 0,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.826Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "228",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 1,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.824Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "230",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-3.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 2,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.822Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "231",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-4.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 3,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.832Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "232",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-5.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 4,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.830Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "233",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-6.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 5,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.828Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "234",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-7.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 6,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.881Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "235",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-8.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 7,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.883Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "236",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-9.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 8,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.897Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "237",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-10.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 9,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.905Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "238",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-11.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 10,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.903Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "239",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-12.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 11,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.906Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "240",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-14.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 12,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.937Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "241",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-15.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 13,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.936Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "242",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-16.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 14,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.962Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "243",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-17.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 15,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.964Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "244",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-18.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 16,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.976Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "245",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-19.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 17,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:18.973Z",
+            "stale": false
+          },
+          {
+            "project_image_override_id": "227",
+            "organization_id": "1",
+            "project_id": "binan-residence",
+            "image_path": "/images/projects-fb/binan-residence-13.jpg",
+            "override_type": "image_order",
+            "category": null,
+            "value_text": null,
+            "value_int": 18,
+            "created_by": null,
+            "created_at": "2026-07-23T04:05:03.282Z",
+            "updated_at": "2026-07-23T23:32:19.003Z",
+            "stale": false
+          }
+        ],
+        "originalCover": "/images/projects-fb/binan-residence-2.jpg"
+      },
+      "imageList": [],
+      "afterReorder": {
+        "newCover": "/images/projects-fb/binan-residence-2.jpg",
+        "coverChanged": false
+      },
+      "galleryCover": "/images/projects-fb/binan-residence-2.jpg",
+      "restore": {
+        "restoredCover": "/images/projects-fb/binan-residence-2.jpg",
+        "restored": true
+      },
+      "pass": false
+    }
+  },
+  "check8": {
+    "label": "Replace Image e2e",
+    "status": "FAIL",
+    "details": {
+      "testImageCreated": true,
+      "testImagePath": "/tmp/test-replace-img.jpg",
+      "dialogInfo": [
+        {
+          "text": "We use cookies to improve your experience. By continuing to browse, you agree to our Cookie Policy.DeclineAccept",
+          "class": "fixed bottom-4 left-4 right-4 lg:left-6 lg:right-auto lg:max-w-[420px] z-[52]"
+        }
+      ],
+      "replaceClicked": {
+        "clicked": false,
+        "reason": "no row found"
+      },
+      "fileInputFound": false,
+      "uploadSuccess": false,
+      "uploadToasts": []
+    }
+  }
+}
