@@ -1,0 +1,34 @@
+{
+  "home": {
+    "imgs": 82,
+    "broken": 0,
+    "loaded": 21,
+    "title": "FourlinQ — Custom-made uPVC Windows & Doors | Philippines",
+    "jsErrors": []
+  },
+  "inspiration": {
+    "imgs": 74,
+    "broken": 0,
+    "loaded": 33,
+    "title": "FourlinQ — Custom-made uPVC Windows & Doors | Philippines",
+    "jsErrors": []
+  },
+  "heroGallery": {
+    "before": {
+      "railWidth": 320,
+      "thumbsTotal": 17,
+      "thumbsVisible": 17
+    },
+    "after": {
+      "railWidth": 289,
+      "thumbsTotal": 17,
+      "thumbsVisible": 17
+    },
+    "jsErrors": []
+  },
+  "admin": {
+    "url": "https://fourlinq.ph/admin",
+    "loggedIn": true,
+    "jsErrors": []
+  }
+}
