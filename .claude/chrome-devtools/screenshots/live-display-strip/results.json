@@ -1,0 +1,56 @@
+{
+  "homeStrip": {
+    "tiles": 55,
+    "hiddenLeaked": [],
+    "rankedTiles": 55,
+    "orderMatchesAdmin": true,
+    "coverMismatches": [
+      {
+        "slug": "curved-facade-residence",
+        "shown": "curved-facade-residence.webp",
+        "expected": "curved-facade-residence.jpg"
+      },
+      {
+        "slug": "cebu-s-residences",
+        "shown": "cebu-s-residences.webp",
+        "expected": "cebu-s-residences.jpg"
+      },
+      {
+        "slug": "cebu-a-residences",
+        "shown": "cebu-a-residences.webp",
+        "expected": "cebu-a-residences.jpg"
+      },
+      {
+        "slug": "cebu-m-residence-molave",
+        "shown": "cebu-m-residence-molave.webp",
+        "expected": "cebu-m-residence-molave.jpg"
+      },
+      {
+        "slug": "cebu-sch-residence-monterrazas",
+        "shown": "cebu-sch-residence-monterrazas.webp",
+        "expected": "cebu-sch-residence-monterrazas.jpg"
+      }
+    ],
+    "coverMismatchCount": 48,
+    "jsErrors": []
+  },
+  "chatBubble": {
+    "desktopBefore": {
+      "present": true,
+      "opacity": 1,
+      "display": "flex",
+      "visibility": "visible"
+    },
+    "afterResizeRoundTrip": {
+      "present": true,
+      "opacity": 1,
+      "display": "flex",
+      "visibility": "visible"
+    }
+  },
+  "scrollWindowMobile": {
+    "frameImgs": 2,
+    "brokenFrames": 0,
+    "jsErrors": []
+  }
+}
