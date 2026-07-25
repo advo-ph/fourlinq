@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import RouteErrorBoundary from "@/components/shared/RouteErrorBoundary";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import CookieBanner from "@/components/shared/CookieBanner";
@@ -42,6 +43,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
+        <RouteErrorBoundary>
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -68,6 +70,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </RouteErrorBoundary>
         <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>

@@ -94,6 +94,13 @@ if (isProd) {
       maxAge: "30d",
       immutable: true,
       setHeaders(res, filePath) {
+        // HTML files must never be served from a long-lived cache — the browser
+        // must always revalidate so a new deploy's hashed asset references are
+        // picked up immediately rather than serving stale chunk URLs.
+        if (filePath.endsWith(".html")) {
+          res.setHeader("Cache-Control", "no-store");
+          return;
+        }
         if (filePath.includes("/images/")) {
           res.setHeader(
             "Cache-Control",
@@ -104,6 +111,9 @@ if (isProd) {
     })
   );
   app.use((req, res) => {
+    // SPA fallback: same no-store policy so the freshly-deployed index.html
+    // (with updated hashed asset references) is never served stale.
+    res.setHeader("Cache-Control", "no-store");
     res.status(spaStatusForPath(req.path)).sendFile(path.join(distPath, "index.html"));
   });
 }
