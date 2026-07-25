@@ -1,0 +1,34 @@
+{
+  "hiddenPerApi": [
+    "portfolio-residence-01",
+    "portfolio-residence-03",
+    "portfolio-residence-05",
+    "portfolio-residence-08",
+    "portfolio-residence-09",
+    "portfolio-residence-15"
+  ],
+  "inspiration": {
+    "linkedProjects": 55,
+    "hiddenLeaked": [],
+    "pass": true,
+    "imgTotal": 73,
+    "imgBroken": 0,
+    "jsErrors": []
+  },
+  "home": {
+    "linkedProjects": 55,
+    "hiddenLeaked": [],
+    "pass": true,
+    "imgTotal": 81,
+    "imgBroken": 0,
+    "jsErrors": []
+  },
+  "hiddenRouteControl": {
+    "slug": "portfolio-residence-01",
+    "status": 200
+  },
+  "restoredImage": {
+    "status": 200,
+    "bytes": 195068
+  }
+}
