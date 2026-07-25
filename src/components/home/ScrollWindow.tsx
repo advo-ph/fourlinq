@@ -78,6 +78,7 @@ const STEP_COUNT = WINDOW_PARTS.length + 1; // intro + parts
 const FADE_DISTANCE_PX = 120;   // cardOpacity = max(0, 1 - |dy| / 120)
 const COMMIT_DISTANCE_PX = 44;  // displacement threshold for commit
 const COMMIT_VELOCITY = 0.35;   // px/ms threshold for velocity commit
+const EXIT_RELEASE_PX = 44;     // scroll delta to trigger boundary exit release
 
 const ScrollWindow = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -90,14 +91,16 @@ const ScrollWindow = () => {
   // ── Gesture refs (unconditional — Rules of Hooks) ──────────
   const engagedRef = useRef(false);        // true only while section is engaged in-view (sticky-pin)
   const exitingRef = useRef(false);        // true while a boundary-exit glide is in progress; suppresses re-engagement
-  const touchStartYRef = useRef(0);
-  const touchLastYRef = useRef(0);
-  const touchSamplesRef = useRef<Array<{ y: number; t: number }>>([]);
-  const gestureDirectionRef = useRef<'up' | 'down' | null>(null);
-  const gestureCapturedRef = useRef(false);
-  const dragBaseYRef = useRef(0);          // card Y at direction-lock time (mid-spring capture)
-  const pendingExitRef = useRef<null | "down" | "up">(null); // deferred boundary-exit glide direction; fired on touchend
+  const fingerDownRef = useRef(false);     // true while a finger is on screen
+  const anchorYRef = useRef(0);            // the scrollY the component clamps to while engaged
+  const gestureBaseCardYRef = useRef(0);   // cardY.get() at the moment this gesture's first scroll event fires
+  const gestureStartStepRef = useRef(0);   // stepRef.current captured at onTouchStart; guards boundary releases
+  const deltaSamplesRef = useRef<Array<{ d: number; t: number }>>([]);  // last ≤4 {delta, timestamp} samples for velocity
+  const burstLockRef = useRef(false);      // true after touchend; absorbs momentum-leak scroll events
+  const burstTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null); // 150ms quiet-gap timer to clear burstLock
   const lastInSectionFlagRef = useRef<boolean | null>(null); // shared dedupe flag for fq-hide-header / fq-scrollwindow-inview dispatches
+  const exitAssistRef = useRef<"up" | "down" | null>(null);  // direction of the last boundary release; drives post-release exit assist
+  const exitAssistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null); // 250ms post-release assist timer
 
   const [nearViewport, setNearViewport] = useState(false);
   const [isDesktop, setIsDesktop] = useState(
@@ -239,10 +242,14 @@ const ScrollWindow = () => {
           if (consecutivePinCount >= 2) {
             // Engage: determine entry direction from last known prevTop
             engagedRef.current = true;
-            el.style.touchAction = "none";
             const entryStep = prevTop > 0 ? 0 : STEP_COUNT - 1;
             setStep(entryStep);
             stepRef.current = entryStep;
+            // Anchor: mid-track position so the page can scroll in both directions
+            const trackRect = el.getBoundingClientRect();
+            const trackTopAbs = trackRect.top + window.scrollY;
+            anchorYRef.current = trackTopAbs + (trackRect.height - window.innerHeight) / 2;
+            window.scrollTo(0, anchorYRef.current);
             cardY.set(0);
             cardOpacity.set(1);
             dispatchInSection(true);
@@ -257,7 +264,6 @@ const ScrollWindow = () => {
         if (isFullyOut()) {
           engagedRef.current = false;
           exitingRef.current = false;
-          el.style.touchAction = "";
           dispatchInSection(false);
           consecutivePinCount = 0;
         }
@@ -267,13 +273,16 @@ const ScrollWindow = () => {
       if (FQ_DEBUG) {
         const r = el.getBoundingClientRect();
         writeHud({
-          engaged: engagedRef.current,
-          ta: (el.style.touchAction || "auto"),
+          eng: engagedRef.current,
           step: stepRef.current,
-          captured: "-",
+          gs: gestureStartStepRef.current,
+          anchor: Math.round(anchorYRef.current),
+          delta: Math.round(window.scrollY - anchorYRef.current),
+          fgr: fingerDownRef.current,
+          burst: burstLockRef.current,
+          exit: exitingRef.current,
           pinTop: Math.round(r.top),
           pinBot: Math.round(r.bottom - window.innerHeight),
-          exiting: exitingRef.current,
           evt: "raf",
         });
       }
@@ -285,7 +294,6 @@ const ScrollWindow = () => {
 
     const onOrientationChange = () => {
       engagedRef.current = false;
-      el.style.touchAction = "";
       dispatchInSection(false);
       cardY.set(0);
       cardOpacity.set(1);
@@ -300,13 +308,15 @@ const ScrollWindow = () => {
     return () => {
       cancelAnimationFrame(raf);
       engagedRef.current = false;
-      el.style.touchAction = "";
       dispatchInSection(false);
       window.removeEventListener("orientationchange", onOrientationChange);
     };
   }, [isDesktop, cardY, cardOpacity]);
 
-  // ── Mobile: native touch gesture engine ────────────────────────────────────
+  // ── Mobile: scroll-delta gesture engine (v4) ──────────────────────────────
+  // Touch listeners are purely passive bookkeepers (no preventDefault, no touchmove).
+  // A passive window scroll listener reads delta from the mid-track anchor and drives
+  // cardY/cardOpacity directly. Clamp at touchend; boundary exits release native momentum.
   useEffect(() => {
     if (isDesktop) return;
 
@@ -341,227 +351,245 @@ const ScrollWindow = () => {
       animate(cardOpacity, 1, { duration: 0.28 });
     };
 
-    const onTouchStart = (e: TouchEvent) => {
-      // Stop any in-progress spring and snap the card back to neutral (y=0, opacity=1).
-      // Without this reset, an underdamped entry spring can overshoot far past its
-      // target (e.g. -107px at 120ms for a spring starting at -36), leaving the
-      // effective drag displacement well below the commit threshold (Bug 2 fix).
+    // ── Passive touch state tracker ────────────────────────────────────────────
+
+    const onTouchStart = (_e: TouchEvent) => {
       cardY.stop();
       cardOpacity.stop();
-      cardY.set(0);
-      cardOpacity.set(1);
-
-      if (e.touches.length > 1) {
-        touchStartYRef.current = 0;
-        touchLastYRef.current = 0;
-        touchSamplesRef.current = [];
-        gestureDirectionRef.current = null;
-        gestureCapturedRef.current = false;
-        pendingExitRef.current = null;
-        return;
+      fingerDownRef.current = true;
+      gestureBaseCardYRef.current = cardY.get();
+      // Capture which step this gesture started at — used by onScrollDelta to guard
+      // boundary releases so momentum-leak events (finger already up) cannot release.
+      gestureStartStepRef.current = stepRef.current;
+      deltaSamplesRef.current = [];
+      burstLockRef.current = false;
+      if (burstTimerRef.current !== null) {
+        clearTimeout(burstTimerRef.current);
+        burstTimerRef.current = null;
       }
-      touchStartYRef.current = e.touches[0].clientY;
-      touchLastYRef.current = e.touches[0].clientY;
-      touchSamplesRef.current = [];
-      gestureDirectionRef.current = null;
-      gestureCapturedRef.current = false;
-      pendingExitRef.current = null;
-
-      writeHud({
-        engaged: engagedRef.current,
-        ta: (el.style.touchAction || "auto"),
-        step: stepRef.current,
-        captured: false,
-        dir: "null",
-        dy: 0,
-        evt: "start",
-      });
+      // Cancel any pending exit assist and clear direction on new touch
+      exitAssistRef.current = null;
+      if (exitAssistTimerRef.current !== null) {
+        clearTimeout(exitAssistTimerRef.current);
+        exitAssistTimerRef.current = null;
+      }
+      if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: 0, fgr: true, burst: false, assist: null, evt: "ts" });
     };
 
-    const onTouchMove = (e: TouchEvent) => {
-      // Multi-touch: release capture if it was grabbed
-      if (e.touches.length > 1) {
-        if (gestureCapturedRef.current) {
-          gestureCapturedRef.current = false;
-          springBack();
-        }
-        return;
+    // ── Post-release exit assist ───────────────────────────────────────────────
+    // After a boundary release, natural momentum may not carry a slow drag fully
+    // out of the 260lvh track (the page stays sticky-frozen). This helper waits
+    // 250ms for momentum to play, then checks if the page is STILL pinned. If so,
+    // it fires a single smooth scroll to push past the pin edge in the recorded
+    // exit direction. Re-engagement is guarded by engagedRef (cleared at release).
+    const startExitAssist = () => {
+      const dir = exitAssistRef.current;
+      if (!dir) return;
+      if (exitAssistTimerRef.current !== null) {
+        clearTimeout(exitAssistTimerRef.current);
       }
-
-      const currentY = e.touches[0].clientY;
-      const dy = currentY - touchStartYRef.current;
-
-      // ── iOS early-preventDefault (FIX) ──────────────────────────────────────
-      // iOS Safari uses async off-main-thread scrolling: the scroll claim is
-      // decided at the FIRST touchmove, before direction-lock completes. When the
-      // section is engaged we must preventDefault on EVERY touchmove (including the
-      // first) so iOS never claims the scroll. The !engaged path stays untouched
-      // (native scroll permitted). This is belt-and-braces alongside touchAction
-      // which may not propagate to the async arbiter from a rAF tick in time.
-      // Also covers the pendingExitRef window: once engagedRef is cleared by a
-      // boundary exit we still own the touch (touchend fires the glide), so we must
-      // continue preventing native scroll until the finger lifts.
-      if (engagedRef.current || pendingExitRef.current !== null) {
-        e.preventDefault();
-      }
-
-      writeHud({
-        engaged: engagedRef.current,
-        ta: (el.style.touchAction || "auto"),
-        step: stepRef.current,
-        captured: gestureCapturedRef.current,
-        dir: gestureDirectionRef.current ?? "null",
-        dy: Math.round(dy),
-        evt: "move",
-      });
-
-      // Direction lock after 6px movement
-      if (gestureDirectionRef.current === null && Math.abs(dy) > 6) {
-        // If section is not engaged, lock as pass-through — do not hijack native scroll.
-        if (!engagedRef.current) {
-          gestureDirectionRef.current = "down"; // any non-null value to prevent re-evaluation
-          gestureCapturedRef.current = false;
-          return;
-        }
-
-        // Capture drag baseline at direction-lock time (always 0 after touchstart snap)
-        dragBaseYRef.current = cardY.get();
-
-        if (dy < 0) {
-          // Swipe up
-          if (stepRef.current === STEP_COUNT - 1) {
-            // EXIT GLIDE (swipe up at last step) — defer glide to touchend so iOS
-            // does not cancel the programmatic smooth scroll mid-gesture.
-            gestureDirectionRef.current = "up";
-            gestureCapturedRef.current = false;
-            engagedRef.current = false;
-            exitingRef.current = true;  // suppress pin-loop re-engagement during glide
-            el.style.touchAction = "";
-            dispatchInSection(false);
-            pendingExitRef.current = "down"; // "down" = exit downward (page scrolls down past track)
-          } else {
-            gestureDirectionRef.current = "up";
-            gestureCapturedRef.current = true;
-          }
-        } else {
-          // Swipe down
-          if (stepRef.current === 0) {
-            // EXIT GLIDE (swipe down at step 0) — defer glide to touchend so iOS
-            // does not cancel the programmatic smooth scroll mid-gesture.
-            gestureDirectionRef.current = "down";
-            gestureCapturedRef.current = false;
-            engagedRef.current = false;
-            exitingRef.current = true;  // suppress pin-loop re-engagement during glide
-            el.style.touchAction = "";
-            dispatchInSection(false);
-            pendingExitRef.current = "up"; // "up" = exit upward (page scrolls up above track)
-          } else {
-            gestureDirectionRef.current = "down";
-            gestureCapturedRef.current = true;
-          }
-        }
-      }
-
-      if (!gestureCapturedRef.current) {
-        return;
-      }
-
-      e.preventDefault();
-
-      touchLastYRef.current = currentY;
-      const currentDy = currentY - touchStartYRef.current;
-      const now = Date.now();
-      touchSamplesRef.current.push({ y: currentDy, t: now });
-      if (touchSamplesRef.current.length > 3) {
-        touchSamplesRef.current.shift();
-      }
-
-      const effectiveDy = dragBaseYRef.current + currentDy;
-      cardY.set(effectiveDy);
-      cardOpacity.set(Math.max(0, 1 - Math.abs(effectiveDy) / FADE_DISTANCE_PX));
+      exitAssistTimerRef.current = setTimeout(() => {
+        exitAssistTimerRef.current = null;
+        const assistDir = exitAssistRef.current;
+        exitAssistRef.current = null;
+        if (!assistDir) return;
+        // Guard: if somehow re-engaged, don't interfere
+        if (engagedRef.current) return;
+        // Check if page is still inside the pin range (sticky still active)
+        const outer = containerRef.current;
+        if (!outer) return;
+        const rect = outer.getBoundingClientRect();
+        const stillPinned = rect.top <= -2 && rect.bottom >= window.innerHeight + 2;
+        if (!stillPinned) return; // momentum already carried the page out — do nothing
+        // Compute absolute track position for a safe exit target
+        const trackTopAbs = rect.top + window.scrollY;
+        const trackHeight = rect.height;
+        const vh = window.innerHeight;
+        const target = assistDir === "down"
+          ? trackTopAbs + trackHeight - vh * 0.5   // well past the bottom pin edge
+          : trackTopAbs - vh * 0.5;                 // well past the top pin edge
+        if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(window.scrollY - anchorYRef.current), fgr: false, burst: false, assist: assistDir, evt: "assist-fire" });
+        window.scrollTo({ top: target, behavior: "smooth" });
+      }, 250);
     };
 
     const onTouchEnd = () => {
-      writeHud({
-        engaged: engagedRef.current,
-        ta: (el.style.touchAction || "auto"),
-        step: stepRef.current,
-        captured: gestureCapturedRef.current,
-        dir: gestureDirectionRef.current ?? "null",
-        dy: Math.round(touchLastYRef.current - touchStartYRef.current),
-        pend: pendingExitRef.current,
-        evt: "end",
-      });
-
-      // ── Deferred boundary-exit glide ────────────────────────────────────────
-      // iOS cancels programmatic smooth scrolls during an active touch. The glide
-      // target was recorded in pendingExitRef at direction-lock time; fire it now
-      // that the finger has lifted so iOS honors the scroll.
-      if (pendingExitRef.current !== null) {
-        const trackRect = el.getBoundingClientRect();
-        const trackTopAbs = trackRect.top + window.scrollY;
-        const trackHeight = trackRect.height;
-        const top = pendingExitRef.current === "down"
-          ? trackTopAbs + trackHeight - window.innerHeight * 0.5   // exit downward (swipe up at last step)
-          : trackTopAbs - window.innerHeight * 0.5;                // exit upward (swipe down at step 0)
-        pendingExitRef.current = null;
-        window.scrollTo({ top, behavior: "smooth" });
+      fingerDownRef.current = false;
+      if (!engagedRef.current) {
+        // Boundary exit already fired from onScrollDelta (finger was down then) — finger just lifted.
+        // Start the exit assist timer so a slow drag doesn't leave the page frozen.
+        startExitAssist();
+        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(window.scrollY - anchorYRef.current), fgr: false, burst: false, assist: exitAssistRef.current, evt: "te-exit" });
         return;
       }
-
-      if (!gestureCapturedRef.current) return;
-
-      const effectiveDy = dragBaseYRef.current + (touchLastYRef.current - touchStartYRef.current);
-      const samples = touchSamplesRef.current;
+      const finalDelta = window.scrollY - anchorYRef.current;
+      const samples = deltaSamplesRef.current;
       let v = 0;
       if (samples.length >= 2) {
         const first = samples[0];
         const last = samples[samples.length - 1];
         const dt = last.t - first.t;
-        if (dt > 0) {
-          v = (last.y - first.y) / dt;
+        if (dt > 0) v = (last.d - first.d) / dt;
+      }
+      const finalCardY = gestureBaseCardYRef.current - finalDelta;
+      // Direction of this gesture: negative finalCardY = swipe up, positive = swipe down.
+      const gestureDir: "up" | "down" = finalCardY < 0 ? "up" : "down";
+
+      // ── onTouchEnd decision tree ──────────────────────────────────────────────
+      // Evaluated in order; first matching branch wins.
+      //
+      // A. BOUNDARY FLICK EXIT (checked before normal commit/springback):
+      //    Conditions: still engaged AND gesture started at a boundary step AND the
+      //    drag direction points past that boundary AND velocity qualifies as a flick
+      //    (|v| > COMMIT_VELOCITY) even though |finalCardY| ≤ COMMIT_DISTANCE_PX
+      //    (a short-but-fast gesture that wouldn't normally commit a step).
+      //    Also catches the dead-commit case: where commitCard would be called with a
+      //    direction past the boundary (e.g. "up" at step STEP_COUNT-1) — commitCard
+      //    clamps next via min/max into a no-op re-commit of the same step. Route that
+      //    here instead so the user exits rather than being silently stuck.
+      //    Result: release engagement, set exit direction, start assist, do NOT clamp.
+      //
+      // B. NORMAL COMMIT: |finalCardY| > COMMIT_DISTANCE_PX OR |v| > COMMIT_VELOCITY.
+      //    commitCard() advances the step (clamped to 0..STEP_COUNT-1 by min/max).
+      //    Then clamp scroll to anchor and set burstLock.
+      //
+      // C. SPRINGBACK: gesture too short and too slow to commit.
+      //    Animate card back to rest. Then clamp scroll to anchor and set burstLock.
+      //
+      // Non-exit paths (B, C) always clamp + burstLock at the end.
+
+      const isBoundaryFlick =
+        gestureStartStepRef.current === STEP_COUNT - 1 && gestureDir === "up" && Math.abs(v) > COMMIT_VELOCITY ||
+        gestureStartStepRef.current === 0 && gestureDir === "down" && Math.abs(v) > COMMIT_VELOCITY;
+
+      // Dead-commit: would commit past boundary into clamped no-op
+      const isDeadCommit =
+        (Math.abs(finalCardY) > COMMIT_DISTANCE_PX || Math.abs(v) > COMMIT_VELOCITY) && (
+          (gestureDir === "up" && stepRef.current === STEP_COUNT - 1) ||
+          (gestureDir === "down" && stepRef.current === 0)
+        );
+
+      if (isBoundaryFlick || isDeadCommit) {
+        // A. Boundary flick exit (finger is down → about to lift, assist fires via onTouchEnd path).
+        // Direction: at step STEP_COUNT-1, swiping up exits downward (past bottom pin edge).
+        //            at step 0, swiping down exits upward (past top pin edge).
+        const boundaryExitDir: "up" | "down" =
+          gestureStartStepRef.current === STEP_COUNT - 1 ? "down" : "up";
+        engagedRef.current = false;
+        exitingRef.current = true;
+        exitAssistRef.current = boundaryExitDir;
+        dispatchInSection(false);
+        // Do NOT clamp — let native momentum carry the page out.
+        // startExitAssist fires immediately because this IS onTouchEnd (finger already up).
+        startExitAssist();
+        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(finalDelta), fgr: false, burst: false, assist: boundaryExitDir, evt: "te-flick-exit" });
+        return;
+      }
+
+      const shouldCommit = Math.abs(finalCardY) > COMMIT_DISTANCE_PX || Math.abs(v) > COMMIT_VELOCITY;
+      if (shouldCommit) {
+        // B. Normal commit — commitCard clamps next via min/max so it is safe at any step
+        commitCard(gestureDir);
+      } else {
+        // C. Springback
+        springBack();
+      }
+      // Non-exit paths: always clamp + burstLock (invisible under sticky pin)
+      window.scrollTo(0, anchorYRef.current);
+      burstLockRef.current = true;
+      burstTimerRef.current = setTimeout(() => { burstLockRef.current = false; }, 150);
+      if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(finalDelta), fgr: false, burst: true, assist: null, evt: "te" });
+    };
+
+    // ── Passive window scroll listener — drives cardY while engaged ────────────
+    // Sign convention: swipe up → scrollY increases → delta positive → cardY negative → commitCard("up")
+
+    const onScrollDelta = () => {
+      if (!engagedRef.current || exitingRef.current) return;
+      const delta = window.scrollY - anchorYRef.current;
+      if (delta === 0) return; // our own clamp fired → scroll event from scrollTo → ignore
+
+      // Boundary release check (live — checked first, before any card update).
+      // Guards: (1) finger must currently be down — momentum-leak events (finger up) must
+      //         never trigger a release; they fall through to burst-absorption below.
+      //         (2) this gesture must have STARTED at the boundary step — a rapid swipe
+      //         that commits INTO step 0/3 cannot release via its own momentum tail,
+      //         because gestureStartStepRef was set to the prior step at onTouchStart.
+      if (
+        fingerDownRef.current &&
+        gestureStartStepRef.current === 0 &&
+        stepRef.current === 0 &&
+        delta < -EXIT_RELEASE_PX
+      ) {
+        engagedRef.current = false;
+        exitingRef.current = true;
+        exitAssistRef.current = "up";
+        dispatchInSection(false);
+        // onTouchEnd will call startExitAssist() when it fires (finger is down now).
+        // The momentum-phase assist-start path is intentionally removed — releases only
+        // happen finger-down, so onTouchEnd always follows this branch.
+        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(delta), fgr: fingerDownRef.current, burst: burstLockRef.current, exit: true, assist: "up", evt: "sc-exit-up" });
+        return; // Do NOT clamp — let native momentum exit upward
+      }
+      if (
+        fingerDownRef.current &&
+        gestureStartStepRef.current === STEP_COUNT - 1 &&
+        stepRef.current === STEP_COUNT - 1 &&
+        delta > EXIT_RELEASE_PX
+      ) {
+        engagedRef.current = false;
+        exitingRef.current = true;
+        exitAssistRef.current = "down";
+        dispatchInSection(false);
+        // onTouchEnd will call startExitAssist() when it fires (finger is down now).
+        // The momentum-phase assist-start path is intentionally removed — releases only
+        // happen finger-down, so onTouchEnd always follows this branch.
+        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(delta), fgr: fingerDownRef.current, burst: burstLockRef.current, exit: true, assist: "down", evt: "sc-exit-dn" });
+        return; // Do NOT clamp — let native momentum exit downward
+      }
+
+      if (fingerDownRef.current && !burstLockRef.current) {
+        // Mid-gesture: drive card from scroll delta
+        const liveCardY = gestureBaseCardYRef.current - delta;
+        cardY.set(liveCardY);
+        cardOpacity.set(Math.max(0, 1 - Math.abs(liveCardY) / FADE_DISTANCE_PX));
+        deltaSamplesRef.current.push({ d: delta, t: performance.now() });
+        if (deltaSamplesRef.current.length > 4) deltaSamplesRef.current.shift();
+      } else if (fingerDownRef.current && burstLockRef.current) {
+        // Finger down but burst lock active — absorb without driving cardY
+      } else if (!fingerDownRef.current) {
+        if (burstLockRef.current) {
+          // Reset quiet-gap timer — absorb momentum-leak without clamping or driving cardY
+          if (burstTimerRef.current !== null) clearTimeout(burstTimerRef.current);
+          burstTimerRef.current = setTimeout(() => { burstLockRef.current = false; }, 150);
+        } else {
+          // Stray momentum (no finger, no burst lock, not exiting) — kill it
+          window.scrollTo(0, anchorYRef.current);
         }
       }
 
-      const shouldCommit = (Math.abs(effectiveDy) > COMMIT_DISTANCE_PX || Math.abs(v) > COMMIT_VELOCITY);
-      if (shouldCommit) {
-        commitCard(effectiveDy < 0 ? "up" : "down");
-      } else {
-        springBack();
-      }
+      if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(delta), fgr: fingerDownRef.current, burst: burstLockRef.current, exit: exitingRef.current, assist: exitAssistRef.current, evt: "sc" });
     };
 
-    const onTouchCancel = () => {
-      // If a deferred exit glide was pending, fire it on cancel too
-      // (finger was interrupted — e.g. phone call — but we still want to exit).
-      if (pendingExitRef.current !== null) {
-        const trackRect = el.getBoundingClientRect();
-        const trackTopAbs = trackRect.top + window.scrollY;
-        const trackHeight = trackRect.height;
-        const top = pendingExitRef.current === "down"
-          ? trackTopAbs + trackHeight - window.innerHeight * 0.5
-          : trackTopAbs - window.innerHeight * 0.5;
-        pendingExitRef.current = null;
-        window.scrollTo({ top, behavior: "smooth" });
-        return;
-      }
-      if (!gestureCapturedRef.current) return;
-      springBack();
-    };
-
-    // touchstart must be passive — never preventDefault here
     el.addEventListener("touchstart", onTouchStart, { passive: true });
-    // touchmove must be non-passive so we can preventDefault to block native scroll
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
     el.addEventListener("touchend", onTouchEnd, { passive: true });
-    el.addEventListener("touchcancel", onTouchCancel, { passive: true });
+    el.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    window.addEventListener("scroll", onScrollDelta, { passive: true });
 
     return () => {
       el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchCancel);
-      el.style.touchAction = "";            // Fix A6: restore on gesture engine teardown
+      el.removeEventListener("touchcancel", onTouchEnd);
+      window.removeEventListener("scroll", onScrollDelta);
+      if (burstTimerRef.current !== null) {
+        clearTimeout(burstTimerRef.current);
+        burstTimerRef.current = null;
+      }
+      if (exitAssistTimerRef.current !== null) {
+        clearTimeout(exitAssistTimerRef.current);
+        exitAssistTimerRef.current = null;
+      }
+      exitAssistRef.current = null;
       dispatchInSection(false);
     };
   }, [isDesktop, cardY, cardOpacity]);
