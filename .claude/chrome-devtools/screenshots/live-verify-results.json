@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-07-25T08:51:05.494Z",
+  "results": [
+    {
+      "name": "1a: JPG HTTP 200",
+      "status": "pass",
+      "detail": "181428 bytes"
+    },
+    {
+      "name": "1a: Color ambiguous — manual review needed",
+      "status": "warn",
+      "reason": "r=8 g=8 b=8"
+    },
+    {
+      "name": "1b: WebP thumb HTTP 200",
+      "status": "pass",
+      "detail": "23340 bytes"
+    },
+    {
+      "name": "1b: WebP color ambiguous",
+      "status": "warn",
+      "reason": "r=8 g=8 b=8"
+    },
+    {
+      "name": "1c: ?v= hash = ab5a0ed0 (expected)",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/images/projects-fb/thumbs/portfolio-interior-03.webp?v=ab5a0ed0"
+    },
+    {
+      "name": "2a: nuvali slat-wall NEVER renders (All projects view)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "2b: Final nuvali card src = -6 variant",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-b-6.webp?v=7fd67bd9"
+    },
+    {
+      "name": "2c: Skeleton check",
+      "status": "warn",
+      "reason": "No skeleton-class elements found at early paint (may load fast enough or use different class names)"
+    },
+    {
+      "name": "2d: nuvali-laguna-residence-b absent from INTERIOR filter (correct — its interior best-image is hidden)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "3: fourlinq-turnover-2 card src = -4 variant",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/images/projects-fb/thumbs/fourlinq-turnover-2-4.webp?v=24ae6ff8"
+    },
+    {
+      "name": "4: Hidden project absent (portfolio-residence-08)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "4: Hidden project absent (portfolio-residence-09)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "4: Nuvali home — no slat-wall (bare filename) src",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/images/projects-fb/thumbs/nuvali-laguna-residence-b-6.webp?v=7fd67bd9"
+    },
+    {
+      "name": "4: No hidden project images on home page",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "4: No hidden project links on home page",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5a: /api/project-images/merged returns 200 with projectRatios",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5a: ALL projectRatios are 4:3",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5b: Admin login submitted",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "5b: Admin shows \"Ratio: 4:3\" for nuvali-laguna-residence-b",
+      "status": "pass",
+      "detail": "Ratio: 4:3"
+    },
+    {
+      "name": "5b: fourlinq-turnover-2 card",
+      "status": "warn",
+      "reason": "Card not found in admin — may require scroll"
+    },
+    {
+      "name": "6a: Row thumbnail shows portfolio-interior-03",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/images/projects-fb/thumbs/portfolio-interior-03.webp?v=ab5a0ed0"
+    },
+    {
+      "name": "6b: Lightbox shows portfolio-interior-03",
+      "status": "pass",
+      "detail": "https://fourlinq.ph/images/projects-fb/thumbs/portfolio-interior-03.webp?v=ab5a0ed0"
+    },
+    {
+      "name": "7: Zero console errors — Home",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "7: Zero console errors — Gallery",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "7: Zero console errors — Project Detail",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "7: Zero console errors — Admin Panel",
+      "status": "pass",
+      "detail": ""
+    }
+  ]
+}
