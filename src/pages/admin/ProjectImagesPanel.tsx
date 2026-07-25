@@ -543,6 +543,7 @@ function ImageRow({
   isHidden,
   replacedUrl,
   bestForCategories,
+  categoryCoverBadges,
   flagged,
   isCover,
   onHide,
@@ -557,6 +558,8 @@ function ImageRow({
   isHidden: boolean;
   replacedUrl: string | null;
   bestForCategories: Category[];
+  /** Categories for which this image is the current effective category cover. */
+  categoryCoverBadges: Category[];
   flagged: boolean;
   /** True when this image is currently first in the project's image order (auto-derived cover). */
   isCover: boolean;
@@ -579,6 +582,20 @@ function ImageRow({
         {} as Record<Category, number>
       )
   );
+
+  // FIX 4: Resync editScores whenever effectiveScores change (e.g. after a score_override
+  // save invalidates baseline and the parent re-fetches). This ensures reopening the
+  // Modify-values dialog after a save shows the newly saved values rather than stale state.
+  useEffect(() => {
+    setEditScores(
+      CATEGORIES.reduce(
+        (acc, cat) => ({ ...acc, [cat]: image.effectiveScores?.[cat] ?? 0 }),
+        {} as Record<Category, number>
+      )
+    );
+    // JSON-stable key so the effect only fires when values actually change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(image.effectiveScores)]);
 
   const displaySrc = replacedUrl ?? image.path;
   const filename = image.path.split("/").pop() ?? image.path;
@@ -663,6 +680,15 @@ function ImageRow({
                 <Bookmark size={9} className="fill-primary" /> Cover
               </span>
             )}
+            {categoryCoverBadges.map((cat) => (
+              <span
+                key={`cover-${cat}`}
+                className="text-[10px] px-1.5 py-0.5 bg-violet-500/12 text-violet-700 rounded font-medium"
+                title={`This image is the effective ${CATEGORY_LABELS[cat]} category cover`}
+              >
+                Cover {CATEGORY_LABELS[cat]}
+              </span>
+            ))}
           </div>
 
           {/* AI Scores */}
@@ -810,6 +836,52 @@ function ImageRow({
   );
 }
 
+// ── computeCategoryCoverPaths: derive which image is each category's effective cover ──
+//    Mirrors the server-side buildMergedResponse logic exactly:
+//    1. Explicit non-hidden best_for_category pin wins outright.
+//    2. If the pinned image is hidden, OR there is no pin, rescan all non-hidden
+//       images using effectiveScores (baseline overridden by score_override rows)
+//       and pick the highest scorer that meets THRESHOLD (50).
+//    Returns a map of category → winning image path (or undefined if no winner).
+//    An image can win multiple categories simultaneously.
+const CLIENT_THRESHOLD = 50;
+
+function computeCategoryCoverPaths(
+  images: BaselineImage[],
+  projectOverrides: OverrideRow[],
+): Partial<Record<Category, string>> {
+  const hiddenSet = new Set(
+    projectOverrides.filter((r) => r.override_type === "hidden").map((r) => r.image_path)
+  );
+  const pinMap = new Map<Category, string>(); // category → pinned image path
+  for (const r of projectOverrides.filter((r) => r.override_type === "best_for_category" && r.category)) {
+    pinMap.set(r.category as Category, r.image_path);
+  }
+
+  const result: Partial<Record<Category, string>> = {};
+
+  for (const cat of CATEGORIES) {
+    const pinPath = pinMap.get(cat);
+    if (pinPath && !hiddenSet.has(pinPath)) {
+      // Explicit non-hidden pin wins outright
+      result[cat] = pinPath;
+    } else {
+      // No pin, or pin is hidden — rescan with effective scores
+      let best: { path: string; score: number } | null = null;
+      for (const im of images) {
+        if (hiddenSet.has(im.path)) continue;
+        const score = im.effectiveScores?.[cat] ?? im.scores?.[cat] ?? 0;
+        if (!best || score > best.score) best = { path: im.path, score };
+      }
+      if (best && best.score >= CLIENT_THRESHOLD) {
+        result[cat] = best.path;
+      }
+    }
+  }
+
+  return result;
+}
+
 // ── computeImageOrder: apply image_order overrides to produce correct initial path order ──
 
 function computeImageOrder(
@@ -916,6 +988,20 @@ function ProjectDetailView({
       .filter((r) => r.override_type === "image_flagged" && r.image_path !== "__project__")
       .map((r) => r.image_path)
   );
+
+  // FIX 3: Compute which image path wins each category (effective cover per category).
+  // Uses the same precedence as the server: explicit non-hidden best_for_category pin
+  // wins; else highest effectiveScore >= THRESHOLD among non-hidden images.
+  // Built into a map of imagePath → Category[] so ImageRow knows its badges.
+  const categoryCoverPaths = computeCategoryCoverPaths(project.images, projectOverrides);
+  const imageCategoryCoverBadges = new Map<string, Category[]>();
+  for (const cat of CATEGORIES) {
+    const winnerPath = categoryCoverPaths[cat];
+    if (winnerPath) {
+      const existing = imageCategoryCoverBadges.get(winnerPath) ?? [];
+      imageCategoryCoverBadges.set(winnerPath, [...existing, cat]);
+    }
+  }
 
   // Derive the cover image: the first non-hidden image in the current image order.
   // This mirrors the server-side derivation in buildMergedResponse so admin always
@@ -1332,6 +1418,7 @@ function ProjectDetailView({
                           isHidden={hiddenSet.has(image.path)}
                           replacedUrl={replacedMap.get(image.path) ?? null}
                           bestForCategories={bestForCatMap.get(image.path) ?? []}
+                          categoryCoverBadges={imageCategoryCoverBadges.get(image.path) ?? []}
                           flagged={imageFlaggedSet.has(image.path)}
                           isCover={imageOrderIds.indexOf(image.path) === imageOrderIds.findIndex((p) => !hiddenSet.has(p))}
                           onHide={async () => {
@@ -1693,8 +1780,12 @@ export default function ProjectImagesPanel() {
   // (flagged/hidden/deleted/ratio come from the /baseline endpoint, not /overrides).
   // Mutations for these types must also invalidate the baseline query so the
   // UI reflects the new state immediately rather than waiting 5 minutes.
+  // "score_override" included here so that saving a score override immediately
+  // invalidates the baseline query — chips, badges, and category order panels
+  // update without a manual page refresh (Gap B fix).
   const PROJECT_LEVEL_TYPES = new Set([
     "project_flagged", "project_checked", "project_hidden", "project_deleted", "project_ratio",
+    "score_override",
   ]);
 
   const addOverrideMutation = useMutation({

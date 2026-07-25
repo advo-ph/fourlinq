@@ -308,27 +308,45 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
       const overridePath = bestForCategoryMap.get(`${projectId}|${cat}`);
 
       if (overridePath) {
-        // Admin explicitly set this image as best for this category
-        // Apply hidden/replaced on top
+        // Admin explicitly pinned this image as best for this category.
+        // If the pinned image is hidden, fall back to effective-score rescan
+        // (same logic as the no-pin path below) rather than the baked baseline.
         if (hiddenSet.has(`${projectId}|${overridePath}`)) {
-          // The override image itself is hidden — fall back to base
-          const basePath = baseImages[cat];
-          if (basePath && !hiddenSet.has(`${projectId}|${basePath}`)) {
-            per[cat] = replacedMap.get(`${projectId}|${basePath}`) ?? basePath;
-            tags.push(cat);
+          // Pinned image is hidden — rescan with effective scores
+          const rec = manifest.projects[projectId];
+          if (rec) {
+            let best: { path: string; score: number } | null = null;
+            for (const im of rec.images) {
+              if (hiddenSet.has(`${projectId}|${im.path}`)) continue;
+              const s = getEffectiveScore(projectId, im.path, cat, im.scores, scoreOverrideMap);
+              if (!best || s > best.score) best = { path: im.path, score: s };
+            }
+            if (best && best.score >= THRESHOLD) {
+              per[cat] = replacedMap.get(`${projectId}|${best.path}`) ?? best.path;
+              tags.push(cat);
+            }
           }
         } else {
           per[cat] = replacedMap.get(`${projectId}|${overridePath}`) ?? overridePath;
           tags.push(cat);
         }
-      } else if (baseTags.includes(cat)) {
-        const basePath = baseImages[cat];
-        if (basePath) {
-          if (!hiddenSet.has(`${projectId}|${basePath}`)) {
-            per[cat] = replacedMap.get(`${projectId}|${basePath}`) ?? basePath;
+      } else {
+        // No explicit pin — rescan all non-hidden images with effective scores
+        // (baseline score overridden by score_override rows). This is the key fix
+        // for Gap A: previously the baked baseline winner was copied here, ignoring
+        // score_override rows entirely.
+        const rec = manifest.projects[projectId];
+        if (rec) {
+          let best: { path: string; score: number } | null = null;
+          for (const im of rec.images) {
+            if (hiddenSet.has(`${projectId}|${im.path}`)) continue;
+            const s = getEffectiveScore(projectId, im.path, cat, im.scores, scoreOverrideMap);
+            if (!best || s > best.score) best = { path: im.path, score: s };
+          }
+          if (best && best.score >= THRESHOLD) {
+            per[cat] = replacedMap.get(`${projectId}|${best.path}`) ?? best.path;
             tags.push(cat);
           }
-          // If best image is hidden, the project drops from that category
         }
       }
     }
@@ -364,17 +382,48 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
   const publicProjectOrderMap = new Map([...projectOrderMap.entries()].filter(([id]) => publicIdSet.has(id)));
   const effectiveProjectOrder = applyOrderOverrides(basePublicOrder, publicProjectOrderMap);
 
-  // ── Sort projectCategoryOrder with overrides (public: exclude hidden + deleted) ──
+  // ── Sort projectCategoryOrder using effective scores (mirrors loadBaseline sort) ──
+  // Recompute from effectiveDerivedTags/effectiveCategoryImages so that score_override
+  // rows shift category membership and ordering without requiring a baseline rebuild.
+  const heroScore = (id: string) => manifest.projects[id]?.quality?.heroScore ?? 0;
+  const origIdx = new Map(canon.map((c, i) => [c.id, i]));
+
+  // Compute the best effective score for each project/category (used for sort only)
+  const effectiveCatBestScore = new Map<string, number>(); // "projectId|cat" → score
+  for (const projectId of coveredIds) {
+    const rec = manifest.projects[projectId];
+    if (!rec) continue;
+    for (const cat of CATEGORIES) {
+      if (!effectiveDerivedTags[projectId]?.includes(cat)) continue;
+      let best = 0;
+      for (const im of rec.images) {
+        if (hiddenSet.has(`${projectId}|${im.path}`)) continue;
+        const s = getEffectiveScore(projectId, im.path, cat, im.scores, scoreOverrideMap);
+        if (s > best) best = s;
+      }
+      effectiveCatBestScore.set(`${projectId}|${cat}`, best);
+    }
+  }
+
   const effectiveProjectCategoryOrder: Record<Category, string[]> = {} as Record<Category, string[]>;
   for (const cat of CATEGORIES) {
-    const baseOrder = (projectCategoryOrder[cat] ?? []).filter((id) => publicIdSet.has(id));
+    // Start from IDs that have this category in the EFFECTIVE tags (post-override)
+    const catIds = coveredIds.filter((id) => effectiveDerivedTags[id]?.includes(cat) && publicIdSet.has(id));
+    catIds.sort(
+      (a, b) =>
+        (effectiveCatBestScore.get(`${b}|${cat}`) ?? 0) - (effectiveCatBestScore.get(`${a}|${cat}`) ?? 0) ||
+        heroScore(b) - heroScore(a) ||
+        (origIdx.get(a) ?? 0) - (origIdx.get(b) ?? 0)
+    );
+
+    // Apply any manual category_order overrides on top
     const overMap = categoryOrderMap.get(cat);
     const publicCatOverMap = overMap
       ? new Map([...overMap.entries()].filter(([id]) => publicIdSet.has(id)))
       : undefined;
     effectiveProjectCategoryOrder[cat] = publicCatOverMap
-      ? applyOrderOverrides(baseOrder, publicCatOverMap)
-      : baseOrder;
+      ? applyOrderOverrides(catIds, publicCatOverMap)
+      : catIds;
   }
 
   // Build projectRatios for public payload
