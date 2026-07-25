@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { motion, useMotionValue, animate } from "framer-motion";
+import { motion, useMotionValue, animate, type AnimationPlaybackControls } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
 import { useSegmentedFrames } from "@/hooks/useSegmentedFrames";
@@ -74,11 +74,16 @@ const INACTIVE_OPACITY = 0.28;
 // highlight advances). Swipe down: fades down, the previous returns.
 const STEP_COUNT = WINDOW_PARTS.length + 1; // intro + parts
 
-// Swipe feel tuning — v3
-const FADE_DISTANCE_PX = 120;   // cardOpacity = max(0, 1 - |dy| / 120)
+// Swipe feel tuning — v5
+const FADE_DISTANCE_PX = 120;   // cardOpacity = max(0, 1 - |cardY| / 120)
 const COMMIT_DISTANCE_PX = 44;  // displacement threshold for commit
 const COMMIT_VELOCITY = 0.35;   // px/ms threshold for velocity commit
-const BOUNDARY_EXIT_EPSILON_PX = 8; // jitter guard for instant boundary exit release
+const RUBBER_BAND = 0.3;        // drag resistance at boundary steps in the exit direction
+const VELOCITY_STALE_MS = 80;   // pause longer than this before release → drag, not flick
+const EXIT_OVERSHOOT_VH = 0.35; // exit glide lands this far past the pin edge
+const EXIT_EDGE_RUNWAY_PX = 24; // exit glide starts this far inside the pin edge (invisible) — not from the anchor
+const GLIDE_CANCEL_REVERSAL_PX = 12; // finger reversal against a live glide reclaims control at this distance
+const POINTER_SCROLL_COOLDOWN_MS = 400; // wheel/keyboard scrolling suppresses engagement for this long
 
 const ScrollWindow = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -89,19 +94,21 @@ const ScrollWindow = () => {
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
 
   // ── Gesture refs (unconditional — Rules of Hooks) ──────────
-  const engagedRef = useRef(false);        // true only while section is engaged in-view (sticky-pin)
-  const exitingRef = useRef(false);        // true while a boundary-exit glide is in progress; suppresses re-engagement
-  const fingerDownRef = useRef(false);     // true while a finger is on screen
-  const anchorYRef = useRef(0);            // the scrollY the component clamps to while engaged
-  const gestureBaseCardYRef = useRef(0);   // cardY.get() at the moment this gesture's first scroll event fires
-  const gestureStartStepRef = useRef(0);   // stepRef.current captured at onTouchStart; guards boundary releases
-  const gestureStartDeltaRef = useRef(0);  // delta (scrollY - anchor) at touchStart; guards epsilon against anchor drift
-  const deltaSamplesRef = useRef<Array<{ d: number; t: number }>>([]);  // last ≤4 {delta, timestamp} samples for velocity
-  const burstLockRef = useRef(false);      // true after touchend; absorbs momentum-leak scroll events
-  const burstTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null); // 150ms quiet-gap timer to clear burstLock
+  const engagedRef = useRef(false);        // true while the section is engaged (pinned + touch-captured)
+  const anchorYRef = useRef(0);            // the scrollY the page is held at while engaged
+  const touchActiveRef = useRef(false);    // a finger is currently on the screen (window-level)
+  const lastTouchYRef = useRef(0);         // latest touch clientY — feeds mid-gesture capture on engage
+  const gestureStartYRef = useRef(0);      // touch clientY at the current gesture's baseline
+  const gestureBaseCardYRef = useRef(0);   // cardY at the current gesture's baseline
+  const gestureBaseOpacityRef = useRef(1); // cardOpacity at the baseline — keeps the fade continuous when grabbing mid-animation
+  const nativePanRef = useRef(false);      // this gesture is a browser-owned native scroll (non-cancelable moves) — clamp holds the page, exits defer to touchend
+  const touchSamplesRef = useRef<Array<{ y: number; t: number }>>([]); // last ≤5 touchmove samples for flick velocity
+  const exitAnimRef = useRef<AnimationPlaybackControls | null>(null);  // in-flight exit glide; non-null suppresses re-engagement, any touchstart cancels it
+  const glideScrollYRef = useRef(0);       // last scrollY the glide wrote — re-asserted by onScroll so nothing else can fight the glide
+  const glideDirRef = useRef<"up" | "down">("down"); // live glide direction — a finger reversal against it reclaims control
+  const glideStartTouchYRef = useRef(0);   // finger Y when the glide started — baseline for the reversal check
+  const pointerScrollUntilRef = useRef(0); // wheel/keyboard scroll seen until this timestamp — engagement suppressed (no touch = no way to swipe out)
   const lastInSectionFlagRef = useRef<boolean | null>(null); // shared dedupe flag for fq-hide-header / fq-scrollwindow-inview dispatches
-  const exitAssistRef = useRef<"up" | "down" | null>(null);  // direction of the last boundary release; drives post-release exit assist
-  const exitAssistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null); // 250ms post-release assist timer
 
   const [nearViewport, setNearViewport] = useState(false);
   const [isDesktop, setIsDesktop] = useState(
@@ -187,149 +194,141 @@ const ScrollWindow = () => {
     };
   }, [isDesktop]);
 
-  // ── Mobile: sticky-pin engagement via rAF geometry ────────────────────────
+  // ── Mobile: touch-driven swipe engine (v5) ────────────────────────────────
   // The outer container is a 260lvh scroll track; the inner layout div is CSS
-  // sticky top-0 on mobile. This loop detects when the track is pinned (fully
-  // straddling the viewport) and engages/disengages the touch capture accordingly.
-  // Replaces the v2 scroll-settle state machine entirely.
+  // sticky top-0 on mobile. A rAF loop detects when the track is pinned (fully
+  // straddling the viewport) and engages/disengages the touch capture.
+  //
+  // The v4 engine derived gestures from window scroll deltas, which made swipes
+  // dependent on iOS momentum/scroll-event timing (burst locks, clamp races) and
+  // could freeze entirely when a drag started outside the section (its touchstart
+  // never hit the section element, so the live gesture read as stray momentum and
+  // was clamped away). v5 inverts the model:
+  //
+  //   • The card is driven 1:1 from finger positions via WINDOW-level touch
+  //     listeners — never from scroll events. touchmove events dispatch to the
+  //     element where the touch started, so only window sees every gesture.
+  //   • Zero lockouts: every touchstart stops in-flight springs and rebases the
+  //     gesture from the current card pose; commits are synchronous at release.
+  //   • Mid-gesture capture: if a finger is already down when the pin loop
+  //     engages (user swiped into the section without lifting), the baseline
+  //     rebases to the live finger position and that same drag moves the card.
+  //   • While engaged the page is held at a mid-track anchor: touch-action:none
+  //     blocks native scroll for new gestures, and a passive scroll listener
+  //     re-clamps any parasitic scroll (captured-gesture native scroll, momentum
+  //     tails) — invisible while the sticky pin covers the viewport.
+  //   • Boundary exits are a cancelable programmatic glide past the pin edge.
+  //     Re-engagement is suppressed only while the glide handle is live, and any
+  //     touchstart cancels it (re-engaging if still pinned) — no reachable state
+  //     leaves the user on a frozen, unresponsive screen.
   useEffect(() => {
     if (isDesktop) return;
 
     const el = containerRef.current;
     if (!el) return;
 
-    // Dedupe dispatches — only emit when flag actually changes (shared ref with touch engine)
+    let lastEvt = "-"; // HUD only
+
+    // Dedupe dispatches — only emit when flag actually changes
     const dispatchInSection = (flag: boolean) => {
       if (flag === lastInSectionFlagRef.current) return;
       lastInSectionFlagRef.current = flag;
       window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: flag }));
       window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView: flag } }));
     };
-
-    // Consecutive pinned-frame counter — requires 2 frames before engaging
-    // to prevent fling-through from momentarily triggering engagement.
-    let consecutivePinCount = 0;
-    let raf = 0;
-    let prevTop = el.getBoundingClientRect().top;
 
     // Track is "pinned" when the 260lvh outer container straddles the viewport:
     // top is scrolled past (negative) and bottom is still below viewport bottom.
-    function isPinned(): boolean {
+    const isPinned = () => {
       const rect = el.getBoundingClientRect();
       return rect.top <= -2 && rect.bottom >= window.innerHeight + 2;
-    }
+    };
 
     // Track is fully out when neither edge is within the viewport straddle.
-    function isFullyOut(): boolean {
+    const isFullyOut = () => {
       const rect = el.getBoundingClientRect();
       return rect.top > 0 || rect.bottom < window.innerHeight;
-    }
+    };
 
-    function tick() {
+    const cancelExitGlide = () => {
+      if (exitAnimRef.current !== null) {
+        exitAnimRef.current.stop();
+        exitAnimRef.current = null;
+      }
+    };
+
+    const engage = (entryStep: number) => {
+      cancelExitGlide();
+      engagedRef.current = true;
+      stepRef.current = entryStep;
+      setStep(entryStep);
+      // Anchor: mid-track position so parasitic scroll has clamp room both ways
       const rect = el.getBoundingClientRect();
-      if (!engagedRef.current) {
-        if (isFullyOut()) {
-          // Track has left the viewport — clear any pending exit suppression
-          // so that a re-entry from either direction re-engages cleanly.
-          if (exitingRef.current) {
-            exitingRef.current = false;
-          }
-          consecutivePinCount = 0;
-          prevTop = rect.top;
-        } else if (isPinned() && !exitingRef.current) {
-          // Only count pinned frames if we are NOT in an exit glide.
-          // exitingRef suppresses re-engagement during the smooth scroll out.
-          consecutivePinCount++;
-          if (consecutivePinCount >= 2) {
-            // Engage: determine entry direction from last known prevTop
-            engagedRef.current = true;
-            const entryStep = prevTop > 0 ? 0 : STEP_COUNT - 1;
-            setStep(entryStep);
-            stepRef.current = entryStep;
-            // Anchor: mid-track position so the page can scroll in both directions
-            const trackRect = el.getBoundingClientRect();
-            const trackTopAbs = trackRect.top + window.scrollY;
-            anchorYRef.current = trackTopAbs + (trackRect.height - window.innerHeight) / 2;
-            window.scrollTo(0, anchorYRef.current);
-            cardY.set(0);
-            cardOpacity.set(1);
-            dispatchInSection(true);
-          }
-        } else {
-          // Pinned but exitingRef is true, OR not pinned and not fully out:
-          // hold the count and update prevTop so re-entry direction is correct.
-          consecutivePinCount = 0;
-          prevTop = rect.top;
-        }
-      } else {
-        if (isFullyOut()) {
-          engagedRef.current = false;
-          exitingRef.current = false;
-          dispatchInSection(false);
-          consecutivePinCount = 0;
-        }
-      }
-
-      // HUD: refresh pin state every rAF (cheap — direct DOM write)
-      if (FQ_DEBUG) {
-        const r = el.getBoundingClientRect();
-        writeHud({
-          eng: engagedRef.current,
-          step: stepRef.current,
-          gs: gestureStartStepRef.current,
-          anchor: Math.round(anchorYRef.current),
-          delta: Math.round(window.scrollY - anchorYRef.current),
-          fgr: fingerDownRef.current,
-          burst: burstLockRef.current,
-          exit: exitingRef.current,
-          pinTop: Math.round(r.top),
-          pinBot: Math.round(r.bottom - window.innerHeight),
-          evt: "raf",
-        });
-      }
-
-      raf = requestAnimationFrame(tick);
-    }
-
-    raf = requestAnimationFrame(tick);
-
-    const onOrientationChange = () => {
-      engagedRef.current = false;
-      dispatchInSection(false);
+      anchorYRef.current = rect.top + window.scrollY + (rect.height - window.innerHeight) / 2;
+      window.scrollTo(0, anchorYRef.current);
+      cardY.stop();
+      cardOpacity.stop();
       cardY.set(0);
       cardOpacity.set(1);
-      setStep(0);
-      stepRef.current = 0;
-      consecutivePinCount = 0;
-      prevTop = el.getBoundingClientRect().top;
+      // Mid-gesture capture: rebase to the current finger position so a drag
+      // that is already in progress immediately starts driving the card.
+      gestureStartYRef.current = lastTouchYRef.current;
+      gestureBaseCardYRef.current = 0;
+      gestureBaseOpacityRef.current = 1;
+      nativePanRef.current = false; // re-derived per move (non-cancelable ⇒ true)
+      touchSamplesRef.current = [];
+      el.style.touchAction = "none"; // new gestures: no native scroll while engaged
+      dispatchInSection(true);
     };
 
-    window.addEventListener("orientationchange", onOrientationChange);
-
-    return () => {
-      cancelAnimationFrame(raf);
+    const disengage = () => {
       engagedRef.current = false;
+      el.style.touchAction = "";
+      // Never leave a half-faded, offset card behind (resize/URL-bar jumps can
+      // disengage mid-drag and the section may still be partially on screen).
+      cardY.stop();
+      cardOpacity.stop();
+      cardY.set(0);
+      cardOpacity.set(1);
       dispatchInSection(false);
-      window.removeEventListener("orientationchange", onOrientationChange);
     };
-  }, [isDesktop, cardY, cardOpacity]);
 
-  // ── Mobile: scroll-delta gesture engine (v4) ──────────────────────────────
-  // Touch listeners are purely passive bookkeepers (no preventDefault, no touchmove).
-  // A passive window scroll listener reads delta from the mid-track anchor and drives
-  // cardY/cardOpacity directly. Clamp at touchend; boundary exits release native momentum.
-  useEffect(() => {
-    if (isDesktop) return;
-
-    const el = containerRef.current;
-    if (!el) return;
-
-    // Dedupe dispatches — only emit when flag actually changes (shared ref with pin loop)
-    const dispatchInSection = (flag: boolean) => {
-      if (flag === lastInSectionFlagRef.current) return;
-      lastInSectionFlagRef.current = flag;
-      window.dispatchEvent(new CustomEvent("fq-hide-header", { detail: flag }));
-      window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView: flag } }));
+    // Boundary exit: deterministic scroll glide past the pin edge. "down" leaves
+    // past the bottom edge (swiped up on the last step), "up" past the top edge
+    // (swiped down on the intro). Cancelable — a touchstart mid-glide re-engages,
+    // and a still-down finger reversing against it reclaims control (onTouchMove).
+    // The glide snaps to just inside the pin edge first (invisible under the pin)
+    // so visible motion starts immediately instead of easing through ~80lvh of
+    // hidden track. While it runs, onScroll re-asserts the glide's position —
+    // single-writer discipline so native pan/momentum can't fight it.
+    const startExitGlide = (dir: "up" | "down") => {
+      disengage(); // also snaps the card to rest
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const trackTopAbs = rect.top + window.scrollY;
+      // scrollY at which the pin edge is crossed
+      const edgeY = dir === "down" ? trackTopAbs + rect.height - vh : trackTopAbs;
+      const start =
+        dir === "down"
+          ? Math.max(window.scrollY, edgeY - EXIT_EDGE_RUNWAY_PX)
+          : Math.min(window.scrollY, edgeY + EXIT_EDGE_RUNWAY_PX);
+      const target = dir === "down" ? edgeY + vh * EXIT_OVERSHOOT_VH : edgeY - vh * EXIT_OVERSHOOT_VH;
+      cancelExitGlide();
+      glideDirRef.current = dir;
+      glideStartTouchYRef.current = lastTouchYRef.current;
+      glideScrollYRef.current = start;
+      window.scrollTo(0, start);
+      exitAnimRef.current = animate(start, target, {
+        duration: 0.45,
+        ease: [0.16, 1, 0.3, 1],
+        onUpdate: (v) => {
+          glideScrollYRef.current = v;
+          window.scrollTo(0, v);
+        },
+        onComplete: () => {
+          exitAnimRef.current = null;
+        },
+      });
     };
 
     const springBack = () => {
@@ -347,272 +346,302 @@ const ScrollWindow = () => {
       const entryY = direction === "up" ? 36 : -36;
       cardY.set(entryY);
       cardOpacity.set(0);
-      // 3. Spring in
+      // 3. Spring in — interruptible: the next touchstart stops and rebases
       animate(cardY, 0, { type: "spring", stiffness: 300, damping: 30, velocity: 0 });
       animate(cardOpacity, 1, { duration: 0.28 });
     };
 
-    // ── Passive touch state tracker ────────────────────────────────────────────
+    // ── Pin loop ──────────────────────────────────────────────────────────────
+    // Consecutive pinned-frame counter — requires 2 frames before engaging
+    // to prevent fling-through from momentarily triggering engagement.
+    let consecutivePinCount = 0;
+    let raf = 0;
 
-    const onTouchStart = (_e: TouchEvent) => {
+    function tick() {
+      if (!engagedRef.current) {
+        if (
+          isPinned() &&
+          exitAnimRef.current === null &&
+          performance.now() > pointerScrollUntilRef.current
+        ) {
+          // Not during an exit glide — the glide's own scroll through the pin
+          // range must not re-engage. (Suppression dies with the glide handle,
+          // so it can never strand the section in a frozen state.)
+          // Not during pointer scrolling either — wheel/keyboard users have no
+          // touch gestures to swipe out with, so engaging would trap them.
+          consecutivePinCount++;
+          if (consecutivePinCount >= 2) {
+            consecutivePinCount = 0;
+            // Entry direction from which pin edge is closer at engagement —
+            // robust at any scroll speed (unlike sampling the last pre-pin
+            // rect.top, which lands in a 2px dead zone on slow entries).
+            const rect = el.getBoundingClientRect();
+            const enteredFromTop = rect.top >= -(rect.height - window.innerHeight) / 2;
+            engage(enteredFromTop ? 0 : STEP_COUNT - 1);
+          }
+        } else {
+          consecutivePinCount = 0;
+        }
+      } else if (isFullyOut()) {
+        // Shouldn't happen while clamped, but resize/URL-bar jumps can move the
+        // page — never stay "engaged" while off screen.
+        disengage();
+        consecutivePinCount = 0;
+      }
+
+      // HUD: refresh state every rAF (cheap — direct DOM write)
+      if (FQ_DEBUG) {
+        const r = el.getBoundingClientRect();
+        writeHud({
+          eng: engagedRef.current,
+          step: stepRef.current,
+          cardY: Math.round(cardY.get()),
+          touch: touchActiveRef.current,
+          pan: nativePanRef.current,
+          glide: exitAnimRef.current !== null,
+          anchor: Math.round(anchorYRef.current),
+          off: Math.round(window.scrollY - anchorYRef.current),
+          pinTop: Math.round(r.top),
+          pinBot: Math.round(r.bottom - window.innerHeight),
+          evt: lastEvt,
+        });
+      }
+
+      raf = requestAnimationFrame(tick);
+    }
+
+    raf = requestAnimationFrame(tick);
+
+    // ── Touch handlers (window-level — see header comment) ────────────────────
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (touchActiveRef.current) return; // second finger — the first keeps the gesture
+      const touch = e.touches[0];
+      if (!touch) return;
+      touchActiveRef.current = true;
+      lastTouchYRef.current = touch.clientY;
+      // Grabbing the page mid-exit-glide: cancel the glide; if the section is
+      // still pinned re-engage on the same card, otherwise native scroll resumes.
+      if (exitAnimRef.current !== null) {
+        cancelExitGlide();
+        if (isPinned()) engage(stepRef.current);
+      }
+      if (!engagedRef.current) return;
+      // Zero-delay chaining: stop in-flight springs, rebase from the current pose.
       cardY.stop();
       cardOpacity.stop();
-      fingerDownRef.current = true;
+      gestureStartYRef.current = touch.clientY;
       gestureBaseCardYRef.current = cardY.get();
-      // Capture which step and delta this gesture started at — used by onScrollDelta to
-      // guard boundary releases so momentum-leak events (finger already up) cannot release,
-      // and to measure gesture-relative delta (ignores anchor drift from prior touchEnd clamps).
-      gestureStartStepRef.current = stepRef.current;
-      gestureStartDeltaRef.current = window.scrollY - anchorYRef.current;
-      deltaSamplesRef.current = [];
-      burstLockRef.current = false;
-      if (burstTimerRef.current !== null) {
-        clearTimeout(burstTimerRef.current);
-        burstTimerRef.current = null;
-      }
-      // Cancel any pending exit assist and clear direction on new touch
-      exitAssistRef.current = null;
-      if (exitAssistTimerRef.current !== null) {
-        clearTimeout(exitAssistTimerRef.current);
-        exitAssistTimerRef.current = null;
-      }
-      if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(gestureStartDeltaRef.current), fgr: true, burst: false, assist: null, evt: "ts" });
+      gestureBaseOpacityRef.current = cardOpacity.get();
+      nativePanRef.current = false;
+      touchSamplesRef.current = [{ y: touch.clientY, t: e.timeStamp }];
+      lastEvt = "ts";
     };
 
-    // ── Post-release exit assist ───────────────────────────────────────────────
-    // After a boundary release, natural momentum may not carry a slow drag fully
-    // out of the 260lvh track (the page stays sticky-frozen). This helper waits
-    // 250ms for momentum to play, then checks if the page is STILL pinned. If so,
-    // it fires a single smooth scroll to push past the pin edge in the recorded
-    // exit direction. Re-engagement is guarded by engagedRef (cleared at release).
-    const startExitAssist = () => {
-      const dir = exitAssistRef.current;
-      if (!dir) return;
-      if (exitAssistTimerRef.current !== null) {
-        clearTimeout(exitAssistTimerRef.current);
-      }
-      exitAssistTimerRef.current = setTimeout(() => {
-        exitAssistTimerRef.current = null;
-        const assistDir = exitAssistRef.current;
-        exitAssistRef.current = null;
-        if (!assistDir) return;
-        // Guard: if somehow re-engaged, don't interfere
-        if (engagedRef.current) return;
-        // Check if page is still inside the pin range (sticky still active)
-        const outer = containerRef.current;
-        if (!outer) return;
-        const rect = outer.getBoundingClientRect();
-        const stillPinned = rect.top <= -2 && rect.bottom >= window.innerHeight + 2;
-        if (!stillPinned) return; // momentum already carried the page out — do nothing
-        // Compute absolute track position for a safe exit target
-        const trackTopAbs = rect.top + window.scrollY;
-        const trackHeight = rect.height;
-        const vh = window.innerHeight;
-        const target = assistDir === "down"
-          ? trackTopAbs + trackHeight - vh * 0.5   // well past the bottom pin edge
-          : trackTopAbs - vh * 0.5;                 // well past the top pin edge
-        if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(window.scrollY - anchorYRef.current), fgr: false, burst: false, assist: assistDir, evt: "assist-fire" });
-        window.scrollTo({ top: target, behavior: "smooth" });
-      }, 120);
-    };
+    // Fade continuous from the grab pose: for a fresh gesture (base y=0, base
+    // opacity=1) this is exactly 1 - |y|/FADE_DISTANCE; grabbing a card mid-fade
+    // continues from its frozen opacity instead of popping to the formula value.
+    const fadeFrom = (yPos: number) =>
+      Math.min(
+        1,
+        Math.max(
+          0,
+          gestureBaseOpacityRef.current -
+            (Math.abs(yPos) - Math.abs(gestureBaseCardYRef.current)) / FADE_DISTANCE_PX,
+        ),
+      );
 
-    const onTouchEnd = () => {
-      fingerDownRef.current = false;
-      if (!engagedRef.current) {
-        // Boundary exit already fired from onScrollDelta (finger was down then) — finger just lifted.
-        // Start the exit assist timer so a slow drag doesn't leave the page frozen.
-        startExitAssist();
-        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(window.scrollY - anchorYRef.current), fgr: false, burst: false, assist: exitAssistRef.current, evt: "te-exit" });
-        return;
-      }
-      const finalDelta = window.scrollY - anchorYRef.current;
-      const samples = deltaSamplesRef.current;
-      let v = 0;
-      if (samples.length >= 2) {
-        const first = samples[0];
-        const last = samples[samples.length - 1];
-        const dt = last.t - first.t;
-        if (dt > 0) v = (last.d - first.d) / dt;
-      }
-      const finalCardY = gestureBaseCardYRef.current - finalDelta;
-      // Direction of this gesture: negative finalCardY = swipe up, positive = swipe down.
-      const gestureDir: "up" | "down" = finalCardY < 0 ? "up" : "down";
+    const onTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      const y = touch.clientY;
+      lastTouchYRef.current = y;
 
-      // ── onTouchEnd decision tree ──────────────────────────────────────────────
-      // Evaluated in order; first matching branch wins.
-      //
-      // A. BOUNDARY EXIT (backstop — checked before normal commit/springback):
-      //    With live release at ±BOUNDARY_EXIT_EPSILON_PX (8px), this branch is
-      //    rarely hit. It catches: a boundary-start gesture ending in the exit direction
-      //    that somehow never released live (delta stayed under epsilon throughout),
-      //    OR the dead-commit case where commitCard would be a no-op (already at boundary).
-      //    No velocity requirement — any exit-direction drag from a boundary step exits.
-      //    Result: snap card to rest, release engagement, set exit direction, start assist,
-      //    do NOT clamp.
-      //
-      // B. NORMAL COMMIT: |finalCardY| > COMMIT_DISTANCE_PX OR |v| > COMMIT_VELOCITY.
-      //    commitCard() advances the step (clamped to 0..STEP_COUNT-1 by min/max).
-      //    Then clamp scroll to anchor and set burstLock.
-      //
-      // C. SPRINGBACK: gesture too short and too slow to commit.
-      //    Animate card back to rest. Then clamp scroll to anchor and set burstLock.
-      //
-      // Non-exit paths (B, C) always clamp + burstLock at the end.
-
-      // Branch A: boundary-start gesture in exit direction (any distance — instant exit semantic)
-      const isBoundaryExit =
-        (gestureStartStepRef.current === STEP_COUNT - 1 && gestureDir === "up") ||
-        (gestureStartStepRef.current === 0 && gestureDir === "down");
-
-      // Dead-commit: would commit past boundary into clamped no-op
-      const isDeadCommit =
-        (Math.abs(finalCardY) > COMMIT_DISTANCE_PX || Math.abs(v) > COMMIT_VELOCITY) && (
-          (gestureDir === "up" && stepRef.current === STEP_COUNT - 1) ||
-          (gestureDir === "down" && stepRef.current === 0)
-        );
-
-      if (isBoundaryExit || isDeadCommit) {
-        // A. Boundary exit backstop (finger is down → about to lift, assist fires via onTouchEnd path).
-        // Direction: at step STEP_COUNT-1, swiping up exits downward (past bottom pin edge).
-        //            at step 0, swiping down exits upward (past top pin edge).
-        const boundaryExitDir: "up" | "down" =
-          gestureStartStepRef.current === STEP_COUNT - 1 ? "down" : "up";
-        // Snap card to rest before releasing — no residual fade while scrolling away
-        cardY.stop(); cardOpacity.stop(); cardY.set(0); cardOpacity.set(1);
-        engagedRef.current = false;
-        exitingRef.current = true;
-        exitAssistRef.current = boundaryExitDir;
-        dispatchInSection(false);
-        // Do NOT clamp — let native momentum carry the page out.
-        // startExitAssist fires immediately because this IS onTouchEnd (finger already up).
-        startExitAssist();
-        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(finalDelta), fgr: false, burst: false, assist: boundaryExitDir, evt: "te-boundary-exit" });
-        return;
-      }
-
-      const shouldCommit = Math.abs(finalCardY) > COMMIT_DISTANCE_PX || Math.abs(v) > COMMIT_VELOCITY;
-      if (shouldCommit) {
-        // B. Normal commit — commitCard clamps next via min/max so it is safe at any step
-        commitCard(gestureDir);
-      } else {
-        // C. Springback
-        springBack();
-      }
-      // Non-exit paths: always clamp + burstLock (invisible under sticky pin)
-      window.scrollTo(0, anchorYRef.current);
-      burstLockRef.current = true;
-      burstTimerRef.current = setTimeout(() => { burstLockRef.current = false; }, 150);
-      if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(finalDelta), fgr: false, burst: true, assist: null, evt: "te" });
-    };
-
-    // ── Passive window scroll listener — drives cardY while engaged ────────────
-    // Sign convention: swipe up → scrollY increases → delta positive → cardY negative → commitCard("up")
-
-    const onScrollDelta = () => {
-      if (!engagedRef.current || exitingRef.current) return;
-      const delta = window.scrollY - anchorYRef.current;
-      if (delta === 0) return; // our own clamp fired → scroll event from scrollTo → ignore
-
-      // Boundary release check (live — checked first, before any card update).
-      // Guards: (1) finger must currently be down — momentum-leak events (finger up) must
-      //         never trigger a release; they fall through to burst-absorption below.
-      //         (2) this gesture must have STARTED at the boundary step — a rapid swipe
-      //         that commits INTO step 0/3 cannot release via its own momentum tail,
-      //         because gestureStartStepRef was set to the prior step at onTouchStart.
-      //
-      // Epsilon measured as GESTURE-RELATIVE delta (delta - gestureStartDeltaRef) to
-      // ignore anchor drift (page settled slightly off-anchor from prior touchEnd clamp).
-      // This ensures a swipe in the non-exit direction cannot trigger a release merely
-      // because the page started a few px below/above the anchor.
-      const gestureDelta = delta - gestureStartDeltaRef.current;
-      if (
-        fingerDownRef.current &&
-        gestureStartStepRef.current === 0 &&
-        stepRef.current === 0 &&
-        gestureDelta < -BOUNDARY_EXIT_EPSILON_PX
-      ) {
-        // Snap card to rest before releasing so no residual fade shows while scrolling away
-        cardY.stop(); cardOpacity.stop(); cardY.set(0); cardOpacity.set(1);
-        engagedRef.current = false;
-        exitingRef.current = true;
-        exitAssistRef.current = "up";
-        dispatchInSection(false);
-        // onTouchEnd will call startExitAssist() when it fires (finger is down now).
-        // The momentum-phase assist-start path is intentionally removed — releases only
-        // happen finger-down, so onTouchEnd always follows this branch.
-        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(delta), fgr: fingerDownRef.current, burst: burstLockRef.current, exit: true, assist: "up", evt: "sc-exit-up" });
-        return; // Do NOT clamp — let native momentum exit upward
-      }
-      if (
-        fingerDownRef.current &&
-        gestureStartStepRef.current === STEP_COUNT - 1 &&
-        stepRef.current === STEP_COUNT - 1 &&
-        gestureDelta > BOUNDARY_EXIT_EPSILON_PX
-      ) {
-        // Snap card to rest before releasing so no residual fade shows while scrolling away
-        cardY.stop(); cardOpacity.stop(); cardY.set(0); cardOpacity.set(1);
-        engagedRef.current = false;
-        exitingRef.current = true;
-        exitAssistRef.current = "down";
-        dispatchInSection(false);
-        // onTouchEnd will call startExitAssist() when it fires (finger is down now).
-        // The momentum-phase assist-start path is intentionally removed — releases only
-        // happen finger-down, so onTouchEnd always follows this branch.
-        if (FQ_DEBUG) writeHud({ eng: false, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(delta), fgr: fingerDownRef.current, burst: burstLockRef.current, exit: true, assist: "down", evt: "sc-exit-dn" });
-        return; // Do NOT clamp — let native momentum exit downward
-      }
-
-      // Requirement 4: skip card-drive for exit-direction deltas at boundary steps.
-      // The release fires at ±BOUNDARY_EXIT_EPSILON_PX (8px) on gesture-relative delta,
-      // but the first 1-2 scroll events under that threshold must also not flash a fade.
-      // Use gestureDelta (gesture-relative) so anchor drift doesn't block card-drive in
-      // the non-exit direction.
-      const isBoundaryExitDirection =
-        (gestureStartStepRef.current === 0 && stepRef.current === 0 && gestureDelta < 0) ||
-        (gestureStartStepRef.current === STEP_COUNT - 1 && stepRef.current === STEP_COUNT - 1 && gestureDelta > 0);
-
-      if (fingerDownRef.current && !burstLockRef.current && !isBoundaryExitDirection) {
-        // Mid-gesture: drive card from scroll delta
-        const liveCardY = gestureBaseCardYRef.current - delta;
-        cardY.set(liveCardY);
-        cardOpacity.set(Math.max(0, 1 - Math.abs(liveCardY) / FADE_DISTANCE_PX));
-        deltaSamplesRef.current.push({ d: delta, t: performance.now() });
-        if (deltaSamplesRef.current.length > 4) deltaSamplesRef.current.shift();
-      } else if (fingerDownRef.current && burstLockRef.current) {
-        // Finger down but burst lock active — absorb without driving cardY
-      } else if (!fingerDownRef.current) {
-        if (burstLockRef.current) {
-          // Reset quiet-gap timer — absorb momentum-leak without clamping or driving cardY
-          if (burstTimerRef.current !== null) clearTimeout(burstTimerRef.current);
-          burstTimerRef.current = setTimeout(() => { burstLockRef.current = false; }, 150);
-        } else {
-          // Stray momentum (no finger, no burst lock, not exiting) — kill it
-          window.scrollTo(0, anchorYRef.current);
+      // A still-down finger reversing against a live exit glide reclaims control:
+      // cancel the glide and re-engage on the same card — but ONLY while the pin
+      // still holds. Cancelling without re-engaging would strand the page
+      // mid-glide with a dead (captured) finger; once the pin edge has crossed,
+      // the exit is already visibly animating — let it finish. (Co-directional
+      // motion must NOT cancel — the same gesture's next move would otherwise
+      // kill every mid-gesture exit instantly.)
+      if (exitAnimRef.current !== null && touchActiveRef.current) {
+        const d = y - glideStartTouchYRef.current;
+        const reversed =
+          glideDirRef.current === "up" ? d < -GLIDE_CANCEL_REVERSAL_PX : d > GLIDE_CANCEL_REVERSAL_PX;
+        if (reversed && isPinned()) {
+          cancelExitGlide();
+          engage(stepRef.current);
+          lastEvt = "glide-cancel";
         }
       }
 
-      if (FQ_DEBUG) writeHud({ eng: engagedRef.current, step: stepRef.current, gs: gestureStartStepRef.current, anchor: Math.round(anchorYRef.current), delta: Math.round(delta), fgr: fingerDownRef.current, burst: burstLockRef.current, exit: exitingRef.current, assist: exitAssistRef.current, evt: "sc" });
+      if (!engagedRef.current) return;
+      // Mid-gesture captures may be an active native scroll (non-cancelable) —
+      // the scroll clamp below holds the page for those; the card still follows.
+      if (e.cancelable) e.preventDefault();
+      else nativePanRef.current = true; // browser owns this gesture as a scroll
+
+      const dy = y - gestureStartYRef.current;
+      const samples = touchSamplesRef.current;
+      samples.push({ y, t: e.timeStamp });
+      if (samples.length > 5) samples.shift();
+
+      const atFirst = stepRef.current === 0;
+      const atLast = stepRef.current === STEP_COUNT - 1;
+      const exitDrag = (atFirst && dy > 0) || (atLast && dy < 0);
+
+      if (exitDrag) {
+        // Past the commit distance the gesture leaves the section immediately —
+        // no waiting for the finger to lift. ONLY for fully captured gestures:
+        // a native-pan capture has a live scroll writer, so starting the glide
+        // now would drop the clamp and fight it — those exit at touchend instead.
+        if (Math.abs(dy) > COMMIT_DISTANCE_PX && !nativePanRef.current) {
+          lastEvt = "exit-drag";
+          startExitGlide(atLast ? "down" : "up");
+          return;
+        }
+        // Under it (or a native pan): rubber-band resistance.
+        const ry = gestureBaseCardYRef.current + dy * RUBBER_BAND;
+        cardY.set(ry);
+        cardOpacity.set(fadeFrom(ry));
+      } else {
+        const targetY = gestureBaseCardYRef.current + dy;
+        cardY.set(targetY);
+        cardOpacity.set(fadeFrom(targetY));
+      }
+      lastEvt = "tm";
     };
 
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-    el.addEventListener("touchcancel", onTouchEnd, { passive: true });
-    window.addEventListener("scroll", onScrollDelta, { passive: true });
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        // A finger remains — hand the gesture to it.
+        const touch = e.touches[0];
+        lastTouchYRef.current = touch.clientY;
+        if (engagedRef.current) {
+          gestureStartYRef.current = touch.clientY;
+          gestureBaseCardYRef.current = cardY.get();
+          gestureBaseOpacityRef.current = cardOpacity.get();
+          touchSamplesRef.current = [{ y: touch.clientY, t: e.timeStamp }];
+        }
+        return;
+      }
+      touchActiveRef.current = false;
+      if (!engagedRef.current) return;
+
+      const dy = lastTouchYRef.current - gestureStartYRef.current;
+      const samples = touchSamplesRef.current;
+      let v = 0; // px/ms; negative = upward flick
+      if (samples.length >= 2) {
+        const a = samples[0];
+        const b = samples[samples.length - 1];
+        // A pause before release means the drag is a position, not a flick.
+        if (b.t > a.t && e.timeStamp - b.t < VELOCITY_STALE_MS) v = (b.y - a.y) / (b.t - a.t);
+      }
+      const flick = Math.abs(v) > COMMIT_VELOCITY;
+      const shouldCommit = flick || Math.abs(dy) > COMMIT_DISTANCE_PX;
+      // Flick direction wins over net displacement (drag down, flick up → up).
+      const dir: "up" | "down" = flick ? (v < 0 ? "up" : "down") : dy < 0 ? "up" : "down";
+
+      if (!shouldCommit) {
+        springBack();
+        lastEvt = "te-spring";
+      } else if (dir === "up" && stepRef.current === STEP_COUNT - 1) {
+        startExitGlide("down");
+        lastEvt = "te-exit-dn";
+      } else if (dir === "down" && stepRef.current === 0) {
+        startExitGlide("up");
+        lastEvt = "te-exit-up";
+      } else {
+        commitCard(dir);
+        lastEvt = "te-commit";
+      }
+    };
+
+    // A canceled gesture (system UI stole the touch — notification shade, edge
+    // gesture, incoming call) must never commit a step or fire an exit glide.
+    const onTouchCancel = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        // A finger remains — hand the gesture to it, same as touchend.
+        const touch = e.touches[0];
+        lastTouchYRef.current = touch.clientY;
+        if (engagedRef.current) {
+          gestureStartYRef.current = touch.clientY;
+          gestureBaseCardYRef.current = cardY.get();
+          gestureBaseOpacityRef.current = cardOpacity.get();
+          touchSamplesRef.current = [{ y: touch.clientY, t: e.timeStamp }];
+        }
+        return;
+      }
+      touchActiveRef.current = false;
+      if (engagedRef.current) springBack();
+      lastEvt = "tc";
+    };
+
+    // Single scroll writer at all times:
+    //  • glide live → re-assert the glide's last written position, so a captured
+    //    native pan or its fling momentum can't fight the exit;
+    //  • engaged → re-clamp to the anchor (invisible under the sticky pin).
+    const onScroll = () => {
+      if (exitAnimRef.current !== null) {
+        if (Math.abs(window.scrollY - glideScrollYRef.current) > 0.5) {
+          window.scrollTo(0, glideScrollYRef.current);
+        }
+        return;
+      }
+      if (!engagedRef.current) return;
+      if (Math.abs(window.scrollY - anchorYRef.current) > 0.5) {
+        window.scrollTo(0, anchorYRef.current);
+      }
+    };
+
+    // Wheel/keyboard scrolling (trackpad, mouse, PageDown — narrow windows,
+    // iPad + keyboard, Android + mouse) has no touch gestures to swipe out with:
+    // engaging would trap the page at the anchor with the header hidden. Any
+    // pointer-scroll input disengages and suppresses engagement while it lasts;
+    // the section then behaves as a plain sticky scroll-through. The event fires
+    // before the scroll it causes, so the clamp is already off when scroll lands.
+    const onPointerScroll = () => {
+      pointerScrollUntilRef.current = performance.now() + POINTER_SCROLL_COOLDOWN_MS;
+      if (engagedRef.current) disengage();
+    };
+    const SCROLL_KEYS = new Set([" ", "Spacebar", "PageDown", "PageUp", "ArrowDown", "ArrowUp", "Home", "End"]);
+    const onKeyDown = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (SCROLL_KEYS.has(e.key)) onPointerScroll();
+    };
+
+    const onOrientationChange = () => {
+      cancelExitGlide();
+      disengage();
+      setStep(0);
+      stepRef.current = 0;
+      consecutivePinCount = 0;
+    };
+
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchCancel, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("wheel", onPointerScroll, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("orientationchange", onOrientationChange);
 
     return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchEnd);
-      window.removeEventListener("scroll", onScrollDelta);
-      if (burstTimerRef.current !== null) {
-        clearTimeout(burstTimerRef.current);
-        burstTimerRef.current = null;
-      }
-      if (exitAssistTimerRef.current !== null) {
-        clearTimeout(exitAssistTimerRef.current);
-        exitAssistTimerRef.current = null;
-      }
-      exitAssistRef.current = null;
+      cancelAnimationFrame(raf);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchCancel);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onPointerScroll);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("orientationchange", onOrientationChange);
+      cancelExitGlide();
+      engagedRef.current = false;
+      touchActiveRef.current = false;
+      el.style.touchAction = "";
       dispatchInSection(false);
     };
   }, [isDesktop, cardY, cardOpacity]);
