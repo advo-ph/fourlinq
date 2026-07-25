@@ -54,9 +54,14 @@ const ProjectDetail = () => {
     return () => { active = false; };
   }, []);
 
-  // Fetch merged project-images data for per-project ratio, hidden images, and
-  // hidden/deleted project IDs. Uses the same /api/project-images/merged endpoint
-  // as Inspiration.tsx; TanStack is not used here so we mirror the plain-fetch pattern.
+  // Admin-set cover image path for this project. When set, it becomes the first
+  // (hero) photo in the gallery. Falls back to the project's baseline hero.
+  const [projectCoverImages, setProjectCoverImages] = useState<MergedProjectImagesResponse["projectCoverImages"]>({});
+
+  // Fetch merged project-images data for per-project ratio, hidden images,
+  // hidden/deleted project IDs, and cover image overrides.
+  // Uses the same /api/project-images/merged endpoint as Inspiration.tsx;
+  // TanStack is not used here so we mirror the plain-fetch pattern.
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/project-images/merged", { signal: controller.signal })
@@ -70,6 +75,7 @@ const ProjectDetail = () => {
         setHiddenProjectIds(
           new Set([...(data.hiddenProjects ?? []), ...(data.deletedProjects ?? [])])
         );
+        setProjectCoverImages(data.projectCoverImages ?? {});
       })
       .catch(() => {
         // Swallow — hero defaults to 16:9, no images hidden on failure
@@ -120,14 +126,30 @@ const ProjectDetail = () => {
   // which matches the paths stored in projects.ts, so no normalization is needed.
   const projectHiddenSet = new Set(hiddenImages[selectedProject.id] ?? []);
 
+  // Admin-set cover path for this project. The server already excludes covers
+  // pointing at hidden images, but we also guard here defensively.
+  const adminCoverPath = (() => {
+    const c = projectCoverImages?.[selectedProject.id];
+    return c && !projectHiddenSet.has(c) ? c : null;
+  })();
+
   // Build the full gallery list (hero + extras), filtering out hidden images.
-  const visibleGalleryPhotos: Array<{ src: string; alt: string }> = [
+  // If a cover override exists, place it first; then the remaining baseline
+  // images (hero + gallery), deduplicating the cover if it appears in that list.
+  const baseGalleryPhotos: Array<{ src: string; alt: string }> = [
     { src: selectedProject.image, alt: selectedProject.name },
     ...(selectedProject.gallery ?? []).map((src, i) => ({
       src,
       alt: `${selectedProject.name} detail ${i + 1}`,
     })),
   ].filter((photo) => !projectHiddenSet.has(photo.src));
+
+  const visibleGalleryPhotos: Array<{ src: string; alt: string }> = adminCoverPath
+    ? [
+        { src: adminCoverPath, alt: selectedProject.name },
+        ...baseGalleryPhotos.filter((p) => p.src !== adminCoverPath),
+      ]
+    : baseGalleryPhotos;
 
   // If the hero image was hidden and filtered out, fall back to the first
   // remaining gallery photo so we never show a blank first slide.

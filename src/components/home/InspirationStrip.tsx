@@ -4,7 +4,7 @@ import FeatureLink from "@/components/primitives/FeatureLink";
 import { projects as allProjects } from "@/data/projects";
 import { toThumbPath } from "@/lib/project-thumbs";
 import { cn } from "@/lib/utils";
-import type { MergedProjectImagesResponse } from "@/types/project-images";
+import { fetchMergedProjectImages } from "@/lib/merged-project-images";
 
 const FB = "/images/projects-fb";
 
@@ -27,28 +27,32 @@ const STICKY_TOP = 88;
 // natural aspect ratio (no cropping); the left column is a sticky feature that
 // crossfades through five heroes as you scroll, with a thin top line tracking
 // scroll position within the current part. (Per Prince, 2026-07-22.)
-const ProjectTile = ({ project }: { project: (typeof allProjects)[number] }) => (
-  <Link
-    to={`/projects/${project.id}`}
-    className="group block overflow-hidden rounded-sm bg-[color:var(--canvas-soft)]"
-  >
-    <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
-      <img
-        src={toThumbPath(project.image)}
-        alt={project.name}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.04]"
-        onError={(e) => {
-          // Thumb missing (e.g. newly added image) — fall back to full-res.
-          if ((e.currentTarget as HTMLImageElement).src !== project.image) {
-            (e.currentTarget as HTMLImageElement).src = project.image;
-          }
-        }}
-      />
-    </div>
-  </Link>
-);
+const ProjectTile = ({ project, coverSrc }: { project: (typeof allProjects)[number]; coverSrc?: string }) => {
+  // Use admin-set cover if available, otherwise the baseline project hero.
+  const imageSrc = coverSrc ?? project.image;
+  return (
+    <Link
+      to={`/projects/${project.id}`}
+      className="group block overflow-hidden rounded-sm bg-[color:var(--canvas-soft)]"
+    >
+      <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
+        <img
+          src={toThumbPath(imageSrc)}
+          alt={project.name}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.04]"
+          onError={(e) => {
+            // Thumb missing (e.g. newly added image) — fall back to full-res.
+            if ((e.currentTarget as HTMLImageElement).src !== imageSrc) {
+              (e.currentTarget as HTMLImageElement).src = imageSrc;
+            }
+          }}
+        />
+      </div>
+    </Link>
+  );
+};
 
 const InspirationStrip = () => {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -59,15 +63,15 @@ const InspirationStrip = () => {
   // the merged API response arrives. Until then, all projects are visible
   // (same baseline behaviour as before this fix).
   const [projects, setProjects] = useState(allProjects);
+  // Admin-set cover images: projectId → cover image path. Empty until the
+  // merged API responds. Tiles fall back to the baseline hero when absent.
+  const [coverImages, setCoverImages] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/project-images/merged", { signal: controller.signal })
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json() as Promise<MergedProjectImagesResponse>;
-      })
+    let live = true;
+    fetchMergedProjectImages()
       .then((data) => {
+        if (!live) return;
         const hiddenSet = new Set([
           ...(data.hiddenProjects ?? []),
           ...(data.deletedProjects ?? []),
@@ -75,11 +79,14 @@ const InspirationStrip = () => {
         if (hiddenSet.size > 0) {
           setProjects(allProjects.filter((p) => !hiddenSet.has(p.id)));
         }
+        if (data.projectCoverImages && Object.keys(data.projectCoverImages).length > 0) {
+          setCoverImages(data.projectCoverImages);
+        }
       })
       .catch(() => {
         // Swallow — keep showing the full project list on failure
       });
-    return () => { controller.abort(); };
+    return () => { live = false; };
   }, []);
 
   useEffect(() => {
@@ -215,7 +222,7 @@ const InspirationStrip = () => {
           <div className="columns-2 xl:columns-3 gap-3 lg:gap-4">
             {projects.map((p) => (
               <div key={p.id} className="mb-3 lg:mb-4 break-inside-avoid">
-                <ProjectTile project={p} />
+                <ProjectTile project={p} coverSrc={coverImages[p.id]} />
               </div>
             ))}
           </div>

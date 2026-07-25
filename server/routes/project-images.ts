@@ -91,6 +91,10 @@ export interface MergedResponse {
   hiddenProjects: string[];
   deletedProjects: string[];
   projectRatios: Record<string, string>;
+  /** projectId → admin-chosen cover image path for All-projects cards, project hero,
+   *  and InspirationStrip tiles. A cover pointing at a hidden image is omitted
+   *  (falls back to normal logic on the client). */
+  projectCoverImages: Record<string, string>;
 }
 
 interface OverrideRow {
@@ -220,6 +224,7 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
   const deletedProjectSet = new Set<string>(); // projectIds with project_deleted override
   const projectRatioMap = new Map<string, string>(); // projectId → value_text ('16:9' | '4:3')
   const scoreOverrideMap = new Map<string, Map<string, number>>(); // "projectId|imagePath" → category → value_int
+  const projectCoverMap = new Map<string, string>(); // projectId → cover image path (value_text)
 
   for (const row of overrides) {
     switch (row.override_type) {
@@ -268,6 +273,11 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
           if (!scoreOverrideMap.has(key)) scoreOverrideMap.set(key, new Map());
           scoreOverrideMap.get(key)!.set(row.category, row.value_int);
         }
+        break;
+      case "project_cover":
+        // image_path = '__project__', value_text = the chosen cover image path.
+        // One row per project enforced by the uq_pio_coalesce unique index.
+        if (row.value_text) projectCoverMap.set(row.project_id, row.value_text);
         break;
       // image_flagged: no server-side action needed; purely a visual marker for admin
     }
@@ -377,6 +387,16 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     projectRatios[id] = ratio;
   }
 
+  // Build projectCoverImages for public payload.
+  // A cover path that is hidden (via the hiddenSet) is excluded so the client
+  // never inadvertently renders a hidden image.
+  const projectCoverImages: Record<string, string> = {};
+  for (const [projectId, coverPath] of projectCoverMap.entries()) {
+    // Skip if the cover image itself is hidden
+    if (hiddenSet.has(`${projectId}|${coverPath}`)) continue;
+    projectCoverImages[projectId] = coverPath;
+  }
+
   return {
     projectCategoryImages: effectiveCategoryImages,
     projectDerivedTags: effectiveDerivedTags,
@@ -390,6 +410,7 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     hiddenProjects: [...hiddenProjectSet],
     deletedProjects: [...deletedProjectSet],
     projectRatios,
+    projectCoverImages,
   };
 }
 
@@ -442,7 +463,8 @@ projectImagesPublic.get("/merged", async (req, res) => {
     let overrides: OverrideRow[] = [];
     try {
       const { rows } = await pool.query<OverrideRow>(
-        `SELECT * FROM project_image_override WHERE organization_id = 1 ORDER BY project_id, override_type, value_int`
+        `SELECT project_id, image_path, override_type, category, value_text, value_int
+         FROM project_image_override WHERE organization_id = 1 ORDER BY project_id, override_type, value_int`
       );
       overrides = rows;
     } catch (dbErr) {
@@ -507,7 +529,7 @@ projectImagesAdmin.post("/overrides", async (req, res) => {
       "hidden", "replaced", "best_for_category",
       "project_order", "category_order", "image_order",
       "project_flagged", "project_checked", "project_hidden", "project_deleted",
-      "project_ratio", "score_override", "image_flagged",
+      "project_ratio", "score_override", "image_flagged", "project_cover",
     ];
     if (!validTypes.includes(override_type)) {
       return res.status(400).json({ error: `Invalid override_type: ${override_type}` });
@@ -721,6 +743,10 @@ projectImagesAdmin.post("/apply-exterior-first", async (_req, res) => {
     let applied = 0;
     let skipped = 0;
 
+    // Collect all (organization_id, project_id, image_path, override_type, category, value_text, value_int)
+    // tuples across all projects so we can do a single batched INSERT.
+    const batchValues: Array<[number, string, string, string, null, null, number]> = [];
+
     for (const c of canon) {
       if (alreadyOrdered.has(c.id)) { skipped++; continue; }
       const rec = manifest.projects[c.id];
@@ -751,19 +777,32 @@ projectImagesAdmin.post("/apply-exterior-first", async (_req, res) => {
       const otherPaths = c.webPaths.filter((p) => p !== bestFirst);
       const orderedPaths = [bestFirst, ...otherPaths];
 
-      // Bulk UPSERT image_order rows for this project
-      const values = orderedPaths
-        .map((p, idx) => `(1, '${c.id.replace(/'/g, "''")}', '${p.replace(/'/g, "''")}', 'image_order', NULL, NULL, ${idx})`)
+      for (let idx = 0; idx < orderedPaths.length; idx++) {
+        batchValues.push([1, c.id, orderedPaths[idx], "image_order", null, null, idx]);
+      }
+      applied++;
+    }
+
+    if (batchValues.length > 0) {
+      // Build a single multi-row INSERT with positional parameters so no user
+      // data touches the query string. Each tuple needs 7 parameters.
+      const placeholders = batchValues
+        .map((_, i) => {
+          const base = i * 7;
+          return `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6}, $${base + 7})`;
+        })
         .join(",\n");
+
+      const params = batchValues.flat();
 
       await pool.query(
         `INSERT INTO project_image_override
            (organization_id, project_id, image_path, override_type, category, value_text, value_int)
-         VALUES ${values}
+         VALUES ${placeholders}
          ON CONFLICT (organization_id, project_id, image_path, override_type, COALESCE(category, ''))
-         DO UPDATE SET value_int = EXCLUDED.value_int, updated_at = NOW()`
+         DO UPDATE SET value_int = EXCLUDED.value_int, updated_at = NOW()`,
+        params
       );
-      applied++;
     }
 
     res.json({ applied, skipped, message: `Applied exterior-first order to ${applied} projects; skipped ${skipped} already-ordered projects.` });

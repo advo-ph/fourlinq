@@ -39,16 +39,16 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
     if (isHoverDevice()) setHoveredIdx(null);
   };
 
-  // Thumbnail grid class: 1-col for ≤6 photos, 2-col for >6
+  // Thumbnail grid class: 1-col for ≤4 photos, 2-col for >4
   const railGridClass =
-    photos.length > 6 ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-3";
+    photos.length > 4 ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-3";
 
   const thumbButtonClass = (i: number) =>
     cn(
       "block w-full aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)] transition-opacity duration-300 ease-marvin",
       i === activeIdx
-        ? "ring-1 ring-[color:var(--accent)] opacity-100"
-        : "ring-1 ring-[color:var(--rule-soft)] opacity-70 hover:opacity-100"
+        ? "ring-2 ring-inset ring-[color:var(--accent)] opacity-100"
+        : "ring-1 ring-inset ring-[color:var(--rule-soft)] opacity-70 hover:opacity-100"
     );
 
   const photoStack = (
@@ -69,18 +69,9 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
     </>
   );
 
-  const scrimOverlay = (
-    <div
-      className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/65 via-black/25 to-transparent pointer-events-none"
-      aria-hidden="true"
-    />
-  );
-
   const titleOverlay = (
-    <div className="absolute bottom-0 left-0 p-8 lg:p-12 pointer-events-none">
-      <h1
-        className="font-serif text-h3 lg:text-h2 xl:text-h1 tracking-tight text-white text-balance max-w-[20ch] drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)]"
-      >
+    <div className="absolute inset-x-0 bottom-0 pointer-events-none bg-gradient-to-t from-black/70 via-black/30 to-transparent pt-20 sm:pt-24 lg:pt-32 px-5 pb-5 sm:px-8 sm:pb-7 lg:px-12 lg:pb-10">
+      <h1 className="font-serif text-h4 sm:text-h3 lg:text-h2 xl:text-h1 tracking-tight text-white text-balance max-w-[20ch] drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)]">
         {title}
       </h1>
     </div>
@@ -99,7 +90,6 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
         {/* Left: large photo panel */}
         <div className="relative flex-1 overflow-hidden bg-[color:var(--canvas-soft)]">
           {photoStack}
-          {scrimOverlay}
           {titleOverlay}
         </div>
 
@@ -139,7 +129,6 @@ const ProjectHeroGallery = ({ photos, title, className }: ProjectHeroGalleryProp
         {/* Hero image */}
         <div className="relative h-[68svh] overflow-hidden w-full bg-[color:var(--canvas-soft)]">
           {photoStack}
-          {scrimOverlay}
           {titleOverlay}
         </div>
 

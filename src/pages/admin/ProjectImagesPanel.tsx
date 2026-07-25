@@ -53,6 +53,7 @@ import {
   Sliders,
   ArrowUpDown,
   Ratio as RatioIcon,
+  Star,
 } from "lucide-react";
 import { toThumbPath } from "@/lib/project-thumbs";
 import { nearestRatioLabel } from "@/lib/image-ratio";
@@ -334,6 +335,8 @@ function ProjectOrderRow({
   isCurrentProject,
   flagged,
   checked,
+  hidden,
+  deleted,
   onOpen,
 }: {
   pid: string;
@@ -342,6 +345,8 @@ function ProjectOrderRow({
   isCurrentProject: boolean;
   flagged: boolean;
   checked: boolean;
+  hidden: boolean;
+  deleted: boolean;
   onOpen: (id: string) => void;
 }) {
   const displayName = projectDisplayName(pid);
@@ -354,6 +359,8 @@ function ProjectOrderRow({
       </span>
       {flagged && <Flag size={10} className="text-orange-500 shrink-0" />}
       {checked && <Check size={10} className="text-green-600 shrink-0" />}
+      {hidden && <span title="Hidden"><EyeOff size={10} className="text-muted-foreground/60 shrink-0" /></span>}
+      {deleted && <span title="Deleted"><Trash2 size={10} className="text-destructive/60 shrink-0" /></span>}
       {isCurrentProject && <span className="text-[9px] bg-primary/20 text-primary px-1 py-0.5 rounded shrink-0">this</span>}
     </>
   );
@@ -534,11 +541,14 @@ function ImageRow({
   replacedUrl,
   bestForCategories,
   flagged,
+  isCover,
   onHide,
   onUnhide,
   onReplaced,
   onFlag,
   onUnflag,
+  onSetCover,
+  onUnsetCover,
   onSaveScores,
   onOpenLightbox,
 }: {
@@ -548,11 +558,14 @@ function ImageRow({
   replacedUrl: string | null;
   bestForCategories: Category[];
   flagged: boolean;
+  isCover: boolean;
   onHide: () => void;
   onUnhide: () => void;
   onReplaced: (url: string) => void;
   onFlag: () => void;
   onUnflag: () => void;
+  onSetCover: () => void;
+  onUnsetCover: () => void;
   onSaveScores: (scores: Record<Category, number>) => Promise<void>;
   onOpenLightbox: () => void;
 }) {
@@ -633,6 +646,11 @@ function ImageRow({
                 Best: {CATEGORY_LABELS[cat]}
               </span>
             ))}
+            {isCover && (
+              <span className="text-[10px] px-1.5 py-0.5 bg-primary/15 text-primary rounded font-medium flex items-center gap-0.5">
+                <Star size={9} className="fill-primary" /> Preview
+              </span>
+            )}
           </div>
 
           {/* AI Scores */}
@@ -702,6 +720,22 @@ function ImageRow({
             >
               <Flag size={13} /> {flagged ? "Flagged" : "Flag"}
             </button>
+
+            {/* Set as Preview (project cover) */}
+            {!isHidden && (
+              <button
+                onClick={isCover ? onUnsetCover : onSetCover}
+                className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded transition-colors ${
+                  isCover
+                    ? "bg-primary/15 text-primary hover:bg-primary/25"
+                    : "bg-muted text-muted-foreground hover:bg-border"
+                }`}
+                title={isCover ? "Remove as project preview (cover) image" : "Set as project preview (cover) image"}
+              >
+                <Star size={13} className={isCover ? "fill-primary" : ""} />
+                {isCover ? "Preview" : "Set as Preview"}
+              </button>
+            )}
 
             {/* B3: Modify values (replaces Set best) */}
             {!isHidden && (
@@ -858,6 +892,13 @@ function ProjectDetailView({
       .map((r) => r.image_path)
   );
 
+  // Derive the current project cover path from overrides.
+  // Storage: image_path = '__project__', value_text = the cover image path.
+  const coverRow = projectOverrides.find(
+    (r) => r.override_type === "project_cover" && r.image_path === "__project__"
+  );
+  const coverPath = coverRow?.value_text ?? null;
+
   const staleOverrides = projectOverrides.filter((r) => r.stale);
 
   // Project order lists
@@ -872,11 +913,44 @@ function ProjectDetailView({
     exterior: categoryProjectOrder("exterior"),
   });
 
+  // FIX 4: Drag guard — prevents resync effects from clobbering an in-progress drag.
+  const isDraggingRef = useRef(false);
+
+  // FIX 4: Resync allOrderIds / catOrderIds whenever baselineData changes (e.g. after
+  // a save mutation causes TanStack to refetch). Skip if a drag is in progress so
+  // the live drag state is not interrupted.
+  useEffect(() => {
+    if (isDraggingRef.current) return;
+    setAllOrderIds([...baselineData.projectOrder]);
+    setCatOrderIds({
+      windows: [...(baselineData.projectCategoryOrder.windows ?? [])],
+      doors: [...(baselineData.projectCategoryOrder.doors ?? [])],
+      interior: [...(baselineData.projectCategoryOrder.interior ?? [])],
+      exterior: [...(baselineData.projectCategoryOrder.exterior ?? [])],
+    });
+  }, [baselineData]);
+
+  // FIX 4: Resync imageOrderIds when the overrides data changes for the current
+  // project (currently only resyncs on project navigation). Skip if dragging.
+  useEffect(() => {
+    if (isDraggingRef.current) return;
+    setImageOrderIds(computeImageOrder(
+      project.images,
+      overrides.filter((r) => r.project_id === project.id),
+    ));
+  }, [overrides, project.id, project.images]);
+
   // distance: 8 keeps plain clicks (e.g. opening the lightbox) from ever starting a drag
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
+  // FIX 4: Set drag flag on start so resync effects don't clobber an in-progress drag.
+  function handleDragStart() {
+    isDraggingRef.current = true;
+  }
+
   // DnD handlers
   async function handleProjectOrderEnd(event: DragEndEvent, ids: string[], setIds: (ids: string[]) => void, overrideType: "project_order" | "category_order", category?: Category) {
+    isDraggingRef.current = false;
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIdx = ids.indexOf(String(active.id));
@@ -898,6 +972,7 @@ function ProjectDetailView({
   }
 
   async function handleImageOrderEnd(event: DragEndEvent) {
+    isDraggingRef.current = false;
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIdx = imageOrderIds.indexOf(String(active.id));
@@ -952,8 +1027,11 @@ function ProjectDetailView({
               const heroPath = project.quality?.heroImage ?? project.images[0]?.path;
               if (!heroPath) return;
               const heroImage = project.images.find((im) => im.path === heroPath);
+              // FIX 3: use the replaced URL if one exists, so the lightbox shows the
+              // actual current image rather than the original (replaced) path.
+              const heroSrc = replacedMap.get(heroPath) ?? heroPath;
               setLightbox({
-                src: heroPath,
+                src: heroSrc,
                 filename: heroPath.split("/").pop() ?? heroPath,
                 scores: heroImage?.scores ?? null,
                 reasoning: heroImage?.reasoning ?? "",
@@ -963,11 +1041,12 @@ function ProjectDetailView({
             className="shrink-0 cursor-zoom-in rounded overflow-hidden border border-border/40 hover:border-primary/40 transition-colors"
           >
             <img
-              src={toThumbPath(project.quality?.heroImage ?? project.images[0]?.path ?? "")}
+              src={toThumbPath(replacedMap.get(project.quality?.heroImage ?? project.images[0]?.path ?? "") ?? (project.quality?.heroImage ?? project.images[0]?.path ?? ""))}
               alt=""
               className="h-20 w-28 object-cover"
               onError={(e) => {
-                const full = project.quality?.heroImage ?? project.images[0]?.path;
+                const heroPath = project.quality?.heroImage ?? project.images[0]?.path;
+                const full = heroPath ? (replacedMap.get(heroPath) ?? heroPath) : undefined;
                 if (full) (e.currentTarget as HTMLImageElement).src = full;
               }}
             />
@@ -1091,7 +1170,7 @@ function ProjectDetailView({
         {/* G — Within-project image order */}
         <div className="mb-4 p-3 bg-muted/30 rounded-lg border border-border/40">
           <p className="text-[11px] text-muted-foreground mb-2 font-medium">Drag to reorder images within this project</p>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleImageOrderEnd}>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleImageOrderEnd}>
             <SortableContext items={imageOrderIds} strategy={verticalListSortingStrategy}>
               <div className="space-y-2">
                 {imageOrderIds.map((imgPath) => {
@@ -1107,6 +1186,7 @@ function ProjectDetailView({
                           replacedUrl={replacedMap.get(image.path) ?? null}
                           bestForCategories={bestForCatMap.get(image.path) ?? []}
                           flagged={imageFlaggedSet.has(image.path)}
+                          isCover={coverPath === image.path}
                           onHide={async () => {
                             await onAddOverride({ project_id: project.id, image_path: image.path, override_type: "hidden" });
                           }}
@@ -1123,6 +1203,20 @@ function ProjectDetailView({
                           onUnflag={async () => {
                             const row = projectOverrides.find((r) => r.override_type === "image_flagged" && r.image_path === image.path);
                             if (row) await onDeleteOverride(row.project_image_override_id);
+                          }}
+                          onSetCover={async () => {
+                            // UPSERT: image_path = '__project__', value_text = the chosen image path.
+                            // The uq_pio_coalesce index on (org, project_id, '__project__', 'project_cover', '')
+                            // ensures only one cover row per project; the ON CONFLICT DO UPDATE replaces it.
+                            await onAddOverride({
+                              project_id: project.id,
+                              image_path: "__project__",
+                              override_type: "project_cover",
+                              value_text: image.path,
+                            });
+                          }}
+                          onUnsetCover={async () => {
+                            if (coverRow) await onDeleteOverride(coverRow.project_image_override_id);
                           }}
                           onSaveScores={async (scores) => {
                             await Promise.all(
@@ -1184,7 +1278,7 @@ function ProjectDetailView({
 
         {/* Section E — All-projects order */}
         {orderTab === "all" && (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleProjectOrderEnd(e, allOrderIds, setAllOrderIds, "project_order")}>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleProjectOrderEnd(e, allOrderIds, setAllOrderIds, "project_order")}>
             <SortableContext items={allOrderIds} strategy={verticalListSortingStrategy}>
               <div className="space-y-1 max-h-80 overflow-y-auto rounded border border-border p-2">
                 {allOrderIds.map((pid, idx) => {
@@ -1200,6 +1294,8 @@ function ProjectDetailView({
                           isCurrentProject={pid === project.id}
                           flagged={p?.flagged ?? false}
                           checked={p?.checked ?? false}
+                          hidden={p?.hidden ?? false}
+                          deleted={p?.deleted ?? false}
                           onOpen={onSelectProject}
                         />
                       )}
@@ -1216,6 +1312,7 @@ function ProjectDetailView({
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
             onDragEnd={(e) => {
               const cat = orderTab as Category;
               handleProjectOrderEnd(e, catOrderIds[cat], (ids) => setCatOrderIds((prev) => ({ ...prev, [cat]: ids })), "category_order", cat);
@@ -1237,6 +1334,8 @@ function ProjectDetailView({
                           isCurrentProject={pid === project.id}
                           flagged={p?.flagged ?? false}
                           checked={p?.checked ?? false}
+                          hidden={p?.hidden ?? false}
+                          deleted={p?.deleted ?? false}
                           onOpen={onSelectProject}
                         />
                       )}

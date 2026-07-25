@@ -43,4 +43,10 @@ export interface MergedProjectImagesResponse {
 
   /** projectIds soft-deleted (project_deleted override). Server already excludes from ordering. */
   deletedProjects?: string[];
+
+  /** projectId → admin-chosen cover image path. Used as the representative image for
+   *  All-projects cards in Inspiration, the InspirationStrip catalog tiles, and the
+   *  ProjectDetail hero. A cover pointing at a hidden image is omitted by the server;
+   *  clients should also guard defensively. */
+  projectCoverImages?: Record<string, string>;
 }

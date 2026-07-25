@@ -14,6 +14,7 @@ import { fetchProjects, mergeProject } from "@/lib/cms-api";
 import { cn } from "@/lib/utils";
 import type { MergedProjectImagesResponse } from "@/types/project-images";
 import { toThumbPath } from "@/lib/project-thumbs";
+import { fetchMergedProjectImages } from "@/lib/merged-project-images";
 
 type Filter = "all" | InspirationTag;
 
@@ -195,14 +196,12 @@ const Inspiration = () => {
 
   // Runtime merge fetch — background; on success updates ordering and category images;
   // on failure the baked BASELINE_MERGED stays in place (no blank screen, no error UI).
+  // Uses the shared module-level cache so concurrent callers share one in-flight request.
   useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/project-images/merged", { signal: controller.signal })
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json() as Promise<MergedProjectImagesResponse>;
-      })
+    let live = true;
+    fetchMergedProjectImages()
       .then((data) => {
+        if (!live) return;
         setMergedData(data);
         // Build a set of project IDs that should not appear on the public site.
         // The server already excludes them from projectOrder/projectCategoryOrder,
@@ -227,7 +226,7 @@ const Inspiration = () => {
       .catch(() => {
         // Swallow — baseline already rendered, nothing to do
       });
-    return () => { controller.abort(); };
+    return () => { live = false; };
   }, []);
 
   // Idle preload of thumbnail variants for category-switch images. Fires
@@ -318,11 +317,14 @@ const Inspiration = () => {
                   <Link to={`/projects/${p.id}`} className="group block">
                     <div className="relative aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
                       {/* In a category view, show that project's best image for
-                          the active category; "All projects" keeps the hero.
+                          the active category; "All projects" uses the admin-set
+                          cover if one exists, otherwise the baseline hero.
+                          Category views keep the per-category best image logic
+                          (cover override only applies to the All-projects view).
                           CardImage decodes in the background before swapping so
                           the tile never flashes blank during a category switch. */}
                       <CardImage
-                        src={active !== "all" ? (p.categoryImages[active] ?? p.image) : p.image}
+                        src={active !== "all" ? (p.categoryImages[active] ?? p.image) : (mergedData.projectCoverImages?.[p.id] ?? p.image)}
                         alt={p.name}
                         className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                       />

@@ -10,6 +10,10 @@ name: Sync CMS data
 #                          values (project_flagged, project_hidden, project_deleted,
 #                          project_ratio, score_override, image_flagged); guarded
 #                          by absence of 'project_flagged' in the constraint def
+#   migration 016          add project_checked to override_type CHECK (visual-only marker);
+#                          guarded by absence of 'project_checked' in the constraint def
+#   migration 017          add project_cover to override_type CHECK; value_text = cover path,
+#                          image_path = '__project__'; guarded by absence of 'project_cover'
 #   migrate-cms-data.ts    src/data/projects.ts + whats-new.ts
 #                          -> cms_project, cms_news_post, cms_media_asset
 #   sync-product-content.ts src/data/products.ts display fields
@@ -77,6 +81,22 @@ jobs:
             sudo -u postgres psql fourlinq -v ON_ERROR_STOP=1 -f server/migrations/016_project_checked.sql
           else
             echo "override_type constraint already includes project_checked — skipping."
+          fi
+
+          echo "--- migration 017: add project_cover to override_type CHECK constraint ---"
+          if [ -z "$(sudo -u postgres psql fourlinq -tAc "SELECT 1 FROM pg_constraint WHERE conrelid='public.project_image_override'::regclass AND contype='c' AND pg_get_constraintdef(oid) LIKE '%project_cover%'")" ]; then
+            echo "constraint missing project_cover — applying 017_project_cover.sql"
+            sudo -u postgres psql fourlinq -v ON_ERROR_STOP=1 -f server/migrations/017_project_cover.sql
+          else
+            echo "override_type constraint already includes project_cover — skipping."
+          fi
+
+          echo "--- migration 018: composite index idx_pio_org_project_type_order ---"
+          if [ -z "$(sudo -u postgres psql fourlinq -tAc "SELECT 1 FROM pg_indexes WHERE indexname = 'idx_pio_org_project_type_order'")" ]; then
+            echo "index missing — applying 018_project_image_override_indexes.sql"
+            sudo -u postgres psql fourlinq -v ON_ERROR_STOP=1 -f server/migrations/018_project_image_override_indexes.sql
+          else
+            echo "idx_pio_org_project_type_order already exists — skipping."
           fi
 
           echo "--- migrate-cms-data (projects + news) ---"
