@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import FeatureLink from "@/components/primitives/FeatureLink";
 import { projects as allProjects } from "@/data/projects";
 import { toThumbPath } from "@/lib/project-thumbs";
 import { versionedImage } from "@/lib/image-version";
 import { cn } from "@/lib/utils";
-import { fetchMergedProjectImages } from "@/lib/merged-project-images";
+import { fetchMergedProjectImagesFresh } from "@/lib/merged-project-images";
+import { fetchProjects, mergeProject, type CmsProject } from "@/lib/cms-api";
+import type { MergedProjectImagesResponse } from "@/types/project-images";
 
 const FB = "/images/projects-fb";
 
@@ -61,35 +63,56 @@ const InspirationStrip = () => {
   const panelRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  // Start with the full project list; filter out hidden/deleted projects once
-  // the merged API response arrives. Until then, all projects are visible
-  // (same baseline behaviour as before this fix).
-  const [projects, setProjects] = useState(allProjects);
-  // Admin-set cover images: projectId → cover image path. Empty until the
-  // merged API responds. Tiles fall back to the baseline hero when absent.
-  const [coverImages, setCoverImages] = useState<Record<string, string>>({});
+  // Live admin/CMS state. Null until each request lands; the derived list below
+  // degrades to the static baseline so the gallery is never blank.
+  const [merged, setMerged] = useState<MergedProjectImagesResponse | null>(null);
+  const [cmsRows, setCmsRows] = useState<CmsProject[] | null>(null);
 
   useEffect(() => {
     let live = true;
-    fetchMergedProjectImages()
-      .then((data) => {
-        if (!live) return;
-        const hiddenSet = new Set([
-          ...(data.hiddenProjects ?? []),
-          ...(data.deletedProjects ?? []),
-        ]);
-        if (hiddenSet.size > 0) {
-          setProjects(allProjects.filter((p) => !hiddenSet.has(p.id)));
-        }
-        if (data.projectCoverImages && Object.keys(data.projectCoverImages).length > 0) {
-          setCoverImages(data.projectCoverImages);
-        }
-      })
-      .catch(() => {
-        // Swallow — keep showing the full project list on failure
-      });
+
+    // Both requests fire in parallel and each paints independently — the merged
+    // payload decides what is visible, so it must not wait on the CMS call.
+    //
+    // Fresh, not the shared 60 s fetch: the endpoint ships
+    // `max-age=30, stale-while-revalidate=300`, so a cached read can be minutes
+    // behind an admin hide/reorder/image swap. fetchMergedProjectImagesFresh
+    // sends ?_r=1 + no-cache to defeat the module, browser, and server caches.
+    fetchMergedProjectImagesFresh()
+      .then((d) => { if (live) setMerged(d); })
+      .catch(() => { /* keep the static baseline rendered */ });
+
+    // CMS rows layer edited titles over projects.ts. Currently a no-op for the
+    // tile image (see below) but keeps this gallery in step with /inspiration.
+    fetchProjects()
+      .then((rows) => { if (live) setCmsRows(rows); })
+      .catch(() => { /* covers/order still apply without it */ });
+
     return () => { live = false; };
   }, []);
+
+  const projects = useMemo(() => {
+    const base = cmsRows ? mergeProject(allProjects, cmsRows) : allProjects;
+    if (!merged) return base;
+
+    const hiddenSet = new Set([
+      ...(merged.hiddenProjects ?? []),
+      ...(merged.deletedProjects ?? []),
+    ]);
+    // projectOrder is already hidden/deleted-filtered server-side, so anything
+    // missing from it is unranked and sorts to the end, stably.
+    const rank = new Map((merged.projectOrder ?? []).map((id, i) => [id, i]));
+    const rankOf = (id: string) => rank.get(id) ?? Number.MAX_SAFE_INTEGER;
+
+    return base
+      .filter((p) => !hiddenSet.has(p.id))
+      .sort((a, b) => rankOf(a.id) - rankOf(b.id));
+  }, [merged, cmsRows]);
+
+  // projectId → cover path, derived server-side from the project's effective
+  // image order with admin hides/replacements applied. Present for every
+  // project, so in practice this and not project.image drives every tile.
+  const coverImages = merged?.projectCoverImages ?? {};
 
   useEffect(() => {
     const track = trackRef.current;
