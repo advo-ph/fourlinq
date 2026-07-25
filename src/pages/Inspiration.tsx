@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import type { MergedProjectImagesResponse } from "@/types/project-images";
 import { toThumbPath } from "@/lib/project-thumbs";
 import { versionedImage } from "@/lib/image-version";
-import { fetchMergedProjectImages } from "@/lib/merged-project-images";
+import { fetchMergedProjectImages, fetchMergedProjectImagesFresh } from "@/lib/merged-project-images";
 
 type Filter = "all" | InspirationTag;
 
@@ -168,15 +168,24 @@ const Inspiration = () => {
   const active: Filter = isFilter(paramFilter) ? paramFilter : "all";
   const setActive = (f: Filter) => setSearchParams(f === "all" ? {} : { filter: f });
 
-  // mergedData starts from the baked baseline (instant paint); the runtime fetch
-  // below replaces it with the live merged result (overrides applied).
+  // mergedReady tracks whether the live merged fetch has resolved at least once.
+  // Cards are NOT rendered until mergedReady is true — skeleton grid shows instead.
+  // This prevents stale baked-baseline images (hidden projects, wrong covers) from
+  // ever painting in the user's browser.
+  const [mergedReady, setMergedReady] = useState(false);
+  // mergedData starts null; once the live fetch resolves it is set to the live
+  // result. If the live fetch fails after retries, we fall back to BASELINE_MERGED
+  // so the page is never permanently blank. The baked baseline is never painted
+  // first — it only appears as the last-resort fallback on network failure.
   const [mergedData, setMergedData] = useState<MergedProjectImagesResponse>(BASELINE_MERGED);
-  const [items, setItems] = useState<ViewProject[]>(() => fallbackProject.map((p) => toView(p, BASELINE_MERGED)));
+  const [items, setItems] = useState<ViewProject[]>([]);
 
   // CMS projects fetch (project names, locations, hero images).
-  // Re-runs when mergedData changes so the latest overrides (including the
-  // hidden/deleted set) are applied on top of CMS names/images each time.
+  // Only runs once mergedReady is true so items are NEVER built from the
+  // baked-baseline fallback. Category membership and hidden-set are always
+  // derived from the live mergedData resolved on this page-load.
   useEffect(() => {
+    if (!mergedReady) return;
     let live = true;
     fetchProjects()
       .then((row) => {
@@ -193,53 +202,66 @@ const Inspiration = () => {
             .map((p) => toView(p, mergedData))
         );
       })
-      .catch(() => { /* keep fallback */ });
+      .catch(() => { /* keep items already set from merged fetch */ });
     return () => { live = false; };
-  }, [mergedData]);
+  }, [mergedReady, mergedData]);
 
-  // Runtime merge fetch — background; on success updates ordering and category images;
-  // on failure the baked BASELINE_MERGED stays in place (no blank screen, no error UI).
-  // Uses the shared module-level cache so concurrent callers share one in-flight request.
+  // Primary live-data fetch — runs once on mount and bypasses ALL caches so the
+  // page always reflects the current DB state (hidden images/projects, cover
+  // overrides, category best-images). On success: sets mergedData + builds items
+  // from fallbackProject filtered by the live hidden set, then mergedReady = true
+  // → cards paint. On failure: one retry with the shared (possibly cached) fetch,
+  // then fall back to BASELINE_MERGED so the page is never permanently blank.
   useEffect(() => {
     let live = true;
-    fetchMergedProjectImages()
-      .then((data) => {
-        if (!live) return;
-        setMergedData(data);
-        // Build a set of project IDs that should not appear on the public site.
-        // The server already excludes them from projectOrder/projectCategoryOrder,
-        // but items is derived from the full fallback project list, so we must
-        // filter here too or they will still render (just sorted to the bottom).
-        const hiddenSet = new Set([
-          ...(data.hiddenProjects ?? []),
-          ...(data.deletedProjects ?? []),
-        ]);
-        // Re-derive items with new merged category images and derived tags,
-        // and exclude any project the admin has hidden or deleted.
-        setItems((prev) =>
-          prev
-            .filter((vp) => !hiddenSet.has(vp.id))
-            .map((vp) => ({
-              ...vp,
-              tag: data.projectDerivedTags[vp.id] ?? vp.tag,
-              categoryImages: data.projectCategoryImages[vp.id] ?? vp.categoryImages,
-            }))
-        );
-      })
+
+    function applyLiveData(data: MergedProjectImagesResponse) {
+      if (!live) return;
+      setMergedData(data);
+      const hiddenSet = new Set([
+        ...(data.hiddenProjects ?? []),
+        ...(data.deletedProjects ?? []),
+      ]);
+      // Build initial items from fallbackProject with live merged overrides.
+      // CMS names/images will be layered on top by the fetchProjects effect above.
+      setItems(
+        fallbackProject
+          .filter((p) => !hiddenSet.has(p.id))
+          .map((p) => toView(p, data))
+      );
+      setMergedReady(true);
+    }
+
+    fetchMergedProjectImagesFresh()
+      .then(applyLiveData)
       .catch(() => {
-        // Swallow — baseline already rendered, nothing to do
+        if (!live) return;
+        // One retry using the shared (possibly cached) fetch before falling back.
+        fetchMergedProjectImages()
+          .then(applyLiveData)
+          .catch(() => {
+            if (!live) return;
+            // Network failure — fall back to baked baseline so the page isn't blank.
+            console.warn(
+              "[Inspiration] /api/project-images/merged fetch failed after retry. " +
+              "Falling back to baked baseline — some hidden images may be visible."
+            );
+            applyLiveData(BASELINE_MERGED);
+          });
       });
+
     return () => { live = false; };
   }, []);
 
-  // Idle preload of thumbnail variants for category-switch images. Fires
-  // immediately using the baked BASELINE_MERGED data (via mergedData initial
-  // state) so preloading starts before the CMS/overrides fetches complete.
-  // Re-fires when mergedData updates with live overrides, priming any new URLs.
+  // Idle preload of thumbnail variants for category-switch images.
+  // Only fires after mergedReady so we preload the live-correct URLs, not stale
+  // baked-baseline ones that may point to hidden images.
+  // Re-fires if mergedData updates (e.g. CMS refresh later in the session).
   //
   // We preload the THUMB variants (640px WebP) since those are what the cards
   // actually render — preloading full-res would waste bandwidth on card views.
   useEffect(() => {
+    if (!mergedReady) return;
     // Collect all category-variant thumbnail URLs from mergedData directly so
     // we don't have to wait for the items/CMS waterfall to resolve.
     const urls = new Set<string>();
@@ -268,7 +290,7 @@ const Inspiration = () => {
         window.cancelIdleCallback(id);
       }
     };
-  }, [mergedData]); // fires on baseline immediately, re-primes when live overrides arrive
+  }, [mergedReady, mergedData]); // fires once merged data is live; re-primes on updates
 
   const filtered = useMemo(() => {
     const base = active === "all" ? items : items.filter((p) => p.tag.includes(active));
@@ -310,7 +332,21 @@ const Inspiration = () => {
             })}
           </div>
 
-          {filtered.length === 0 ? (
+          {/* Skeleton grid — shown while the live merged fetch is in-flight.
+              18 placeholders ≈ 3 rows × 6 cols (desktop) so the page height
+              is stable and there is no layout shift when cards paint. */}
+          {!mergedReady ? (
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10" aria-busy="true" aria-label="Loading projects">
+              {Array.from({ length: 18 }).map((_, i) => (
+                <li key={i} aria-hidden="true">
+                  <div className="animate-pulse">
+                    <div className="aspect-[4/3] bg-[color:var(--canvas-soft)] rounded-sm" />
+                    <div className="mt-3 h-4 w-2/3 bg-[color:var(--canvas-soft)] rounded-sm" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : filtered.length === 0 ? (
             <p className="text-body text-[color:var(--ink-muted)]">No projects in this category yet.</p>
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">

@@ -724,7 +724,7 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
           checked: baselineCheckedSet.has(c.id),
           hidden: baselineHiddenProjectSet.has(c.id),
           deleted: baselineDeletedProjectSet.has(c.id),
-          ratio: baselineProjectRatioMap.get(c.id) ?? "16:9",
+          ratio: baselineProjectRatioMap.get(c.id) ?? "4:3",
         };
       });
 

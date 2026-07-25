@@ -64,3 +64,34 @@ export async function fetchMergedProjectImages(
 
   return inFlight;
 }
+
+/**
+ * Fetch /api/project-images/merged bypassing all caches — both the module-level
+ * 60 s cache above AND any HTTP cache the browser may hold for the endpoint.
+ *
+ * Used by Inspiration.tsx on initial page-load so it always gets the current DB
+ * state rather than a possibly-stale baked baseline or a browser-cached response
+ * that predates the latest admin hide/override actions.
+ *
+ * ?_r=1 is the server flag that forces loadBaseline() to reload from disk,
+ * defeating the server's own in-memory TTL. cache:'no-cache' tells the browser to
+ * revalidate with the server even if it has a fresh HTTP-cached copy.
+ *
+ * The result is written into the shared module cache so any subsequent call from
+ * InspirationStrip (or another component) within the same 60 s window benefits
+ * from the already-fresh response without an extra round-trip.
+ */
+export async function fetchMergedProjectImagesFresh(): Promise<MergedProjectImagesResponse> {
+  const data = await fetch("/api/project-images/merged?_r=1", { cache: "no-cache" })
+    .then((r) => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json() as Promise<MergedProjectImagesResponse>;
+    });
+
+  // Populate shared cache so sibling callers don't re-fetch.
+  cachedResult = data;
+  cachedAt = Date.now();
+  inFlight = null;
+
+  return data;
+}
