@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { motion, useMotionValue, animate } from "framer-motion";
+import { motion, useMotionValue, animate, type AnimationPlaybackControls } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFramePreloader } from "@/hooks/useFramePreloader";
 import { useSegmentedFrames } from "@/hooks/useSegmentedFrames";
@@ -80,7 +80,9 @@ const COMMIT_DISTANCE_PX = 44;  // displacement threshold for commit
 const COMMIT_VELOCITY = 0.35;   // px/ms threshold for velocity commit
 const RUBBER_BAND = 0.3;        // drag resistance at boundary steps in the exit direction
 const VELOCITY_STALE_MS = 80;   // pause longer than this before release → drag, not flick
-const EDGE_ANCHOR_INSET_PX = 12; // boundary steps anchor this far inside the pin edge — keeps pin condition satisfied while sitting effectively at the edge
+const ENGAGE_EDGE_INSET_PX = 64; // anchor stays at least this far inside the pin edges — pan-write reversals can't cross an edge before the pre-paint clamp corrects
+const EXIT_EDGE_RUNWAY_PX = 24;  // captured-gesture exit glides snap here (invisible under the pin) before the visible slide out
+const EXIT_OVERSHOOT_VH = 0.3;   // exit glide lands this far past the pin edge
 const POINTER_SCROLL_COOLDOWN_MS = 400; // wheel/keyboard scrolling suppresses engagement for this long
 
 const ScrollWindow = () => {
@@ -101,6 +103,9 @@ const ScrollWindow = () => {
   const gestureBaseOpacityRef = useRef(1); // cardOpacity at the baseline — keeps the fade continuous when grabbing mid-animation
   const nativePanRef = useRef(false);      // this gesture is a browser-owned native scroll (non-cancelable moves) — clamp holds the page, exits defer to touchend
   const touchSamplesRef = useRef<Array<{ y: number; t: number }>>([]); // last ≤5 touchmove samples for flick velocity
+  const exitAnimRef = useRef<AnimationPlaybackControls | null>(null);  // in-flight captured-gesture exit glide; non-null suppresses re-engagement, touchstart cancels it
+  const exitStepRef = useRef(0);           // step at the last boundary exit — a re-engage shortly after restores it (a stalled exit must not teleport to the other card)
+  const exitStepUntilRef = useRef(0);      // exitStepRef is honored until this timestamp
   const pointerScrollUntilRef = useRef(0); // wheel/keyboard scroll seen until this timestamp — engagement suppressed (no touch = no way to swipe out)
   const lastInSectionFlagRef = useRef<boolean | null>(null); // shared dedupe flag for fq-hide-header / fq-scrollwindow-inview dispatches
 
@@ -189,7 +194,7 @@ const ScrollWindow = () => {
   }, [isDesktop]);
 
   // ── Mobile: touch-driven swipe engine (v5) ────────────────────────────────
-  // The outer container is a 260lvh scroll track; the inner layout div is CSS
+  // The outer container is a 2.6-viewport (--fq-lvh × 2.6) scroll track; the inner layout div is CSS
   // sticky top-0 on mobile. A rAF loop detects when the track is pinned (fully
   // straddling the viewport) and engages/disengages the touch capture.
   //
@@ -207,14 +212,18 @@ const ScrollWindow = () => {
   //   • Mid-gesture capture: if a finger is already down when the pin loop
   //     engages (user swiped into the section without lifting), the baseline
   //     rebases to the live finger position and that same drag moves the card.
-  //   • While engaged the page is held at a mid-track anchor: touch-action:none
+  //   • Engagement never jumps the page: the anchor is wherever the user
+  //     already is (clamped just inside the pin edges) and stays STATIC for the
+  //     whole session — commits/springbacks never write scroll. touch-action:none
   //     blocks native scroll for new gestures, and a passive scroll listener
   //     re-clamps any parasitic scroll (captured-gesture native scroll, momentum
   //     tails) — invisible while the sticky pin covers the viewport.
-  //   • Boundary exits are a cancelable programmatic glide past the pin edge.
-  //     Re-engagement is suppressed only while the glide handle is live, and any
-  //     touchstart cancels it (re-engaging if still pinned) — no reachable state
-  //     leaves the user on a frozen, unresponsive screen.
+  //   • Boundary exits: browser-owned pans (mid-gesture captures) release and
+  //     coast out on their real momentum; captured gestures have zero native
+  //     momentum, so they glide out programmatically from just inside the pin
+  //     edge. The glide suppresses re-engagement only while its handle is live,
+  //     and any touchstart cancels it (re-engaging if still pinned) — no
+  //     reachable state leaves the user on a frozen, unresponsive screen.
   useEffect(() => {
     if (isDesktop) return;
 
@@ -231,11 +240,21 @@ const ScrollWindow = () => {
       window.dispatchEvent(new CustomEvent("fq-scrollwindow-inview", { detail: { inView: flag } }));
     };
 
-    // Track is "pinned" when the 260lvh outer container straddles the viewport:
-    // top is scrolled past (negative) and bottom is still below viewport bottom.
+    // Height of the sticky inner (px-pinned --fq-lvh, see stable-viewport.ts).
+    // The sticky DETACHES from the viewport top once rect.bottom < stickyHeight —
+    // THAT is the true bottom pin edge, not the live innerHeight. With browser
+    // chrome expanded (innerHeight < lvh by ~60-110px — the normal state when
+    // scrolling UP into the section) the two differ, and innerHeight-based math
+    // put "invisible" writes into a zone where the sticky already moves 1:1
+    // with scroll — the bottom-entry teleport.
+    const stickyHeight = () => stickyRef.current?.offsetHeight ?? window.innerHeight;
+
+    // Track is "pinned" (sticky attached and static — scroll writes invisible)
+    // while the top is scrolled past and the bottom hasn't reached the sticky's
+    // detach point.
     const isPinned = () => {
       const rect = el.getBoundingClientRect();
-      return rect.top <= -2 && rect.bottom >= window.innerHeight + 2;
+      return rect.top <= -2 && rect.bottom >= stickyHeight() + 2;
     };
 
     // Track is fully out when neither edge is within the viewport straddle.
@@ -244,26 +263,37 @@ const ScrollWindow = () => {
       return rect.top > 0 || rect.bottom < window.innerHeight;
     };
 
-    // Step-dependent anchor: boundary steps sit EDGE_ANCHOR_INSET_PX inside the
-    // pin edge so the page is already at the edge — native momentum exits instantly.
-    // Middle steps sit at mid-track for symmetric clamp room in both directions.
-    const anchorForStep = (s: number): number => {
+    const cancelExitGlide = () => {
+      if (exitAnimRef.current !== null) {
+        exitAnimRef.current.stop();
+        exitAnimRef.current = null;
+      }
+    };
+
+    // Anchor: wherever the user actually is, clamped ENGAGE_EDGE_INSET_PX inside
+    // the pin edges. Engagement must NEVER jump the page — a mid-track snap is
+    // pixel-identical under the sticky pin, but iOS reacts to the scroll jump
+    // (URL-bar state flips → viewport resize, and a live pan re-derives from the
+    // finger origin, ping-ponging against the clamp right at the pin edge) — it
+    // reads as a teleport/jitter on entry. The only write ever made here is the
+    // ≤inset nudge on a slow edge entry, always in the user's own scroll direction.
+    const clampedAnchor = (): number => {
       const rect = el.getBoundingClientRect();
       const trackTopAbs = rect.top + window.scrollY;
-      const trackHeight = rect.height;
-      const innerHeight = window.innerHeight;
-      if (s === 0) return trackTopAbs + EDGE_ANCHOR_INSET_PX;
-      if (s === STEP_COUNT - 1) return trackTopAbs + trackHeight - innerHeight - EDGE_ANCHOR_INSET_PX;
-      return trackTopAbs + (trackHeight - innerHeight) / 2;
+      const lo = trackTopAbs + ENGAGE_EDGE_INSET_PX;
+      const hi = trackTopAbs + rect.height - stickyHeight() - ENGAGE_EDGE_INSET_PX;
+      return Math.min(hi, Math.max(lo, window.scrollY));
     };
 
     const engage = (entryStep: number) => {
+      cancelExitGlide();
       engagedRef.current = true;
       stepRef.current = entryStep;
       setStep(entryStep);
-      // Anchor: step-dependent — boundary steps sit at the edge, middle at mid-track.
-      anchorYRef.current = anchorForStep(entryStep);
-      window.scrollTo(0, anchorYRef.current);
+      anchorYRef.current = clampedAnchor();
+      if (Math.abs(window.scrollY - anchorYRef.current) > 0.5) {
+        window.scrollTo(0, anchorYRef.current);
+      }
       cardY.stop();
       cardOpacity.stop();
       cardY.set(0);
@@ -284,18 +314,21 @@ const ScrollWindow = () => {
       el.style.touchAction = "";
       // Never leave a half-faded, offset card behind (resize/URL-bar jumps can
       // disengage mid-drag and the section may still be partially on screen).
+      // Animated, not a hard set — a rubber-banded card snapping to rest in one
+      // frame reads as a pop right at exit release. The active card stays bound
+      // to the MotionValues (step doesn't change on disengage), so this settles
+      // it smoothly while the page slides away; engage() hard-resets over it.
       cardY.stop();
       cardOpacity.stop();
-      cardY.set(0);
-      cardOpacity.set(1);
+      animate(cardY, 0, { duration: 0.15, ease: "easeOut" });
+      animate(cardOpacity, 1, { duration: 0.15, ease: "easeOut" });
       dispatchInSection(false);
     };
 
+    // The anchor is STATIC for the whole engaged session — commits and
+    // springbacks never write scroll. Zero programmatic scrolling while the
+    // user swipes means zero chances for iOS to jitter.
     const springBack = () => {
-      // Clamp to current step's anchor for consistency — anchor is already set
-      // correctly, so this is just a safety re-assert.
-      anchorYRef.current = anchorForStep(stepRef.current);
-      window.scrollTo(0, anchorYRef.current);
       animate(cardY, 0, { type: "spring", stiffness: 380, damping: 32 });
       animate(cardOpacity, 1, { duration: 0.18 });
     };
@@ -306,16 +339,42 @@ const ScrollWindow = () => {
       // 1. Advance step synchronously — React binds the new card immediately
       stepRef.current = next;
       setStep(next);
-      // 2. Re-anchor to the new step's position (edge anchor for boundary steps)
-      anchorYRef.current = anchorForStep(next);
-      window.scrollTo(0, anchorYRef.current);
-      // 3. Set entry pose for incoming card (old card is inactive → opacity 0 via style binding)
+      // 2. Set entry pose for incoming card (old card is inactive → opacity 0 via style binding)
       const entryY = direction === "up" ? 36 : -36;
       cardY.set(entryY);
       cardOpacity.set(0);
-      // 4. Spring in — interruptible: the next touchstart stops and rebases
+      // 3. Spring in — interruptible: the next touchstart stops and rebases
       animate(cardY, 0, { type: "spring", stiffness: 300, damping: 30, velocity: 0 });
       animate(cardOpacity, 1, { duration: 0.28 });
+    };
+
+    // Captured gestures (touch-action:none) generate ZERO native momentum, so a
+    // boundary release can't coast out on its own — glide out programmatically:
+    // snap to just inside the pin edge (invisible under the pin; the finger is
+    // up and captured gestures have no competing scroll writer), then slide the
+    // visible overshoot. A new touchstart cancels it (re-engaging if still
+    // pinned), so it can never strand the user.
+    const startExitGlide = (dir: "up" | "down") => {
+      disengage();
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const trackTopAbs = rect.top + window.scrollY;
+      const edgeY = dir === "down" ? trackTopAbs + rect.height - stickyHeight() : trackTopAbs;
+      const start =
+        dir === "down"
+          ? Math.max(window.scrollY, edgeY - EXIT_EDGE_RUNWAY_PX)
+          : Math.min(window.scrollY, edgeY + EXIT_EDGE_RUNWAY_PX);
+      const target = dir === "down" ? edgeY + vh * EXIT_OVERSHOOT_VH : edgeY - vh * EXIT_OVERSHOOT_VH;
+      cancelExitGlide();
+      window.scrollTo(0, start);
+      exitAnimRef.current = animate(start, target, {
+        duration: 0.35,
+        ease: [0.16, 1, 0.3, 1],
+        onUpdate: (v) => window.scrollTo(0, v),
+        onComplete: () => {
+          exitAnimRef.current = null;
+        },
+      });
     };
 
     // ── Pin loop ──────────────────────────────────────────────────────────────
@@ -328,10 +387,13 @@ const ScrollWindow = () => {
       if (!engagedRef.current) {
         if (
           isPinned() &&
+          exitAnimRef.current === null &&
           performance.now() > pointerScrollUntilRef.current
         ) {
-          // Not during pointer scrolling — wheel/keyboard users have no touch
-          // gestures to swipe out with, so engaging would trap them.
+          // Not during an exit glide — its own scroll through the pin range must
+          // not re-engage (suppression dies with the glide handle, so it can
+          // never strand the section). Not during pointer scrolling either —
+          // wheel/keyboard users have no touch gestures to swipe out with.
           consecutivePinCount++;
           if (consecutivePinCount >= 2) {
             consecutivePinCount = 0;
@@ -339,8 +401,18 @@ const ScrollWindow = () => {
             // robust at any scroll speed (unlike sampling the last pre-pin
             // rect.top, which lands in a 2px dead zone on slow entries).
             const rect = el.getBoundingClientRect();
-            const enteredFromTop = rect.top >= -(rect.height - window.innerHeight) / 2;
-            engage(enteredFromTop ? 0 : STEP_COUNT - 1);
+            const enteredFromTop = rect.top >= -(rect.height - stickyHeight()) / 2;
+            // A recent exit that stalled inside the pin (weak native-pan flick,
+            // or a quick return) re-engages on the card the user left — the
+            // midpoint test alone could teleport a stalled last-step exit back
+            // to the intro.
+            const entryStep =
+              performance.now() < exitStepUntilRef.current
+                ? exitStepRef.current
+                : enteredFromTop
+                  ? 0
+                  : STEP_COUNT - 1;
+            engage(entryStep);
           }
         } else {
           consecutivePinCount = 0;
@@ -361,6 +433,7 @@ const ScrollWindow = () => {
           cardY: Math.round(cardY.get()),
           touch: touchActiveRef.current,
           pan: nativePanRef.current,
+          glide: exitAnimRef.current !== null,
           anchor: Math.round(anchorYRef.current),
           off: Math.round(window.scrollY - anchorYRef.current),
           pinTop: Math.round(r.top),
@@ -382,6 +455,12 @@ const ScrollWindow = () => {
       if (!touch) return;
       touchActiveRef.current = true;
       lastTouchYRef.current = touch.clientY;
+      // Grabbing the page mid-exit-glide: cancel it; if still pinned, re-engage
+      // on the same card — otherwise the fresh gesture scrolls natively.
+      if (exitAnimRef.current !== null) {
+        cancelExitGlide();
+        if (isPinned()) engage(stepRef.current);
+      }
       if (!engagedRef.current) return;
       // Zero-delay chaining: stop in-flight springs, rebase from the current pose.
       cardY.stop();
@@ -429,10 +508,9 @@ const ScrollWindow = () => {
       const exitDrag = (atFirst && dy > 0) || (atLast && dy < 0);
 
       if (exitDrag) {
-        // Exit-direction drag at a boundary step: rubber-band only. The page is
-        // already edge-anchored (EDGE_ANCHOR_INSET_PX from the pin edge), so
-        // lifting the finger lets native momentum carry the page out naturally —
-        // no programmatic assist needed.
+        // Exit-direction drag at a boundary step: rubber-band only; the release
+        // decides the exit (native momentum for browser-owned pans, programmatic
+        // glide for captured gestures — see onTouchEnd).
         const ry = gestureBaseCardYRef.current + dy * RUBBER_BAND;
         cardY.set(ry);
         cardOpacity.set(fadeFrom(ry));
@@ -479,20 +557,20 @@ const ScrollWindow = () => {
         (dir === "down" && stepRef.current === 0);
 
       if (atBoundaryExit && shouldCommit) {
-        // Snap the card to rest, disengage, and let native momentum carry the
-        // page out. The page is already edge-anchored (EDGE_ANCHOR_INSET_PX from
-        // the pin edge) — no assist scroll needed; the finger's own gesture has
-        // enough energy to cross the remaining 12px + continue naturally.
-        // Suppress re-engagement for 400ms so the rAF loop doesn't re-engage while
-        // the user's momentum is carrying the page the last 12px + beyond.
-        cardY.stop();
-        cardOpacity.stop();
-        cardY.set(0);
-        cardOpacity.set(1);
-        engagedRef.current = false;
-        el.style.touchAction = "";
-        pointerScrollUntilRef.current = performance.now() + 400;
-        dispatchInSection(false);
+        // Remember which card we exited from — a stalled or quickly-returning
+        // re-engage within this window restores it instead of the midpoint guess.
+        exitStepRef.current = stepRef.current;
+        exitStepUntilRef.current = performance.now() + 1500;
+        if (nativePanRef.current) {
+          // Browser-owned gesture: real fling momentum exists — release and let
+          // it carry the page out naturally. Suppress re-engagement while it does.
+          disengage();
+          pointerScrollUntilRef.current = performance.now() + POINTER_SCROLL_COOLDOWN_MS;
+        } else {
+          // Captured gesture: zero native momentum — glide out programmatically.
+          // dir "up" at the last step exits past the bottom edge and vice versa.
+          startExitGlide(dir === "up" ? "down" : "up");
+        }
         lastEvt = dir === "up" ? "te-exit-dn" : "te-exit-up";
       } else if (!shouldCommit) {
         springBack();
@@ -551,9 +629,11 @@ const ScrollWindow = () => {
     };
 
     const onOrientationChange = () => {
+      cancelExitGlide();
       disengage();
       setStep(0);
       stepRef.current = 0;
+      exitStepUntilRef.current = 0; // stale exit-step memory must not survive a layout change
       consecutivePinCount = 0;
     };
 
@@ -576,6 +656,7 @@ const ScrollWindow = () => {
       window.removeEventListener("wheel", onPointerScroll);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("orientationchange", onOrientationChange);
+      cancelExitGlide();
       engagedRef.current = false;
       touchActiveRef.current = false;
       el.style.touchAction = "";
@@ -648,14 +729,18 @@ const ScrollWindow = () => {
   return (
     <div
       ref={containerRef}
-      className="relative bg-[color:var(--canvas)] max-lg:h-[260lvh]"
+      /* Track height reads --fq-lvh (== 100lvh in real browsers — identical
+         rendering; px-pinned on touch devices so in-app webviews (Messenger)
+         can't reflow the 2.6-viewport track mid-scroll when their bars
+         collapse). Class-only swap — the swipe engine is untouched. */
+      className="relative bg-[color:var(--canvas)] max-lg:h-[calc(var(--fq-lvh)*2.6)]"
     >
       {/* FULL-WIDTH layout — sticky on desktop, static full-screen on mobile */}
       <div
         ref={stickyRef}
         className={cn(
           !isDesktop
-            ? "sticky top-0 flex w-full h-[100lvh] overflow-hidden bg-[color:var(--canvas)] items-end"
+            ? "sticky top-0 flex w-full h-[var(--fq-lvh)] overflow-hidden bg-[color:var(--canvas)] items-end"
             : "sticky top-0 flex h-screen w-full overflow-hidden bg-[color:var(--canvas)] lg:items-center lg:pb-0"
         )}
       >
@@ -733,7 +818,7 @@ const ScrollWindow = () => {
           <div className="pointer-events-none absolute inset-0 z-10">
             {/* Step 0 — section title + Part 0 intro */}
             <motion.div
-              className="absolute inset-x-0 top-0 px-6 pt-[4vh] pointer-events-auto"
+              className="absolute inset-x-0 top-0 px-6 pt-[calc(var(--fq-lvh)*0.04)] pointer-events-auto"
               aria-hidden={step !== 0}
               style={
                 step === 0
@@ -767,7 +852,7 @@ const ScrollWindow = () => {
             {WINDOW_PARTS.map((part, i) => (
               <motion.div
                 key={part.id}
-                className="absolute inset-x-0 top-0 px-6 pt-[4vh] pointer-events-auto"
+                className="absolute inset-x-0 top-0 px-6 pt-[calc(var(--fq-lvh)*0.04)] pointer-events-auto"
                 aria-hidden={step !== i + 1}
                 style={
                   step === i + 1
