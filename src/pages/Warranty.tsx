@@ -75,7 +75,9 @@ const Warranty = () => (
               {photo && (
                 <EditorialImage src={photo.src} alt={photo.alt} ratio="aspect-[4/3]" className="mb-6" />
               )}
-              <p className="font-serif text-h3 leading-none text-[color:var(--rule-strong)] mb-3 tracking-tight">
+              {/* Brand red — matches the EditorialSplit index numerals (client
+                  comment: numbered markers should be red, not grey). */}
+              <p className="font-serif text-h3 leading-none text-[color:var(--accent)] mb-3 tracking-tight">
                 {String(i + 1).padStart(2, "0")}
               </p>
               <h3 className="font-serif text-h4 text-[color:var(--ink-primary)] tracking-tight mb-3">{scope}</h3>

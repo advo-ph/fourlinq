@@ -31,7 +31,6 @@ export interface BucketCopy {
   subSystemList: string;
   /** Which products.ts category to filter by */
   filterCategory: "windows" | "doors" | "specialist";
-  breadcrumbLabel: string;
 }
 
 const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
@@ -48,7 +47,6 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
       <PageHeader
         eyebrow={copy.eyebrow}
         title={copy.title}
-        breadcrumbLabel={copy.breadcrumbLabel}
         subtitle={copy.slogan}
       />
 

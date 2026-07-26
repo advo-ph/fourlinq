@@ -48,7 +48,9 @@ const EditorialSplit = ({
     <Reveal from={flip ? "right" : "left"} delay={0.1}>
       <div className="max-w-[34rem]">
         {index && (
-          <span className="block font-serif text-display leading-none text-[color:var(--rule-strong)] mb-4 select-none">
+          // Brand red per client feedback (2026-07 comments): "Numerical order
+          // would work best if they were RED rather than GREY."
+          <span className="block font-serif text-display leading-none text-[color:var(--accent)] mb-4 select-none">
             {index}
           </span>
         )}

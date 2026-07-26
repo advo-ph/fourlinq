@@ -21,7 +21,6 @@ const Aluminium = () => {
       <PageHeader
         eyebrow="The aluminium line"
         title="Aluminium, when uPVC isn't enough."
-        breadcrumbLabel="Aluminium"
         subtitle="FourlinQ carries two material lines. uPVC for most residential openings, aluminium for the projects that need bigger spans, thinner sightlines, or a different aesthetic. Three aluminium systems, each suited to a different brief."
       />
 

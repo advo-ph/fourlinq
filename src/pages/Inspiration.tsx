@@ -307,7 +307,7 @@ const Inspiration = () => {
 
   return (
     <Layout>
-      <PageHeader title="Our Projects" breadcrumbLabel="Our Projects" />
+      <PageHeader title="Our Projects" />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">

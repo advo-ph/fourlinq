@@ -218,7 +218,7 @@ const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
   if (isLoading) {
     return (
       <Chrome>
-        {!isEmbed && <PageHeader title="Design Tool" breadcrumbLabel="Design Tool" subtitle="Loading configurator..." />}
+        {!isEmbed && <PageHeader title="Design Tool" subtitle="Loading configurator..." />}
         <div className={isEmbed ? "py-6" : "pb-20"}>
           <div className="page-container max-w-6xl">
             <div className="flex items-center justify-center py-20">
@@ -233,7 +233,7 @@ const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
   return (
     <Chrome>
       {!isEmbed && (
-        <PageHeader title="Design Tool" breadcrumbLabel="Design Tool" />
+        <PageHeader title="Design Tool" />
       )}
 
       <div className={isEmbed ? "py-6" : "pb-20"}>

@@ -7,7 +7,6 @@ const WindowSystems = () => (
       // TODO: client copy — slogan + title + intro need brochure-verified replacements
       slogan: "Quiet daylight.",
       title: "Casement, Sliding, Awning, Special Shapes.",
-      breadcrumbLabel: "Window Systems",
       intro:
         "Multi-chamber uPVC profiles for residential window openings, fabricated to your architect's drawings. Aluminium systems available when the project calls for larger spans or slimmer sightlines.",
       subSystemList:

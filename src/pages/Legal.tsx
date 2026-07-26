@@ -89,7 +89,6 @@ const Legal = () => {
       <PageHeader
         eyebrow="Legal"
         title={content.title}
-        breadcrumbLabel={content.title}
         subtitle={`Last updated ${content.lastUpdated}.`}
       />
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">

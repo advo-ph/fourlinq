@@ -6,7 +6,6 @@ const SpecialistSystems = () => (
       eyebrow: "Specialist Systems",
       slogan: "When the shape isn't standard.",
       title: "For projects that refuse the standard catalog.",
-      breadcrumbLabel: "Specialist Systems",
       intro:
         "Some homes ask for shapes the catalog doesn't have. A curved gable above a heritage entry. A triangular dormer on a modernist roofline. A full curtain wall on a seaside elevation. We fabricate project-by-project, drawn to your architect's geometry. The panels that other manufacturers say can't be done.",
       subSystemList:

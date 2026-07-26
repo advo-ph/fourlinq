@@ -20,7 +20,6 @@ const FAQPage = () => {
       <PageHeader
         eyebrow="Frequently asked"
         title="Answers, organized."
-        breadcrumbLabel="FAQ"
         subtitle="The questions we hear most often, about our systems, the uPVC material, ordering, installation, warranty, and ongoing care. Filter by topic or scan the full list."
       />
 

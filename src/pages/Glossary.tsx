@@ -18,7 +18,6 @@ const Glossary = () => (
     <PageHeader
       eyebrow="Reference"
       title="The language of windows and doors."
-      breadcrumbLabel="Glossary"
       subtitle="Windows and doors carry their own vocabulary: operation, sightline, glazing, mullion. Here is what the terms mean, in plain language, so you can read a quote and specify a project with confidence."
     />
 

@@ -246,7 +246,6 @@ const Products = () => {
     <Layout>
       <PageHeader
         title={isLanding ? "Systems" : activeType?.label ?? "Systems"}
-        breadcrumbLabel="Systems"
       />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">

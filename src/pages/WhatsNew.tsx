@@ -65,7 +65,7 @@ const WhatsNew = () => {
 
   return (
     <Layout>
-      <PageHeader title="What's New" breadcrumbLabel="What's New" />
+      <PageHeader title="What's New" />
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
