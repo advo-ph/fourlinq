@@ -119,12 +119,23 @@
 @layer base {
   * { @apply border-border; }
 
-  html { background: var(--canvas); }
+  html {
+    background: var(--canvas);
+    /* Kill accidental pull-to-refresh mid-scroll on mobile (client comment:
+       "Scrolling refresh on Mobile"). A pull that starts at scrollTop 0 — e.g.
+       while the ScrollWindow engine is holding the page still — reads as
+       overscroll and triggers the browser refresh gesture. Only the vertical
+       axis: horizontal swipe-back navigation is untouched. Set on both html
+       and body — Chrome reads the root scroller, Safari 16+ the root element;
+       older browsers ignore it gracefully. */
+    overscroll-behavior-y: none;
+  }
 
   body {
     @apply bg-[color:var(--canvas)] font-sans antialiased;
     color: var(--ink-primary);
     font-feature-settings: "kern", "liga", "calt", "ss01";
+    overscroll-behavior-y: none;
   }
 
   /* Headlines use Fraunces with a tighter optical metric */

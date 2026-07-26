@@ -200,7 +200,10 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
     <div
       id="linq-dialog"
       ref={dialogRef}
-      className="fixed bottom-24 right-6 z-[60] w-[400px] max-w-[calc(100vw-32px)] h-[600px] max-h-[calc(var(--fq-svh)-140px)] flex flex-col overflow-hidden bg-white shadow-depth-8 border border-[color:var(--rule-soft)] animate-in slide-in-from-bottom-4 fade-in duration-300 ease-marvin rounded-sm"
+      /* max-w mirrors the right-6 (24px) anchor on BOTH sides — on phones the
+         panel sits centered with equal 24px margins instead of hugging the left
+         edge (client comment: width should match the right-side margin). */
+      className="fixed bottom-24 right-6 z-[60] w-[400px] max-w-[calc(100vw-48px)] h-[600px] max-h-[calc(var(--fq-svh)-140px)] flex flex-col overflow-hidden bg-white shadow-depth-8 border border-[color:var(--rule-soft)] animate-in slide-in-from-bottom-4 fade-in duration-300 ease-marvin rounded-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="linq-dialog-title"

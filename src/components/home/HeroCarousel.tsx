@@ -18,6 +18,15 @@ interface HeroCarouselProps {
   interval?: number;
 }
 
+/* Hover-pause is a desktop affordance. On touch devices a tap fires
+   mouseenter with no matching mouseleave, so one tap on the hero froze the
+   carousel permanently (client comment: images "remain static and immobile"
+   after navigating back to the landing page and touching the hero). Same
+   gate as SystemCardMedia / ProjectHeroGallery. */
+const canHover =
+  typeof window !== "undefined" &&
+  !!window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
+
 /**
  * Showroom hero: cross-fading full-bleed project carousel with restrained
  * centered copy and a two-button CTA rhythm.
@@ -46,8 +55,8 @@ const HeroCarousel = ({
       /* NOT 100dvh — see VideoHero: dvh resizes with the collapsing browser
          chrome and jitters the page; --fq-svh is stable. */
       style={{ height: "var(--fq-svh)" }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onMouseEnter={canHover ? () => setPaused(true) : undefined}
+      onMouseLeave={canHover ? () => setPaused(false) : undefined}
       aria-roledescription="carousel"
       aria-label="FourlinQ projects"
     >

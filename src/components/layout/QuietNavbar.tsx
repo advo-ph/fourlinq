@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, Search, X, ArrowUpRight, ArrowDownToLine } from "lucide-react";
+import { Menu, Search, X, ArrowUpRight, ArrowDownToLine, ChevronDown } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 import SystemCardMedia from "@/components/shared/SystemCardMedia";
 import { cn } from "@/lib/utils";
@@ -397,9 +397,13 @@ const QuietNavbar = () => {
           "h-[72px] will-change-transform",
           "transition-[background-color,backdrop-filter,color,transform] duration-300 ease-marvin",
           navHidden && "-translate-y-full",
-          transparent
-            ? "bg-transparent text-white"
-            : "bg-white/80 text-[color:var(--ink-primary)] backdrop-blur-md"
+          // Solid white while a mega-panel hangs off the bar, so the two read
+          // as one surface; otherwise frosted (or transparent on the hero).
+          openPanel
+            ? "bg-white text-[color:var(--ink-primary)]"
+            : transparent
+              ? "bg-transparent text-white"
+              : "bg-white/80 text-[color:var(--ink-primary)] backdrop-blur-md"
         )}
       >
         <div className="container-editorial h-full">
@@ -435,7 +439,7 @@ const QuietNavbar = () => {
                         onMouseEnter={(e) => moveHoverLine(e.currentTarget)}
                         className={cn(
                           "whitespace-nowrap text-body-sm font-medium transition-[background-color,color] duration-300 ease-marvin",
-                          "inline-flex min-h-8 items-center rounded-sm px-4",
+                          "relative inline-flex min-h-8 items-center rounded-sm px-4",
                           active || panelOpen
                             ? transparent
                               ? "bg-white/15 text-white"
@@ -446,6 +450,30 @@ const QuietNavbar = () => {
                         )}
                       >
                         {link.label}
+                        {/* Dropdown affordance (client comment: the three panel
+                            triggers read as plain links). Flips while the panel
+                            is open so state is legible at a glance. */}
+                        <ChevronDown
+                          size={14}
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                          className={cn(
+                            "ml-1 shrink-0 transition-transform duration-300 ease-marvin",
+                            panelOpen && "rotate-180"
+                          )}
+                        />
+                        {/* Solid red line pinned here while this panel is open.
+                            -bottom-0.5 lands on the exact 2px strip the shared
+                            (translucent) hover line occupies, so the hover cue
+                            reads as a preview of this committed state. */}
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "pointer-events-none absolute inset-x-0 -bottom-0.5 h-[2px] bg-[color:var(--accent)]",
+                            "origin-center transition-transform duration-150 ease-marvin",
+                            panelOpen ? "scale-x-100" : "scale-x-0"
+                          )}
+                        />
                       </button>
                     ) : (
                       <Link
@@ -469,9 +497,14 @@ const QuietNavbar = () => {
 
                     {link.group && (
                       <div
-                        // Click-only panel: no mouse handlers here. It stays
-                        // open until the trigger is clicked again, the backdrop
-                        // is clicked, Escape is pressed, or the route changes.
+                        // Click-only panel: it stays open until the trigger is
+                        // clicked again, the backdrop is clicked, Escape is
+                        // pressed, or the route changes. The mouseenter below
+                        // only parks the cosmetic hover line — this panel is a
+                        // DOM child of the <ul>, so entering it never fires the
+                        // list's mouseleave and the line would otherwise stay
+                        // stuck under the last-hovered button.
+                        onMouseEnter={retractHoverLine}
                         className={cn(
                           "fixed left-0 right-0 top-[72px]",
                           panelOpen
@@ -574,11 +607,13 @@ const QuietNavbar = () => {
               {/* The shared hover underline. Position/size are written by
                   moveHoverLine/retractHoverLine; this class only owns the
                   tween. bottom-[18px] parks it just under the 32px buttons
-                  centered in the 72px bar. */}
+                  centered in the 72px bar. Translucent on purpose — the solid
+                  line belongs to an open panel's trigger (see below), so open
+                  vs merely-hovered stay visually distinct. */}
               <span
                 ref={hoverLineRef}
                 aria-hidden="true"
-                className="pointer-events-none absolute bottom-[18px] left-0 h-[2px] w-0 bg-[color:var(--accent)] transition-[left,width] duration-200 ease-marvin"
+                className="pointer-events-none absolute bottom-[18px] left-0 h-[2px] w-0 bg-[color:var(--accent)] opacity-50 transition-[left,width] duration-150 ease-marvin"
               />
             </ul>
 
