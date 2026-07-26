@@ -8,28 +8,25 @@ import ConsultationForm from "@/components/shared/ConsultationForm";
 import BranchMap from "@/components/shared/BranchMap";
 import { Stagger, StaggerItem } from "@/components/primitives/Reveal";
 import WordReveal from "@/components/primitives/WordReveal";
-import GradualBlur from "@/components/primitives/GradualBlur";
 import { certifications, CONTACT, BRANCHES, BRAND, phoneHref } from "@/data/brand";
 import { Phone, Mail, ArrowUpRight } from "lucide-react";
 
-// The hero line, set in black. Shared by the desktop overlay and the mobile
-// stacked block so the wording stays in one place. No eyebrow — the mockup
-// leads straight with the headline, subline, then the gallery link.
+// The hero line, set in black over the video's white wall. No eyebrow — the
+// page leads straight with the headline, subline, then the gallery link.
 const HeroCopy = () => (
   <Stagger gap={0.1} className="max-w-[43rem]">
     <StaggerItem>
-      {/* WhyUpvc hero scale, capped in the 1024-1439 overlay band: the dark
-          glazing starts at ~60% of the photo's width, so lg holds 3.75rem and
-          xl holds 5rem to keep the single-line headline on the white wall
-          (re-verified against the v4 photo: 6rem at xl would leave <40px to
-          the glazing). From 1440 the full 6rem clears the window edge. */}
+      {/* WhyUpvc hero scale, capped in the 1024-1439 band: the atrium glazing
+          enters at ~58% of the video frame, so lg/xl hold 3.75/5rem to keep
+          the single-line headline on the white wall. From 1440 the full 6rem
+          clears the window edge. */}
       <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[3rem] sm:text-[3.75rem] xl:text-[5rem] min-[1440px]:text-[6rem] leading-[1.02] max-w-[14ch]">
         Built for a lifetime.
       </h1>
     </StaggerItem>
     <StaggerItem>
-      {/* lg narrows the measure so the overlay subline also stays clear of the
-          glazing; stacked (below lg) and xl+ use the full WhyUpvc 36rem. */}
+      {/* lg narrows the measure so the subline also stays clear of the
+          glazing; below lg and from xl+ it uses the full WhyUpvc 36rem. */}
       <p className="mt-8 lg:mt-10 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[36rem] lg:max-w-[30rem] xl:max-w-[36rem] leading-[1.55]">
         What we promise, what the warranty covers, where to put your hands on it.
       </p>
@@ -46,62 +43,51 @@ const HeroCopy = () => (
   </Stagger>
 );
 
-const Brand = () => (
+const Brand = () => {
+  // One-time check at render — no resize listener needed for a decorative
+  // background loop. Mobile (<768px) gets the lighter 960px encode; desktop
+  // gets the full-resolution CRF-18 encode.
+  const isSmallViewport =
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 767px)").matches;
+  const heroVideo = isSmallViewport
+    ? "/videos/brand-hero-mobile.mp4"
+    : "/videos/brand-hero.mp4";
+  const heroPoster = isSmallViewport
+    ? "/videos/brand-hero-poster-mobile.jpg"
+    : "/videos/brand-hero-poster.jpg";
+
+  return (
   <Layout>
-    {/* Editorial hero the photograph shown at its true 1429:804 ratio — an
-        interior atrium: white shadow-dappled wall on the left, dark-framed
-        windows above and right, a wood door lower centre. The brand line sits
-        in black over that left white wall on wide screens, and stacks beneath
-        the banner on narrow ones. */}
-    <section className="relative overflow-hidden bg-[color:var(--canvas)]">
-      <div className="relative aspect-[1429/804]">
-        <img
-          src="/images/brand-hero-v4.webp"
-          alt="An interior atrium with a white sunlit wall, dark-framed windows, and a wood door fitted by FourlinQ"
-          width={1429}
-          height={804}
-          loading="eager"
-          decoding="async"
-          className="h-full w-full object-cover [mask-image:linear-gradient(to_bottom,black_72%,rgba(0,0,0,0.8)_82%,rgba(0,0,0,0.35)_92%,transparent_99%)] lg:[mask-image:linear-gradient(to_bottom,black_76%,rgba(0,0,0,0.8)_85%,rgba(0,0,0,0.35)_93%,transparent_99%)]"
-        />
-        {/* Bottom dissolve — three static layers so the photo melts into the white
-            canvas with no perceptible seam. Not scroll-driven.
-            1. The img itself is masked to transparent over its last ~25% (the
-               804-tall frame is far taller than the old banner, so the stops sit
-               deep — most of the atrium, door, and windows stay fully visible),
-               guaranteeing the final pixels are pure canvas white.
-            2. GradualBlur smears the image well above where the white goes solid —
-               desktop-only, kept off the ~220px mobile crop.
-            3. An eased white wash below tints the blurred remnant so tone ramps
-               smoothly instead of jumping at the section boundary. */}
-        <GradualBlur
-          target="parent"
-          position="bottom"
-          height="10rem"
-          strength={3}
-          divCount={8}
-          curve="bezier"
-          exponential
-          opacity={1}
-          zIndex={10}
-          className="hidden lg:block"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 lg:h-44 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_0%,rgba(255,255,255,0.38)_42%,rgba(255,255,255,0.74)_66%,rgba(255,255,255,0.93)_84%,#fff_96%)]"
-        />
-        {/* Over the image, aligned to the white wall on the left. */}
-        <div className="absolute inset-0 hidden lg:flex items-center z-20">
-          <div className="container-editorial">
-            <HeroCopy />
-          </div>
+    {/* ── Full-bleed video hero ── pulled behind the fixed 72px navbar via
+        -mt-[72px], full stable-viewport height. The loop tracks up an interior
+        atrium: white sunlit wall on the left, dark-framed glazing and a wood
+        ceiling on the right. The brand line sits in black over the white wall,
+        vertically centred at every breakpoint. ── */}
+    <header
+      className="relative w-full overflow-hidden bg-[color:var(--canvas-soft)] -mt-[72px]"
+      style={{ height: "var(--fq-svh)" }}
+      aria-label="Built for a lifetime"
+    >
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        src={heroVideo}
+        poster={heroPoster}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        disablePictureInPicture
+        disableRemotePlayback
+      />
+
+      <div className="relative h-full flex items-center pt-[72px]">
+        <div className="container-editorial w-full">
+          <HeroCopy />
         </div>
       </div>
-      {/* Narrow screens the same line, stacked below the full-ratio banner. */}
-      <div className="container-editorial py-10 lg:hidden">
-        <HeroCopy />
-      </div>
-    </section>
+    </header>
 
     {/* Story editorial splits, alternating */}
     <Section tone="canvas" size="md">
@@ -304,7 +290,8 @@ const Brand = () => (
       </div>
     </Section>
   </Layout>
-);
+  );
+};
 
 const ContactRow = ({ icon, label, value, href, external }: { icon: React.ReactNode; label: string; value: string; href: string; external?: boolean }) => (
   <li>
