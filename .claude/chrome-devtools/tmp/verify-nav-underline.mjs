@@ -69,4 +69,26 @@ const closedAfterClick = await p.evaluate(() =>
 console.log('click opens panel?       :', openAfterClick, '(expect true)');
 console.log('second click closes?     :', !closedAfterClick, '(expect true)');
 
+// 7. open-state solid line vs translucent hover line
+const hoverStyle = await line.evaluate(el => ({
+  opacity: getComputedStyle(el).opacity,
+  duration: getComputedStyle(el).transitionDuration,
+}));
+console.log('hover line style         :', hoverStyle, '(expect opacity 0.5, 0.15s)');
+await systems.click();
+await p.waitForTimeout(300);
+const openLine = await systems.locator('span[aria-hidden="true"]').evaluate(el => ({
+  transform: getComputedStyle(el).transform,
+  opacity: getComputedStyle(el).opacity,
+  duration: getComputedStyle(el).transitionDuration,
+}));
+console.log('open trigger solid line  :', openLine, '(expect scale 1 / opacity 1)');
+await p.mouse.move(720, 500);
+await p.waitForTimeout(300);
+const solidPersists = await systems.locator('span[aria-hidden="true"]').evaluate(
+  el => getComputedStyle(el).transform);
+const hoverGone = await line.evaluate(el => el.offsetWidth);
+console.log('mouse left nav: solid    :', solidPersists, '(expect matrix scale 1)');
+console.log('mouse left nav: hover    :', hoverGone, '(expect 0 — only solid stays)');
+
 await b.close();
