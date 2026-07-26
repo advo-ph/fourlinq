@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import PageBody from "@/components/shared/PageBody";
 import Section from "@/components/primitives/Section";
 import EditorialButton from "@/components/primitives/Button";
+import WordReveal from "@/components/primitives/WordReveal";
 import { benefits, comparisonData } from "@/data/benefits";
 import { UPVC_PROFILE_FEATURES, FRAME_FINISHES } from "@/data/fourlinq-data";
 import ProfileSystems from "@/components/shared/ProfileSystems";
@@ -55,9 +55,12 @@ const FinishGrid = () => (
       <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
         {find(featured).title}
       </h2>
-      <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
+      <WordReveal
+        as="p"
+        className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end"
+      >
         {elaboration[featured]}
-      </p>
+      </WordReveal>
     </div>
     <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
       {FRAME_FINISHES.map((f) => (
@@ -97,50 +100,58 @@ const rest = [
   "sound-insulation",
 ];
 
-const WhyUpvc = () => (
-  <Layout>
-    {/* ── Full-viewport hero ── text left, profile image right, both vertically
-        centered. Breadcrumb floats at top inside the same hero. ── */}
-    <header className="relative h-[calc(var(--fq-lvh)-72px)] flex flex-col">
-      <div className="container-editorial pt-8 lg:pt-12">
-        <nav aria-label="Breadcrumb">
-          <ol className="flex items-center gap-2 text-[12px] tracking-[0.08em] uppercase text-[color:var(--ink-muted)]">
-            <li>
-              <Link to="/" className="hover:text-[color:var(--ink-primary)] transition-colors duration-300 ease-marvin">
-                FourlinQ
-              </Link>
-            </li>
-            <li aria-hidden="true"><ChevronRight size={12} strokeWidth={1.5} /></li>
-            <li className="text-[color:var(--ink-primary)] font-medium">Why uPVC</li>
-          </ol>
-        </nav>
-      </div>
+const WhyUpvc = () => {
+  // One-time check at render — no resize listener needed for a decorative
+  // background loop. Mobile (<768px) gets the lighter 960px encode; desktop
+  // gets the full-resolution CRF-18 encode.
+  const isSmallViewport =
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 767px)").matches;
+  const heroVideo = isSmallViewport
+    ? "/videos/why-upvc-hero-mobile.mp4"
+    : "/videos/why-upvc-hero.mp4";
+  const heroPoster = isSmallViewport
+    ? "/videos/why-upvc-hero-poster-mobile.jpg"
+    : "/videos/why-upvc-hero-poster.jpg";
 
-      <div className="container-editorial flex-1 flex items-center py-12 lg:py-16">
-        <div className="grid lg:grid-cols-12 gap-x-12 gap-y-16 items-center w-full">
-          <div className="lg:col-span-6">
-            <p className="eyebrow mb-6">
-              The material
-            </p>
+  return (
+  <Layout>
+    {/* ── Full-bleed video hero ── pulled behind the fixed 72px navbar via
+        -mt-[72px], full stable-viewport height. The video is a bright
+        off-white studio shot throughout; no scrims needed. Dark editorial
+        ink text sits vertically centred in the visible hero area. ── */}
+    <header
+      className="relative w-full overflow-hidden bg-[color:var(--canvas-soft)] -mt-[72px]"
+      style={{ height: "var(--fq-svh)" }}
+      aria-label="Why uPVC"
+    >
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        src={heroVideo}
+        poster={heroPoster}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        disablePictureInPicture
+        disableRemotePlayback
+      />
+
+      {/* Mobile-only light scrim — the portrait crop pushes the dark profile
+          under the text; a soft white wash keeps the ink legible. Hidden from
+          sm: up where text and product no longer overlap. */}
+      <div className="absolute inset-0 sm:hidden bg-gradient-to-r from-white/70 via-white/40 to-transparent pointer-events-none" aria-hidden="true" />
+
+      <div className="relative h-full flex items-center pt-[72px]">
+        <div className="container-editorial w-full">
+          <div className="max-w-[43rem] text-left">
             <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02] max-w-[14ch]">
               Why uPVC.
             </h1>
             <p className="mt-8 lg:mt-10 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.55]">
-              We use uPVC because of what this country does to a window. The heat, the humidity, the salt air along the coast, the storms. The rest of this page is what that actually means for the frame in your wall.
+              We use uPVC because of what this country does to a window. The heat, the humidity, the salt air along the coast, the storms.
             </p>
-          </div>
-          {/* Contained on a soft panel and sized down: the cut profile reads as
-              a product study, not a floating cutout filling half the screen. */}
-          <div className="lg:col-span-5 lg:col-start-8">
-            <div className="bg-[color:var(--canvas-soft)] p-8 lg:p-12 flex items-center justify-center">
-              <img
-                src="/images/wp-export/Walnut-Profile.png"
-                alt="FourlinQ multi-chamber uPVC profile in Walnut finish"
-                loading="eager"
-                decoding="async"
-                className="block w-full h-auto max-h-[calc(var(--fq-lvh)*0.48)] object-contain"
-              />
-            </div>
           </div>
         </div>
       </div>
@@ -157,9 +168,12 @@ const WhyUpvc = () => (
         <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
           What's actually in the frame.
         </h2>
-        <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
+        <WordReveal
+          as="p"
+          className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end"
+        >
           Seven things engineered into every FourlinQ uPVC profile, and what each one means once the window is in your wall.
-        </p>
+        </WordReveal>
       </div>
 
       <ul className="border-t border-[color:var(--rule-strong)]">
@@ -175,12 +189,18 @@ const WhyUpvc = () => (
               {f.label}
             </h3>
             <div className="lg:col-span-7">
-              <p className="text-body text-[color:var(--ink-primary)] leading-[1.6]">
+              <WordReveal
+                as="p"
+                className="text-body text-[color:var(--ink-primary)] leading-[1.6]"
+              >
                 {f.descriptionVerbatim}
-              </p>
-              <p className="mt-2 text-body-sm text-[color:var(--ink-secondary)] leading-[1.6]">
+              </WordReveal>
+              <WordReveal
+                as="p"
+                className="mt-2 text-body-sm text-[color:var(--ink-secondary)] leading-[1.6]"
+              >
                 {f.benefitPlain}
-              </p>
+              </WordReveal>
             </div>
           </li>
         ))}
@@ -192,10 +212,18 @@ const WhyUpvc = () => (
         part of the answer to "why uPVC", and it's what actually backs the
         European-engineering claim. */}
     <Section tone="soft" size="lg">
-      <h2 className="mb-12 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
-        The profiles we build with.
-      </h2>
-      <ProfileSystems material="upvc" />
+      {/* Heading beside the list rather than stacked above it — the two-entry
+          list is short, and the full-width layout left a field of empty canvas
+          to the right (client comment: "so much negative space lenient to the
+          right side"). Mirrors the certifications-style 12-col split. */}
+      <div className="grid lg:grid-cols-12 gap-x-12 gap-y-10">
+        <h2 className="lg:col-span-4 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
+          The profiles we build with.
+        </h2>
+        <div className="lg:col-span-8">
+          <ProfileSystems material="upvc" />
+        </div>
+      </div>
     </Section>
 
     {/* ── Featured advantage ── all twelve finishes, one grid ── */}
@@ -215,9 +243,12 @@ const WhyUpvc = () => (
               <h3 className="font-serif font-normal tracking-tight text-h5 text-[color:var(--ink-primary)] leading-[1.2] mb-3">
                 {b.title}
               </h3>
-              <p className="text-body text-[color:var(--ink-secondary)] leading-[1.6]">
+              <WordReveal
+                as="p"
+                className="text-body text-[color:var(--ink-secondary)] leading-[1.6]"
+              >
                 {elaboration[id]}
-              </p>
+              </WordReveal>
             </article>
           );
         })}
@@ -230,9 +261,12 @@ const WhyUpvc = () => (
         <h2 className="lg:col-span-5 font-serif font-normal tracking-tight text-h3 leading-[1.15] text-[color:var(--ink-primary)]">
           uPVC. Aluminium. Timber.
         </h2>
-        <p className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end">
+        <WordReveal
+          as="p"
+          className="lg:col-span-6 lg:col-start-7 mt-6 lg:mt-0 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6] self-end"
+        >
           We carry uPVC and aluminium. Most houses end up with uPVC; bigger openings or thinner sightlines go to aluminium. Timber sits in the third column for comparison. We don't sell it.
-        </p>
+        </WordReveal>
       </div>
 
       {/* Table. uPVC column gets a tinted background + bold text */}
@@ -291,9 +325,9 @@ uPV<span className="text-[color:var(--accent)]">C</span>
           When we'd point you elsewhere.
         </h2>
         <div className="lg:col-span-6 lg:col-start-7 space-y-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
-          <p>
+          <WordReveal as="p">
             And if what you really want is hardwood, just buy hardwood. The wood-grain finish is good, but it's a finish. We'll tell you that before you order.
-          </p>
+          </WordReveal>
         </div>
       </div>
     </Section>
@@ -319,6 +353,7 @@ uPV<span className="text-[color:var(--accent)]">C</span>
       </div>
     </Section>
   </Layout>
-);
+  );
+};
 
 export default WhyUpvc;
