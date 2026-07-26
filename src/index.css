@@ -91,6 +91,28 @@
     --accent:       #C8102E;
     --accent-hover: #A00D26;
     --accent-quiet: rgba(200, 16, 46, 0.08);
+
+    /* ── Stable viewport heights ─────────────────────────────
+       Mobile browser chrome (and in-app browsers like FB Messenger) collapses
+       and expands while scrolling; anything sized with vh/dvh reflows
+       mid-scroll and the page "jitters" / teleports. In-flow layout must size
+       against these vars instead: svh/lvh never move during a scroll in real
+       browsers, and stable-viewport.ts pins them to px on touch devices so
+       in-app webviews (where every unit tracks the resizing webview) hold
+       still too. Fixed/overlay UI keeps viewport-anchored POSITIONING (the
+       chat bubble's plain fixed bottom-6 is what rides above the collapsing
+       bottom bar — never wire these vars into its offsets); overlay SIZING
+       caps (max-h on the chat panel / nav flyouts) may use --fq-svh so they
+       always fit the smallest viewport. */
+    --fq-svh: 100vh;
+    --fq-lvh: 100vh;
+  }
+
+  @supports (height: 100svh) {
+    :root {
+      --fq-svh: 100svh;
+      --fq-lvh: 100lvh;
+    }
   }
 }
 

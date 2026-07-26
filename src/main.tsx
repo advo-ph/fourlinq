@@ -1,6 +1,11 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { initStableViewport } from "./lib/stable-viewport";
+
+// Pin --fq-svh/--fq-lvh to px on touch devices before first paint — keeps
+// hero/section heights from reflowing when mobile browser chrome collapses.
+initStableViewport();
 
 // Guard against chunk-load failures after a new deploy. Vite fires this event
 // when a dynamically-imported module (lazy route chunk) 404s because the old
