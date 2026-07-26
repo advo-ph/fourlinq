@@ -7,6 +7,8 @@ import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 import ConsultationForm from "@/components/shared/ConsultationForm";
 import BranchMap from "@/components/shared/BranchMap";
 import { Stagger, StaggerItem } from "@/components/primitives/Reveal";
+import WordReveal from "@/components/primitives/WordReveal";
+import GradualBlur from "@/components/primitives/GradualBlur";
 import { certifications, CONTACT, BRANCHES, BRAND, phoneHref } from "@/data/brand";
 import { Phone, Mail, ArrowUpRight } from "lucide-react";
 
@@ -14,19 +16,26 @@ import { Phone, Mail, ArrowUpRight } from "lucide-react";
 // stacked block so the wording stays in one place. No eyebrow — the mockup
 // leads straight with the headline, subline, then the gallery link.
 const HeroCopy = () => (
-  <Stagger gap={0.1} className="max-w-[46ch]">
+  <Stagger gap={0.1} className="max-w-[43rem]">
     <StaggerItem>
-      <h1 className="font-serif font-normal text-[color:var(--ink-primary)] text-display-sm xl:text-h1 leading-[1.02] tracking-tight max-w-[16ch]">
+      {/* WhyUpvc hero scale, capped in the 1024-1439 overlay band: the dark
+          glazing starts at ~60% of the photo's width, so lg holds 3.75rem and
+          xl holds 5rem to keep the single-line headline on the white wall
+          (re-verified against the v4 photo: 6rem at xl would leave <40px to
+          the glazing). From 1440 the full 6rem clears the window edge. */}
+      <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[3rem] sm:text-[3.75rem] xl:text-[5rem] min-[1440px]:text-[6rem] leading-[1.02] max-w-[14ch]">
         Built for a lifetime.
       </h1>
     </StaggerItem>
     <StaggerItem>
-      <p className="mt-5 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[40ch] leading-snug">
+      {/* lg narrows the measure so the overlay subline also stays clear of the
+          glazing; stacked (below lg) and xl+ use the full WhyUpvc 36rem. */}
+      <p className="mt-8 lg:mt-10 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[36rem] lg:max-w-[30rem] xl:max-w-[36rem] leading-[1.55]">
         What we promise, what the warranty covers, where to put your hands on it.
       </p>
     </StaggerItem>
     <StaggerItem>
-      <div className="mt-7">
+      <div className="mt-8">
         {/* -ml-5 negates the button's own px-5 so the link text aligns flush
             with the headline and subline rather than sitting inset. */}
         <EditorialButton to="/inspiration" variant="ghost" size="md" className="-ml-5">
@@ -39,24 +48,50 @@ const HeroCopy = () => (
 
 const Brand = () => (
   <Layout>
-    {/* Editorial hero the photograph shown at its true 2172:603 ratio, so the
-        whole frame reads rather than a tall crop. The brand line sits in black
-        over the image's own white-wall margin on wide screens, and stacks
-        beneath the banner on narrow ones where the wide crop is too short to
-        hold type. */}
+    {/* Editorial hero the photograph shown at its true 1429:804 ratio — an
+        interior atrium: white shadow-dappled wall on the left, dark-framed
+        windows above and right, a wood door lower centre. The brand line sits
+        in black over that left white wall on wide screens, and stacks beneath
+        the banner on narrow ones. */}
     <section className="relative overflow-hidden bg-[color:var(--canvas)]">
-      <div className="relative aspect-[2172/603]">
+      <div className="relative aspect-[1429/804]">
         <img
-          src="/images/brand-hero.webp"
-          alt="A modern Philippine residence outfitted with FourlinQ windows and doors"
-          width={2172}
-          height={603}
+          src="/images/brand-hero-v4.webp"
+          alt="An interior atrium with a white sunlit wall, dark-framed windows, and a wood door fitted by FourlinQ"
+          width={1429}
+          height={804}
           loading="eager"
           decoding="async"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover [mask-image:linear-gradient(to_bottom,black_72%,rgba(0,0,0,0.8)_82%,rgba(0,0,0,0.35)_92%,transparent_99%)] lg:[mask-image:linear-gradient(to_bottom,black_76%,rgba(0,0,0,0.8)_85%,rgba(0,0,0,0.35)_93%,transparent_99%)]"
+        />
+        {/* Bottom dissolve — three static layers so the photo melts into the white
+            canvas with no perceptible seam. Not scroll-driven.
+            1. The img itself is masked to transparent over its last ~25% (the
+               804-tall frame is far taller than the old banner, so the stops sit
+               deep — most of the atrium, door, and windows stay fully visible),
+               guaranteeing the final pixels are pure canvas white.
+            2. GradualBlur smears the image well above where the white goes solid —
+               desktop-only, kept off the ~220px mobile crop.
+            3. An eased white wash below tints the blurred remnant so tone ramps
+               smoothly instead of jumping at the section boundary. */}
+        <GradualBlur
+          target="parent"
+          position="bottom"
+          height="10rem"
+          strength={3}
+          divCount={8}
+          curve="bezier"
+          exponential
+          opacity={1}
+          zIndex={10}
+          className="hidden lg:block"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 lg:h-44 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_0%,rgba(255,255,255,0.38)_42%,rgba(255,255,255,0.74)_66%,rgba(255,255,255,0.93)_84%,#fff_96%)]"
         />
         {/* Over the image, aligned to the white wall on the left. */}
-        <div className="absolute inset-0 hidden lg:flex items-center">
+        <div className="absolute inset-0 hidden lg:flex items-center z-20">
           <div className="container-editorial">
             <HeroCopy />
           </div>
@@ -77,15 +112,14 @@ const Brand = () => (
           ratio="aspect-[4/3]"
           index="01"
         >
-          <p className="eyebrow mb-3">The promise</p>
           <h2 className="font-serif text-h2 lg:text-h1 text-[color:var(--ink-primary)] leading-[1.04] tracking-tight">
             A lifetime of peace of mind.
           </h2>
-          <p className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
+          <WordReveal className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
             Windows and doors built to last. Made to your specification, backed
             for ten years, and engineered to stay true long after the keys change
             hands.
-          </p>
+          </WordReveal>
         </EditorialSplit>
 
         <EditorialSplit
@@ -95,14 +129,13 @@ const Brand = () => (
           ratio="aspect-[4/3]"
           index="02"
         >
-          <p className="eyebrow mb-3">Any project</p>
           <h2 className="font-serif text-h2 lg:text-h1 text-[color:var(--ink-primary)] leading-[1.04] tracking-tight">
             Homes and resorts alike.
           </h2>
-          <p className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
+          <WordReveal className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
             A single residence or a multi-unit development. The same standard
             holds, whether the job is a private home or a commercial fitout.
-          </p>
+          </WordReveal>
         </EditorialSplit>
 
         <EditorialSplit
@@ -111,14 +144,13 @@ const Brand = () => (
           ratio="aspect-[4/3]"
           index="03"
         >
-          <p className="eyebrow mb-3">Finishes</p>
           <h2 className="font-serif text-h2 lg:text-h1 text-[color:var(--ink-primary)] leading-[1.04] tracking-tight">
-            Twelve, heat-fused.
+            Twelve finishes, heat-fused.
           </h2>
-          <p className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
+          <WordReveal className="mt-5 text-body-lg text-[color:var(--ink-secondary)] leading-[1.6]">
             Six solid colors, six wood-grain laminates, fused into the profile.
             Wipe-clean, never repainted.
-          </p>
+          </WordReveal>
           <div className="mt-8">
             <EditorialButton to="/finishes" variant="ghost" size="md">
               See all twelve
@@ -141,9 +173,9 @@ const Brand = () => (
             Year limited warranty.
           </p>
         </div>
-        <p className="lg:col-span-5 text-body-sm lg:text-body text-white/65 leading-[1.55] max-w-[32rem]">
-          {BRAND.promise} That is what the warranty is for.
-        </p>
+        <WordReveal className="lg:col-span-5 text-body-sm lg:text-body text-white/65 leading-[1.55] max-w-[32rem]">
+          {`${BRAND.promise} That is what the warranty is for.`}
+        </WordReveal>
       </div>
 
       {/* Marquee scope band flush to bottom of section */}
@@ -171,11 +203,11 @@ const Brand = () => (
             Certifications and standards.
           </EyebrowHeading>
         </div>
-        <p className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
+        <WordReveal className="lg:col-span-6 lg:col-start-7 text-body lg:text-body-lg text-[color:var(--ink-secondary)] leading-[1.65] self-end">
           Every FourlinQ system is engineered, fabricated, and installed against
           the standards below. They hold whether your project is a private
           residence or a commercial fitout.
-        </p>
+        </WordReveal>
       </div>
       <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
         {certifications.map((cert) => (
@@ -197,10 +229,10 @@ const Brand = () => (
           <EyebrowHeading eyebrow="Book a consultation" level={2}>
             Start with a conversation.
           </EyebrowHeading>
-          <p className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[28rem] leading-[1.65]">
+          <WordReveal className="mt-6 text-body lg:text-body-lg text-[color:var(--ink-secondary)] max-w-[28rem] leading-[1.65]">
             Four quick questions about your project. A FourlinQ engineer replies
             within one business day to book your ninety-minute showroom visit.
-          </p>
+          </WordReveal>
 
           <ul className="mt-10 flex flex-col divide-y divide-[color:var(--rule-soft)] border-y border-[color:var(--rule-soft)]">
             <ContactRow icon={<Phone size={16} strokeWidth={1.5} />} label="Sales" value={CONTACT.mobileSales} href={phoneHref(CONTACT.mobileSales)} />
