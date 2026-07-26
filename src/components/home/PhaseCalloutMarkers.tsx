@@ -25,7 +25,7 @@ const PhaseCalloutMarkers = ({ callouts, active }: Props) => (
     {callouts.map((c, i) => (
       <span
         key={c.label + i}
-        className="absolute flex h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[color:var(--accent)] text-[0.5rem] font-semibold leading-none text-white shadow-[0_1px_5px_rgba(0,0,0,0.35)] ring-[1.5px] ring-white"
+        className="absolute flex h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[color:var(--accent)] text-[0.625rem] font-semibold leading-none text-white shadow-[0_1px_5px_rgba(0,0,0,0.35)] ring-[1.5px] ring-white"
         style={{ left: `${c.anchor.x}%`, top: `${c.anchor.y}%` }}
       >
         {i + 1}

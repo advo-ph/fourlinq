@@ -998,7 +998,7 @@ const PartBody = ({
               >
                 {/* Matches the numbered pin on the still — mobile only */}
                 <span
-                  className="mt-px flex h-3.5 w-3.5 flex-none items-center justify-center rounded-full bg-[color:var(--accent)] text-[0.5rem] font-semibold leading-none text-white lg:hidden"
+                  className="mt-px flex h-3.5 w-3.5 flex-none items-center justify-center rounded-full bg-[color:var(--accent)] text-[0.625rem] font-semibold leading-none text-white lg:hidden"
                   aria-hidden="true"
                 >
                   {ci + 1}
