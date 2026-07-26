@@ -37,8 +37,10 @@ const Index = () => {
         headline={"Built to Last.\nDesigned to Inspire."}
       />
 
-      {/* A little breathing room above the benefit sequence. */}
-      <div aria-hidden="true" className="h-[10vh]" />
+      {/* A little breathing room above the benefit sequence. Sized against the
+          stable viewport var so it can't reflow when mobile browser chrome
+          collapses mid-scroll. */}
+      <div aria-hidden="true" className="h-[calc(var(--fq-lvh)*0.1)]" />
 
       {/* Benefit sequence. Its section title + Part 0 intro live inside the
           component now (aligned to the sequence's own margins), per Prince

@@ -101,7 +101,7 @@ const WhyUpvc = () => (
   <Layout>
     {/* ── Full-viewport hero ── text left, profile image right, both vertically
         centered. Breadcrumb floats at top inside the same hero. ── */}
-    <header className="relative h-[calc(100vh-72px)] flex flex-col">
+    <header className="relative h-[calc(var(--fq-lvh)-72px)] flex flex-col">
       <div className="container-editorial pt-8 lg:pt-12">
         <nav aria-label="Breadcrumb">
           <ol className="flex items-center gap-2 text-[12px] tracking-[0.08em] uppercase text-[color:var(--ink-muted)]">
@@ -138,7 +138,7 @@ const WhyUpvc = () => (
                 alt="FourlinQ multi-chamber uPVC profile in Walnut finish"
                 loading="eager"
                 decoding="async"
-                className="block w-full h-auto max-h-[48vh] object-contain"
+                className="block w-full h-auto max-h-[calc(var(--fq-lvh)*0.48)] object-contain"
               />
             </div>
           </div>

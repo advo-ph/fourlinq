@@ -139,7 +139,7 @@ const NavSearch = ({ open, onClose }: NavSearchProps) => {
       role="search"
       className="fixed left-0 right-0 top-[72px] z-50 bg-white text-[color:var(--ink-primary)] border-b border-[color:var(--rule-soft)]"
     >
-      <div className="container-editorial py-8 lg:py-10 max-h-[calc(100vh-72px)] overflow-y-auto">
+      <div className="container-editorial py-8 lg:py-10 max-h-[calc(var(--fq-svh)-72px)] overflow-y-auto">
         {/* Input row */}
         <div className="flex items-center gap-4 border-b-2 border-[color:var(--ink-primary)] pb-4">
           <Search size={20} strokeWidth={1.5} className="text-[color:var(--ink-muted)] shrink-0" />

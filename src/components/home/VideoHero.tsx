@@ -68,7 +68,11 @@ const VideoHero = (props: VideoHeroProps) => {
   return (
     <section
       className="relative w-full overflow-hidden bg-[color:var(--canvas-dark)] -mt-[72px]"
-      style={{ height: "100dvh" }}
+      /* NOT 100dvh: dvh tracks the collapsing browser chrome, so the hero
+         resized mid-scroll and shifted the whole page (mobile jitter).
+         --fq-svh is the stable small-viewport height (px-pinned on touch
+         devices for in-app browsers) — same size at load, never moves. */
+      style={{ height: "var(--fq-svh)" }}
       aria-label="FourlinQ projects"
     >
       <video

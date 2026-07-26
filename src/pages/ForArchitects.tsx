@@ -110,7 +110,7 @@ const ForArchitects = () => {
   return (
   <Layout>
     {/* Cinematic hero */}
-    <section className="relative h-[82vh] min-h-[560px] overflow-hidden">
+    <section className="relative h-[calc(var(--fq-lvh)*0.82)] min-h-[560px] overflow-hidden">
       <EditorialImage
         src="/images/projects/real/residence-wood-grain-corner.webp"
         alt="A two-storey residence with full-height FourlinQ corner glazing"

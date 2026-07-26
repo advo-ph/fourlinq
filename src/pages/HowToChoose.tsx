@@ -158,7 +158,7 @@ const HowToChoose = () => {
   return (
     <Layout>
       {/* Cinematic hero: one photograph, one confident line */}
-      <section className="relative h-[72vh] min-h-[520px] overflow-hidden">
+      <section className="relative h-[calc(var(--fq-lvh)*0.72)] min-h-[520px] overflow-hidden">
         <EditorialImage
           src="/images/projects/real/sliding-doors-lanai.webp"
           alt="Sliding lanai doors on a FourlinQ home, open to a garden"

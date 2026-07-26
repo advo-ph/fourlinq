@@ -12,7 +12,7 @@ const NotFound = () => {
 
   return (
     <Layout>
-      <section className="min-h-[70vh] flex items-center">
+      <section className="min-h-[calc(var(--fq-lvh)*0.7)] flex items-center">
         <div className="container-editorial">
           <p className="eyebrow mb-5">
             404. Page not found

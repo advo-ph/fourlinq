@@ -15,7 +15,7 @@ import { BRAND, CONTACT } from "@/data/fourlinq-data";
 const Warranty = () => (
   <Layout>
     {/* Cinematic hero */}
-    <section className="relative h-[78vh] min-h-[540px] overflow-hidden">
+    <section className="relative h-[calc(var(--fq-lvh)*0.78)] min-h-[540px] overflow-hidden">
       <EditorialImage
         src="/images/wp-export/FourlinQ-Project-7.jpg"
         alt="Modern residence with FourlinQ casement and sliding windows installed throughout"

@@ -128,7 +128,7 @@ const ProjectDetail = () => {
     if (!cmsSettled) {
       return (
         <Layout>
-          <section className="min-h-[60vh]" aria-busy="true" aria-label="Loading project" />
+          <section className="min-h-[calc(var(--fq-lvh)*0.6)]" aria-busy="true" aria-label="Loading project" />
         </Layout>
       );
     }

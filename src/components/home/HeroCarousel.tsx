@@ -43,7 +43,9 @@ const HeroCarousel = ({
   return (
     <section
       className="relative w-full overflow-hidden bg-[color:var(--canvas-dark)] -mt-[72px]"
-      style={{ height: "100dvh" }}
+      /* NOT 100dvh — see VideoHero: dvh resizes with the collapsing browser
+         chrome and jitters the page; --fq-svh is stable. */
+      style={{ height: "var(--fq-svh)" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"

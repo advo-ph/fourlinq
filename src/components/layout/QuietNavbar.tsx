@@ -284,7 +284,6 @@ const QuietNavbar = () => {
   // Force-hidden by full-bleed sections (e.g. the ScrollWindow benefit sequence)
   // that want the viewport to themselves — overrides the scroll-direction logic.
   const [forceHidden, setForceHidden] = useState(false);
-  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
   const lastScrollY = useRef(0);
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -298,15 +297,44 @@ const QuietNavbar = () => {
     onClose: () => setMobileOpen(false),
   });
 
-  // A short grace period keeps the panel open while the pointer travels from
-  // the trigger into the panel (the bug was: any un-hover instantly hid it).
-  const holdPanel = (label: string) => {
-    clearTimeout(closeTimer.current);
-    setOpenPanel(label);
+  // A single red underline shared by every top-level desktop item. Hovering a
+  // button grows it out from that button's center; moving to a sibling slides
+  // and resizes it there; leaving the list shrinks it back into its center.
+  // Driven imperatively (refs + style writes) so pointer moves never re-render
+  // the nav; the span's className owns the tween timing.
+  const navListRef = useRef<HTMLUListElement>(null);
+  const hoverLineRef = useRef<HTMLSpanElement>(null);
+  const hoverLineVisible = useRef(false);
+
+  const moveHoverLine = (el: HTMLElement) => {
+    const list = navListRef.current;
+    const line = hoverLineRef.current;
+    if (!list || !line) return;
+    const listBox = list.getBoundingClientRect();
+    const box = el.getBoundingClientRect();
+    if (!hoverLineVisible.current) {
+      // Snap (transition suppressed) to a zero-width line at the button's
+      // center so the tween below reads as "grow outward", not "fly in".
+      line.style.transition = "none";
+      line.style.left = `${box.left - listBox.left + box.width / 2}px`;
+      line.style.width = "0px";
+      void line.offsetWidth; // flush the snap before re-enabling the tween
+      line.style.transition = "";
+    }
+    line.style.left = `${box.left - listBox.left}px`;
+    line.style.width = `${box.width}px`;
+    hoverLineVisible.current = true;
   };
-  const releasePanel = () => {
-    clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => setOpenPanel(null), 160);
+
+  const retractHoverLine = () => {
+    const line = hoverLineRef.current;
+    if (!line || !hoverLineVisible.current) return;
+    // Collapse in place: recentre on the line's current midpoint at width 0.
+    // offsetLeft/offsetWidth read the live mid-tween values, so a fast exit
+    // shrinks from wherever the line actually is, not its last target.
+    line.style.left = `${line.offsetLeft + line.offsetWidth / 2}px`;
+    line.style.width = "0px";
+    hoverLineVisible.current = false;
   };
 
   // Warm the window & door hover animations the first time Systems opens.
@@ -380,9 +408,12 @@ const QuietNavbar = () => {
               <Logo variant={transparent ? "light" : "dark"} className="h-11" />
             </Link>
 
-            {/* Desktop nav. Each li spans the full 72px bar so there is no
-                dead hover zone between the trigger and its panel. */}
-            <ul className="hidden lg:flex items-center gap-1 xl:gap-2 h-full">
+            {/* Desktop nav */}
+            <ul
+              ref={navListRef}
+              onMouseLeave={retractHoverLine}
+              className="relative hidden lg:flex items-center gap-1 xl:gap-2 h-full"
+            >
               {navLinks.map((link) => {
                 const active = location.pathname === link.to ||
                                (link.to !== "/" && location.pathname.startsWith(link.to));
@@ -391,22 +422,17 @@ const QuietNavbar = () => {
                   <li
                     key={link.label}
                     className="relative h-full flex items-center"
-                    onMouseEnter={() => link.group && holdPanel(link.label)}
-                    onMouseLeave={() => link.group && releasePanel()}
                   >
                     {link.group ? (
-                      /* A panel trigger. Hover opens it; click toggles it open
-                         and closed. It never navigates — the panel is the
-                         destination. */
+                      /* A panel trigger. Click toggles it open and closed —
+                         hover only moves the underline cue, never the panel.
+                         It never navigates — the panel is the destination. */
                       <button
                         type="button"
                         aria-haspopup="true"
                         aria-expanded={panelOpen}
-                        onFocus={() => holdPanel(link.label)}
-                        onClick={() => {
-                          clearTimeout(closeTimer.current);
-                          setOpenPanel(panelOpen ? null : link.label);
-                        }}
+                        onClick={() => setOpenPanel(panelOpen ? null : link.label)}
+                        onMouseEnter={(e) => moveHoverLine(e.currentTarget)}
                         className={cn(
                           "whitespace-nowrap text-body-sm font-medium transition-[background-color,color] duration-300 ease-marvin",
                           "inline-flex min-h-8 items-center rounded-sm px-4",
@@ -415,8 +441,8 @@ const QuietNavbar = () => {
                               ? "bg-white/15 text-white"
                               : "bg-[color:var(--canvas-soft)] text-[color:var(--ink-primary)]"
                             : transparent
-                              ? "text-white hover:bg-white/15"
-                              : "text-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)]"
+                              ? "text-white"
+                              : "text-[color:var(--ink-primary)]"
                         )}
                       >
                         {link.label}
@@ -424,6 +450,7 @@ const QuietNavbar = () => {
                     ) : (
                       <Link
                         to={link.to}
+                        onMouseEnter={(e) => moveHoverLine(e.currentTarget)}
                         className={cn(
                           "whitespace-nowrap text-body-sm font-medium transition-[background-color,color] duration-300 ease-marvin",
                           "inline-flex min-h-8 items-center rounded-sm px-4",
@@ -432,8 +459,8 @@ const QuietNavbar = () => {
                               ? "bg-white/15 text-white"
                               : "bg-[color:var(--canvas-soft)] text-[color:var(--ink-primary)]"
                             : transparent
-                              ? "text-white hover:bg-white/15"
-                              : "text-[color:var(--ink-primary)] hover:bg-[color:var(--canvas-soft)]"
+                              ? "text-white"
+                              : "text-[color:var(--ink-primary)]"
                         )}
                       >
                         {link.label}
@@ -442,19 +469,9 @@ const QuietNavbar = () => {
 
                     {link.group && (
                       <div
-                        // The parent <li> is the single source of truth for
-                        // hover: its onMouseEnter/onMouseLeave already keep the
-                        // panel open while the pointer is anywhere inside the
-                        // trigger+panel subtree. Because this panel is a DOM
-                        // descendant of that <li> (position:fixed changes where
-                        // it paints, not where it lives in the tree), moving the
-                        // pointer from the panel back up onto the trigger never
-                        // fires the <li>'s mouseleave — so the panel stays open.
-                        // onMouseEnter here is a harmless safety net. A panel
-                        // onMouseLeave is deliberately omitted: it used to fire
-                        // on that panel→trigger move and schedule a close, which
-                        // read as "hovering the button a second time closes it".
-                        onMouseEnter={() => holdPanel(link.label)}
+                        // Click-only panel: no mouse handlers here. It stays
+                        // open until the trigger is clicked again, the backdrop
+                        // is clicked, Escape is pressed, or the route changes.
                         className={cn(
                           "fixed left-0 right-0 top-[72px]",
                           panelOpen
@@ -464,7 +481,7 @@ const QuietNavbar = () => {
                         )}
                       >
                         <div className="bg-white text-[color:var(--ink-primary)] border-b border-[color:var(--rule-soft)]">
-                          <div className="container-editorial py-9 max-h-[calc(100vh-72px)] overflow-y-auto">
+                          <div className="container-editorial py-9 max-h-[calc(var(--fq-svh)-72px)] overflow-y-auto">
                             {link.label === "Systems" ? (
                               /* Systems: a 4-up product grid (windows on the top
                                  row, doors beneath) on the left, a vertical
@@ -554,6 +571,15 @@ const QuietNavbar = () => {
                   </li>
                 );
               })}
+              {/* The shared hover underline. Position/size are written by
+                  moveHoverLine/retractHoverLine; this class only owns the
+                  tween. bottom-[18px] parks it just under the 32px buttons
+                  centered in the 72px bar. */}
+              <span
+                ref={hoverLineRef}
+                aria-hidden="true"
+                className="pointer-events-none absolute bottom-[18px] left-0 h-[2px] w-0 bg-[color:var(--accent)] transition-[left,width] duration-200 ease-marvin"
+              />
             </ul>
 
             {/* Right side: search + primary conversion CTA (red, Marvin-style). */}
@@ -603,11 +629,11 @@ const QuietNavbar = () => {
 
       {/* Dim + blur the page behind an open mega-panel. Sits under the nav
           (z-40 vs the nav's z-50) so the bar and its crisp panel stay on top,
-          while everything below the bar is frosted. Hovering it closes the
+          while everything below the bar is frosted. Clicking it closes the
           panel. */}
       <div
         aria-hidden="true"
-        onMouseEnter={() => setOpenPanel(null)}
+        onClick={() => setOpenPanel(null)}
         className={cn(
           "fixed inset-x-0 top-[72px] bottom-0 z-40 bg-black/60 backdrop-blur-md",
           "transition-opacity duration-300 ease-marvin",
