@@ -30,8 +30,23 @@ const STICKY_TOP = 88;
 // 4:3 cropped tiles; the left column is a sticky feature that
 // crossfades through five heroes as you scroll, with a thin top line tracking
 // scroll position within the current part. (Per Prince, 2026-07-22.)
-const ProjectTile = ({ project, coverSrc }: { project: (typeof allProjects)[number]; coverSrc?: string }) => {
+// Tiles this far into the list are on screen the moment the section is reached,
+// so they load eagerly at high priority; everything below stays lazy. Two
+// masonry columns on mobile, three from xl — six covers the first rows either way.
+const EAGER_TILE_COUNT = 6;
+
+const ProjectTile = ({
+  project,
+  coverSrc,
+  eager,
+}: {
+  project: (typeof allProjects)[number];
+  coverSrc?: string;
+  eager?: boolean;
+}) => {
   // Use admin-set cover if available, otherwise the baseline project hero.
+  // toThumbPath resolves both families of small variant — the baked 640px WebP
+  // for repo assets and the 480px "-thumb" sibling for CMS uploads.
   const imageSrc = coverSrc ?? project.image;
   return (
     <Link
@@ -42,7 +57,8 @@ const ProjectTile = ({ project, coverSrc }: { project: (typeof allProjects)[numb
         <img
           src={versionedImage(toThumbPath(imageSrc))}
           alt={project.name}
-          loading="lazy"
+          loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : "auto"}
           decoding="async"
           className="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.04]"
           onError={(e) => {
@@ -63,6 +79,14 @@ const InspirationStrip = () => {
   const panelRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  // The feature heroes are ~1.9 MB of full-res JPEG. They are display:none below
+  // lg, but a hidden <img> with a src still downloads — so mobile was paying for
+  // all five and showing none. Gate on the same query the scroll effect uses and
+  // skip rendering them entirely. Initialised eagerly (not in an effect) so
+  // desktop still paints the first hero on the very first render.
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches,
+  );
   // Live admin/CMS state. Null until each request lands; the derived list below
   // degrades to the static baseline so the gallery is never blank.
   const [merged, setMerged] = useState<MergedProjectImagesResponse | null>(null);
@@ -171,6 +195,9 @@ const InspirationStrip = () => {
 
     const onMq = () => {
       stop();
+      // Keep hero rendering in step with the breakpoint: crossing up to desktop
+      // mounts them, crossing down unmounts so they stop costing bandwidth.
+      setIsDesktop(mq.matches);
       if (mq.matches) start();
       else setActiveIndex(0);
     };
@@ -213,7 +240,7 @@ const InspirationStrip = () => {
 
             {/* Crossfading hero stack. object-cover so any source ratio overlays cleanly. */}
             <div className="relative hidden mt-3 aspect-[3/2] overflow-hidden bg-neutral-100 lg:block">
-              {FEATURE_HEROES.map((hero, i) => (
+              {isDesktop && FEATURE_HEROES.map((hero, i) => (
                 <img
                   key={hero.src}
                   src={versionedImage(hero.src)}
@@ -249,9 +276,13 @@ const InspirationStrip = () => {
 
           {/* The full catalog: every project, 4:3 tiles, masonry columns. */}
           <div className="columns-2 xl:columns-3 gap-1.5 lg:gap-2">
-            {projects.map((p) => (
+            {projects.map((p, i) => (
               <div key={p.id} className="mb-1.5 lg:mb-2 break-inside-avoid">
-                <ProjectTile project={p} coverSrc={coverImages[p.id]} />
+                <ProjectTile
+                  project={p}
+                  coverSrc={coverImages[p.id]}
+                  eager={i < EAGER_TILE_COUNT}
+                />
               </div>
             ))}
           </div>
