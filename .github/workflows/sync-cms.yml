@@ -36,7 +36,11 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Raised from 10: the job now also re-embeds the knowledge base. 106 chunks
+    # at ~0.75s each is ~80s on a clean run, but seed-embeddings backs off up to
+    # 30s per chunk on 429s, so a throttled run needs far more than the migrations
+    # alone ever did.
+    timeout-minutes: 20
 
     steps:
       - name: Configure SSH
@@ -97,5 +101,33 @@ jobs:
           echo "--- sync-product-content (product display fields) ---"
           ./node_modules/.bin/tsx server/scripts/sync-product-content.ts
 
-          echo "Done: migrations applied and content synced against production."
+          # ── Chatbot knowledge base ──────────────────────────────────────
+          # LinQ answers from knowledge_chunk, which is generated out of
+          # src/data (branches, finishes, products, FAQ, page map). Nothing
+          # used to regenerate it, so every content edit silently drifted away
+          # from what the bot knew until someone SSHed in and reseeded by hand.
+          #
+          # These two run as a PAIR and must never be split: seed-site-knowledge
+          # sets embedding=NULL on every row it rewrites, and retrieveContext
+          # filters on `embedding IS NOT NULL` for its vector search. Between the
+          # two steps the bot silently degrades to the keyword ILIKE fallback, so
+          # a half-run is worse than no run at all. The verification below is
+          # what makes that failure loud instead of invisible.
+          echo "--- seed-site-knowledge (regenerate chunks from src/data) ---"
+          ./node_modules/.bin/tsx server/scripts/seed-site-knowledge.ts
+
+          echo "--- seed-embeddings (re-embed what the reseed nulled) ---"
+          ./node_modules/.bin/tsx server/scripts/seed-embeddings.ts
+
+          echo "--- verify: every active chunk carries an embedding ---"
+          UNEMBEDDED=$(sudo -u postgres psql fourlinq -tAc \
+            "SELECT count(*) FROM knowledge_chunk WHERE is_active = true AND embedding IS NULL")
+          if [ "$UNEMBEDDED" != "0" ]; then
+            echo "FAIL: ${UNEMBEDDED} active chunk(s) have no embedding — LinQ is on the keyword fallback."
+            echo "Re-run this workflow. If it persists, check GEMINI_API_KEY and the embedding quota on the VPS."
+            exit 1
+          fi
+          echo "OK: all active chunks embedded."
+
+          echo "Done: migrations applied, content synced, knowledge base reseeded."
           REMOTE

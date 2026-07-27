@@ -25,7 +25,9 @@ export async function checkAuthHandler(req: Request, res: Response) {
   // Adapter for the existing /api/admin/check shape: { authenticated: bool, user? }.
   const fakeRes = {
     statusCode: 200,
-    status(code: number) { this.statusCode = code; return this; },
+    // `this` needs annotating: the trailing `as unknown as Response` cast makes
+    // TS infer the literal's `this` as {}, so `this.statusCode` fails to resolve.
+    status(this: { statusCode: number }, code: number) { this.statusCode = code; return this; },
     json(body: unknown) { (this as { _body?: unknown })._body = body; return this; },
   } as unknown as Response & { _body?: { user?: unknown } };
   await new Promise<void>((resolve) => {
