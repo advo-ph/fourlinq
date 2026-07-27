@@ -34,14 +34,24 @@ const elaboration: Record<string, string> = {
     "With the right glazing, the chambered profile typically gives 24 to 32 dB of attenuation. That isn't silence, but a bedroom on a main road becomes usable as a bedroom again.",
 };
 
-const photo: Record<string, { src: string; alt: string }> = {
-  "attractive-appearance":     { src: "/images/finishes/textures/walnut.jpeg",                  alt: "Walnut wood-grain finish texture" },
-  "fire-retardant":            { src: "/images/wp-export/Fire-Retardant.jpg",                  alt: "uPVC fire-retardant material test" },
-  "thermal-efficiency":        { src: "/images/wp-export/White-Profile.jpg",                   alt: "Multi-chamber uPVC profile cross-section" },
-  "corrosion-resistant":       { src: "/images/wp-export/Corrosion-Resistance.jpg",            alt: "Salt-air corrosion test on uPVC" },
-  "long-lasting-performance":  { src: "/images/wp-export/Stainless-Mechanism-e1568775693636.jpg", alt: "Stainless operating hardware" },
-  "weather-resistance":        { src: "/images/wp-export/Air-Water-Tight.jpg",                 alt: "EPDM gasket weather seal" },
-  "sound-insulation":          { src: "/images/wp-export/Sound-Insulation.jpg",                alt: "Sound-insulating profile and glazing" },
+/**
+ * One isometric cutaway per advantage. These replace the wp-export stock
+ * photos, which showed a flame, a rusted hinge and a sound wave — generic
+ * enough to belong to any material, and doing none of the arguing.
+ *
+ * Each diagram is the same FourlinQ multi-chamber profile, sectioned, with
+ * one thing happening to it. Same drawing, same viewing angle, same line
+ * weight across all six, so the grid reads as one exploded set rather than
+ * six unrelated pictures. Normalised to a shared 4:3 box at a fixed margin
+ * by scripts/optimize-benefit-icons.mjs.
+ */
+const diagram: Record<string, { src: string; alt: string }> = {
+  "fire-retardant":            { src: "/images/benefit-icon/fire-retardant.webp",           alt: "Cutaway of a uPVC profile with a flame deflected off a shield at its face" },
+  "thermal-efficiency":        { src: "/images/benefit-icon/thermal-efficiency.webp",       alt: "Cutaway showing heat entering the chambered profile and cold held on the other side" },
+  "corrosion-resistant":       { src: "/images/benefit-icon/corrosion-resistant.webp",      alt: "Cutaway with salt and moisture turned back from the profile face" },
+  "long-lasting-performance":  { src: "/images/benefit-icon/long-lasting-performance.webp", alt: "Cutaway of a hinged sash on a cycle arrow, marked as passing" },
+  "weather-resistance":        { src: "/images/benefit-icon/weather-resistance.webp",       alt: "Cutaway showing driven rain and wind stopped at the gasket and drained out" },
+  "sound-insulation":          { src: "/images/benefit-icon/sound-insulation.webp",         alt: "Cutaway showing sound waves attenuating through the glazing and chambered frame" },
 };
 
 const find = (id: string) => benefits.find((b) => b.id === id)!;
@@ -234,11 +244,19 @@ const WhyUpvc = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
         {rest.map((id) => {
           const b = find(id);
-          const p = photo[id];
+          const d = diagram[id];
           return (
             <article key={id}>
-              <div className="aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)] mb-6">
-                <img src={p.src} alt={p.alt} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+              {/* No tile fill and no frame — the drawings are already trimmed to
+                  a shared box on white, so they align on their own and sit on
+                  the page the way a cutaway does in the brochure.
+
+                  Square below md, where one tile owns the full column and a
+                  landscape box would waste the width the near-square drawing
+                  could be using; 4:3 from md up, where tiles sit two- and
+                  three-across and the row wants the shorter box. */}
+              <div className="aspect-square md:aspect-[4/3] mb-6">
+                <img src={d.src} alt={d.alt} loading="lazy" decoding="async" className="w-full h-full object-contain" />
               </div>
               <h3 className="font-serif font-normal tracking-tight text-h5 text-[color:var(--ink-primary)] leading-[1.2] mb-3">
                 {b.title}
