@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, ImagePlus } from "lucide-react";
+import { X, Send, Loader2, ImagePlus, ChevronRight, PanelsTopLeft, Camera, MapPin } from "lucide-react";
 import ChatMessage from "./ChatMessage";
 import { streamChat, resetChat } from "@/lib/gemini-chat";
 import { useDialogFocus } from "@/hooks/useDialogFocus";
@@ -23,11 +23,48 @@ interface ChatPanelProps {
   onClose: () => void;
 }
 
-const SUGGESTIONS = [
-  "What systems do you offer?",
-  "Is uPVC good for typhoons?",
-  "How do I request a quote?",
-  "Tell me about your finishes",
+/**
+ * Three ways in, instead of four interchangeable question chips.
+ *
+ * The old empty state was a flat chip row on ~400px of dead grey, and it never
+ * told anyone the panel can read a photo — that lived behind an unlabelled
+ * icon in the composer, so effectively nobody used it. Each row here commits to
+ * one job and says what it does, and the middle one exists to surface the
+ * photo path at the moment someone is deciding what to ask.
+ */
+type Intent = {
+  id: string;
+  icon: typeof PanelsTopLeft;
+  title: string;
+  detail: string;
+  /** Sends this as the opening question. Omit for rows that run an action. */
+  message?: string;
+  /** Opens the photo picker rather than sending a message. */
+  action?: "photo";
+};
+
+const INTENT: Intent[] = [
+  {
+    id: "system",
+    icon: PanelsTopLeft,
+    title: "Find the right system",
+    detail: "Casement, sliding, awning — and which suits your opening",
+    message: "Help me choose a window system. What types do you offer, and how do I pick the right one for my opening?",
+  },
+  {
+    id: "photo",
+    icon: Camera,
+    title: "Show me your wall",
+    detail: "Send a photo — I'll suggest a system and a finish",
+    action: "photo",
+  },
+  {
+    id: "visit",
+    icon: MapPin,
+    title: "Visit us or get a quote",
+    detail: "Branches, the sales team, and what the warranty covers",
+    message: "Where can I see FourlinQ windows in person, and how do I get a quote?",
+  },
 ];
 
 function getFollowUps(text: string, allMessages: Message[]): FollowUp[] {
@@ -251,23 +288,48 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
             <p className="text-[14px] font-semibold text-[color:var(--ink-primary)] mb-1">
               Hi, I'm LinQ
             </p>
-            <p className="text-[12.5px] text-[color:var(--ink-secondary)] leading-relaxed mb-4">
-              Your FourlinQ product specialist. Ask anything about our windows, doors, or uPVC systems.
+            <p className="text-[12.5px] text-[color:var(--ink-secondary)] leading-relaxed mb-5">
+              I answer from FourlinQ's own product data — systems, finishes, warranty, branches.
             </p>
-            <p className="text-[10px] tracking-[0.1em] uppercase text-[color:var(--ink-muted)] font-medium mb-2">
-              Try asking
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => sendMessage(s)}
-                  className="text-[12px] px-3 py-1.5 bg-white border border-[color:var(--rule-strong)] text-[color:var(--ink-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin rounded-full"
-                >
-                  {s}
-                </button>
+
+            {/* Hairline-separated rows rather than boxed cards: the panel is
+                already a bordered surface, and stacking outlines inside it
+                reads as clutter at this width. */}
+            <ul className="border-t border-[color:var(--rule-soft)]">
+              {INTENT.map(({ id, icon: Icon, title, detail, message, action }) => (
+                <li key={id}>
+                  <button
+                    onClick={() => (action === "photo" ? fileInputRef.current?.click() : sendMessage(message!))}
+                    className="group w-full flex items-start gap-3 py-3 text-left border-b border-[color:var(--rule-soft)] transition-colors duration-300 ease-marvin hover:bg-white"
+                  >
+                    <Icon
+                      size={16}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                      className="mt-0.5 shrink-0 text-[color:var(--ink-muted)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[12.5px] font-medium text-[color:var(--ink-primary)] leading-snug">
+                        {title}
+                      </span>
+                      <span className="block text-[11.5px] text-[color:var(--ink-muted)] leading-snug mt-0.5">
+                        {detail}
+                      </span>
+                    </span>
+                    <ChevronRight
+                      size={14}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                      className="mt-0.5 shrink-0 text-[color:var(--ink-faint)] group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+                    />
+                  </button>
+                </li>
               ))}
-            </div>
+            </ul>
+
+            <p className="mt-4 text-[11.5px] text-[color:var(--ink-muted)] leading-relaxed">
+              Or type your question below. For pricing, I'll point you to sales — quotes are always per project.
+            </p>
           </div>
         )}
 

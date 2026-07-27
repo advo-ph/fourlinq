@@ -64,6 +64,13 @@ export async function retrieveContext(
 
 /**
  * Build the system prompt with injected RAG context for LinQ.
+ *
+ * NOTE: currently unused. The mounted chat route is routes/chat-lite.ts, which
+ * carries its own SYSTEM_PROMPT and only imports retrieveContext from here;
+ * routes/chat.ts, the sole caller of this function, is never mounted in
+ * server/index.ts. Until 2026-07-27 this prompt carried placeholder contact
+ * details (+63 2 8123 4567, info@fourlinq.ph) that would have gone live the
+ * moment anyone wired the route up. Kept in sync with chat-lite deliberately.
  */
 export function buildSystemPrompt(
   context: Array<{ title: string; content: string }>
@@ -92,6 +99,6 @@ RULES:
 3. If asked about competitors, focus on FourlinQ strengths rather than criticizing competitors
 4. Proactively suggest the Design Tool (/design-tool) when users discuss configurations
 5. Suggest booking a consultation when the conversation reaches a buying stage
-6. Contact info: +63 2 8123 4567, info@fourlinq.ph
+6. Contact info: Sales 0925-848-8888, Assistance 0925-896-5978, Landline (02)8563-5363, Email sales@fourlinq.com
 7. Always format responses in clean markdown`;
 }
