@@ -1,0 +1,107 @@
+name: DB drift audit
+
+# Reports where the PRODUCTION schema disagrees with server/migrations/*.
+#
+# Migrations here are applied by hand — there is no runner and no schema_migrations
+# ledger — so a migration that shipped, ran, and was later reverted out of the repo
+# leaves the database carrying something no file describes. That is exactly what
+# happened with 017_project_cover.sql: it was added (1657a0e), auto-deployed, then
+# deleted (b8d51a4) with no down-migration.
+#
+# STRICTLY READ-ONLY. Every statement below is a SELECT. This workflow must never
+# ALTER, DROP, INSERT, UPDATE or DELETE — its whole value is being safe to run any
+# time, against production, without thinking about it first.
+#
+# Manual trigger only.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: db-drift-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Read production schema
+        env:
+          VPS: ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          SSH="ssh -i $HOME/.ssh/id_ed25519 -o StrictHostKeyChecking=yes"
+          $SSH "$VPS" bash -s <<'REMOTE' > live-schema.txt
+          set -euo pipefail
+          Q() { sudo -u postgres psql fourlinq -tAc "$1"; }
+
+          echo "### override_type CHECK constraint"
+          Q "SELECT pg_get_constraintdef(oid)
+             FROM pg_constraint
+             WHERE conrelid = 'public.project_image_override'::regclass AND contype = 'c'"
+
+          echo "### override_type row counts (live data by type)"
+          Q "SELECT override_type || ' = ' || count(*)
+             FROM project_image_override
+             GROUP BY override_type ORDER BY override_type"
+
+          echo "### indexes on project_image_override"
+          Q "SELECT indexname FROM pg_indexes
+             WHERE tablename = 'project_image_override' ORDER BY indexname"
+
+          echo "### knowledge_chunk health"
+          Q "SELECT 'active = ' || count(*) FILTER (WHERE is_active)
+                 || ', unembedded = ' || count(*) FILTER (WHERE is_active AND embedding IS NULL)
+             FROM knowledge_chunk"
+          REMOTE
+
+          echo "──────── PRODUCTION ────────"
+          cat live-schema.txt
+
+      - name: Compare against the migrations in this repo
+        run: |
+          set -uo pipefail
+          echo "──────── DRIFT ────────"
+          STATUS=0
+
+          # 017 is absent from server/migrations on purpose: it was reverted, so
+          # 'project_cover' appearing in the live constraint is by definition drift.
+          LIVE_CHECK=$(sed -n '/### override_type CHECK/,/^###/p' live-schema.txt)
+
+          for t in project_cover; do
+            if echo "$LIVE_CHECK" | grep -q "'$t'"; then
+              echo "DRIFT: override_type '$t' is allowed in production, but no migration in this repo defines it."
+              echo "       Source: 017_project_cover.sql, added in 1657a0e and deleted in b8d51a4 with no down-migration."
+              STATUS=1
+            else
+              echo "ok: '$t' is not present in the live constraint."
+            fi
+          done
+
+          ORPHAN=$(sed -n '/### override_type row counts/,/^###/p' live-schema.txt | grep -c 'project_cover' || true)
+          if [ "$ORPHAN" != "0" ]; then
+            echo "DRIFT: project_cover rows exist in project_image_override. Nothing in the current"
+            echo "       codebase reads them — cover is derived from the first ordered image (b8d51a4)."
+            STATUS=1
+          else
+            echo "ok: no orphaned project_cover rows."
+          fi
+
+          echo
+          if [ "$STATUS" = "0" ]; then
+            echo "No drift detected."
+          else
+            echo "Drift detected — see above. This job reports only; it changes nothing."
+          fi
+          # Reporting job: surface findings without failing the run.
+          exit 0
