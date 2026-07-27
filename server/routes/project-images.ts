@@ -785,7 +785,10 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
                     baselineScoreOverrideMap.get(`${c.id}|${im.path}`)?.get(cat)
                       ?? im.scores![cat] ?? 0,
                   ])
-                ) as ImageScore
+                  // fromEntries widens to an index signature, which does not
+                  // overlap ImageScore's named keys — CATEGORIES supplies them
+                  // all, so go through unknown rather than loosen ImageScore.
+                ) as unknown as ImageScore
               : null,
           })),
           quality: rec.quality ?? null,

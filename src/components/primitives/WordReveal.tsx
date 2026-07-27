@@ -16,9 +16,9 @@ interface WordRevealProps {
   baseRotation?: number;
   /** Blur amount in px at animation start. Default 4. */
   blurStrength?: number;
-  /** ScrollTrigger end position for the container rotation tween. Default "top center". */
+  /** ScrollTrigger end position for the container rotation tween. Default "bottom bottom-=15%". */
   rotationEnd?: string;
-  /** ScrollTrigger end position for the per-word opacity/blur tweens. Default "top center". */
+  /** ScrollTrigger end position for the per-word opacity/blur tweens. Default "bottom bottom-=15%". */
   wordAnimationEnd?: string;
   /** HTML element to render. Default "p". */
   as?: ElementType;
@@ -35,6 +35,20 @@ interface WordRevealProps {
  *
  * Uses gsap.context() for scoped cleanup so multiple instances on the same
  * page do not clobber each other's ScrollTriggers on unmount.
+ *
+ * TIMING (changed 2026-07-27). The reveal used to end at "top center" — the
+ * element's TOP reaching the viewport middle. Combined with scrub and a 0.05
+ * stagger, which spreads the tween across the whole scrub range, that left the
+ * tail of a paragraph at baseOpacity while the paragraph was fully on screen
+ * and being read. A scan of /why-upvc found 57 paragraphs sitting entirely
+ * inside the viewport with words still at opacity 0.1 and blur(4px) — worst on
+ * the seven profile-feature claims, which are the page's technical argument.
+ *
+ * It now ends at "bottom bottom-=15%": the element's BOTTOM reaching 15% above
+ * the viewport bottom, i.e. the moment the whole paragraph is comfortably in
+ * view. The range is therefore "entering" to "fully readable" rather than
+ * "entering" to "halfway up the screen", and it scales with the element — a
+ * long paragraph gets a longer reveal, a short one a shorter one.
  */
 const WordReveal = ({
   children,
@@ -43,8 +57,8 @@ const WordReveal = ({
   baseOpacity = 0.1,
   baseRotation = 3,
   blurStrength = 4,
-  rotationEnd = "top center",
-  wordAnimationEnd = "top center",
+  rotationEnd = "bottom bottom-=15%",
+  wordAnimationEnd = "bottom bottom-=15%",
   as: Tag = "p",
   className,
 }: WordRevealProps) => {
@@ -108,12 +122,18 @@ const WordReveal = ({
       const toVars: gsap.TweenVars = {
         ease: "none",
         opacity: 1,
-        stagger: 0.05,
+        // Under scrub, stagger is what strands the tail of a long paragraph:
+        // the last word only lands at the very end of the range. 0.03 keeps the
+        // left-to-right sweep visible while pulling the tail in.
+        stagger: 0.03,
         ...(enableBlur ? { filter: "blur(0px)" } : {}),
         scrollTrigger: {
           trigger: el,
           scroller,
-          start: "top bottom-=20%",
+          // Start as the element enters rather than 20% in: with the end now
+          // pinned to "fully readable", starting later would compress the whole
+          // stagger into a very short scroll range and read as a flicker.
+          start: "top bottom",
           end: wordAnimationEnd,
           scrub: 1,
         },

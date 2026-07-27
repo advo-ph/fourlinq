@@ -14,7 +14,7 @@ import pool from "../db.js";
 import {
   BRAND, CONTACT, BRANCHES, ADVANTAGES, UPVC_PROFILE_FEATURES,
   PRODUCT_TYPES, MATERIALS, FRAME_FINISHES, DIMENSION_CONSTRAINTS,
-  ALUMINUM_FINISHES, PROFILE_SYSTEMS,
+  ALUMINIUM_FINISHES, PROFILE_SYSTEMS,
 } from "../../src/data/fourlinq-data.js";
 import { products as PRODUCTS } from "../../src/data/products.js";
 import { FAQ, FAQ_CATEGORIES } from "../../src/data/faq.js";
@@ -142,8 +142,8 @@ for (const m of MATERIALS) {
       (finishName.length
         ? `Compatible frame finishes (${finishName.length}): ${finishName.join(", ")}.`
         : "Compatible frame finishes: not yet confirmed for this material.") +
-      (m.id === "aluminum"
-        ? `\nAluminium is also offered in powder-coat colours — popular ones: ${ALUMINUM_FINISHES.map((f) => f.name).join(", ")}.`
+      (m.id === "aluminium"
+        ? `\nAluminium is also offered in powder-coat colours — popular ones: ${ALUMINIUM_FINISHES.map((f) => f.name).join(", ")}.`
         : ""),
     type: "material",
     tags: ["material", m.id, "finish"],
@@ -172,7 +172,7 @@ chunks.push({
 // --- Aluminium finishes (popular powder-coat colours, distinct from uPVC) ---
 chunks.push({
   title: "Aluminium Finishes — popular powder-coat colours",
-  content: `FourlinQ aluminium products come in a range of powder-coat colours. Popular finishes: ${ALUMINUM_FINISHES.map(f => f.name).join(", ")}. These are distinct from the uPVC frame finishes.`,
+  content: `FourlinQ aluminium products come in a range of powder-coat colours. Popular finishes: ${ALUMINIUM_FINISHES.map(f => f.name).join(", ")}. These are distinct from the uPVC frame finishes.`,
   type: "finish_overview",
   tags: ["finish", "aluminium", "aluminum", "powder-coat", "colours", "gray", "black", "brown", "white"],
   sourceUrl: "site://aluminium-finishes",
@@ -181,7 +181,7 @@ chunks.push({
 // --- Profile systems (extrusion brands / lines we fabricate from) ---
 chunks.push({
   title: "Profile Systems — uPVC and aluminium extrusion lines",
-  content: `uPVC profile systems: ${PROFILE_SYSTEMS.filter(p => p.material === "upvc").map(p => `${p.name} (${p.origin})`).join(", ")}. Aluminium profile systems: ${PROFILE_SYSTEMS.filter(p => p.material === "aluminum").map(p => `${p.name}${p.note ? ` — ${p.note}` : ""}`).join("; ")}.`,
+  content: `uPVC profile systems: ${PROFILE_SYSTEMS.filter(p => p.material === "upvc").map(p => `${p.name} (${p.origin})`).join(", ")}. Aluminium profile systems: ${PROFILE_SYSTEMS.filter(p => p.material === "aluminium").map(p => `${p.name}${p.note ? ` — ${p.note}` : ""}`).join("; ")}.`,
   type: "material",
   tags: ["profile", "veka", "skyframe", "aluminium", "alu-slim", "systems"],
   sourceUrl: "site://profile-systems",

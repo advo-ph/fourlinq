@@ -8,7 +8,12 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    // src/data is in `include` above, and some of those modules import each
+    // other through the @/ alias. Without this the server project cannot
+    // resolve them and reports phantom TS2307s.
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": [
     "server/**/*.ts",
