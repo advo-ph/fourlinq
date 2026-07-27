@@ -64,7 +64,14 @@ export function phoneHref(phone: string): string {
 
 // ─────────────────────────────────────────────
 // BRANCHES
-// Source: Brochure footer: all 5 locations verified
+// Source: Brochure footer. Three locations, all verified.
+//
+// `type` is not rendered anywhere — its only consumer is the chatbot knowledge
+// seed, which writes it into the passage as "{label} ({type})". Ortigas and
+// Alabang were typed "depot" while every customer-facing surface, LinQ
+// included, calls all three showrooms; that mismatch put "(depot)" into the
+// bot's grounding for two of the three. Client wording wins, so they are
+// typed to match what we actually say.
 // ─────────────────────────────────────────────
 
 export interface Branch {
@@ -83,7 +90,7 @@ export const BRANCHES: Branch[] = [
   {
     id: "ortigas",
     label: "Ortigas: CW Home Depot",
-    type: "depot",
+    type: "showroom",
     address: "Unit 41 Doña Julia Vargas Ave., cor. Meralco Avenue, Brgy. Ugong, Pasig City",
     city: "Pasig City",
     region: "NCR",
@@ -94,7 +101,7 @@ export const BRANCHES: Branch[] = [
   {
     id: "alabang",
     label: "Alabang: CW Home Depot",
-    type: "depot",
+    type: "showroom",
     address: "Alabang Showroom G/F Unit B-22 / Alabang Showroom 2/F Unit A-44, Alabang Zapote Road cor. Filinvest Ave., Westgate Alabang, Muntinlupa",
     city: "Muntinlupa",
     region: "NCR",
