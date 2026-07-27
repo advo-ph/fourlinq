@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+await p.goto('http://localhost:8080/projects/fourlinq-turnover-3', { waitUntil: 'networkidle', timeout: 90000 });
+await p.waitForTimeout(800);
+const strip = p.locator('section.lg\\:hidden');
+const thumbs = strip.locator('button[aria-label^="Show photo"]');
+console.log('mobile thumbs:', await thumbs.count());
+const read = (i) => thumbs.nth(i).evaluate(n => { const cs = getComputedStyle(n); return `${cs.outlineStyle} ${cs.outlineWidth} ${cs.outlineColor} @ ${cs.outlineOffset} opacity=${cs.opacity}`; });
+console.log('default #0:', await read(0));
+await thumbs.nth(2).tap();
+await p.waitForTimeout(400);
+console.log('tapped  #2:', await read(2), '| #0 now:', await read(0));
+const box = await strip.locator('div.grid').boundingBox();
+await p.screenshot({ path: '.claude/chrome-devtools/tmp/gallery-ring-after-mobile.png', clip: box });
+await b.close();

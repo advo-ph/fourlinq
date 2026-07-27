@@ -135,12 +135,19 @@ const ProjectHeroGallery = ({ photos, title, className, ratio = "4/3" }: Project
   const railGridClass =
     photos.length > 4 ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-3";
 
+  // HAZARD — the selection marker must be `outline`, not `ring-inset`. Tailwind's
+  // ring compiles to an inset box-shadow, which CSS paints in the element's
+  // background/border phase, i.e. BEFORE child content. The thumbnail <img> fills
+  // the whole button box with object-cover, so an inset ring is painted and then
+  // completely covered — the accent marker was invisible on every breakpoint.
+  // Outlines are painted after descendants, and a negative offset keeps the stroke
+  // inside the box so it reads the same as the original inset design.
   const thumbButtonClass = (i: number) =>
     cn(
-      "block w-full aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)] transition-opacity duration-300 ease-marvin",
+      "block w-full aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)] outline transition-opacity duration-300 ease-marvin",
       i === activeIdx
-        ? "ring-2 ring-inset ring-[color:var(--accent)] opacity-100"
-        : "ring-1 ring-inset ring-[color:var(--rule-soft)] opacity-70 hover:opacity-100"
+        ? "outline-2 -outline-offset-2 outline-[color:var(--accent)] opacity-100"
+        : "outline-1 -outline-offset-1 outline-[color:var(--rule-soft)] opacity-70 hover:opacity-100"
     );
 
   const photoStack = (
