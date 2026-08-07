@@ -27,7 +27,6 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
-<<<<<<< HEAD
 ### Session: 2026-08-07 — catalog lane: four Aug-7 products (glass-railing, sc-door, louvre, automated-window)
 
 Client feedback products that had no `/products` home. Glass stays a product line under specialist (not a fourth type card). Static catalog + hand-run migration 019 seed both halves so `USE_API=true` can serve them after apply.
