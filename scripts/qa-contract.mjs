@@ -5,18 +5,28 @@ export const BASE_URL = process.env.QA_BASE_URL ?? "http://127.0.0.1:8080";
 // One row per rendered public state needed by the deterministic CP-4 browser gate.
 // URL aliases are checked separately because their acceptance criterion is the
 // redirect/canonical URL, not a distinct rendered page.
+//
+// `heading` must track the copy the page ACTUALLY renders. Four rows below went
+// stale for ~3 weeks: ec116d9 (Prince's twenty-item UI punch list) deliberately
+// shortened the h1 on /products, /inspiration, /whats-new and /for-architects to
+// nav-style titles and did not update this file, so the gate reported 28 failures
+// per run against copy no page had rendered since. Realigned 2026-08-07.
+//
+// When an h1 changes on purpose, change it HERE in the same commit. If the gate
+// disagrees with the page, decide which one is wrong before editing either —
+// silencing this file is how a real regression gets mistaken for stale copy.
 export const PUBLIC_ROUTE = [
   { name: "home", path: "/", heading: "Built to Last" },
-  { name: "products", path: "/products", heading: "Window, door, and specialist systems" },
+  { name: "products", path: "/products", heading: "Systems" },
   { name: "products-windows", path: "/products?filter=windows", heading: "Window Systems", pressed: "Window Systems" },
   { name: "products-doors", path: "/products?filter=doors", heading: "Door Systems", pressed: "Door Systems" },
   { name: "products-specialist", path: "/products?filter=specialist", heading: "Specialist Systems", pressed: "Specialist Systems" },
   { name: "aluminium", path: "/aluminium", heading: "Aluminium, when uPVC" },
   { name: "design-tool", path: "/design-tool", heading: "Build your window" },
   { name: "why-upvc", path: "/why-upvc", heading: "Why uPVC" },
-  { name: "inspiration", path: "/inspiration", heading: "Real projects" },
-  { name: "whats-new", path: "/whats-new", heading: "From the workshop" },
-  { name: "for-architects", path: "/for-architects", heading: "The spec that never changes" },
+  { name: "inspiration", path: "/inspiration", heading: "Our Projects" },
+  { name: "whats-new", path: "/whats-new", heading: "What's New" },
+  { name: "for-architects", path: "/for-architects", heading: "Drawings, samples, and a spec team." },
   { name: "warranty", path: "/warranty", heading: "Backed for ten years" },
   { name: "care", path: "/care", heading: "Built to outlast you" },
   { name: "faq", path: "/faq", heading: "Answers, organized" },
