@@ -30,17 +30,82 @@ function scanPage() {
     if (!image.hasAttribute("alt")) finding.noAlt.push((image.getAttribute("src") || "").slice(-64));
   });
 
+  /**
+   * Accessible name, per the "name from content" rule in the accname spec.
+   *
+   * Content is NOT element.textContent: textContent skips replaced elements, so
+   * an image-only link (<a><img alt="Las Piñas Residence"></a>) computed as
+   * unnamed even though a screen reader announces it correctly. That single
+   * omission produced 124 false findings on home alone (62 controls x 2
+   * viewports) and stalled this gate for weeks. The fix belongs here, not in
+   * the markup — adding aria-label to those 62 links would have turned the gate
+   * green while making the page worse, by giving each link a second competing
+   * name.
+   *
+   * Content now walks children and takes alt from <img>/<area>, value from
+   * <input type=image|submit|button>, <title> from inline <svg>, and skips any
+   * subtree hidden from the accessibility tree (aria-hidden, hidden,
+   * display:none, visibility:hidden).
+   */
+  const contentName = (node, depth = 0) => {
+    if (depth > 12 || !node) return "";
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent || "";
+    if (node.nodeType !== Node.ELEMENT_NODE) return "";
+    if (node.getAttribute("aria-hidden") === "true" || node.hasAttribute("hidden")) return "";
+    const style = getComputedStyle(node);
+    if (style.display === "none" || style.visibility === "hidden") return "";
+
+    // A descendant's own aria-label replaces its subtree (accname step 2B).
+    const ariaLabel = node.getAttribute("aria-label");
+    if (depth > 0 && ariaLabel) return ` ${ariaLabel} `;
+
+    const tag = node.tagName.toLowerCase();
+    if (tag === "img" || tag === "area") return ` ${node.getAttribute("alt") || ""} `;
+    if (tag === "svg") return ` ${node.querySelector("title")?.textContent || ""} `;
+    if (tag === "input") {
+      const type = (node.getAttribute("type") || "").toLowerCase();
+      if (type === "image") return ` ${node.getAttribute("alt") || ""} `;
+      if (type === "submit" || type === "button") return ` ${node.value || ""} `;
+      return "";
+    }
+    return Array.from(node.childNodes).map((child) => contentName(child, depth + 1)).join("");
+  };
+
   const accessibleName = (element) => {
     const labelledBy = (element.getAttribute("aria-labelledby") || "").split(/\s+/).filter(Boolean)
-      .map((id) => document.getElementById(id)?.textContent || "").join(" ");
+      .map((id) => {
+        const target = document.getElementById(id);
+        return target ? contentName(target) : "";
+      }).join(" ");
     const label = "labels" in element && element.labels
-      ? Array.from(element.labels).map((entry) => entry.textContent || "").join(" ")
+      ? Array.from(element.labels).map((entry) => contentName(entry)).join(" ")
       : "";
-    return (element.getAttribute("aria-label") || labelledBy || label || element.getAttribute("title") || element.textContent || "")
+    return (element.getAttribute("aria-label") || labelledBy || label || element.getAttribute("title") || contentName(element) || "")
       .replace(/\s+/g, " ").trim();
   };
 
+  /**
+   * Is this control exposed to assistive tech at all?
+   *
+   * Collapsed nav panels and closed menus keep their links in the DOM behind
+   * display:none. Those are not in the accessibility tree, so an unnamed one is
+   * not a defect — it is unreachable. Before contentName() respected hidden
+   * subtrees this was masked, because textContent returns text regardless of
+   * visibility; once naming got correct, ~1000 hidden nav links started
+   * reporting as unnamed. Filter them out at COLLECTION, so the check keeps
+   * meaning "every control a user can actually reach has a name".
+   */
+  const isExposed = (element) => {
+    if (element.closest("[aria-hidden='true'],[hidden]")) return false;
+    for (let node = element; node && node !== document.documentElement; node = node.parentElement) {
+      const style = getComputedStyle(node);
+      if (style.display === "none" || style.visibility === "hidden") return false;
+    }
+    return true;
+  };
+
   document.querySelectorAll("button,a[href],input:not([type='hidden']),select,textarea,[role='button']").forEach((element) => {
+    if (!isExposed(element)) return;
     if (!accessibleName(element)) {
       finding.emptyControl.push(`${element.tagName.toLowerCase()}${element.getAttribute("href") ? `[${element.getAttribute("href")}]` : ""}`);
     }
@@ -112,13 +177,57 @@ async function focusFinding(page, selector, label) {
   return null;
 }
 
+/**
+ * Canary: prove the detector still detects.
+ *
+ * scanPage's name computation was corrected on 2026-08-08 (image-only links
+ * were being reported as unnamed). Any edit that loosens it can silence the
+ * check into a permanent green — the failure mode that makes a gate worse than
+ * no gate. So before trusting a clean run, inject two controls that MUST be
+ * caught and one that must NOT be, and fail loudly if the detector disagrees.
+ *
+ * Injected into a live page and removed immediately; nothing is left behind.
+ */
+async function selfCheck(page) {
+  return page.evaluate((scanSource) => {
+    const scan = new Function(`return (${scanSource})`)();
+    const host = document.createElement("div");
+    host.id = "qa-a11y-canary";
+    // 1 + 2 must be flagged: an image-only link whose alt is empty, and an
+    // icon-only button with no name of any kind. 3 must NOT be flagged: an
+    // image-only link with a real alt — the exact case that was false-positive.
+    host.innerHTML = `
+      <a href="/qa-canary-unnamed"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt=""></a>
+      <button><svg width="8" height="8"><rect width="8" height="8"></rect></svg></button>
+      <a href="/qa-canary-named"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Canary named link"></a>
+    `;
+    document.body.appendChild(host);
+    const result = scan();
+    host.remove();
+
+    const flagged = result.emptyControl.join(" | ");
+    const problem = [];
+    if (!flagged.includes("/qa-canary-unnamed")) problem.push("an image-only link with alt=\"\" was NOT flagged");
+    if (!result.emptyControl.some((entry) => entry.startsWith("button"))) problem.push("an icon-only button with no name was NOT flagged");
+    if (flagged.includes("/qa-canary-named")) problem.push("an image-only link WITH alt was wrongly flagged");
+    return { problem };
+  }, scanPage.toString());
+}
+
 async function staticScan(browser, finding) {
   for (const viewport of RM17_VIEWPORT) {
     const context = await consentContext(browser, viewport);
     try {
       const page = await context.newPage();
+      let canaryDone = false;
       for (const route of PUBLIC_ROUTE) {
         await visitPublicRoute(page, route, 900);
+        if (!canaryDone) {
+          canaryDone = true;
+          const canary = await selfCheck(page);
+          canary.problem.forEach((problem) =>
+            finding.push(`${viewport.name}: DETECTOR SELF-CHECK FAILED — ${problem}`));
+        }
         finding.push(...(await routeFinding(page, route)).map((entry) => `${viewport.name}: ${entry}`));
         const scan = await page.evaluate(scanPage);
         scan.noAlt.forEach((entry) => finding.push(`${viewport.name} ${route.name}: <img> missing alt (${entry})`));
