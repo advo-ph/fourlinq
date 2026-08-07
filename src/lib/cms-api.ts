@@ -63,6 +63,9 @@ export function projectFromCms(row: CmsProject, fallback?: Project): Project {
     id: projectId,
     name: textValue(row.title, fallback?.name ?? projectId),
     location: textValue(row.location, fallback?.location),
+    // CMS has no area fields yet (catalog lane owns migrations). Keep verified
+    // fallback structure so /inspiration labels and grouping still work.
+    area: fallback?.area,
     image: textValue(row.cover_path, fallback?.image),
     gallery: gallery.length > 0 ? gallery : fallback?.gallery,
     category: (textValue(row.category, fallback?.category) || undefined) as Project["category"],

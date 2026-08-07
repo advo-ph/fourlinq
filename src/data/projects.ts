@@ -10,9 +10,16 @@
 // Gallery photos for each project are the exact set of images attached to
 // the matching Facebook post: verified pairings, not guesses.
 //
+// Structured `area` is populated only from those verified location/caption
+// strings (plus showroom-verified Mandaue→Cebu). Never invent a village,
+// city, province, or region_code. Unknown → omit the field.
+//
 // To add more projects: re-scrape the FourlinQ FB page, download the
 // referenced images, append a new entry here.
 
+import type { ProjectArea } from "@/data/project-area";
+
+export type { ProjectArea };
 export type ProjectCategory =
   | "casement"
   | "sliding"
@@ -53,6 +60,11 @@ export interface Project {
   name: string;
   /** Specific area (city/municipality) when posted by the FourlinQ team. */
   location: string;
+  /**
+   * Structured install area for /inspiration grouping + label derivation.
+   * Optional parts only — omit anything the client has not confirmed.
+   */
+  area?: ProjectArea;
   /** Primary hero image, pulled from the FB scrape. */
   image: string;
   /** Additional photos from the same Facebook post, VERIFIED pairings
@@ -71,7 +83,7 @@ export interface Project {
 
 const FB = "/images/projects-fb";
 
-export const projects: Project[] = [
+const projectRow: Project[] = [
   {
     id: "las-pinas-residence",
     name: "Las Piñas Residence",
@@ -1063,3 +1075,71 @@ export const projects: Project[] = [
     description: "A FourlinQ interior windows and doors installation.",
   },
 ];
+
+/**
+ * Defendable structured area keyed by project id.
+ *
+ * Sources only:
+ * - Verified `location` string on the project
+ * - Caption/description text that already names the place (e.g. San Lorenzo,
+ *   Nuvali Laguna)
+ * - Showroom-verified Mandaue City → Cebu (fourlinq-data BRANCHES, read-only)
+ *
+ * No village/city/province/region is inferred from filenames, slugs, or
+ * plausibility. Philippines-only rows are intentionally absent.
+ */
+const DEFENDABLE_AREA: Readonly<Record<string, ProjectArea>> = {
+  // Metro Manila (NCR cities named in verified location)
+  "las-pinas-residence": { city: "Las Piñas", region_code: "metro_manila" },
+  "san-lorenzo-makati-aluminium": {
+    village: "San Lorenzo",
+    city: "Makati",
+    region_code: "metro_manila",
+  },
+  "taguig-g-residence": { city: "Taguig City", region_code: "metro_manila" },
+
+  // Cebu — location string contains Cebu, or Mandaue (showroom address)
+  "cebu-s-residences": { city: "Cebu City", region_code: "cebu" },
+  "cebu-r-residences": { city: "Cebu City", region_code: "cebu" },
+  "cebu-n-residence-pardo": { city: "Cebu City", region_code: "cebu" },
+  "cebu-n-residence-pardo-b": { city: "Cebu City", region_code: "cebu" },
+  "cebu-sch-residence-monterrazas": { city: "Cebu City", region_code: "cebu" },
+  "cebu-s-residence-maria-luisa": { city: "Cebu City", region_code: "cebu" },
+  "cebu-es-residence-maria-luisa": { city: "Cebu City", region_code: "cebu" },
+  "cebu-ta-residence-monterrazas": { city: "Cebu City", region_code: "cebu" },
+  "cebu-t-residence-cebu-city": { city: "Cebu City", region_code: "cebu" },
+  "cebu-cmsprs": { city: "Cebu", region_code: "cebu" },
+  "cebu-m-residence-2": { city: "Cebu", region_code: "cebu" },
+  "cebu-f-residence-fortunado": { city: "Cebu", region_code: "cebu" },
+  "cebu-maratas-residence": { city: "Cebu", region_code: "cebu" },
+  "cebu-residence-monterrazas": { city: "Cebu", region_code: "cebu" },
+  "cebu-d-residence-mandaue": { city: "Mandaue City", region_code: "cebu" },
+
+  // City/municipality known from location; region not stated on caption
+  "taytay-rizal-residence": { city: "Taytay" },
+  "nuvali-laguna-residence": { city: "Nuvali" },
+  "nuvali-laguna-residence-b": { city: "Nuvali", province: "Laguna" },
+  "nuvali-laguna-residence-c": { city: "Nuvali", province: "Laguna" },
+  "tagaytay-cavite-residence": { city: "Tagaytay City" },
+  "cebu-g-residences": { city: "Talisay City" },
+  "cebu-p-residence-kishanta": { city: "Talisay City" },
+  "cebu-ds-residence-talisay": { city: "Talisay City" },
+  "cebu-aa-residence-vista-grande": { city: "Talisay City" },
+  "cebu-a-residences": { city: "Oslob" },
+  "batangas-c-residences": { city: "Batangas" },
+  "bulacan-n-residence": { province: "Bulacan" },
+  "cebu-as-residence-consolacion": { city: "Consolacion" },
+  "cebu-m-residence-molave": { city: "Consolacion" },
+  "cebu-c-residence-amara": { city: "Liloan" },
+  "cebu-residence-vista-grande-talisay": { city: "Talisay" },
+  "binan-residence": { city: "Biñan" },
+  "bataan-s-residence": { province: "Bataan" },
+  "sarangani-s-residence": { province: "Sarangani" },
+  "cabanatuan-t-residence": { city: "Cabanatuan" },
+};
+
+/** Catalog with defendable `area` attached. Philippines-only rows stay bare. */
+export const projects: Project[] = projectRow.map((p) => {
+  const area = DEFENDABLE_AREA[p.id];
+  return area ? { ...p, area } : p;
+});

@@ -4,6 +4,7 @@ import Layout from "@/components/layout/Layout";
 import ProjectHeroGallery from "@/components/shared/ProjectHeroGallery";
 import EditorialButton from "@/components/primitives/Button";
 import { projects as fallbackProject, type Project } from "@/data/projects";
+import { projectLocationLabel } from "@/data/project-area";
 import { products } from "@/data/products";
 import { fetchProjects, mergeProject, canonicalProjectSlug } from "@/lib/cms-api";
 import { versionedImage } from "@/lib/image-version";
@@ -247,7 +248,9 @@ const ProjectDetail = () => {
               <dl className="space-y-6">
                 <div>
                   <dt className="eyebrow mb-2">Location</dt>
-                  <dd className="text-body text-[color:var(--ink-primary)]">{selectedProject.location}</dd>
+                  <dd className="text-body text-[color:var(--ink-primary)]">
+                    {projectLocationLabel(selectedProject.area, selectedProject.location)}
+                  </dd>
                 </div>
                 {selectedProject.year && (
                   <div className="border-t border-[color:var(--rule-soft)] pt-6">
@@ -359,7 +362,7 @@ const ProjectDetail = () => {
                           className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                         />
                       </div>
-                      <p className="mt-4 eyebrow">{other.location}</p>
+                      <p className="mt-4 eyebrow">{projectLocationLabel(other.area, other.location)}</p>
                       <p className="mt-2 font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                         {other.name}
                       </p>

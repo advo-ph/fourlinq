@@ -27,6 +27,21 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+### Session: 2026-08-07 — Project area axis on /inspiration + slim-door audit
+
+#### Added
+
+- **Geographic area axis on `/inspiration`** — second filter rail (Metro Manila, Cebu, …) and section groups driven by structured `ProjectArea`; empty regions stay hidden; projects without a confirmed `region_code` land in **Area to be confirmed**. Card and detail labels use one derivation helper (`Amara — Cebu` em dash). [src/data/project-area.ts](../src/data/project-area.ts), [src/pages/Inspiration.tsx](../src/pages/Inspiration.tsx), [src/test/project-area.test.ts](../src/test/project-area.test.ts).
+- **Client area request doc** — one row per project with blank village/city/province/region columns, Anvaya Cove Batangas-vs-Bataan question open, slim-door shot list. [docs/AUG07_PROJECT_AREA_REQUEST.md](./AUG07_PROJECT_AREA_REQUEST.md).
+
+#### Changed
+
+- **Defendable `area` on catalog projects only** — 38 projects get structured parts from verified Facebook location/caption (plus showroom-verified Mandaue→Cebu); 23 Philippines-only rows stay unknown. No invented places. [src/data/projects.ts](../src/data/projects.ts).
+
+#### Notes
+
+- Slim-door product photography still missing after full image search; `/aluminium` keeps the single existing slim-frame hero. See CLIENT_PHOTO_INVENTORY slim-door audit.
+
 ### Session: 2026-07-21 — Prince's UI punch list: Marvin-grade header, embedded design tool, page de-texting
 
 Twenty-item UI pass from Prince's review, targeting the "big change Imie will look for". The header is the flagship: image-rich mega-panels with the frame-open hover animation, plus site search copied from marvin.com's real pattern.
