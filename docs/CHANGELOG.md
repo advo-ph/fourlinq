@@ -27,6 +27,18 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+### Session: 2026-08-07 — design-tool lane: door colour, outward open, F-S-S-S-S-F
+
+#### Added
+
+- **Live door recolour on `/finishes`** — SVG casement-door preview driven by `WindowPreview`; every finish swatch paints the frame and solid lower panel (no photo-asset pipeline). [src/pages/Finishes.tsx](../src/pages/Finishes.tsx), [src/data/finish-scenes.ts](../src/data/finish-scenes.ts).
+- **Fixed · 4-panel slide · Fixed layout** — named preset `fixed-slide-slide-slide-slide-fixed` on the sliding-door family; generic sequence drawing with even panel widths. [src/data/configurator.ts](../src/data/configurator.ts), [src/components/configurator/WindowPreview.tsx](../src/components/configurator/WindowPreview.tsx), [src/pages/DesignTool.tsx](../src/pages/DesignTool.tsx).
+
+#### Fixed
+
+- **Casement door solid lower panel** now fills with the active `frameColor` (not outline-only).
+- **Outward-only opening cues** on casement door (`entrance`) and awning; no inward-opening indicator anywhere in the preview.
+
 ### Session: 2026-07-21 — Prince's UI punch list: Marvin-grade header, embedded design tool, page de-texting
 
 Twenty-item UI pass from Prince's review, targeting the "big change Imie will look for". The header is the flagship: image-rich mega-panels with the frame-open hover animation, plus site search copied from marvin.com's real pattern.

@@ -25,6 +25,75 @@ export interface GlassOption {
   tint: string;
 }
 
+/** A single panel in a multi-panel door run: fixed leaf or sliding leaf. */
+export type PanelKind = "fixed" | "slide";
+
+/**
+ * Named panel layout preset for multi-panel door systems.
+ * Sequence field is singular (`panel`) per project naming convention.
+ */
+export interface PanelLayout {
+  id: string;
+  label: string;
+  /** Product family this layout applies to (e.g. sliding-door). */
+  family: string;
+  /** Ordered panel sequence — fixed | slide. Singular field name. */
+  panel: PanelKind[];
+}
+
+/** Sliding-door family id used by panel layouts. */
+export const SLIDING_DOOR_FAMILY = "sliding-door";
+
+/**
+ * Panel layouts available on the sliding-door family.
+ * Drawn generically from the sequence so future 3- or 8-panel runs cost nothing.
+ */
+export const panelLayout: PanelLayout[] = [
+  {
+    id: "slide-slide",
+    label: "Slide · Slide",
+    family: SLIDING_DOOR_FAMILY,
+    panel: ["slide", "slide"],
+  },
+  {
+    id: "fixed-slide",
+    label: "Fixed · Slide",
+    family: SLIDING_DOOR_FAMILY,
+    panel: ["fixed", "slide"],
+  },
+  {
+    id: "fixed-slide-slide-fixed",
+    label: "Fixed · 2-panel slide · Fixed",
+    family: SLIDING_DOOR_FAMILY,
+    panel: ["fixed", "slide", "slide", "fixed"],
+  },
+  {
+    id: "fixed-slide-slide-slide-slide-fixed",
+    label: "Fixed · 4-panel slide · Fixed",
+    family: SLIDING_DOOR_FAMILY,
+    panel: ["fixed", "slide", "slide", "slide", "slide", "fixed"],
+  },
+];
+
+/** Look up a panel layout by id. */
+export function getPanelLayout(id: string): PanelLayout | undefined {
+  return panelLayout.find((layout) => layout.id === id);
+}
+
+/** Layouts available for a product family (e.g. sliding-door). */
+export function panelLayoutForFamily(family: string): PanelLayout[] {
+  return panelLayout.filter((layout) => layout.family === family);
+}
+
+/**
+ * Even width division of the frame inner opening across N panels.
+ * Total of the returned width × count equals innerWidth (floating-point safe for sum checks).
+ */
+export function dividePanelWidth(innerWidth: number, panelCount: number): number {
+  if (panelCount <= 0) return 0;
+  return innerWidth / panelCount;
+}
+
 // Catalog mirrors the brochure-verified FourlinQ product line: 5 windows, 7 doors,
 // 3 specialist geometries. iconKeys reuse a few core icons across related types.
 export const productTypes: ProductType[] = [
@@ -74,6 +143,8 @@ export const defaultConfig = {
   glass: "clear-float",
   width: 1200,
   height: 1400,
+  /** Optional multi-panel layout id (sliding-door family). */
+  panelLayoutId: "slide-slide" as string | undefined,
 };
 
 // Per-type dimension constraints from verified data (in mm)

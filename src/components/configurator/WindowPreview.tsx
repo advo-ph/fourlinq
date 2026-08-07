@@ -1,5 +1,10 @@
 import { memo } from "react";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
+import {
+  dividePanelWidth,
+  getPanelLayout,
+  type PanelKind,
+} from "@/data/configurator";
 
 interface PreviewProps {
   type: string;
@@ -9,6 +14,8 @@ interface PreviewProps {
   glassOpacity: number;
   width: number;
   height: number;
+  /** Named multi-panel layout id (sliding-door family). */
+  panelLayoutId?: string;
 }
 
 const darken = (hex: string, amount: number) => {
@@ -86,7 +93,7 @@ const woodGrainConfig: Record<string, {
   },
 };
 
-const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacity, width, height }: PreviewProps) => {
+const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacity, width, height, panelLayoutId }: PreviewProps) => {
   const aspectRatio = height / width;
   const svgW = 300;
   const svgH = svgW * Math.min(Math.max(aspectRatio, 0.4), 1.6);
@@ -202,6 +209,126 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
     );
   };
 
+  /**
+   * Outward-opening swing cue (plan view arc + arrow). Everything opens out —
+   * never inward. data-opening="outward" is the instrument for tests.
+   */
+  const outwardOpenCue = (opts: {
+    /** hinge side of a vertical swing: "left" | "right" | "top" for awning */
+    hinge: "left" | "right" | "top";
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  }) => {
+    const { hinge, x, y, w, h } = opts;
+    if (hinge === "top") {
+      // Awning: top-hinged, leaf pushes out and down — arc below the top rail, outside the room.
+      const cx = x + w / 2;
+      const cy = y + 4;
+      const r = Math.min(w * 0.28, h * 0.35);
+      return (
+        <g data-opening="outward" aria-hidden="true">
+          <path
+            d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 0 ${cx + r} ${cy}`}
+            fill="none"
+            stroke={handleClr}
+            strokeWidth="1.2"
+            strokeDasharray="3 2"
+            opacity="0.55"
+          />
+          <polygon
+            points={`${cx + r - 3},${cy - 4} ${cx + r + 4},${cy} ${cx + r - 3},${cy + 4}`}
+            fill={handleClr}
+            opacity="0.55"
+          />
+        </g>
+      );
+    }
+    // Side-hinged casement door: arc on the swing side, arrow pointing out of the facade.
+    const isLeft = hinge === "left";
+    const hx = isLeft ? x + 4 : x + w - 4;
+    const hy = y + h * 0.55;
+    const r = Math.min(w * 0.55, h * 0.4);
+    const sweep = isLeft ? 1 : 0;
+    const endX = isLeft ? hx + r : hx - r;
+    const tipDir = isLeft ? 1 : -1;
+    return (
+      <g data-opening="outward" aria-hidden="true">
+        <path
+          d={`M ${hx} ${hy - r * 0.15} A ${r} ${r} 0 0 ${sweep} ${endX} ${hy + r * 0.55}`}
+          fill="none"
+          stroke={handleClr}
+          strokeWidth="1.2"
+          strokeDasharray="3 2"
+          opacity="0.55"
+        />
+        <polygon
+          points={`${endX},${hy + r * 0.55 - 5} ${endX + tipDir * 7},${hy + r * 0.55} ${endX},${hy + r * 0.55 + 5}`}
+          fill={handleClr}
+          opacity="0.55"
+        />
+      </g>
+    );
+  };
+
+  /**
+   * Generic multi-panel run from an ordered PanelKind sequence.
+   * Fixed ends: no handle, no track cue. Slide leaves: handle + bottom track cue.
+   */
+  const renderPanelSequence = (sequence: PanelKind[]) => {
+    const count = sequence.length;
+    const pw = dividePanelWidth(gw, count);
+    return (
+      <g data-panel-sequence={sequence.join("-")}>
+        {sequence.map((kind, i) => {
+          const px = gx + i * pw;
+          const isSlide = kind === "slide";
+          return (
+            <g
+              key={i}
+              data-panel-index={i}
+              data-panel-kind={kind}
+              data-panel-width={pw}
+              data-slide-cue={isSlide ? "true" : undefined}
+            >
+              {sash(px, gy, pw, gh)}
+              {/* Meeting stile line at overlaps between adjacent panels */}
+              {i < count - 1 && (
+                <line
+                  x1={px + pw}
+                  y1={gy}
+                  x2={px + pw}
+                  y2={gy + gh}
+                  stroke={dark}
+                  strokeWidth="1"
+                  opacity="0.35"
+                />
+              )}
+              {isSlide && (
+                <>
+                  {handle(px + pw - 10, gy + gh / 2)}
+                  {/* Track cue under sliding leaves only */}
+                  <rect
+                    x={px + 2}
+                    y={gy + gh - 3}
+                    width={pw - 4}
+                    height={2.5}
+                    fill={dark}
+                    opacity="0.2"
+                    data-slide-track="true"
+                  />
+                </>
+              )}
+            </g>
+          );
+        })}
+        {/* Continuous sill track under the whole opening for sliding family */}
+        <rect x={gx} y={gy + gh - 1.5} width={gw} height={1.5} fill={dark} opacity="0.12" />
+      </g>
+    );
+  };
+
   // --- Outer frame ---
   const outerFrame = () => (
     <g>
@@ -231,6 +358,9 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
             <line x1={midX} y1={gy} x2={midX} y2={gy + gh} stroke={dark} strokeWidth="0.5" opacity="0.3" />
             {handle(midX - 7, gy + gh / 2)}
             {handle(midX + 7, gy + gh / 2)}
+            {/* Both leaves hinge on the outer edge and swing out — never inward. */}
+            {outwardOpenCue({ hinge: "left", x: gx, y: gy, w: pw, h: gh })}
+            {outwardOpenCue({ hinge: "right", x: gx + pw + gap, y: gy, w: pw, h: gh })}
           </g>
         );
       }
@@ -258,6 +388,7 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
             <circle cx={gx + 12} cy={gy + 6} r="2" fill={handleClr} opacity="0.6" />
             <circle cx={gx + gw - 12} cy={gy + 6} r="2" fill={handleClr} opacity="0.6" />
             {handle(gx + gw / 2, gy + gh - 10, false)}
+            {outwardOpenCue({ hinge: "top", x: gx, y: gy, w: gw, h: gh })}
           </g>
         );
       case "tilt-turn":
@@ -289,15 +420,12 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
         );
       }
       case "sliding-door": {
-        const pw = gw / 2 + 5;
-        return (
-          <g>
-            {sash(gx, gy, pw, gh)}
-            {sash(gx + gw - pw, gy, pw, gh)}
-            {handle(gx + gw - 16, gy + gh / 2)}
-            <rect x={gx} y={gy + gh - 2} width={gw} height={2} fill={dark} opacity="0.15" />
-          </g>
-        );
+        // Prefer a named panel layout (generic sequence drawing). Fall back to 2-slide.
+        const layout = panelLayoutId ? getPanelLayout(panelLayoutId) : undefined;
+        if (layout && layout.panel.length > 0) {
+          return renderPanelSequence(layout.panel);
+        }
+        return renderPanelSequence(["slide", "slide"]);
       }
       case "lift-slide": {
         const pw = gw / 2 + 5;
@@ -323,6 +451,9 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
             <line x1={midX} y1={gy} x2={midX} y2={gy + gh} stroke={dark} strokeWidth="0.5" opacity="0.3" />
             {handle(midX - 7, gy + gh / 2)}
             {handle(midX + 7, gy + gh / 2)}
+            {/* Both leaves hinge on the outer edge and swing out — never inward. */}
+            {outwardOpenCue({ hinge: "left", x: gx, y: gy, w: pw, h: gh })}
+            {outwardOpenCue({ hinge: "right", x: gx + pw + gap, y: gy, w: pw, h: gh })}
           </g>
         );
       }
@@ -581,11 +712,25 @@ const WindowPreview = memo(({ type, frameColor, finishId, glassTint, glassOpacit
             <rect x={gx + 1} y={doorTop + 1} width={gw - 2} height={doorH - 2} fill={frameFill} rx="1" />
             {glass(gx + 8, doorTop + 6, gw - 16, doorGlassH)}
             <rect x={gx + 8} y={doorTop + 6} width={gw - 16} height={doorGlassH} fill="none" stroke={dark} strokeWidth="0.5" opacity="0.3" />
-            <rect x={gx + 8} y={panelTop} width={gw - 16} height={panelH} rx="2" fill="none" stroke={dark} strokeWidth="0.8" opacity="0.15" />
-            <rect x={gx + 16} y={panelTop + 8} width={gw - 32} height={panelH * 0.4} rx="2" fill="none" stroke={dark} strokeWidth="0.6" opacity="0.12" />
-            <rect x={gx + 16} y={panelTop + panelH * 0.52} width={gw - 32} height={panelH * 0.38} rx="2" fill="none" stroke={dark} strokeWidth="0.6" opacity="0.12" />
+            {/* Solid lower panel — painted with the active finish, not outline-only. */}
+            <rect
+              data-door-panel="solid-lower"
+              x={gx + 8}
+              y={panelTop}
+              width={gw - 16}
+              height={panelH}
+              rx="2"
+              fill={frameColor}
+              stroke={dark}
+              strokeWidth="0.8"
+              opacity="0.92"
+            />
+            <rect x={gx + 16} y={panelTop + 8} width={gw - 32} height={panelH * 0.4} rx="2" fill="none" stroke={dark} strokeWidth="0.6" opacity="0.25" />
+            <rect x={gx + 16} y={panelTop + panelH * 0.52} width={gw - 32} height={panelH * 0.38} rx="2" fill="none" stroke={dark} strokeWidth="0.6" opacity="0.25" />
             {handle(gx + gw - 18, doorTop + doorH / 2)}
             <rect x={gx + gw / 2 - 14} y={panelTop + panelH - 6} width={28} height={3} rx="1" fill={handleClr} opacity="0.6" />
+            {/* Casement door swings outward — never inward. */}
+            {outwardOpenCue({ hinge: "right", x: gx, y: doorTop, w: gw, h: doorH })}
           </g>
         );
       }
