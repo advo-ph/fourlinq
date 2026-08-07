@@ -130,8 +130,8 @@ She wants FourlinQ to surface when an AI is asked *"what's the best uPVC"*. ❌ 
 |---|---|---|---|
 | Remove Chinese characters from the slim-aluminium video | *"**Kaya niyo bang tanggalin yung video, yung Chinese, na character?**"* | `00:37:00` | ❌ |
 | Zero-leak page is thin | *"**Zero leak and then what's next? Ang daming qualities ng uPVC eh.**"* | `00:35:26` | ✅ fixed (PR #20 — 7 profile features) |
-| Awning opens outward | *"ang awning, you're **pushing it outside**… Everything is going out. **Never inward.**"* | `00:12:32` | ⚠️ verify |
-| "Sliding", not "glider" | *"**We don't call it glider. It's called sliding.**"* | `00:13:32` | ⚠️ verify |
+| Awning opens outward | *"ang awning, you're **pushing it outside**… Everything is going out. **Never inward.**"* | `00:12:32` | ⚠️ **partial** (design-tool lane) — every **swing** type now draws an outward-only cue in `WindowPreview` (awning, casement, casement door/entrance, french-door), locked by an explicit swing-type list in `configurator.test.tsx`. **Open:** `glossary.ts` "Tilt & Turn" is `is_fourlinq_offering: true` and describes a sash that *"tilts **inward**… swings **inward** like a door"* — the exact thing she corrected. A tilt & turn genuinely opens inward, so this cannot be fixed by rewriting the copy. **Ask her whether FourlinQ sells tilt & turn at all**; if not, drop the entry. |
+| "Sliding", not "glider" | *"**We don't call it glider. It's called sliding.**"* | `00:13:32` | ✅ verified (design-tool lane — product copy + configurator labels use "sliding" / "Sliding Door"; no "glider" in preview or panel layouts) |
 | Single hang only (no double hung) | *"we only have the **slide down**"* | `00:13:45` | ⚠️ verify |
 
 ---

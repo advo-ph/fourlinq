@@ -37,6 +37,21 @@ Client feedback products that had no `/products` home. Glass stays a product lin
 - **Migration 019** — idempotent `product_type` + `product` seeds with finish/glass/spec labels; explicit no-down header. [server/migrations/019_aug07_product_additions.sql](../server/migrations/019_aug07_product_additions.sql) (new).
 - **Schematic hero placeholders** + client shot list — [public/images/products/schematic/](../public/images/products/schematic/), [docs/AUG07_ASSET_REQUEST.md](./AUG07_ASSET_REQUEST.md) (new).
 - **Integrity + taxonomy + migration-parity tests** for the four fixed ids. [src/test/data-integrity.test.ts](../src/test/data-integrity.test.ts), [src/test/taxonomy.test.ts](../src/test/taxonomy.test.ts).
+### Session: 2026-08-07 — design-tool lane: door colour, outward open, F-S-S-S-S-F
+
+#### Added
+
+- **Live door recolour on `/finishes`** — SVG casement-door preview driven by `WindowPreview`; every finish swatch paints the frame and solid lower panel (no photo-asset pipeline). [src/pages/Finishes.tsx](../src/pages/Finishes.tsx), [src/data/finish-scenes.ts](../src/data/finish-scenes.ts).
+- **Fixed · 4-panel slide · Fixed layout** — named preset `fixed-slide-slide-slide-slide-fixed` on the sliding-door family; generic sequence drawing with even panel widths. [src/data/configurator.ts](../src/data/configurator.ts), [src/components/configurator/WindowPreview.tsx](../src/components/configurator/WindowPreview.tsx), [src/pages/DesignTool.tsx](../src/pages/DesignTool.tsx).
+
+#### Fixed
+
+- **Casement door solid lower panel** now fills with the active `frameColor` (not outline-only).
+- **Outward-only opening cues on every swing type** — awning, casement, casement door (`entrance`), and french-door. The previous guard test asserted no preview renders `data-opening="inward"`; nothing in the codebase emits that attribute, so it could not fail. Replaced with an explicit swing-type list asserted positively. [src/test/configurator.test.tsx](../src/test/configurator.test.tsx).
+
+#### Open question
+
+- **Tilt & Turn contradicts "never inward"** — [src/data/glossary.ts](../src/data/glossary.ts) describes it tilting and swinging *inward* while flagged `is_fourlinq_offering: true`. That is what the product physically is, so it is not a copy fix. Ask the client whether FourlinQ sells tilt & turn at all. The "never inward" row in [MEETING_INSTRUCTION_INVENTORY.md](./MEETING_INSTRUCTION_INVENTORY.md) is ⚠️ partial, not ✅.
 
 ### Session: 2026-07-21 — Prince's UI punch list: Marvin-grade header, embedded design tool, page de-texting
 

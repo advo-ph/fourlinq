@@ -4,6 +4,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useProductTypes, useMaterials, useFinishes, useGlassTypes, finishesForMaterial } from "@/hooks/useConfigurator";
+import { panelLayoutForFamily, SLIDING_DOOR_FAMILY } from "@/data/configurator";
 import { Link, useSearchParams } from "react-router-dom";
 import { Loader2, CheckCircle, X } from "lucide-react";
 import WindowPreview from "@/components/configurator/WindowPreview";
@@ -170,12 +171,16 @@ const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
     glass: "clear-float",
     width: 1200,
     height: 1400,
+    panelLayoutId: "slide-slide" as string,
   });
 
   const updateConfig = (field: string, value: string | number) => {
     setConfig((prev) => ({ ...prev, [field]: value }));
     if (typeof value === "string") trackConfigChange(field, value);
   };
+
+  const slidingDoorLayout = panelLayoutForFamily(SLIDING_DOOR_FAMILY);
+  const showPanelLayout = config.type === SLIDING_DOOR_FAMILY;
 
   // Switching material re-scopes the finish set, so snap the finish to the first
   // valid one for the new material, otherwise a uPVC finish id would linger on
@@ -233,7 +238,7 @@ const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
   return (
     <Chrome>
       {!isEmbed && (
-        <PageHeader title="Design Tool" />
+        <PageHeader title="Build your window" subtitle="Type, material, finish, glass, and size — live preview as you go." />
       )}
 
       <div className={isEmbed ? "py-6" : "pb-20"}>
@@ -301,6 +306,33 @@ const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
                       );
                     })}
                   </div>
+                  {showPanelLayout && (
+                    <div className="mt-8">
+                      <h3 className="eyebrow mb-3">Panel layout</h3>
+                      <p className="text-sm text-[color:var(--ink-muted)] mb-3 max-w-md">
+                        Fixed ends stay put; sliding leaves move on the track.
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {slidingDoorLayout.map((layout) => (
+                          <button
+                            key={layout.id}
+                            type="button"
+                            onClick={() => updateConfig("panelLayoutId", layout.id)}
+                            className={`p-4 rounded-lg border-2 text-left transition-colors ${
+                              config.panelLayoutId === layout.id
+                                ? "border-[color:var(--ink-primary)] bg-[color:var(--canvas-soft)]"
+                                : "border-[color:var(--rule-soft)] hover:border-[color:var(--ink-primary)]"
+                            }`}
+                          >
+                            <span className="block text-sm font-medium text-primary">{layout.label}</span>
+                            <span className="block text-[11px] text-[color:var(--ink-muted)] mt-1">
+                              {layout.panel.length} panels · {layout.panel.map((k) => (k === "fixed" ? "F" : "S")).join("–")}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               {step === 1 && (
@@ -406,12 +438,21 @@ const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
                 glassOpacity={glassVisual.opacity}
                 width={config.width}
                 height={config.height}
+                panelLayoutId={showPanelLayout ? config.panelLayoutId : undefined}
               />
               <div className="mt-8 w-full border-t border-border pt-6 space-y-2">
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Type</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedType.name}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Material</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedMaterial.name}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Finish</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedFinish.name}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Glass</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedGlass.name}</span></div>
+                {showPanelLayout && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[color:var(--ink-muted)]">Layout</span>
+                    <span className="text-[color:var(--ink-primary)] font-medium">
+                      {slidingDoorLayout.find((l) => l.id === config.panelLayoutId)?.label ?? config.panelLayoutId}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Dimensions</span><span className="text-[color:var(--ink-primary)] font-medium">{config.width} × {config.height} mm</span></div>
               </div>
               <div className="flex gap-3 mt-6 w-full">
