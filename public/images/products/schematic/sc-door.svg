@@ -1,0 +1,11 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="SC-Door schematic placeholder">
+  <rect width="1200" height="900" fill="#F9F7F1"/>
+  <rect x="160" y="160" width="880" height="560" fill="none" stroke="#242424" stroke-width="8"/>
+  <rect x="180" y="180" width="400" height="520" fill="#E8EEF2" stroke="#242424" stroke-width="4"/>
+  <rect x="620" y="180" width="400" height="520" fill="#D9E8F2" stroke="#242424" stroke-width="4"/>
+  <line x1="380" y1="180" x2="380" y2="700" stroke="#242424" stroke-width="3"/>
+  <line x1="820" y1="180" x2="820" y2="700" stroke="#242424" stroke-width="3"/>
+  <rect x="540" y="400" width="28" height="80" rx="4" fill="#242424"/>
+  <path d="M560 360 h80" stroke="#C8102E" stroke-width="4" stroke-dasharray="8 6"/>
+  <text x="600" y="800" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#686868">SC-Door (Sliding Casement) — schematic placeholder</text>
+</svg>

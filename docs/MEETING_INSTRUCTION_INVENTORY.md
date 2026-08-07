@@ -52,19 +52,23 @@ Sub-products she named:
 
 **This is the single largest unbuilt ask.** She explicitly asked where it goes and got no answer. The 07-10 audit also flags the footer "omits Aluminium and **Glass**."
 
+**Lane/catalog 2026-08-07 partial surface:** glass railing ships as catalog product `glass-railing` under specialist (not a fourth type). Other glass sub-products above remain unbuilt. Schematic hero pending client photo (`docs/AUG07_ASSET_REQUEST.md`).
+
 ---
 
 ## 3. Products named that don't exist on the site
 
 | Product | Verbatim | Time | Status |
 |---|---|---|---|
+| **SC-Door / Sliding Casement** | Sliding Casement door (not "glider"; `00:13:32`) | Aug-7 catalog lane | ✅ catalog product `sc-door` (lane/catalog; schematic hero pending client photo) |
+| **Louvre windows** | Louvre / blade ventilation (catalog gap closed Aug-7) | Aug-7 catalog lane | ✅ catalog product `louvre` (lane/catalog; schematic hero pending client photo) |
 | **Gazebos** | *"Meron din kami **gazebos**. **Idadagdag nyo rin as a product** yun."* | `00:38:35` | ❌ |
 | **Replacement windows** | *"**Replacement window, I also want this.**"* + the real process (corrosion, chipping, board-it-up) | `00:21:52` | ❌ |
 | **Screens** | *"**Hardware, glass, screens, we want that eh.**"* | `00:20:09` | ❌ |
 | **Hardware** | same | `00:20:09` | ❌ |
 | **Casing** | *"We also have that **casing**, if they like."* | `00:20:39` | ❌ |
-| **Automation / digital access** | *"**Automate your door**, meron din kami. Gusto mo magkaroon ng **digital access**, meron din kami."* | `00:20:47` | ❌ |
-| **Window opening devices** | *"**Window opening devices.** Meron din tayo yan."* | `00:21:11` | ❌ |
+| **Automation / digital access** | *"**Automate your door**, meron din kami. Gusto mo magkaroon ng **digital access**, meron din kami."* | `00:20:47` | ✅ surface: catalog product `automated-window` (lane/catalog; schematic hero pending client photo) |
+| **Window opening devices** | *"**Window opening devices.** Meron din tayo yan."* | `00:21:11` | ✅ surface: catalog product `automated-window` (lane/catalog; schematic hero pending client photo) |
 | **Largest windows** | *"**largest windows**… we have the widest panel na kaya niya isara ng mag-isa"* | `00:21:23` | ❌ |
 | **Divided lights / muntin bars** | *"Divided lights with muntin bars. **We term it French. Some term it Georgian bars.**"* | `00:20:09` | ❌ |
 | **Special doors** (slide→swing) | *"pwede siya magiging swing. Meron tayong ganun sa alabang."* | `00:16:05` | ❌ |

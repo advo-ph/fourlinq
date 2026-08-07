@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Glass Railing schematic placeholder">
+  <rect width="1200" height="900" fill="#F9F7F1"/>
+  <rect x="180" y="220" width="840" height="420" fill="none" stroke="#242424" stroke-width="6"/>
+  <line x1="180" y1="640" x2="1020" y2="640" stroke="#242424" stroke-width="10"/>
+  <line x1="180" y1="220" x2="1020" y2="220" stroke="#242424" stroke-width="8"/>
+  <line x1="360" y1="220" x2="360" y2="640" stroke="#242424" stroke-width="4"/>
+  <line x1="600" y1="220" x2="600" y2="640" stroke="#242424" stroke-width="4"/>
+  <line x1="840" y1="220" x2="840" y2="640" stroke="#242424" stroke-width="4"/>
+  <rect x="200" y="240" width="140" height="380" fill="#D9E8F2" fill-opacity="0.55"/>
+  <rect x="380" y="240" width="200" height="380" fill="#D9E8F2" fill-opacity="0.45"/>
+  <rect x="620" y="240" width="200" height="380" fill="#D9E8F2" fill-opacity="0.45"/>
+  <rect x="860" y="240" width="140" height="380" fill="#D9E8F2" fill-opacity="0.55"/>
+  <text x="600" y="760" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#686868">Glass Railing — schematic placeholder</text>
+</svg>
