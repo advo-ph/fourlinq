@@ -283,4 +283,87 @@ export const products: Product[] = [
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Low-E Coated", "Tinted Bronze", "Laminated Safety"],
   },
+  // ─── Aug 7 client feedback — four products that had no catalog home ───
+  // Glass is a product LINE under specialist (not a fourth type card). See
+  // taxonomy.ts header and MEETING_INSTRUCTION_INVENTORY §2 (00:10:14).
+  {
+    id: "glass-railing",
+    name: "Glass Railing",
+    category: "specialist",
+    description:
+      "Frameless or minimal-framed glass railing and balcony systems for residential and commercial openings. Tempered safety glass panels with discrete hardware, suited to balconies, mezzanines, stair edges, and terrace edges where the view should stay open. Project-specified: panel height, mounting detail, and glass type are set per drawing. Consultation required for structural fixings and local code.",
+    shortDescription: "Open views. Safety glass at the edge.",
+    // Schematic placeholder — no verified client product photo in-repo yet.
+    // See docs/AUG07_ASSET_REQUEST.md.
+    image: "/images/products/schematic/glass-railing.svg",
+    specs: [
+      "Tempered safety glass panels",
+      "Frameless or minimal-frame hardware options",
+      "Balcony, mezzanine, and terrace applications",
+      "Project-specified height and mounting",
+      "⚠️ Indicative only — structural fixings and code compliance by project consultation",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
+  },
+  {
+    id: "sc-door",
+    name: "SC-Door System (Sliding Casement Door)",
+    category: "doors",
+    description:
+      "Sliding Casement Door system — a casement door that slides rather than swings. The leaf travels on a track to free floor space while keeping the sealed, multi-point character of a casement door. For main and secondary entries, lanai access, and rooms where a swinging leaf would block furniture or circulation. We call it sliding. Custom-specified per opening.",
+    shortDescription: "Casement seal and security, sliding operation.",
+    // Schematic placeholder — no verified client product photo in-repo yet.
+    // See docs/AUG07_ASSET_REQUEST.md.
+    image: "/images/products/schematic/sc-door.svg",
+    specs: [
+      "Sliding Casement operation (not a swing leaf)",
+      "Multi-point locking on the active leaf",
+      "Space-saving travel on track",
+      "Multi-chamber profile with weather seals",
+      "Custom specification per project",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Frosted Privacy", "Low-E Coated", "Laminated Safety"],
+  },
+  {
+    id: "louvre",
+    name: "Louvre Windows",
+    category: "windows",
+    description:
+      "Operable louvre windows with adjustable horizontal blades for controlled ventilation. Blades open together so air moves even when you want the opening to stay rain-aware. Common in kitchens, bathrooms, utility rooms, and tropical facades that need airflow without a full sash swing. Available in glass louvre blades; project consultation for blade count, frame finish, and insect-screen options.",
+    shortDescription: "Blade-by-blade ventilation for tropical rooms.",
+    // Schematic placeholder — no verified client product photo in-repo yet.
+    // See docs/AUG07_ASSET_REQUEST.md.
+    image: "/images/products/schematic/louvre.svg",
+    specs: [
+      "Adjustable horizontal louvre blades",
+      "Ventilation with partial rain protection when angled",
+      "Glass blade options",
+      "Suited to kitchens, baths, and utility openings",
+      "Project consultation for blade count and screen options",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Frosted Privacy", "Tinted Bronze", "Laminated Safety"],
+  },
+  {
+    id: "automated-window",
+    name: "Automated Windows",
+    category: "windows",
+    description:
+      "Motorised window opening devices and digital-access automation for operable windows and compatible door leaves. Open high or hard-to-reach sashes without climbing; pair with wall switches, remotes, or building controls where specified. The surface for both window opening devices and automate-your-door / digital access asks from the 2026-07-10 client meeting. Hardware and control scope are project-specified — not a single SKU. Consultation required for load, travel, power, and lock integration.",
+    shortDescription: "Open and secure openings without the ladder.",
+    // Schematic placeholder — no verified client product photo in-repo yet.
+    // See docs/AUG07_ASSET_REQUEST.md.
+    image: "/images/products/schematic/automated-window.svg",
+    specs: [
+      "Motorised window opening devices",
+      "Digital access options for compatible door leaves",
+      "Wall switch, remote, or building-control integration (project-specified)",
+      "Suited to high, large, or hard-to-reach operable units",
+      "⚠️ Indicative only — actuator load, travel, and power by project consultation",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
+  },
 ];

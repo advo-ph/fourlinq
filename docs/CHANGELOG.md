@@ -27,6 +27,17 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+### Session: 2026-08-07 — catalog lane: four Aug-7 products (glass-railing, sc-door, louvre, automated-window)
+
+Client feedback products that had no `/products` home. Glass stays a product line under specialist (not a fourth type card). Static catalog + hand-run migration 019 seed both halves so `USE_API=true` can serve them after apply.
+
+#### Added
+
+- **Four catalog products** — `glass-railing` (specialist), `sc-door` / SC-Door System Sliding Casement Door (doors), `louvre` / Louvre Windows (windows), `automated-window` / Automated Windows (windows). Full product shape: description, shortDescription, specs, finishes, glassOptions. [src/data/products.ts](../src/data/products.ts).
+- **Migration 019** — idempotent `product_type` + `product` seeds with finish/glass/spec labels; explicit no-down header. [server/migrations/019_aug07_product_additions.sql](../server/migrations/019_aug07_product_additions.sql) (new).
+- **Schematic hero placeholders** + client shot list — [public/images/products/schematic/](../public/images/products/schematic/), [docs/AUG07_ASSET_REQUEST.md](./AUG07_ASSET_REQUEST.md) (new).
+- **Integrity + taxonomy + migration-parity tests** for the four fixed ids. [src/test/data-integrity.test.ts](../src/test/data-integrity.test.ts), [src/test/taxonomy.test.ts](../src/test/taxonomy.test.ts).
+
 ### Session: 2026-07-21 — Prince's UI punch list: Marvin-grade header, embedded design tool, page de-texting
 
 Twenty-item UI pass from Prince's review, targeting the "big change Imie will look for". The header is the flagship: image-rich mega-panels with the frame-open hover animation, plus site search copied from marvin.com's real pattern.

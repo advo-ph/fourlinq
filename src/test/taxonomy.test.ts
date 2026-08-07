@@ -125,3 +125,28 @@ describe("the type axis agrees with the product catalog", () => {
     }
   });
 });
+
+describe("Aug 7: glass is a product line under specialist, not a fourth type", () => {
+  it("the type axis still has exactly three members", () => {
+    expect(SYSTEM_TYPE).toHaveLength(3);
+    expect(SYSTEM_TYPE.map((t) => t.type_code)).toEqual([
+      "window",
+      "door",
+      "specialist",
+    ]);
+  });
+
+  it("glass-railing is reachable under specialist and is not a new ProductCategory", () => {
+    const product = products.find((p) => p.id === "glass-railing");
+    expect(product, "glass-railing must exist in the static catalog").toBeDefined();
+    expect(product!.category).toBe("specialist");
+
+    // Regression guard: no "glass" peer on the type axis (the 2026-07-05 mistake
+    // was a fourth type card; glass stays a product LINE inside specialist).
+    for (const type of SYSTEM_TYPE) {
+      expect(type.type_code).not.toBe("glass");
+      expect(type.filter).not.toBe("glass");
+      expect(type.label.toLowerCase()).not.toBe("glass");
+    }
+  });
+});
