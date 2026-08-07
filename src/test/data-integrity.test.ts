@@ -126,6 +126,90 @@ describe("Aug 7 product additions (glass-railing, sc-door, automated-window, lou
   });
 });
 
+describe("Aug 8 door-automation split (automated-door)", () => {
+  it("automated-door exists under doors, so the door ask is reachable from the doors filter", () => {
+    const product = products.find((p) => p.id === "automated-door");
+    expect(product, "missing product id automated-door").toBeDefined();
+    expect(product!.name).toBe("Automated Door Access");
+    // The whole point of the split: /products?filter=doors must surface it.
+    expect(product!.category).toBe("doors");
+  });
+
+  it("automated-door is fully specified and its schematic exists on disk", () => {
+    const product = products.find((p) => p.id === "automated-door")!;
+    expect(product.description.trim().length).toBeGreaterThan(0);
+    expect(product.shortDescription.trim().length).toBeGreaterThan(0);
+    expect(product.specs.length).toBeGreaterThan(0);
+    expect(product.finishes.length).toBeGreaterThan(0);
+    expect(product.glassOptions.length).toBeGreaterThan(0);
+    expect(product.image).toMatch(/^\/images\//);
+    expect(
+      publicImageExists(product.image),
+      `automated-door image missing: ${product.image}`,
+    ).toBe(true);
+  });
+
+  it("automated-window no longer claims door scope", () => {
+    // Regression guard for the gap this split closes: one product answering two
+    // asks meant the door half was filed under windows and unreachable from
+    // /products?filter=doors.
+    const window = products.find((p) => p.id === "automated-window")!;
+    expect(window.category).toBe("windows");
+    const copy = `${window.description} ${window.shortDescription} ${window.specs.join(" ")}`;
+
+    // It must not OFFER door automation as its own scope — that was the 019
+    // phrasing ("...automation for operable windows and compatible door
+    // leaves") that made this one product answer two asks.
+    expect(copy).not.toMatch(/and compatible door leaves/i);
+    expect(copy).not.toMatch(/Digital access options for/i);
+
+    // It MAY mention digital access — but only as a pointer to the door
+    // product, never as a bare claim. If the phrase appears, the pointer must
+    // appear with it.
+    if (/digital access/i.test(copy)) {
+      expect(copy).toMatch(/separate product/i);
+      expect(copy).toMatch(/Automated Door Access/);
+    }
+  });
+
+  it("each door-category ask has a product a doors shopper can actually reach", () => {
+    const doorProduct = products.filter((p) => p.category === "doors");
+    expect(doorProduct.some((p) => p.id === "automated-door")).toBe(true);
+    expect(doorProduct.some((p) => p.id === "sc-door")).toBe(true);
+  });
+});
+
+describe("migration 020 ↔ static catalog parity", () => {
+  it("020 seeds automated-door and narrows automated-window", () => {
+    const migrationPath = resolve(
+      process.cwd(),
+      "server/migrations/020_automated_door_split.sql",
+    );
+    expect(existsSync(migrationPath), "migration 020 file must exist").toBe(true);
+    const sql = readFileSync(migrationPath, "utf8");
+
+    expect(sql).toContain("'automated-door'");
+    expect(sql).toMatch(/UPDATE product/);
+    expect(sql).toContain("'automated-window'");
+    // Same no-DELETE discipline as 019 — withdrawal is is_active = false in a
+    // later migration, never a DELETE here (the 017 failure mode).
+    expect(sql).not.toMatch(/\bDELETE\b/i);
+    expect(sql).not.toMatch(/\bDROP\b/i);
+  });
+
+  it("the static description and the migration description agree for automated-door", () => {
+    const sql = readFileSync(
+      resolve(process.cwd(), "server/migrations/020_automated_door_split.sql"),
+      "utf8",
+    );
+    const product = products.find((p) => p.id === "automated-door")!;
+    // Static catalog is the fallback when /api/products errors, so a drift
+    // between the two ships two different products under one id.
+    expect(sql).toContain(product.description);
+    expect(sql).toContain(product.shortDescription);
+  });
+});
+
 describe("migration 019 ↔ static catalog id parity", () => {
   it("seeded product slugs in 019 match the Aug-7 static id set", () => {
     const migrationPath = resolve(

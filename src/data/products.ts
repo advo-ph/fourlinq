@@ -351,19 +351,44 @@ export const products: Product[] = [
     name: "Automated Windows",
     category: "windows",
     description:
-      "Motorised window opening devices and digital-access automation for operable windows and compatible door leaves. Open high or hard-to-reach sashes without climbing; pair with wall switches, remotes, or building controls where specified. The surface for both window opening devices and automate-your-door / digital access asks from the 2026-07-10 client meeting. Hardware and control scope are project-specified — not a single SKU. Consultation required for load, travel, power, and lock integration.",
-    shortDescription: "Open and secure openings without the ladder.",
+      "Motorised window opening devices for operable windows. Open high or hard-to-reach sashes without climbing; pair with wall switches, remotes, or building controls where specified. Answers the window opening devices ask from the 2026-07-10 client meeting (00:21:11) — door automation and digital access is a separate product, Automated Door Access, filed under doors. Hardware and control scope are project-specified — not a single SKU. Consultation required for load, travel, and power.",
+    shortDescription: "Open a high window without the ladder.",
     // Schematic placeholder — no verified client product photo in-repo yet.
     // See docs/AUG07_ASSET_REQUEST.md.
     image: "/images/products/schematic/automated-window.svg",
     specs: [
       "Motorised window opening devices",
-      "Digital access options for compatible door leaves",
       "Wall switch, remote, or building-control integration (project-specified)",
       "Suited to high, large, or hard-to-reach operable units",
       "⚠️ Indicative only — actuator load, travel, and power by project consultation",
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
+  },
+  // ─── Aug 8 — door automation split out of automated-window ───
+  // She asked two separate things: "Automate your door… digital access"
+  // (00:20:47, a DOOR) and "Window opening devices" (00:21:11, a WINDOW).
+  // Migration 019 answered both with one windows-category product, so the door
+  // ask was unreachable from /products?filter=doors — the one place someone
+  // following up on that remark would look. Split, per ask, per category.
+  {
+    id: "automated-door",
+    name: "Automated Door Access",
+    category: "doors",
+    description:
+      "Digital access and motorised operation for door leaves — keypad, card, fob, or app entry, with automatic opening where the leaf and frame allow it. For main entries, offices, and shared entrances that should open without a key and close without being pulled. Answers the automate-your-door / digital access ask from the 2026-07-10 client meeting (00:20:47). Lock integration, power, and control scope are project-specified — not a single SKU. Consultation required for leaf weight, fire-egress rules, and power provision.",
+    shortDescription: "Enter without a key. Close without a pull.",
+    // Schematic placeholder — no verified client product photo in-repo yet.
+    // See docs/AUG07_ASSET_REQUEST.md.
+    image: "/images/products/schematic/automated-door.svg",
+    specs: [
+      "Digital access: keypad, card, fob, or app (project-specified)",
+      "Motorised opening for compatible door leaves",
+      "Integrates with multi-point locking",
+      "Suited to main entries and shared entrances",
+      "⚠️ Indicative only — leaf weight, egress compliance, and power by project consultation",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Frosted Privacy", "Low-E Coated", "Laminated Safety"],
   },
 ];

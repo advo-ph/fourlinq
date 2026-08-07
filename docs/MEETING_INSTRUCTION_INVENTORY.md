@@ -67,8 +67,14 @@ Sub-products she named:
 | **Screens** | *"**Hardware, glass, screens, we want that eh.**"* | `00:20:09` | ❌ |
 | **Hardware** | same | `00:20:09` | ❌ |
 | **Casing** | *"We also have that **casing**, if they like."* | `00:20:39` | ❌ |
-| **Automation / digital access** | *"**Automate your door**, meron din kami. Gusto mo magkaroon ng **digital access**, meron din kami."* | `00:20:47` | ✅ surface: catalog product `automated-window` (lane/catalog; schematic hero pending client photo) |
-| **Window opening devices** | *"**Window opening devices.** Meron din tayo yan."* | `00:21:11` | ✅ surface: catalog product `automated-window` (lane/catalog; schematic hero pending client photo) |
+| **Automation / digital access** | *"**Automate your door**, meron din kami. Gusto mo magkaroon ng **digital access**, meron din kami."* | `00:20:47` | ✅ surface: catalog product `automated-door` / **Automated Door Access**, category **doors** — reachable from `/products?filter=doors` (migration 020, 2026-08-08). Schematic hero pending client photo. |
+| **Window opening devices** | *"**Window opening devices.** Meron din tayo yan."* | `00:21:11` | ✅ surface: catalog product `automated-window` / **Automated Windows**, category **windows** (migration 019). Copy narrowed 2026-08-08 so it no longer claims door scope. Schematic hero pending client photo. |
+
+> **Two asks, two products (fixed 2026-08-08).** Migration 019 answered both rows
+> above with the single windows-category product `automated-window`. That marked
+> both ✅ while the *door* ask was unreachable from `/products?filter=doors` — the
+> one place a customer following up on "automate your door" would look. Migration
+> 020 splits them. Guard: `data-integrity.test.ts` → "Aug 8 door-automation split".
 | **Largest windows** | *"**largest windows**… we have the widest panel na kaya niya isara ng mag-isa"* | `00:21:23` | ❌ |
 | **Divided lights / muntin bars** | *"Divided lights with muntin bars. **We term it French. Some term it Georgian bars.**"* | `00:20:09` | ❌ |
 | **Special doors** (slide→swing) | *"pwede siya magiging swing. Meron tayong ganun sa alabang."* | `00:16:05` | ❌ |

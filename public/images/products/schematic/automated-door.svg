@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Automated door access schematic placeholder">
+  <rect width="1200" height="900" fill="#F9F7F1"/>
+  <!-- Outer frame -->
+  <rect x="380" y="120" width="440" height="660" fill="none" stroke="#242424" stroke-width="8"/>
+  <!-- Door leaf -->
+  <rect x="400" y="140" width="400" height="620" fill="#E8EEF2" stroke="#242424" stroke-width="4"/>
+  <!-- Upper glazed panel -->
+  <rect x="440" y="180" width="320" height="300" fill="#D9E8F2" stroke="#242424" stroke-width="3"/>
+  <!-- Solid lower panel -->
+  <rect x="440" y="520" width="320" height="200" fill="#DDE3E0" stroke="#242424" stroke-width="3"/>
+  <!-- Keypad / reader on the frame -->
+  <rect x="840" y="380" width="76" height="110" rx="8" fill="#FFFFFF" stroke="#242424" stroke-width="4"/>
+  <circle cx="864" cy="410" r="6" fill="#242424"/>
+  <circle cx="892" cy="410" r="6" fill="#242424"/>
+  <circle cx="864" cy="438" r="6" fill="#242424"/>
+  <circle cx="892" cy="438" r="6" fill="#242424"/>
+  <circle cx="864" cy="466" r="6" fill="#242424"/>
+  <circle cx="892" cy="466" r="6" fill="#242424"/>
+  <!-- Lever handle -->
+  <rect x="756" y="446" width="60" height="12" rx="6" fill="#242424"/>
+  <!-- Motorised swing arc, outward -->
+  <path d="M 800 700 A 240 240 0 0 0 1040 460" fill="none" stroke="#242424" stroke-width="3" stroke-dasharray="12 8" opacity="0.5"/>
+  <polygon points="1032,472 1048,458 1032,444" fill="#242424" opacity="0.5"/>
+  <!-- Placeholder caption -->
+  <text x="600" y="850" font-family="Georgia, serif" font-size="30" fill="#6B6B6B" text-anchor="middle">Automated Door Access — schematic placeholder</text>
+</svg>

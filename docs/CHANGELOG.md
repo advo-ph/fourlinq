@@ -27,6 +27,22 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+### Session: 2026-08-08 — closing the open gaps: honest a11y gate, reachable door automation
+
+#### Added
+
+- **`automated-door` / Automated Door Access** under **doors** — digital access (keypad, card, fob, app) and motorised door-leaf operation. Reachable from `/products?filter=doors`. [src/data/products.ts](../src/data/products.ts), [server/migrations/020_automated_door_split.sql](../server/migrations/020_automated_door_split.sql) (new), schematic placeholder in [public/images/products/schematic/](../public/images/products/schematic/).
+- **Detector self-check in the a11y gate** — each run injects an unnamed link, an unnamed icon button, and a correctly-named image link, and fails if the detector gets any of the three wrong. Verified by mutation: blinding the name computation exits 1 rather than passing silently. [scripts/rm17-a11y-scan.mjs](../scripts/rm17-a11y-scan.mjs).
+
+#### Fixed
+
+- **`qa:a11y` reported 124 false failures** — every "unnamed control" on home was an image-only link whose `<img>` had a real alt. `accessibleName` used `textContent`, which skips replaced elements; it now follows the accname spec (img/area alt, input value, svg title, aria-hidden subtrees excluded). Controls hidden from the accessibility tree are skipped at collection, not reported as unnamed. **124 → 0**, and `qa:a11y` passes for the first time.
+- **Door automation was unreachable from the doors filter** — migration 019 answered two distinct client asks ("automate your door / digital access", `00:20:47`; "window opening devices", `00:21:11`) with one windows-category product, marking both ✅ while the door half was filed under windows. Split into two products; `automated-window` copy narrowed so it no longer claims door scope. [docs/MEETING_INSTRUCTION_INVENTORY.md](./MEETING_INSTRUCTION_INVENTORY.md).
+
+#### Notes
+
+- Migration 020 is hand-applied on the VPS like 019 — explicit no-down, no `DELETE`/`DROP`, asserted by test. **Until it is applied, `automated-door` will not appear on the live site** (`USE_API=true` means `/api/products` reads Postgres and the static catalog is fallback-only).
+
 ### Session: 2026-08-07 — catalog lane: four Aug-7 products (glass-railing, sc-door, louvre, automated-window)
 
 Client feedback products that had no `/products` home. Glass stays a product line under specialist (not a fourth type card). Static catalog + hand-run migration 019 seed both halves so `USE_API=true` can serve them after apply.
