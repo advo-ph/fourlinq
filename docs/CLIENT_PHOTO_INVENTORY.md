@@ -61,3 +61,17 @@ must correctly depict a product FourlinQ actually sells. All ten above pass that
 The remaining 40 houses are usable but currently have no surface that needs them, and importing
 unused assets is repo bloat. The contact sheets used for review are reproducible from
 `~/Downloads/fourlinq pictures` — regenerate rather than commit them.
+
+## Slim-door audit — 2026-08-07 (`project-photo` lane)
+
+Searched `public/images/**`, `assets-src/`, `uploads/`, `public/images/wp-export-originals/` for a
+genuine **slim-profile aluminium door** product still.
+
+| Finding | Path / note |
+|---|---|
+| Only slim-frame asset in repo | `public/images/aluminium/hero-slim-frame-residence.webp` (residence exterior; already on `/aluminium`) |
+| No dedicated slim-door product photo | Filename hits for "door" are uPVC finish swatches, project galleries, or generic wp-export doors — none are a slim-door product still to wire |
+| Client source set | `~/Downloads/fourlinq pictures` **absent** on this machine/worktree; the 40 not-imported files from 2026-07-17 review include no confirmed slim-door product shot |
+| Action | Did **not** AI-generate a slim door. Shot list for the client is in [AUG07_PROJECT_AREA_REQUEST.md](./AUG07_PROJECT_AREA_REQUEST.md) |
+
+`/aluminium` left on the existing hero only until real slim-door stills arrive.

@@ -442,35 +442,29 @@ Only the four below had **zero** coverage in any roadmap doc.
 
 | # | Item | What it closes | Effort | Benchmark | Status |
 |---|---|---|---|---|---|
-| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. `src/pages/Inspiration.tsx:24-32` filters by Casement/Sliding/Doors/Specialist + Interior/Exterior — a **system-type** axis, never a room/area or residential/commercial one. | ~0.5d | **D-B1** (Tier 1, gate-excluded) | **Blocked — needs project *records*, not photos (see below)** |
+| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. Geographic axis shipped 2026-08-07 (`project-photo` lane): `/inspiration` region filter + grouping (Metro Manila, Cebu, … + unknown bucket) and `Amara — Cebu` labels from structured `ProjectArea`. Room-level (MBR/Living) and residential/commercial — the two axes she actually named — still need records. | ~0.5d | **D-B1** (Tier 1, gate-excluded) + **D-B4** (shipped) | **Blocked — D-B4 (geographic) shipped, but that is a substitute axis; D-B1 as asked is unbuilt** |
 | **D3** | `/inspiration` is a 5th surface with a mixed-axis filter over a single-vocabulary field | **Verified 2026-07-17.** `src/data/projects.ts` gives each project ONE `category` string drawn from two different vocabularies — system (`casement`/`sliding`/`doors`/`specialist`, 4 projects) **or** view (`interior`/`exterior`, 8 projects), **never both**. `Inspiration.tsx:24-32` then renders all seven as one peer row. Two consequences: (a) it repeats the exact mixed-axis error Imie rejected on `/products` (*"Aluminium is like uPVC — they are both profile systems"*), and (b) **the filter silently lies** — selecting *Interior* hides every casement/doors project that is also interior. RM4 governs this but lists only nav, home, product, and footer; `/inspiration` is an uncovered fifth surface. | ~0.5d + data | **D-B3** (Tier 1, gate-excluded) | Blocked on per-project axis values |
 
-### D1 — still blocked. A photo is not a project record.
+### D1 — geographic area shipped; room/occupancy still blocked
 
-**Corrected 2026-07-17.** An earlier revision of this section claimed the client photo drop unblocked
-the occupancy axis, because the set contains a **church** and a **resort/multi-unit**
-([CLIENT_PHOTO_INVENTORY.md](./CLIENT_PHOTO_INVENTORY.md)). That was over-claimed. It proves FourlinQ
-does commercial work — it does **not** produce a publishable project.
+**2026-08-07 (`project-photo` lane).** `/inspiration` now has a **geographic area axis** alongside
+the tag axis: filter + section groups for regions that actually have projects (Metro Manila, Cebu,
+…), an explicit **"Area to be confirmed"** bucket, and card labels from
+`projectLocationLabel` (`Amara — Cebu` em-dash convention). Structured `ProjectArea` is populated
+only from verified Facebook `location`/caption strings — never invented. Client fill-in table:
+[AUG07_PROJECT_AREA_REQUEST.md](./AUG07_PROJECT_AREA_REQUEST.md). Tripwire test locks the confirmed
+count at 38.
 
-A `Project` (`src/data/projects.ts`) requires:
+**Still blocked (unchanged):**
 
-- `location` — typed comment: *"Real location from the FourlinQ Facebook caption."* The dropped files
-  have **no EXIF and hash filenames**; the location is unknown. `Inspiration.tsx:100` renders location
-  **unconditionally** as the card eyebrow, so an empty value ships a blank line.
-- `name`, `description`, `gallery` — every card links to `/projects/:slug`, a **detail page**. A photo
-  supplies none of these.
+- **residential / commercial** — needs two commercial projects with confirmed name + location
+  (she referenced *"maraming dami namin hospital, churches"*, `00:30:20`). The 2026-07-17 client
+  photo drop proves commercial work exists but does **not** produce project records
+  ([CLIENT_PHOTO_INVENTORY.md](./CLIENT_PHOTO_INVENTORY.md)).
+- **"MBR / Living"** — room identity is not reliably visible; do not invent.
 
-Inventing any of them is precisely the error already committed once and reverted in
+Inventing location fields is the error already committed once and reverted in
 `779d889 copy: strip fake project locations`.
-
-So the axis needs **project records**, not imagery:
-
-- **residential / commercial** — buildable the moment two commercial projects have a confirmed name +
-  location (she referenced *"maraming dami namin hospital, churches"*, `00:30:20`).
-- **"MBR / Living"** — blocked regardless; room identity is not reliably visible.
-
-Adding `occupancy` to the existing 12 alone is pointless: all 12 are residences, so the filter would
-render 12 / 0.
 
 D3 (the single mixed `category` field) remains blocked on per-project axis values regardless.
 
@@ -485,7 +479,20 @@ longer hides matching projects). Expected-red until the per-project values exist
 Pass iff `/inspiration` exposes an **area/occupancy axis** (MBR, Living, … or residential/commercial)
 that is **distinct from** the existing system-type axis; a `*.roadmap.test.tsx` asserts both axes
 render as separate labelled groups and do not collapse into one mixed row (the same failure mode as
-the rejected 2026-07-05 `/products` build). Expected-red until built; promote-on-build.
+the rejected 2026-07-05 `/products` build). **Still expected-red** — the 2026-08-07 lane shipped a
+*geographic* axis, which is a different axis than the one this benchmark measures (see D-B4).
+Promote-on-build.
+
+> **Do not rewrite this benchmark to match what got built.** An earlier revision of this section
+> restated D-B1 as a "partial pass (geographic)" — that made the test agree with the deliverable
+> instead of with the instruction. Benchmarks move only when the *client* moves.
+
+### D-B4 — Projects expose a geographic region axis (Tier 1, gate-excluded, shipped)
+**Pass, 2026-08-07 (`project-photo` lane).** `/inspiration` exposes a **region** axis distinct from
+the tag axis; only populated regions appear; unknown projects fall into an explicit
+"Area to be confirmed" bucket and are never guessed into a region;
+`src/test/project-area.test.ts` locks label derivation and the confirmed-area count at 38.
+This is **additional to** D-B1, not a discharge of it.
 
 ### D-B2 — Replacement windows surface (Tier 3)
 Pass iff a Replacement surface exists whose process copy is client-approved and traceable to a source

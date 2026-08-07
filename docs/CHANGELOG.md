@@ -27,6 +27,7 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+<<<<<<< HEAD
 ### Session: 2026-08-07 — catalog lane: four Aug-7 products (glass-railing, sc-door, louvre, automated-window)
 
 Client feedback products that had no `/products` home. Glass stays a product line under specialist (not a fourth type card). Static catalog + hand-run migration 019 seed both halves so `USE_API=true` can serve them after apply.
@@ -52,6 +53,21 @@ Client feedback products that had no `/products` home. Glass stays a product lin
 #### Open question
 
 - **Tilt & Turn contradicts "never inward"** — [src/data/glossary.ts](../src/data/glossary.ts) describes it tilting and swinging *inward* while flagged `is_fourlinq_offering: true`. That is what the product physically is, so it is not a copy fix. Ask the client whether FourlinQ sells tilt & turn at all. The "never inward" row in [MEETING_INSTRUCTION_INVENTORY.md](./MEETING_INSTRUCTION_INVENTORY.md) is ⚠️ partial, not ✅.
+### Session: 2026-08-07 — Project area axis on /inspiration + slim-door audit
+
+#### Added
+
+- **Geographic area axis on `/inspiration`** — second filter rail (Metro Manila, Cebu, …) and section groups driven by structured `ProjectArea`; empty regions stay hidden; projects without a confirmed `region_code` land in **Area to be confirmed**. Card and detail labels use one derivation helper (`Amara — Cebu` em dash). [src/data/project-area.ts](../src/data/project-area.ts), [src/pages/Inspiration.tsx](../src/pages/Inspiration.tsx), [src/test/project-area.test.ts](../src/test/project-area.test.ts).
+- **Client area request doc** — one row per project with blank village/city/province/region columns, Anvaya Cove Batangas-vs-Bataan question open, slim-door shot list. [docs/AUG07_PROJECT_AREA_REQUEST.md](./AUG07_PROJECT_AREA_REQUEST.md).
+
+#### Changed
+
+- **Defendable `area` on catalog projects only** — 38 projects get structured parts from verified Facebook location/caption (plus showroom-verified Mandaue→Cebu); 23 Philippines-only rows stay unknown. No invented places. [src/data/projects.ts](../src/data/projects.ts).
+
+#### Notes
+
+- Slim-door product photography still missing after full image search; `/aluminium` keeps the single existing slim-frame hero. See CLIENT_PHOTO_INVENTORY slim-door audit.
+- **The area axis shipped is geographic, not the one she asked for.** Her words name a room/occupancy axis — *"Kaya, MBR, Living"* / *"pwede residential, commercial"* (`00:23:14`). Benchmark **D-B1** keeps its original pass condition and stays expected-red; the geographic axis is recorded as a separate **D-B4**. Do not present the region filter to the client as the area feature she requested. [docs/ROADMAP.md](./ROADMAP.md).
 
 ### Session: 2026-07-21 — Prince's UI punch list: Marvin-grade header, embedded design tool, page de-texting
 

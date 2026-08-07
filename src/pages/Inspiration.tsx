@@ -4,6 +4,14 @@ import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import { projects as fallbackProject, tagFromCategory, type InspirationTag, type Project } from "@/data/projects";
 import {
+  groupProjectByArea,
+  populatedRegionFilter,
+  projectLocationLabel,
+  UNKNOWN_REGION_CODE,
+  type ProjectArea,
+  type RegionCode,
+} from "@/data/project-area";
+import {
   projectCategoryImages as BASELINE_projectCategoryImages,
   projectDerivedTags as BASELINE_projectDerivedTags,
   projectOrder as BASELINE_projectOrder,
@@ -18,6 +26,7 @@ import { versionedImage } from "@/lib/image-version";
 import { fetchMergedProjectImages, fetchMergedProjectImagesFresh } from "@/lib/merged-project-images";
 
 type Filter = "all" | InspirationTag;
+type AreaFilter = "all" | RegionCode | typeof UNKNOWN_REGION_CODE;
 
 // The initial merged state comes from the baked static baseline. The runtime API
 // fetch in the component's useEffect updates this with live DB overrides.
@@ -37,12 +46,25 @@ const BASELINE_MERGED: MergedProjectImagesResponse = {
 // canonical slug rather than whichever spelling the CMS happens to store.
 // mergedData is passed explicitly so the function always uses the current
 // runtime state (baseline or live API result) rather than module-level imports.
-type ViewProject = { id: string; name: string; location: string; image: string; caption?: string; tag: InspirationTag[]; categoryImages: CategoryImages };
+type ViewProject = {
+  id: string;
+  name: string;
+  location: string;
+  /** Derived card label (village — city convention). */
+  locationLabel: string;
+  area?: ProjectArea;
+  image: string;
+  caption?: string;
+  tag: InspirationTag[];
+  categoryImages: CategoryImages;
+};
 function toView(p: Project, mergedData: MergedProjectImagesResponse): ViewProject {
   return {
     id: p.id,
     name: p.name,
     location: p.location,
+    locationLabel: projectLocationLabel(p.area, p.location),
+    area: p.area,
     image: p.image,
     caption: p.caption,
     // Category membership is derived from what the project's images actually
@@ -161,12 +183,23 @@ function CardImage({ src, alt, className }: CardImageProps) {
 }
 
 const Inspiration = () => {
-  // Filter lives in the URL (?filter=windows) so the nav can deep-link a
-  // category and the back button restores the previous view.
+  // Filters live in the URL (?filter=windows&area=cebu) so the nav can
+  // deep-link a category/area and the back button restores the previous view.
   const [searchParams, setSearchParams] = useSearchParams();
   const paramFilter = searchParams.get("filter");
   const active: Filter = isFilter(paramFilter) ? paramFilter : "all";
-  const setActive = (f: Filter) => setSearchParams(f === "all" ? {} : { filter: f });
+  const paramArea = searchParams.get("area");
+
+  const writeParams = (next: { filter?: Filter; area?: AreaFilter }) => {
+    const filter = next.filter ?? active;
+    const area = next.area ?? (paramArea as AreaFilter | null) ?? "all";
+    const params: Record<string, string> = {};
+    if (filter !== "all") params.filter = filter;
+    if (area !== "all") params.area = area;
+    setSearchParams(params);
+  };
+  const setActive = (f: Filter) => writeParams({ filter: f });
+  const setArea = (a: AreaFilter) => writeParams({ area: a });
 
   // mergedReady tracks whether the live merged fetch has resolved at least once.
   // Cards are NOT rendered until mergedReady is true — skeleton grid shows instead.
@@ -292,8 +325,23 @@ const Inspiration = () => {
     };
   }, [mergedReady, mergedData]); // fires once merged data is live; re-primes on updates
 
+  const areaOption = useMemo(() => populatedRegionFilter(items), [items]);
+  const activeArea: AreaFilter = useMemo(() => {
+    if (!paramArea) return "all";
+    if (paramArea === UNKNOWN_REGION_CODE) return UNKNOWN_REGION_CODE;
+    if (areaOption.some((o) => o.code === paramArea)) return paramArea as AreaFilter;
+    return "all";
+  }, [paramArea, areaOption]);
+
   const filtered = useMemo(() => {
-    const base = active === "all" ? items : items.filter((p) => p.tag.includes(active));
+    let base = active === "all" ? items : items.filter((p) => p.tag.includes(active));
+    if (activeArea !== "all") {
+      base = base.filter((p) =>
+        activeArea === UNKNOWN_REGION_CODE
+          ? !p.area?.region_code
+          : p.area?.region_code === activeArea,
+      );
+    }
     // Best pictures first: "All projects" orders by AI hero-quality (or admin override);
     // a category view orders by each project's best image FOR THAT category.
     // Unranked projects (e.g. a CMS-only entry not yet analyzed) sort to the end, stably.
@@ -303,7 +351,46 @@ const Inspiration = () => {
     const rank = new Map((order ?? []).map((id, i) => [id, i]));
     const rankOf = (id: string) => rank.get(id) ?? Number.MAX_SAFE_INTEGER;
     return [...base].sort((a, b) => rankOf(a.id) - rankOf(b.id));
-  }, [active, items, mergedData]);
+  }, [active, activeArea, items, mergedData]);
+
+  // When no specific area is selected, render one section per populated region
+  // (empty client-named regions never appear — groupProjectByArea omits them).
+  const areaGroup = useMemo(
+    () => (activeArea === "all" ? groupProjectByArea(filtered) : null),
+    [activeArea, filtered],
+  );
+
+  const cardImageSrc = (p: ViewProject) =>
+    active !== "all"
+      ? (p.categoryImages[active] ?? p.image)
+      : (mergedData.projectCoverImages?.[p.id] ?? p.image);
+
+  const renderCard = (p: ViewProject) => (
+    <li key={p.id}>
+      <Link to={`/projects/${p.id}`} className="group block">
+        <div className="relative aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
+          {/* In a category view, show that project's best image for
+              the active category; "All projects" uses the admin-set
+              cover if one exists, otherwise the baseline hero.
+              Category views keep the per-category best image logic
+              (cover override only applies to the All-projects view).
+              CardImage decodes in the background before swapping so
+              the tile never flashes blank during a category switch. */}
+          <CardImage
+            src={cardImageSrc(p)}
+            alt={p.name}
+            className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
+          />
+        </div>
+        <div className="mt-3">
+          <p className="eyebrow mb-1">{p.locationLabel}</p>
+          <h3 className="font-serif text-body text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+            {p.name}
+          </h3>
+        </div>
+      </Link>
+    </li>
+  );
 
   return (
     <Layout>
@@ -311,13 +398,14 @@ const Inspiration = () => {
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
-          {/* Filter rail */}
-          <div className="flex flex-wrap items-end gap-x-8 gap-y-3 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16 overflow-x-auto no-scrollbar">
+          {/* Tag filter rail (existing axis) */}
+          <div className="flex flex-wrap items-end gap-x-8 gap-y-3 border-b border-[color:var(--rule-soft)] mb-6 overflow-x-auto no-scrollbar">
             {filters.map((f) => {
               const isActive = active === f.value;
               return (
                 <button
                   key={f.value}
+                  type="button"
                   onClick={() => setActive(f.value)}
                   className={cn(
                     "pb-4 text-body-sm font-medium whitespace-nowrap transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end",
@@ -327,6 +415,44 @@ const Inspiration = () => {
                   )}
                 >
                   {f.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Area filter rail — only regions that actually have ≥1 project */}
+          <div
+            className="flex flex-wrap items-end gap-x-8 gap-y-3 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16 overflow-x-auto no-scrollbar"
+            role="navigation"
+            aria-label="Filter projects by area"
+          >
+            <button
+              type="button"
+              onClick={() => setArea("all")}
+              className={cn(
+                "pb-4 text-body-sm font-medium whitespace-nowrap transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end",
+                activeArea === "all"
+                  ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
+                  : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
+              )}
+            >
+              All areas
+            </button>
+            {areaOption.map((o) => {
+              const isActive = activeArea === o.code;
+              return (
+                <button
+                  key={o.code}
+                  type="button"
+                  onClick={() => setArea(o.code)}
+                  className={cn(
+                    "pb-4 text-body-sm font-medium whitespace-nowrap transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end",
+                    isActive
+                      ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
+                      : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
+                  )}
+                >
+                  {o.label}
                 </button>
               );
             })}
@@ -348,35 +474,25 @@ const Inspiration = () => {
             </ul>
           ) : filtered.length === 0 ? (
             <p className="text-body text-[color:var(--ink-muted)]">No projects in this category yet.</p>
+          ) : areaGroup ? (
+            <div className="space-y-14 lg:space-y-16">
+              {areaGroup.map((g) => (
+                <section key={g.region_code} aria-labelledby={`area-${g.region_code}`}>
+                  <h2
+                    id={`area-${g.region_code}`}
+                    className="font-serif text-h4 tracking-tight text-[color:var(--ink-primary)] mb-6 lg:mb-8"
+                  >
+                    {g.label}
+                  </h2>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+                    {g.project.map(renderCard)}
+                  </ul>
+                </section>
+              ))}
+            </div>
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-              {filtered.map((p) => {
-                return (
-                <li key={p.id}>
-                  <Link to={`/projects/${p.id}`} className="group block">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-[color:var(--canvas-soft)]">
-                      {/* In a category view, show that project's best image for
-                          the active category; "All projects" uses the admin-set
-                          cover if one exists, otherwise the baseline hero.
-                          Category views keep the per-category best image logic
-                          (cover override only applies to the All-projects view).
-                          CardImage decodes in the background before swapping so
-                          the tile never flashes blank during a category switch. */}
-                      <CardImage
-                        src={active !== "all" ? (p.categoryImages[active] ?? p.image) : (mergedData.projectCoverImages?.[p.id] ?? p.image)}
-                        alt={p.name}
-                        className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
-                      />
-                    </div>
-                    <div className="mt-3">
-                      <h3 className="font-serif text-body text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                        {p.name}
-                      </h3>
-                    </div>
-                  </Link>
-                </li>
-                );
-              })}
+              {filtered.map(renderCard)}
             </ul>
           )}
         </div>
