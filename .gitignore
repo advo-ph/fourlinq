@@ -44,3 +44,7 @@ public/images/projects-fb/thumbs/
 
 # gpt-image script outputs
 scripts/gpt-image-out/
+
+# Delivery copy of the catalog PDF — byte-identical to the tracked copy under
+# public/docs, written by npx tsx scripts/generate-system-catalog.ts
+output/
