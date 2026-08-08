@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FourlinQ · Curtain Wall — 3 × 3 stick system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+  :root{ --paper:#f6f5f2; --ink:#16181a; --muted:#6d7278; --line:#dcdad4; --card:#fff; --accent:#1f4ed8; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;
+       display:grid;grid-template-columns:1fr 340px;height:100vh;overflow:hidden}
+  a{color:var(--accent)} a:hover{color:#16308c}
+  three-d-stage:not(:defined){visibility:hidden}
+  main{position:relative;min-width:0}
+  three-d-stage{width:100%;height:100%;display:block}
+  .badge{position:absolute;left:24px;top:20px;z-index:2;font-size:12px;letter-spacing:.14em;
+         text-transform:uppercase;color:var(--muted)}
+  .badge b{color:var(--ink);font-weight:600;letter-spacing:.06em;text-transform:none;font-size:15px;display:block}
+  aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:22px 20px 40px;
+        display:flex;flex-direction:column;gap:22px}
+  h2{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+  .seg{display:flex;gap:6px}
+  .seg button{flex:1;padding:9px 8px;border:1px solid var(--line);background:#fff;border-radius:7px;
+    font:500 13px 'IBM Plex Sans',sans-serif;color:var(--ink);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .row{display:flex;align-items:center;gap:10px}
+  input[type=range]{flex:1;accent-color:var(--ink)}
+  .val{font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);min-width:56px;text-align:right}
+  .btns{display:grid;gap:6px}
+  .btns button{padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:7px;text-align:left;
+    font:500 13px 'IBM Plex Sans',sans-serif;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+  .btns button:hover{border-color:#b6b2a9;background:#fafaf8}
+  .btns button span{font:400 11px 'IBM Plex Mono',monospace;color:var(--muted)}
+  .btns button:disabled{opacity:.5;cursor:progress}
+  pre{margin:0;background:transparent;border:1px solid var(--line);border-radius:7px;padding:12px;
+      font:400 11.5px/1.6 'IBM Plex Mono',monospace;color:#2b2f33;overflow:auto}
+  dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12.5px}
+  dt{color:var(--muted)} dd{margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px}
+  .strip{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px}
+  .strip img{height:74px;background:#fff;border:1px solid var(--line);border-radius:4px}
+  .hero{display:block;width:100%;background:#fff;border:1px solid var(--line);border-radius:6px}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.55}
+</style>
+</head>
+<body>
+<main>
+  <div class="badge">FourlinQ · product geometry<b>Curtain wall — 3 bays × 3 storeys, slim dark alu</b></div>
+  <three-d-stage name="curtain_wall" background="#f2f3f2"></three-d-stage>
+</main>
+
+<aside>
+  <div>
+    <h2>Module</h2>
+    <div class="seg" id="variant">
+      <button data-v="standard" aria-pressed="true">1500 bay</button>
+      <button data-v="wide" aria-pressed="false">1800 bay</button>
+      <button data-v="lobby" aria-pressed="false">4 m storey</button>
+    </div>
+    <p class="note" style="margin:8px 0 0">3 bays × 3 storeys, always. 65 mm sightline, 190 mm back mullion.</p>
+  </div>
+
+  <div>
+    <h2>Infill</h2>
+    <div class="seg" id="infill">
+      <button data-i="vision" aria-pressed="true">Full vision</button>
+      <button data-i="spandrel" aria-pressed="false">Spandrel band</button>
+    </div>
+  </div>
+
+  <div>
+    <h2>Operable insert</h2>
+    <div class="seg" id="awning">
+      <button data-a="0" aria-pressed="true">All fixed</button>
+      <button data-a="1" aria-pressed="false">Awning · centre bay</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <input id="open" type="range" min="0" max="1" step="0.01" value="0" disabled>
+      <div class="val" id="openVal">closed</div>
+    </div>
+    <p class="note" style="margin:8px 0 0">Top-hung, 26° max projection to exterior. Stay arms track the sash.</p>
+  </div>
+
+  <div>
+    <h2>Scale reference</h2>
+    <div class="seg" id="scale">
+      <button data-s="fig" aria-pressed="false">1.75 m figure</button>
+      <button data-s="slab" aria-pressed="false">Floor slabs</button>
+    </div>
+  </div>
+
+  <div>
+    <h2>Turntable</h2>
+    <div class="row">
+      <input id="yaw" type="range" min="0" max="360" step="1" value="0">
+      <div class="val" id="yawVal">0°</div>
+    </div>
+    <div class="seg" style="margin-top:8px">
+      <button id="poseFront">Front</button>
+      <button id="pose34">3/4</button>
+      <button id="poseSide">Side</button>
+      <button id="spin">Spin</button>
+    </div>
+  </div>
+
+  <div>
+    <h2>Deliverables</h2>
+    <div class="btns" id="exports">
+      <button data-x="glb">Unit as shown <span>GLB</span></button>
+      <button data-x="hero">Hero still · ortho front <span>PNG</span></button>
+      <button data-x="frames">36-step turntable <span>ZIP</span></button>
+      <button data-x="strip">Turntable sprite strip <span>PNG</span></button>
+      <button data-x="json">Config <span>JSON</span></button>
+    </div>
+    <p class="note" style="margin:10px 0 0">Stage toolbar also exports the live view as OBJ + MTL.</p>
+  </div>
+
+  <div>
+    <h2>Hero preview</h2>
+    <img class="hero" id="heroPreview" alt="Orthographic front hero still" style="display:none">
+    <p class="note" id="heroNote">Renders after “Hero still”. Pure white BG, orthographic front, no perspective taper.</p>
+  </div>
+
+  <div>
+    <h2>Turntable preview</h2>
+    <div class="strip" id="stripPreview"><span class="note">Renders after “36-step turntable”.</span></div>
+  </div>
+
+  <div>
+    <h2>Rig</h2>
+    <dl>
+      <dt>Meshes</dt><dd>mullion · transom · cap · glass · spandrel · gasket · spacer · sash · stay_arm · head · sill</dd>
+      <dt>Motion</dt><dd id="motionVal">none — all fixed</dd>
+      <dt>System</dt><dd>stick-built, pressure-plate captured</dd>
+      <dt>Finish</dt><dd>dark anodised aluminium</dd>
+      <dt>Sightline</dt><dd>65 mm</dd>
+      <dt>Glazing</dt><dd>28 mm IGU</dd>
+      <dt>Size</dt><dd id="sizeVal">4500 × 9600 mm</dd>
+    </dl>
+  </div>
+
+  <div>
+    <h2>curtainwall.json</h2>
+    <pre id="cfg"></pre>
+  </div>
+</aside>
+
+<script src="./three-d-stage.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { buildCurtainWall, CW_VARIANTS } from './curtainwall-model.js';
+
+const stage = document.querySelector('three-d-stage');
+await stage.ready;
+
+let variant = 'standard';
+let spandrel = false, awning = false, figure = false, slabs = false;
+let open = 0;
+let yaw = 0;
+let model = null;
+
+const cfgEl = document.getElementById('cfg');
+
+/* The stage frames new objects from a 3/4 azimuth; re-seat the camera dead-on
+   (exterior side, −Z) so the turntable readout means what it says: 0° = front. */
+function lockCamera() {
+  const cam = stage._camera, ctr = stage._controls;
+  if (!cam || !ctr) return;
+  const t = ctr.target;
+  const d = cam.position.distanceTo(t);
+  cam.position.set(t.x, t.y + d * 0.10, t.z - d * 0.995);
+  cam.lookAt(t);
+  ctr.update();
+}
+
+function build() {
+  return buildCurtainWall({ variant, spandrel, awning, figure, slabs });
+}
+function mount() {
+  model = build();
+  model.setYaw(yaw);
+  model.setOpen(open);
+  stage.setObject(model.group);
+  lockCamera();
+  document.getElementById('sizeVal').textContent = CW_VARIANTS[variant].label + ' mm';
+  document.getElementById('motionVal').textContent = model.config.motion;
+  cfgEl.textContent = JSON.stringify(model.config, null, 2);
+}
+mount();
+
+const openEl = document.getElementById('open'), openVal = document.getElementById('openVal');
+function setOpen(v) {
+  open = Math.min(1, Math.max(0, v));
+  openEl.value = open;
+  openVal.textContent = open === 0 ? 'closed' : Math.round(open * 26) + '°';
+  model.setOpen(open);
+}
+openEl.addEventListener('input', () => setOpen(parseFloat(openEl.value)));
+
+const yawEl = document.getElementById('yaw'), yawVal = document.getElementById('yawVal');
+function setYaw(v) {
+  yaw = ((v % 360) + 360) % 360;
+  yawEl.value = yaw;
+  yawVal.textContent = Math.round(yaw) + '°';
+  model.setYaw(yaw);
+}
+yawEl.addEventListener('input', () => { stopSpin(); setYaw(parseFloat(yawEl.value)); });
+document.getElementById('poseFront').onclick = () => { stopSpin(); lockCamera(); setYaw(0); };
+document.getElementById('pose34').onclick = () => { stopSpin(); lockCamera(); setYaw(35); };
+document.getElementById('poseSide').onclick = () => { stopSpin(); lockCamera(); setYaw(90); };
+
+let raf = null;
+const spinBtn = document.getElementById('spin');
+function stopSpin() { if (raf) { cancelAnimationFrame(raf); raf = null; spinBtn.textContent = 'Spin'; } }
+spinBtn.onclick = () => {
+  if (raf) return stopSpin();
+  spinBtn.textContent = 'Stop';
+  let last = performance.now();
+  const tick = (now) => {
+    const dt = (now - last) / 1000; last = now;
+    setYaw(yaw + dt * 26);
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+};
+
+document.getElementById('variant').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-v]'); if (!b) return;
+  [...e.currentTarget.children].forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+  variant = b.dataset.v; mount();
+});
+document.getElementById('infill').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-i]'); if (!b) return;
+  [...e.currentTarget.children].forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+  spandrel = b.dataset.i === 'spandrel'; mount();
+});
+document.getElementById('awning').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-a]'); if (!b) return;
+  [...e.currentTarget.children].forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+  awning = b.dataset.a === '1';
+  openEl.disabled = !awning;
+  if (!awning) { open = 0; openEl.value = 0; openVal.textContent = 'closed'; }
+  mount();
+});
+document.getElementById('scale').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-s]'); if (!b) return;
+  const on = b.getAttribute('aria-pressed') !== 'true';
+  b.setAttribute('aria-pressed', String(on));
+  if (b.dataset.s === 'fig') { figure = on; model.setFigure(on); }
+  else { slabs = on; model.setSlabs(on); }
+});
+
+function download(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+function exportGLB(object, filename) {
+  return new Promise((res, rej) => {
+    new GLTFExporter().parse(object, (buf) => {
+      download(new Blob([buf], { type: 'model/gltf-binary' }), filename); res();
+    }, rej, { binary: true, onlyVisible: true });
+  });
+}
+
+/* ---------- white-BG still renderer ---------- */
+let cap = null;
+function capture(w, h) {
+  if (!cap) {
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(1);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xeeeeec, 2.0));
+    const key = new THREE.DirectionalLight(0xffffff, 2.1); key.position.set(2.4, 3.2, -3.6); scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.95); fill.position.set(-3.2, 1.4, -1.4); scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xffffff, 0.7); rim.position.set(-1.2, 2.0, 3.4); scene.add(rim);
+    cap = { renderer, scene };
+  }
+  cap.renderer.setSize(w, h, false);
+  return cap;
+}
+
+function shot(c) {
+  return new Promise(r => c.renderer.domElement.toBlob(r, 'image/png'));
+}
+
+/* Orthographic, dead-on front elevation, tight margin. */
+async function renderHero() {
+  const size = model.size;
+  const aspect = size.w / size.h;
+  const H = 1800, W = Math.round(H * aspect);
+  const c = capture(W, H);
+  const m = build();
+  m.setOpen(open);
+  m.setYaw(0);
+  c.scene.add(m.group);
+  m.group.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(m.group);
+  const ctr = box.getCenter(new THREE.Vector3());
+  const halfH = (box.max.y - box.min.y) / 2 * 1.06;
+  const halfW = halfH * aspect;
+  const camo = new THREE.OrthographicCamera(-halfW, halfW, halfH, -halfH, 0.01, 40);
+  camo.position.set(ctr.x, ctr.y, ctr.z - 6);        // exterior side
+  camo.lookAt(ctr);
+  camo.updateProjectionMatrix();
+  c.renderer.render(c.scene, camo);
+  const blob = await shot(c);
+  c.scene.remove(m.group);
+  return blob;
+}
+
+async function renderTurntable(n = 36) {
+  const W = 900, H = 900;
+  const c = capture(W, H);
+  const m = build();
+  m.setOpen(open);
+  c.scene.add(m.group);
+  m.group.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(m.group);
+  const sph = box.getBoundingSphere(new THREE.Sphere());
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.05, 60);
+  const dist = (sph.radius / Math.tan((cam.fov * Math.PI) / 360)) * 1.16;
+  const dir = new THREE.Vector3(0, 0.20, -1).normalize();
+  cam.position.copy(sph.center).add(dir.multiplyScalar(dist));
+  cam.lookAt(sph.center);
+  cam.updateProjectionMatrix();
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    m.setYaw((i / n) * 360);
+    c.renderer.render(c.scene, cam);
+    out.push(await shot(c));
+  }
+  c.scene.remove(m.group);
+  return out;
+}
+
+/* ---------- minimal store-only ZIP ---------- */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(files) {
+  const enc = new TextEncoder(); const chunks = []; const central = []; let off = 0;
+  const u16 = v => [v & 255, (v >> 8) & 255];
+  const u32 = v => [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255];
+  files.forEach(f => {
+    const name = enc.encode(f.name), crc = crc32(f.data), sz = f.data.length;
+    const local = new Uint8Array([...u32(0x04034b50), ...u16(20), ...u16(0), ...u16(0), ...u16(0), ...u16(0),
+      ...u32(crc), ...u32(sz), ...u32(sz), ...u16(name.length), ...u16(0)]);
+    chunks.push(local, name, f.data);
+    central.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0), ...u16(0), ...u16(0), ...u16(0),
+      ...u32(crc), ...u32(sz), ...u32(sz), ...u16(name.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(off)]), name);
+    off += local.length + name.length + sz;
+  });
+  const cdStart = off;
+  let cdLen = 0; central.forEach(c => cdLen += c.length);
+  const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length),
+    ...u32(cdLen), ...u32(cdStart), ...u16(0)]);
+  return new Blob([...chunks, ...central, end], { type: 'application/zip' });
+}
+
+const tag = () => `curtainwall_${variant}${spandrel ? '_spandrel' : ''}${awning ? '_awning' : ''}`;
+
+document.getElementById('exports').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-x]'); if (!b) return;
+  const kind = b.dataset.x, label = b.innerHTML;
+  b.disabled = true; b.firstChild.textContent = 'Working… ';
+  try {
+    if (kind === 'json') {
+      download(new Blob([cfgEl.textContent], { type: 'application/json' }), tag() + '.json');
+    } else if (kind === 'glb') {
+      const m = build();
+      m.setOpen(open);
+      m.group.updateMatrixWorld(true);
+      await exportGLB(m.group, tag() + '.glb');
+    } else if (kind === 'hero') {
+      const blob = await renderHero();
+      download(blob, tag() + '_hero_front_ortho.png');
+      const img = document.getElementById('heroPreview');
+      img.src = URL.createObjectURL(blob);
+      img.style.display = 'block';
+      document.getElementById('heroNote').textContent = 'Orthographic front, pure white BG.';
+    } else if (kind === 'frames') {
+      const blobs = await renderTurntable(36);
+      const files = [];
+      for (let i = 0; i < blobs.length; i++) {
+        files.push({
+          name: `${tag()}_turn_${String(i + 1).padStart(2, '0')}.png`,
+          data: new Uint8Array(await blobs[i].arrayBuffer()),
+        });
+      }
+      download(zipStore(files), `${tag()}_turntable_36.zip`);
+      const strip = document.getElementById('stripPreview');
+      strip.innerHTML = '';
+      blobs.forEach(bl => { const im = new Image(); im.src = URL.createObjectURL(bl); strip.appendChild(im); });
+    } else if (kind === 'strip') {
+      const blobs = await renderTurntable(36);
+      const TW = 300, TH = 300;
+      const cv = document.createElement('canvas');
+      cv.width = TW * 36; cv.height = TH;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      for (let i = 0; i < blobs.length; i++) {
+        const im = await createImageBitmap(blobs[i]);
+        ctx.drawImage(im, i * TW, 0, TW, TH);
+      }
+      await new Promise(r => cv.toBlob(bl => { download(bl, `${tag()}_strip_36x${TW}.png`); r(); }, 'image/png'));
+    }
+  } catch (err) { console.error(err); }
+  b.disabled = false; b.innerHTML = label;
+});
+
+setYaw(0);
+</script>
+</body>
+</html>

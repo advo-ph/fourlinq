@@ -1,0 +1,21 @@
+{
+  "id": "casement-door",
+  "motion": "hinge_outswing_vertical",
+  "handing": "RH",
+  "size_mm": {
+    "width": 950,
+    "height": 2300,
+    "frame_depth": 140
+  },
+  "leaves": [
+    {
+      "name": "panel",
+      "max_angle_deg": 90
+    }
+  ],
+  "lite": "full",
+  "hinges": 3,
+  "frames": 28,
+  "fps": 28,
+  "easing": "ease_in_out"
+}

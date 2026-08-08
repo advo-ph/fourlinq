@@ -1,0 +1,22 @@
+{
+  "id": "special-shapes-arch",
+  "motion": "fixed",
+  "operable": false,
+  "hardware": "none",
+  "turntable": {
+    "axis": "Y",
+    "from_deg": 0,
+    "to_deg": 360,
+    "duration_s": 8
+  },
+  "profile": {
+    "depth_mm": 84,
+    "face_mm": 62,
+    "finish": "upvc_white_matte"
+  },
+  "size_mm": {
+    "width": 1000,
+    "height": 1900
+  },
+  "note": "Rectangular lower lite + semicircular head, continuous frame, optional transom bar at springline"
+}

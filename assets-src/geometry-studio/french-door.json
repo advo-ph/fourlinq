@@ -1,0 +1,25 @@
+{
+  "id": "french-door",
+  "motion": "hinge_outswing_vertical",
+  "handing": "RH",
+  "size_mm": {
+    "width": 1800,
+    "height": 2100,
+    "frame_depth": 140
+  },
+  "leaves": [
+    {
+      "name": "panel_active",
+      "max_angle_deg": 90
+    },
+    {
+      "name": "panel_passive",
+      "max_angle_deg": 70
+    }
+  ],
+  "lite": "full",
+  "astragal": "passive_leaf",
+  "frames": 28,
+  "fps": 28,
+  "easing": "ease_in_out"
+}
