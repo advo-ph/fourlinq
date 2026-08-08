@@ -55,44 +55,47 @@ const report = await page.evaluate(async () => {
     list.forEach((m) => m && m.name && materialName.add(m.name));
   });
 
-  // Does the open control actually move geometry? Compare a world position
-  // of the first pivot's child between the closed and open pose.
+  // Does the open control actually move geometry?
+  //
+  // Name-matching a pivot does not generalise: a casement hinges on
+  // `sash_pivot`, a glider translates `panel_operable_carrier`, a bifold folds
+  // a chain of panels, and a door's pivot child is a hinge leaf sitting almost
+  // on the swing axis (which reads as ~0 travel even at a full 90° swing).
+  //
+  // So measure the model instead of guessing at it: snapshot every mesh's
+  // world position closed and open, and report the LARGEST displacement any
+  // mesh undergoes. That is motion-type agnostic and cannot be fooled by
+  // naming. `movedMesh_count` separates "one part twitched" from "a leaf swung".
   let poseDelta = null;
+  let movedMeshCount = null;
   const slider = document.getElementById("open");
-  if (slider) {
-    const THREE = stage._THREE;
-    const pivot = [];
-    obj.traverse((o) => {
-      if (o.name && /pivot/i.test(o.name) && !/lever/i.test(o.name)) pivot.push(o);
-    });
-    if (pivot.length && THREE) {
-      const probe = pivot[0];
-      const at = (v) => {
-        slider.value = String(v);
-        slider.dispatchEvent(new Event("input", { bubbles: true }));
-        obj.updateMatrixWorld(true);
-        return new THREE.Vector3().setFromMatrixPosition(probe.matrixWorld).clone();
-      };
-      const closed = at(0);
-      const open = at(1);
-      // A hinge pivot itself may not translate, so measure a descendant.
-      const child = probe.children.find((c) => c.isMesh);
-      if (child) {
-        const cAt = (v) => {
-          slider.value = String(v);
-          slider.dispatchEvent(new Event("input", { bubbles: true }));
-          obj.updateMatrixWorld(true);
-          return new THREE.Vector3().setFromMatrixPosition(child.matrixWorld);
-        };
-        const c0 = cAt(0).clone();
-        const c1 = cAt(1).clone();
-        poseDelta = Number(c0.distanceTo(c1).toFixed(4));
-      } else {
-        poseDelta = Number(closed.distanceTo(open).toFixed(4));
-      }
-      slider.value = "0";
+  const THREE = stage._THREE;
+  if (slider && THREE) {
+    const snapshot = (v) => {
+      slider.value = String(v);
       slider.dispatchEvent(new Event("input", { bubbles: true }));
+      obj.updateMatrixWorld(true);
+      const point = [];
+      obj.traverse((o) => {
+        if (o.isMesh) point.push(new THREE.Vector3().setFromMatrixPosition(o.matrixWorld));
+      });
+      return point;
+    };
+    const closed = snapshot(0);
+    const open = snapshot(1);
+    if (closed.length && closed.length === open.length) {
+      let max = 0;
+      let moved = 0;
+      for (let i = 0; i < closed.length; i++) {
+        const d = closed[i].distanceTo(open[i]);
+        if (d > max) max = d;
+        if (d > 0.001) moved += 1;      // 1 mm — below that is float noise
+      }
+      poseDelta = Number(max.toFixed(4));
+      movedMeshCount = moved;
     }
+    slider.value = "0";
+    slider.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
   return {
@@ -100,6 +103,7 @@ const report = await page.evaluate(async () => {
     meshCount,
     materialName: [...materialName].sort(),
     poseDelta,
+    movedMeshCount,
   };
 });
 

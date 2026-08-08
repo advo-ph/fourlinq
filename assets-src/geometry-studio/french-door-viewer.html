@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FourlinQ · French Door · OX pair</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+  :root{
+    --paper:#f6f5f2; --ink:#16181a; --muted:#6d7278; --line:#dcdad4; --card:#fff; --accent:#1f4ed8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;
+       display:grid;grid-template-columns:1fr 340px;height:100vh;overflow:hidden}
+  a{color:var(--accent)} a:hover{color:#16308c}
+  three-d-stage:not(:defined){visibility:hidden}
+  main{position:relative;min-width:0}
+  three-d-stage{width:100%;height:100%;display:block}
+  .badge{position:absolute;left:24px;top:20px;z-index:2;font-size:12px;letter-spacing:.14em;
+         text-transform:uppercase;color:var(--muted)}
+  .badge b{color:var(--ink);font-weight:600;letter-spacing:.06em;text-transform:none;font-size:15px;display:block}
+  aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:22px 20px 40px;
+        display:flex;flex-direction:column;gap:22px}
+  h2{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+  .seg{display:flex;gap:6px}
+  .seg button{flex:1;padding:9px 8px;border:1px solid var(--line);background:#fff;border-radius:7px;
+    font:500 13px 'IBM Plex Sans',sans-serif;color:var(--ink);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .row{display:flex;align-items:center;gap:10px}
+  input[type=range]{flex:1;accent-color:var(--ink)}
+  .val{font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);min-width:66px;text-align:right}
+  .btns{display:grid;gap:6px}
+  .btns button{padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:7px;text-align:left;
+    font:500 13px 'IBM Plex Sans',sans-serif;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+  .btns button:hover{border-color:#b6b2a9;background:#fafaf8}
+  .btns button span{font:400 11px 'IBM Plex Mono',monospace;color:var(--muted)}
+  .btns button:disabled{opacity:.5;cursor:progress}
+  pre{margin:0;background:#12141600;border:1px solid var(--line);border-radius:7px;padding:12px;
+      font:400 11.5px/1.6 'IBM Plex Mono',monospace;color:#2b2f33;overflow:auto}
+  dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12.5px}
+  dt{color:var(--muted)} dd{margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px}
+  .strip{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px}
+  .strip img{height:74px;background:#fff;border:1px solid var(--line);border-radius:4px}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.55}
+</style>
+</head>
+<body>
+<main>
+  <div class="badge">FourlinQ · product geometry<b id="cfgLabel">French door — outswing pair, RH active</b></div>
+  <three-d-stage name="french" background="#f6f5f2"></three-d-stage>
+</main>
+
+<aside>
+  <div>
+    <h2>Configuration</h2>
+    <div class="seg" id="swing">
+      <button data-s="out" aria-pressed="true">Outswing</button>
+      <button data-s="in" aria-pressed="false">Inswing</button>
+    </div>
+    <div class="seg" id="hand" style="margin-top:6px">
+      <button data-h="RH" aria-pressed="true">RH active</button>
+      <button data-h="LH" aria-pressed="false">LH active</button>
+    </div>
+    <p class="note" style="margin:8px 0 0">Outswing is the PH default — sheds driving rain and keeps the leaf off the interior floor.</p>
+  </div>
+
+  <div>
+    <h2>Overall width</h2>
+    <div class="row">
+      <input id="width" type="range" min="1.5" max="2.1" step="0.05" value="1.8">
+      <div class="val" id="widthVal">1800 mm</div>
+    </div>
+    <p class="note" style="margin:8px 0 0">Height fixed at 2100 mm.</p>
+  </div>
+
+  <div>
+    <h2>Open clip</h2>
+    <div class="row">
+      <input id="open" type="range" min="0" max="1" step="0.005" value="0">
+      <div class="val" id="openVal">0.00 · 0°</div>
+    </div>
+    <div class="seg" style="margin-top:8px">
+      <button id="poseClosed">Closed</button>
+      <button id="poseMid">Mid 0.5</button>
+      <button id="poseOpen">Open</button>
+      <button id="play">Play</button>
+    </div>
+  </div>
+
+  <div>
+    <h2>Deliverables</h2>
+    <div class="btns" id="exports">
+      <button data-x="glb-closed">Closed rest pose <span>GLB</span></button>
+      <button data-x="glb-open">Fully open pose <span>GLB</span></button>
+      <button data-x="glb-anim">Animated “open” clip <span>GLB</span></button>
+      <button data-x="frames">28 stills, white BG <span>ZIP</span></button>
+      <button data-x="strip">Hover sprite strip <span>PNG</span></button>
+      <button data-x="json">Motion config <span>JSON</span></button>
+    </div>
+    <p class="note" style="margin:10px 0 0">Stage toolbar (bottom of viewport) also exports the live pose as OBJ + MTL.</p>
+  </div>
+
+  <div>
+    <h2>Hover strip preview</h2>
+    <div class="strip" id="stripPreview"><span class="note">Renders after “28 stills”.</span></div>
+  </div>
+
+  <div>
+    <h2>Rig</h2>
+    <dl>
+      <dt>Meshes</dt><dd id="meshVal">frame · panel_active · panel_passive · astragal · glass_* · hinge_* · handle_* · sill</dd>
+      <dt>Motion</dt><dd>hinge_outswing, 2 leaves</dd>
+      <dt>Active leaf</dt><dd>0 → 90°</dd>
+      <dt>Passive leaf</dt><dd>0 → 70°</dd>
+      <dt>Frame depth</dt><dd>140 mm</dd>
+      <dt>Leaf</dt><dd>56 mm · 112 mm stile</dd>
+      <dt>Astragal</dt><dd>36 mm, passive leaf</dd>
+      <dt>Bottom rail</dt><dd>215 mm</dd>
+      <dt>Sill</dt><dd>anodised, 26 mm plate</dd>
+      <dt>Size</dt><dd id="sizeVal">—</dd>
+    </dl>
+  </div>
+
+  <div>
+    <h2>french-door.json</h2>
+    <pre id="cfg"></pre>
+  </div>
+</aside>
+
+<script src="./three-d-stage.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { buildSwingDoor } from './swing-door-model.js';
+
+const SPEC = 'french-door';
+const TYPE = 'french';
+const stage = document.querySelector('three-d-stage');
+await stage.ready;
+
+let swing = 'out', handing = 'RH', lite = 'full';
+let width = 1.8;
+let model = null, t = 0;
+
+function build() { return buildSwingDoor({ type: TYPE, swing, handing, lite, width }); }
+
+function mount() {
+  model = build();
+  model.setOpen(t);
+  stage.setObject(model.group);
+  const d = model.dims;
+  document.getElementById('sizeVal').textContent =
+    Math.round(d.W * 1000) + ' × ' + Math.round(d.H * 1000) + ' mm';
+  document.getElementById('cfgLabel').textContent = label();
+  document.getElementById('cfg').textContent = JSON.stringify(model.config, null, 2);
+  setT(t);
+}
+function label() {
+  const s = swing === 'out' ? 'outswing' : 'inswing';
+  if (TYPE === 'french') return `French door — ${s} pair, ${handing} active`;
+  if (TYPE === 'casement-door') return `Casement door — ${s}, ${handing}`;
+  return `90-series entry — ${lite} lite, ${s}, ${handing}`.replace('solid lite', 'solid');
+}
+
+const slider = document.getElementById('open');
+const openVal = document.getElementById('openVal');
+function setT(v) {
+  t = Math.min(1, Math.max(0, v));
+  slider.value = t;
+  model.setOpen(t);
+  const e = t * t * (3 - 2 * t);
+  const deg = model.leaves.map(l => Math.round(e * l.maxDeg) + '°').join(' / ');
+  openVal.textContent = t.toFixed(2) + ' · ' + deg;
+}
+mount();
+
+slider.addEventListener('input', () => { stopPlay(); setT(parseFloat(slider.value)); });
+document.getElementById('poseClosed').onclick = () => { stopPlay(); setT(0); };
+document.getElementById('poseMid').onclick = () => { stopPlay(); setT(0.5); };
+document.getElementById('poseOpen').onclick = () => { stopPlay(); setT(1); };
+
+const widthInput = document.getElementById('width');
+widthInput.addEventListener('input', () => {
+  width = parseFloat(widthInput.value);
+  document.getElementById('widthVal').textContent = Math.round(width * 1000) + ' mm';
+  mount();
+});
+
+function seg(id, attr, fn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-' + attr + ']'); if (!b) return;
+    [...el.children].forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+    fn(b.dataset[attr]); mount();
+  });
+}
+seg('swing', 's', v => swing = v);
+seg('hand', 'h', v => handing = v);
+seg('lite', 'l', v => lite = v);
+
+let raf = null, dir = 1;
+const playBtn = document.getElementById('play');
+function stopPlay() { if (raf) { cancelAnimationFrame(raf); raf = null; playBtn.textContent = 'Play'; } }
+playBtn.onclick = () => {
+  if (raf) return stopPlay();
+  playBtn.textContent = 'Pause';
+  let last = performance.now();
+  const tick = (now) => {
+    const dt = (now - last) / 1000; last = now;
+    let n = t + dir * dt / 2.0;
+    if (n >= 1) { n = 1; dir = -1; } else if (n <= 0) { n = 0; dir = 1; }
+    setT(n);
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+};
+
+/* ---------- download helpers ---------- */
+function download(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function exportGLB(object, animations, filename) {
+  return new Promise((res, rej) => {
+    new GLTFExporter().parse(object, (buf) => {
+      download(new Blob([buf], { type: 'model/gltf-binary' }), filename); res();
+    }, rej, { binary: true, animations: animations || [], onlyVisible: false });
+  });
+}
+function poseCopy(openT) {
+  const m = build(); m.setOpen(openT); m.group.updateMatrixWorld(true); return m;
+}
+
+/* Animated clip: quaternion track per leaf pivot, 28 keyframes @ 28 fps. */
+function buildClip(m) {
+  const N = 28, FPS = 28, DUR = (N - 1) / FPS;
+  const tracks = [];
+  m.leaves.forEach((l) => {
+    const times = [], vals = [];
+    const q = new THREE.Quaternion(), e = new THREE.Euler();
+    for (let i = 0; i < N; i++) {
+      const c = i / (N - 1);
+      m.setOpen(c);
+      e.set(0, l.pivot.rotation.y, 0);
+      q.setFromEuler(e);
+      times.push(c * DUR);
+      vals.push(q.x, q.y, q.z, q.w);
+    }
+    tracks.push(new THREE.QuaternionKeyframeTrack(l.pivot.name + '.quaternion', times, vals));
+  });
+  m.setOpen(0);
+  return new THREE.AnimationClip('open', DUR, tracks);
+}
+
+/* ---------- fixed-camera still renderer (pure white BG) ---------- */
+const CAP_W = 1100, CAP_H = 1100;
+let cap = null;
+function capture() {
+  if (cap) return cap;
+  const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  renderer.setSize(CAP_W, CAP_H, false);
+  renderer.setPixelRatio(1);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xffffff);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xe8e8e6, 2.1));
+  const key = new THREE.DirectionalLight(0xffffff, 2.0); key.position.set(2.6, 3.2, 3.4); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.9); fill.position.set(-3, 1.4, 1.6); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xffffff, 0.7); rim.position.set(-1.2, 2, -3.4); scene.add(rim);
+  const camera = new THREE.PerspectiveCamera(30, CAP_W / CAP_H, 0.05, 80);
+  cap = { renderer, scene, camera };
+  return cap;
+}
+function frameCamera(c, obj) {
+  const box = new THREE.Box3().setFromObject(obj);
+  const sph = box.getBoundingSphere(new THREE.Sphere());
+  const dist = (sph.radius / Math.tan((c.camera.fov * Math.PI) / 360)) * 1.28;
+  const d3 = new THREE.Vector3(0.62, 0.16, 1).normalize();
+  c.camera.position.copy(sph.center).add(d3.multiplyScalar(dist));
+  c.camera.lookAt(sph.center);
+  c.camera.updateProjectionMatrix();
+}
+async function renderFrames(n = 28) {
+  const c = capture();
+  const m = build();
+  m.setOpen(1);
+  m.group.updateMatrixWorld(true);
+  c.scene.add(m.group);
+  frameCamera(c, m.group);          // lock camera on the widest (fully open) silhouette
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    m.setOpen(i / (n - 1));
+    c.renderer.render(c.scene, c.camera);
+    out.push(await new Promise(r => c.renderer.domElement.toBlob(r, 'image/png')));
+  }
+  c.scene.remove(m.group);
+  return out;
+}
+
+/* ---------- minimal store-only ZIP ---------- */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(files) {
+  const enc = new TextEncoder(); const chunks = []; const central = []; let off = 0;
+  const u16 = v => [v & 255, (v >> 8) & 255];
+  const u32 = v => [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255];
+  files.forEach(f => {
+    const name = enc.encode(f.name), crc = crc32(f.data), sz = f.data.length;
+    const local = new Uint8Array([...u32(0x04034b50), ...u16(20), ...u16(0), ...u16(0), ...u16(0), ...u16(0),
+      ...u32(crc), ...u32(sz), ...u32(sz), ...u16(name.length), ...u16(0)]);
+    chunks.push(local, name, f.data);
+    central.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0), ...u16(0), ...u16(0), ...u16(0),
+      ...u32(crc), ...u32(sz), ...u32(sz), ...u16(name.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(off)]), name);
+    off += local.length + name.length + sz;
+  });
+  const cdStart = off;
+  let cdLen = 0; central.forEach(c => cdLen += c.length);
+  const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length),
+    ...u32(cdLen), ...u32(cdStart), ...u16(0)]);
+  return new Blob([...chunks, ...central, end], { type: 'application/zip' });
+}
+
+/* ---------- export actions ---------- */
+document.getElementById('exports').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-x]'); if (!b) return;
+  const kind = b.dataset.x, html = b.innerHTML;
+  const tag = `${TYPE}_${swing}swing_${handing}_${Math.round(width * 1000)}`;
+  b.disabled = true; b.firstChild.textContent = 'Working… ';
+  try {
+    if (kind === 'json') {
+      download(new Blob([document.getElementById('cfg').textContent], { type: 'application/json' }), SPEC + '.json');
+    } else if (kind === 'glb-closed') {
+      await exportGLB(poseCopy(0).group, null, `${tag}_closed.glb`);
+    } else if (kind === 'glb-open') {
+      await exportGLB(poseCopy(1).group, null, `${tag}_open.glb`);
+    } else if (kind === 'glb-anim') {
+      const m = poseCopy(0);
+      await exportGLB(m.group, [buildClip(m)], `${tag}_open_clip.glb`);
+    } else if (kind === 'frames') {
+      const blobs = await renderFrames(28);
+      const files = [];
+      for (let i = 0; i < blobs.length; i++) {
+        files.push({ name: `${tag}_${String(i + 1).padStart(2, '0')}.png`,
+          data: new Uint8Array(await blobs[i].arrayBuffer()) });
+      }
+      download(zipStore(files), `${tag}_frames_01-28.zip`);
+      const strip = document.getElementById('stripPreview');
+      strip.innerHTML = '';
+      blobs.forEach(bl => { const im = new Image(); im.src = URL.createObjectURL(bl); strip.appendChild(im); });
+    } else if (kind === 'strip') {
+      const blobs = await renderFrames(28);
+      const TW = 340, TH = Math.round(340 * CAP_H / CAP_W);
+      const cv = document.createElement('canvas');
+      cv.width = TW * 28; cv.height = TH;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      for (let i = 0; i < blobs.length; i++) {
+        const im = await createImageBitmap(blobs[i]);
+        ctx.drawImage(im, i * TW, 0, TW, TH);
+      }
+      await new Promise(r => cv.toBlob(bl => { download(bl, `${tag}_strip_28x${TW}.png`); r(); }, 'image/png'));
+    }
+  } catch (err) { console.error(err); }
+  b.disabled = false; b.innerHTML = html;
+});
+</script>
+</body>
+</html>
