@@ -62,7 +62,10 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4, ease: [0.68, 0, 0.33, 1] }}
-        className="fixed inset-0 bg-[color:var(--ink-primary)]/30 backdrop-blur-sm z-[55]"
+        className="fixed inset-0 backdrop-blur-sm z-[55]"
+        // See QuoteModal: an opacity modifier on an arbitrary color value
+        // compiles to nothing, leaving the scrim fully transparent.
+        style={{ backgroundColor: "color-mix(in srgb, var(--ink-primary) 30%, transparent)" }}
         onClick={onClose}
       />
       <motion.aside

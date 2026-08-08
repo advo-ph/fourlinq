@@ -59,7 +59,11 @@ const QuoteModal = ({ isOpen, onClose, productName, productId }: QuoteModalProps
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.68, 0, 0.33, 1] }}
-            className="fixed inset-0 bg-[color:var(--ink-primary)]/30 backdrop-blur-sm z-[55]"
+            className="fixed inset-0 backdrop-blur-sm z-[55]"
+            // Inline color-mix, not a bg-[color:var(...)] class carrying an
+            // opacity modifier: Tailwind emits no rule at all for that
+            // combination, which left this scrim blurred but undimmed.
+            style={{ backgroundColor: "color-mix(in srgb, var(--ink-primary) 30%, transparent)" }}
             onClick={handleClose}
           />
           <motion.aside

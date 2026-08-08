@@ -269,11 +269,11 @@ const Window3D = ({
         </Canvas>
 
         {/* Status badge */}
-        {/* Background via inline color-mix, not `bg-[color:var(--x)]/90`:
-            Tailwind cannot apply an opacity modifier to an arbitrary value
-            already wrapped in `color:var(...)`, so that class compiles to an
-            invalid colour and the declaration is dropped entirely — leaving
-            white text on a near-white gradient. */}
+        {/* Background via inline color-mix, not a bg-[color:var(...)] class
+            carrying an opacity modifier: Tailwind emits no rule at all for
+            that combination, so the badge got no background and read as white
+            text on a near-white gradient. Guarded by
+            src/test/tailwind-arbitrary-opacity.test.ts. */}
         <div
           className="absolute top-4 left-4 flex items-center gap-2 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium pointer-events-none"
           style={{ backgroundColor: "color-mix(in srgb, var(--ink-primary) 90%, transparent)" }}
