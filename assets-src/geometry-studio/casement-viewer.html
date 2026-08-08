@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FourlinQ · Casement Window System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+  :root{
+    --paper:#f6f5f2; --ink:#16181a; --muted:#6d7278; --line:#dcdad4; --card:#fff; --accent:#1f4ed8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;
+       display:grid;grid-template-columns:1fr 340px;height:100vh;overflow:hidden}
+  a{color:var(--accent)} a:hover{color:#16308c}
+  three-d-stage:not(:defined){visibility:hidden}
+  main{position:relative;min-width:0}
+  three-d-stage{width:100%;height:100%;display:block}
+  .badge{position:absolute;left:24px;top:20px;z-index:2;font-size:12px;letter-spacing:.14em;
+         text-transform:uppercase;color:var(--muted)}
+  .badge b{color:var(--ink);font-weight:600;letter-spacing:.06em;text-transform:none;font-size:15px;display:block}
+  aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:22px 20px 40px;
+        display:flex;flex-direction:column;gap:22px}
+  h2{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+  .seg{display:flex;gap:6px}
+  .seg button{flex:1;padding:9px 8px;border:1px solid var(--line);background:#fff;border-radius:7px;
+    font:500 13px 'IBM Plex Sans',sans-serif;color:var(--ink);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .row{display:flex;align-items:center;gap:10px}
+  input[type=range]{flex:1;accent-color:var(--ink)}
+  .val{font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);min-width:56px;text-align:right}
+  .btns{display:grid;gap:6px}
+  .btns button{padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:7px;text-align:left;
+    font:500 13px 'IBM Plex Sans',sans-serif;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+  .btns button:hover{border-color:#b6b2a9;background:#fafaf8}
+  .btns button span{font:400 11px 'IBM Plex Mono',monospace;color:var(--muted)}
+  .btns button:disabled{opacity:.5;cursor:progress}
+  pre{margin:0;background:#12141600;border:1px solid var(--line);border-radius:7px;padding:12px;
+      font:400 11.5px/1.6 'IBM Plex Mono',monospace;color:#2b2f33;overflow:auto}
+  dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12.5px}
+  dt{color:var(--muted)} dd{margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px}
+  .strip{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px}
+  .strip img{height:74px;background:#fff;border:1px solid var(--line);border-radius:4px}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.55}
+</style>
+</head>
+<body>
+<main>
+  <div class="badge">FourlinQ · product geometry<b>Casement — outswing, LH hinge</b></div>
+  <three-d-stage name="casement" background="#f6f5f2"></three-d-stage>
+</main>
+
+<aside>
+  <div>
+    <h2>Variant (LOD)</h2>
+    <div class="seg" id="variant">
+      <button data-v="single" aria-pressed="true">Single sash</button>
+      <button data-v="dual" aria-pressed="false">Dual casement</button>
+    </div>
+  </div>
+
+  <div>
+    <h2>Open clip</h2>
+    <div class="row">
+      <input id="open" type="range" min="0" max="1" step="0.005" value="0">
+      <div class="val" id="openVal">0.00 · 0°</div>
+    </div>
+    <div class="seg" style="margin-top:8px">
+      <button id="poseClosed">Closed</button>
+      <button id="poseMid">Mid 0.5</button>
+      <button id="poseOpen">Open</button>
+      <button id="play">Play</button>
+    </div>
+  </div>
+
+  <div>
+    <h2>Deliverables</h2>
+    <div class="btns" id="exports">
+      <button data-x="glb-closed">Closed rest pose <span>GLB</span></button>
+      <button data-x="glb-open">Open pose (70°) <span>GLB</span></button>
+      <button data-x="glb-anim">Animated “open” clip <span>GLB</span></button>
+      <button data-x="frames">28 stills, white BG <span>ZIP</span></button>
+      <button data-x="strip">Hover sprite strip <span>PNG</span></button>
+      <button data-x="json">Motion config <span>JSON</span></button>
+    </div>
+    <p class="note" style="margin:10px 0 0">Stage toolbar (bottom of viewport) also exports the live pose as OBJ + MTL.</p>
+  </div>
+
+  <div>
+    <h2>Hover strip preview</h2>
+    <div class="strip" id="stripPreview"><span class="note">Renders after “28 stills”.</span></div>
+  </div>
+
+  <div>
+    <h2>Rig</h2>
+    <dl>
+      <dt>Meshes</dt><dd>frame · sash · glass · handle · hinge_set · gasket</dd>
+      <dt>Pivot</dt><dd>sash hinge edge, vertical axis</dd>
+      <dt>Frame depth</dt><dd>84 mm sightline</dd>
+      <dt>Sash</dt><dd>72 mm face · 56 mm depth</dd>
+      <dt>Size</dt><dd id="sizeVal">900 × 1400 mm</dd>
+      <dt>Handle</dt><dd>lever, matte black, interior</dd>
+    </dl>
+  </div>
+
+  <div>
+    <h2>casement.json</h2>
+    <pre id="cfg"></pre>
+  </div>
+</aside>
+
+<script src="./three-d-stage.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { buildCasement, makeMaterials } from './window-model.js';
+
+const CONFIG = { id: 'casement', motion: 'hinge_outswing_vertical', max_angle_deg: 70, handing: 'LH' };
+document.getElementById('cfg').textContent = JSON.stringify(CONFIG, null, 2);
+
+const stage = document.querySelector('three-d-stage');
+await stage.ready;
+
+let variant = 'single';
+let model = null;
+let t = 0;
+
+function mount(v) {
+  variant = v;
+  model = buildCasement({ variant: v });
+  model.setOpen(t);
+  stage.setObject(model.group);
+  document.getElementById('sizeVal').textContent = v === 'dual' ? '1600 × 1400 mm' : '900 × 1400 mm';
+}
+mount('single');
+
+/* ---------- controls ---------- */
+const slider = document.getElementById('open');
+const openVal = document.getElementById('openVal');
+function setT(v) {
+  t = Math.min(1, Math.max(0, v));
+  slider.value = t;
+  model.setOpen(t);
+  const e = t * t * (3 - 2 * t);
+  openVal.textContent = t.toFixed(2) + ' · ' + Math.round(e * 70) + '°';
+}
+slider.addEventListener('input', () => { stopPlay(); setT(parseFloat(slider.value)); });
+document.getElementById('poseClosed').onclick = () => { stopPlay(); setT(0); };
+document.getElementById('poseMid').onclick = () => { stopPlay(); setT(0.5); };
+document.getElementById('poseOpen').onclick = () => { stopPlay(); setT(1); };
+
+let raf = null, dir = 1;
+const playBtn = document.getElementById('play');
+function stopPlay() { if (raf) { cancelAnimationFrame(raf); raf = null; playBtn.textContent = 'Play'; } }
+playBtn.onclick = () => {
+  if (raf) return stopPlay();
+  playBtn.textContent = 'Pause';
+  let last = performance.now();
+  const tick = (now) => {
+    const dt = (now - last) / 1000; last = now;
+    let n = t + dir * dt / 2.2;
+    if (n >= 1) { n = 1; dir = -1; } else if (n <= 0) { n = 0; dir = 1; }
+    setT(n);
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+};
+
+document.getElementById('variant').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-v]'); if (!b) return;
+  [...e.currentTarget.children].forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+  mount(b.dataset.v);
+});
+
+/* ---------- download helpers ---------- */
+function download(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+function exportGLB(object, animations, filename) {
+  return new Promise((res, rej) => {
+    new GLTFExporter().parse(object, (buf) => {
+      download(new Blob([buf], { type: 'model/gltf-binary' }), filename); res();
+    }, rej, { binary: true, animations: animations || [], onlyVisible: false });
+  });
+}
+
+/* Build a detached copy at a given pose, so exports never disturb the view. */
+function poseCopy(openT) {
+  const m = buildCasement({ variant });
+  m.setOpen(openT);
+  m.group.updateMatrixWorld(true);
+  return m;
+}
+
+/* Animated clip: sampled quaternion tracks on each sash pivot + handle lever. */
+function buildClip(m) {
+  const DUR = 2.0, N = 41;
+  const tracks = [];
+  const MAX = THREE.MathUtils.degToRad(70), LEV = THREE.MathUtils.degToRad(15);
+  const times = [...Array(N)].map((_, i) => (i / (N - 1)) * DUR);
+  m.sashes.forEach((s) => {
+    const q = [], lq = [], qq = new THREE.Quaternion(), ax = new THREE.Vector3(0, 1, 0), az = new THREE.Vector3(0, 0, 1);
+    times.forEach((tt) => {
+      const c = tt / DUR, e = c * c * (3 - 2 * c);
+      qq.setFromAxisAngle(ax, -s.dir * e * MAX); q.push(qq.x, qq.y, qq.z, qq.w);
+      qq.setFromAxisAngle(az, -s.dir * Math.min(1, c / 0.15) * LEV); lq.push(qq.x, qq.y, qq.z, qq.w);
+    });
+    tracks.push(new THREE.QuaternionKeyframeTrack(s.pivot.name + '.quaternion', times, q));
+    tracks.push(new THREE.QuaternionKeyframeTrack(s.lever.name + '.quaternion', times, lq));
+  });
+  return new THREE.AnimationClip('open', DUR, tracks);
+}
+
+/* ---------- fixed-camera still renderer (pure white BG) ---------- */
+const CAP_W = 900, CAP_H = 1100;
+let cap = null;
+function capture() {
+  if (cap) return cap;
+  const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  renderer.setSize(CAP_W, CAP_H, false);
+  renderer.setPixelRatio(1);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xffffff);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xe8e8e6, 2.1));
+  const key = new THREE.DirectionalLight(0xffffff, 2.0); key.position.set(2.6, 3.2, 3.4); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.9); fill.position.set(-3, 1.4, 1.6); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xffffff, 0.7); rim.position.set(-1.2, 2, -3.4); scene.add(rim);
+  const camera = new THREE.PerspectiveCamera(32, CAP_W / CAP_H, 0.05, 60);
+  cap = { renderer, scene, camera };
+  return cap;
+}
+
+function frameCamera(c, obj) {
+  const box = new THREE.Box3().setFromObject(obj);
+  const sph = box.getBoundingSphere(new THREE.Sphere());
+  const dist = (sph.radius / Math.tan((c.camera.fov * Math.PI) / 360)) * 1.22;
+  const dir3 = new THREE.Vector3(0.72, 0.20, 1).normalize();   // 3/4 from interior right
+  c.camera.position.copy(sph.center).add(dir3.multiplyScalar(dist));
+  c.camera.lookAt(sph.center);
+  c.camera.updateProjectionMatrix();
+}
+
+async function renderFrames(n = 28) {
+  const c = capture();
+  const m = buildCasement({ variant });
+  m.setOpen(1);
+  c.scene.add(m.group);
+  frameCamera(c, m.group);           // frame on the widest (open) pose so nothing crops
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    m.setOpen(i / (n - 1));
+    c.renderer.render(c.scene, c.camera);
+    out.push(await new Promise(r => c.renderer.domElement.toBlob(r, 'image/png')));
+  }
+  c.scene.remove(m.group);
+  return out;
+}
+
+/* ---------- minimal store-only ZIP ---------- */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(files) {
+  const enc = new TextEncoder(); const chunks = []; const central = []; let off = 0;
+  const u16 = v => [v & 255, (v >> 8) & 255];
+  const u32 = v => [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255];
+  files.forEach(f => {
+    const name = enc.encode(f.name), crc = crc32(f.data), sz = f.data.length;
+    const local = new Uint8Array([...u32(0x04034b50), ...u16(20), ...u16(0), ...u16(0), ...u16(0), ...u16(0),
+      ...u32(crc), ...u32(sz), ...u32(sz), ...u16(name.length), ...u16(0)]);
+    chunks.push(local, name, f.data);
+    central.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0), ...u16(0), ...u16(0), ...u16(0),
+      ...u32(crc), ...u32(sz), ...u32(sz), ...u16(name.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(off)]), name);
+    off += local.length + name.length + sz;
+  });
+  const cdStart = off;
+  let cdLen = 0; central.forEach(c => cdLen += c.length);
+  const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length),
+    ...u32(cdLen), ...u32(cdStart), ...u16(0)]);
+  return new Blob([...chunks, ...central, end], { type: 'application/zip' });
+}
+
+/* ---------- export actions ---------- */
+document.getElementById('exports').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-x]'); if (!b) return;
+  const kind = b.dataset.x, label = b.innerHTML;
+  b.disabled = true; b.firstChild.textContent = 'Working… ';
+  try {
+    if (kind === 'json') {
+      download(new Blob([JSON.stringify(CONFIG, null, 2)], { type: 'application/json' }), 'casement.json');
+    } else if (kind === 'glb-closed') {
+      await exportGLB(poseCopy(0).group, null, `casement_${variant}_closed.glb`);
+    } else if (kind === 'glb-open') {
+      await exportGLB(poseCopy(1).group, null, `casement_${variant}_open.glb`);
+    } else if (kind === 'glb-anim') {
+      const m = poseCopy(0);
+      await exportGLB(m.group, [buildClip(m)], `casement_${variant}_open_clip.glb`);
+    } else if (kind === 'frames') {
+      const blobs = await renderFrames(28);
+      const files = [];
+      for (let i = 0; i < blobs.length; i++) {
+        files.push({
+          name: `casement_${variant}_${String(i + 1).padStart(2, '0')}.png`,
+          data: new Uint8Array(await blobs[i].arrayBuffer()),
+        });
+      }
+      download(zipStore(files), `casement_${variant}_frames_01-28.zip`);
+      const strip = document.getElementById('stripPreview');
+      strip.innerHTML = '';
+      blobs.forEach(bl => { const im = new Image(); im.src = URL.createObjectURL(bl); strip.appendChild(im); });
+    } else if (kind === 'strip') {
+      const blobs = await renderFrames(28);
+      const TW = 300, TH = Math.round(300 * CAP_H / CAP_W);
+      const cv = document.createElement('canvas');
+      cv.width = TW * 28; cv.height = TH;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      for (let i = 0; i < blobs.length; i++) {
+        const im = await createImageBitmap(blobs[i]);
+        ctx.drawImage(im, i * TW, 0, TW, TH);
+      }
+      await new Promise(r => cv.toBlob(bl => { download(bl, `casement_${variant}_strip_28x${TW}.png`); r(); }, 'image/png'));
+    }
+  } catch (err) { console.error(err); }
+  b.disabled = false; b.innerHTML = label;
+});
+
+setT(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "id": "awning",
+  "motion": "hinge_outswing_horizontal",
+  "max_angle_deg": 32
+}

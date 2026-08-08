@@ -1,0 +1,42 @@
+{
+  "family": "combination",
+  "motion": "none",
+  "operable": false,
+  "presentation": "turntable_yaw + top_down_plan",
+  "height_mm": 1400,
+  "frame": { "depth_mm": 92, "clad_ext_mm": 34, "sightline_ext_mm": 36, "liner_int_mm": 58 },
+  "variants": [
+    {
+      "id": "combination_bay",
+      "assembly": "bay",
+      "panels": 3,
+      "plan_angle_deg": [30, 45],
+      "front_mm": 1200,
+      "side_mm": 700,
+      "seat_board": "optional",
+      "notes": "Flat side lites splayed off the wall, flat front lite. Seat + head boards close the box."
+    },
+    {
+      "id": "combination_bow",
+      "assembly": "bow",
+      "panels": [4, 5],
+      "facet_mm": 620,
+      "facet_angle_deg": { "4": 18, "5": 15 },
+      "seat_board": "optional",
+      "notes": "Equal facets stepped on a shallow arc; head/seat boards follow the polyline."
+    },
+    {
+      "id": "combination_corner",
+      "assembly": "corner",
+      "panels": 2,
+      "plan_angle_deg": 90,
+      "leg_mm": 1100,
+      "joint": ["post", "butt"],
+      "joint_default": "post",
+      "post_mm": 72,
+      "butt_seal_mm": 26,
+      "notes": "Two fixed lites mitred at 90°. Default slim structural post; butt-glazed drops the post for a structural silicone joint."
+    }
+  ],
+  "roadmap": { "v2": "casement sashes on bay/bow side lites (outswing, 70°)" }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "hung",
+  "label": "Double-hung / single-hung window",
+  "motion": "translate_y",
+  "variants": {
+    "double": { "lower_ratio": 0.5, "upper_ratio": 0.3, "phase_split": 0.55 },
+    "single": { "lower_ratio": 0.5, "upper_ratio": 0, "phase_split": 1 }
+  },
+  "size_mm": { "w": 900, "h": 1500, "depth": 118 },
+  "sash": { "face_mm": 70, "depth_mm": 38, "meeting_rail_overlap_mm": 36 },
+  "planes": { "upper": "exterior -26 mm", "lower": "interior +26 mm" },
+  "hardware": ["cam sash locks ×2", "tilt latches ×2", "lift handles ×2", "jamb liners + balances"],
+  "frames": { "count": 28, "background": "#ffffff", "clip": "lower sash up, then upper sash down" }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "ninety-series",
+  "motion": "hinge_outswing_vertical",
+  "handing": "RH",
+  "size_mm": {
+    "width": 1000,
+    "height": 2150,
+    "frame_depth": 180
+  },
+  "leaves": [
+    {
+      "name": "panel",
+      "max_angle_deg": 90
+    }
+  ],
+  "lite": "half",
+  "lock": "lever_plus_deadbolt",
+  "hinges": 4,
+  "frames": 28,
+  "fps": 28,
+  "easing": "ease_in_out"
+}
