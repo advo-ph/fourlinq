@@ -56,6 +56,11 @@ Exit 0 means meshes present, no console errors, no failed requests.
 | Fixed / direct-glaze | `fixed-model.js` | ✅ | in-viewer | 15 meshes, fixed |
 | Hung | `hung-model.js` | ✅ | `hung.json` | 36 meshes, Δ 0.67 m |
 | Slider / glider | `slider-model.js` | ✅ | `sliding.json` | 23 meshes, translates |
+| Casement door | `swing-door-model.js` | ✅ | `casement-door.json` | 42 meshes, swings |
+
+`swing-door-model.js` is shared: `buildSwingDoor({ type })` covers
+`casement-door`, `french`, and `ninety`, so the French and 90-series viewers
+need no further model work — only their own HTML.
 
 Two probe notes, so the numbers are not over-read:
 
@@ -78,17 +83,16 @@ studio lighting, orbit controls, OBJ/GLB export toolbar) and `support.js`
 
 ## Still to import
 
-7 models — `bifold`, `combination`, `lift-slide`, `multislide`, `sliding-door`,
-`special`, `swing-door`.
+6 models — `bifold`, `combination`, `lift-slide`, `multislide`, `sliding-door`,
+`special`.
 
-9 viewers — `bifold`, `casement-door`, `combination`, `french-door`,
-`lift-slide`, `multislide`, `ninety-series`, `sliding-door`, `special`.
+8 viewers — `bifold`, `combination`, `french-door`, `lift-slide`, `multislide`,
+`ninety-series`, `sliding-door`, `special`.
 
 Plus `Canvas.dc.html` (Claude Design canvas wrapper).
 
-`swing-door-model.js` is likely shared by three of those viewers
-(`casement-door`, `french-door`, `ninety-series`) — their configs differ only
-in leaf count, lite, and hardware — so import it before them.
+`french-door-viewer.html` and `ninety-series-viewer.html` are the cheapest two
+left — their model is already in.
 
 ## Not imported, deliberately
 
