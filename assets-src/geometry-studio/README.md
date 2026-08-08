@@ -67,6 +67,7 @@ Exit 0 means meshes present, no console errors, no failed requests.
 | Casement door | `swing-door-model.js` | ✅ | `casement-door.json` | 42 meshes, Δ 1.04 m |
 | French door | `swing-door-model.js` | ✅ | `french-door.json` | 72 meshes, Δ 1.08 m |
 | 90-series entry | `swing-door-model.js` | ✅ | `ninety-series.json` | 55 meshes, Δ 1.04 m |
+| Sliding patio door | `sliding-door-model.js` | ✅ | `sliding-door.json` | 29 meshes, Δ 1.20 m |
 
 `swing-door-model.js` is shared: `buildSwingDoor({ type })` covers
 `casement-door`, `french`, and `ninety` from one builder.
@@ -91,8 +92,8 @@ studio lighting, orbit controls, OBJ/GLB export toolbar) and `support.js`
 
 ## Still to import
 
-Six systems, each a model + its viewer: `sliding-door`, `lift-slide`,
-`multislide`, `bifold`, `combination`, `special`.
+Five systems, each a model + its viewer: `lift-slide`, `multislide`, `bifold`,
+`combination`, `special`.
 
 Plus `Canvas.dc.html` — the Claude Design canvas wrapper. It has **no reachable
 surface in this repo** (nothing imports it, it renders nothing here); it is an
