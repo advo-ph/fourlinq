@@ -10,6 +10,9 @@ import {
 import * as THREE from "three";
 import { FRAME_FINISHES, type FrameFinish } from "@/data/fourlinq-data";
 import { cn } from "@/lib/utils";
+import { CATALOGUE_SYSTEM, SYSTEMS, type SystemType } from "./window-system";
+
+export type { SystemType };
 
 /**
  * Interactive 3D viewer for FourlinQ window systems.
@@ -25,70 +28,8 @@ import { cn } from "@/lib/utils";
 const MODEL_URL = "/models/animated-window-systems.glb";
 useGLTF.preload(MODEL_URL);
 
-/* ─── System config map ─── */
-
-export type SystemType = "casement" | "sliding" | "awning" | "slide-and-fold";
-
-interface SystemConfig {
-  label: string;
-  /** Match these prefixes against any ancestor node name to decide visibility. */
-  visiblePrefixes: string[];
-  /** Pretty action label for the open/close button. */
-  openLabel: string;
-  closeLabel: string;
-  /**
-   * Known center of the visible subtree in the source GLB's local space.
-   * Captured from gltf-transform inspection of the model. Used directly to
-   * offset the model so the visible system lands at world origin.
-   */
-  center: [number, number, number];
-  /**
-   * Known scale factor for this system. Eliminates bbox auto-fit, which
-   * was non-deterministic (race with useAnimations applying time-0 pose
-   * vs. our setFromObject measurement). Each value tuned per system so
-   * the visible subtree fills ~80% of the viewer canvas height.
-   */
-  scale: number;
-}
-
-const SYSTEMS: Record<SystemType, SystemConfig> = {
-  casement: {
-    label: "Casement",
-    visiblePrefixes: ["casement_frame", "casement_panelL", "casement_panelR"],
-    openLabel: "Open window",
-    closeLabel: "Close window",
-    center: [-225, 552, -12],
-    scale: 0.0014,
-  },
-  sliding: {
-    label: "Sliding",
-    visiblePrefixes: [
-      "sliding_horizontal_frame",
-      "sliding_horizontal_windowL",
-      "sliding_horizontal_windowR",
-    ],
-    openLabel: "Slide open",
-    closeLabel: "Slide closed",
-    center: [-395, 860, -13],
-    scale: 0.0024,
-  },
-  awning: {
-    label: "Awning",
-    visiblePrefixes: ["awning_frame", "awning_armature"],
-    openLabel: "Open awning",
-    closeLabel: "Close awning",
-    center: [120, 470, -7],
-    scale: 0.003,
-  },
-  "slide-and-fold": {
-    label: "Slide & Fold",
-    visiblePrefixes: ["holding_frame", "holding_panels"],
-    openLabel: "Fold open",
-    closeLabel: "Fold closed",
-    center: [290, 573, -17],
-    scale: 0.0018,
-  },
-};
+/** Materials that take the frame finish. `parts`/`parts2` are hardware. */
+const FRAME_MATERIAL = new Set(["frame1", "frame2", "frame3"]);
 
 /* ─── Model component ─── */
 
@@ -112,7 +53,9 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
   // (independent of the outer group transforms) and apply both centering +
   // scaling on innerRef in one go.
   useEffect(() => {
-    const prefixes = SYSTEMS[systemType].visiblePrefixes;
+    const cfg = SYSTEMS[systemType];
+    const exact = new Set(cfg.visibleRoot);
+    const prefix = cfg.visibleRootPrefix ?? [];
 
     sceneClone.traverse((child) => {
       if (child.type !== "Mesh") return;
@@ -121,7 +64,7 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
       let cur: THREE.Object3D | null = mesh;
       while (cur) {
         const n = cur.name || "";
-        if (prefixes.some((p) => n.startsWith(p))) {
+        if (exact.has(n) || prefix.some((p) => n.startsWith(p))) {
           isVisible = true;
           break;
         }
@@ -137,10 +80,10 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     // Apply known-good transform per system. No bbox auto-fit — that was
     // racing with useAnimations' time-0 pose application and setFromObject's
     // matrixWorld reads, producing different bbox values on different mounts
-    // depending on which effect ran first. Hardcoded center + scale per
-    // system is deterministic.
+    // depending on which effect ran first. Pinned center + scale per system is
+    // deterministic. Both are in loaded-scene space, the same space this group
+    // transforms, so the multiply below is unit-consistent.
     if (innerRef.current) {
-      const cfg = SYSTEMS[systemType];
       const [cx, cy, cz] = cfg.center;
       const s = cfg.scale;
       innerRef.current.scale.setScalar(s);
@@ -159,7 +102,7 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
         if (!mesh.visible || !mesh.material) return;
         const mat = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as THREE.MeshStandardMaterial;
         const name = mat.name || "";
-        if (name === "frame1" || name === "frame2") {
+        if (FRAME_MATERIAL.has(name)) {
           mat.color = texture ? new THREE.Color("#ffffff") : target;
           mat.map = texture;
           mat.roughness = 0.65;
@@ -180,18 +123,21 @@ function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
     }
   }, [finish, sceneClone]);
 
-  // Animation control — the source clip is 4 seconds (0-2s open, 2-4s close-back),
-  // so playing it through cycles open AND closed in one shot. We don't want
-  // that. Instead, scrub the action.time manually toward a target:
-  //   - target 0   when closed
-  //   - target 2.0 when fully open (peak of the model's animation)
-  // Lerp via useFrame for a smooth motion regardless of click cadence.
-  const OPEN_TIME = 2.0;
+  // Animation control — the source clip is a single 4-second "Scene" track that
+  // drives every system at once, opening and then closing back. Playing it
+  // through would cycle open AND closed in one shot, so instead we scrub
+  // action.time manually toward a target:
+  //   - target 0                       when closed
+  //   - target SYSTEMS[type].openTime  when fully open
+  // openTime is per system, not a shared constant: the louvre fins reach full
+  // tilt at ~0.93s and a revolving door at 4.0s, while sashes peak near 1.9s.
+  // Using one global 2.0 would have shown the louvre swinging back toward shut.
+  const openTime = SYSTEMS[systemType].openTime;
   const targetTimeRef = useRef(0);
 
   useEffect(() => {
-    targetTimeRef.current = isOpen ? OPEN_TIME : 0;
-  }, [isOpen]);
+    targetTimeRef.current = isOpen ? openTime : 0;
+  }, [isOpen, openTime]);
 
   useEffect(() => {
     const action = actions["Scene"] || (animations[0] && actions[animations[0].name]);
@@ -251,12 +197,13 @@ const Window3D = ({
   );
 
   const config = SYSTEMS[systemType];
+  const isOperable = config.openTime > 0;
 
   return (
     <div className={cn("relative w-full", className)}>
       {/* System tab rail — hairline-underlined */}
       <div className="flex items-end gap-6 border-b border-[color:var(--rule-soft)] mb-5 overflow-x-auto no-scrollbar">
-        {(Object.keys(SYSTEMS) as SystemType[]).map((id) => {
+        {CATALOGUE_SYSTEM.map((id) => {
           const active = systemType === id;
           return (
             <button
@@ -322,7 +269,15 @@ const Window3D = ({
         </Canvas>
 
         {/* Status badge */}
-        <div className="absolute top-4 left-4 flex items-center gap-2 bg-[color:var(--ink-primary)]/90 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium pointer-events-none">
+        {/* Background via inline color-mix, not `bg-[color:var(--x)]/90`:
+            Tailwind cannot apply an opacity modifier to an arbitrary value
+            already wrapped in `color:var(...)`, so that class compiles to an
+            invalid colour and the declaration is dropped entirely — leaving
+            white text on a near-white gradient. */}
+        <div
+          className="absolute top-4 left-4 flex items-center gap-2 backdrop-blur-sm text-white px-3 py-2 text-[11px] uppercase tracking-[0.12em] font-medium pointer-events-none"
+          style={{ backgroundColor: "color-mix(in srgb, var(--ink-primary) 90%, transparent)" }}
+        >
           Live 3D · {config.label} · {selected.label}
         </div>
 
@@ -331,13 +286,21 @@ const Window3D = ({
           Drag to rotate
         </div>
 
-        {/* Open / close */}
-        <button
-          onClick={() => setIsOpen((v) => !v)}
-          className="absolute bottom-4 right-4 px-4 py-3 bg-[color:var(--accent)] text-white text-body-sm font-medium hover:bg-[color:var(--accent-hover)] transition-colors duration-300 ease-marvin"
-        >
-          {isOpen ? config.closeLabel : config.openLabel}
-        </button>
+        {/* Open / close — omitted for fixed glazing, which has no moving part.
+            A disabled button would imply the unit opens and is merely
+            unavailable here; no control says the right thing. */}
+        {isOperable ? (
+          <button
+            onClick={() => setIsOpen((v) => !v)}
+            className="absolute bottom-4 right-4 px-4 py-3 bg-[color:var(--accent)] text-white text-body-sm font-medium hover:bg-[color:var(--accent-hover)] transition-colors duration-300 ease-marvin"
+          >
+            {isOpen ? config.closeLabel : config.openLabel}
+          </button>
+        ) : (
+          <p className="absolute bottom-4 right-4 px-3 py-2 bg-white/85 backdrop-blur-sm text-[11px] uppercase tracking-[0.08em] text-[color:var(--ink-muted)]">
+            Fixed — does not open
+          </p>
+        )}
 
       </div>
 
