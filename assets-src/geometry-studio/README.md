@@ -36,8 +36,16 @@ python -m http.server 8899
 `probe-viewer.mjs` drives a viewer in headless Chromium and asserts the scene is
 real — mesh count, material names, and whether the open control actually moves
 geometry. A page that renders an empty stage still "loads", so the mesh count
-and pose delta are the assertions that matter. Run it from the repo root so it
-resolves `playwright` from `node_modules`:
+and pose delta are the assertions that matter.
+
+Motion is measured, not guessed at. An earlier version looked for a node named
+`*pivot*`, which lied in both directions: the glider reported *no* motion (its
+moving node is `panel_operable_carrier`) and a door reported 0.09 m for a full
+90° swing (the pivot's first mesh child is a hinge leaf sitting on the swing
+axis). It now snapshots every mesh's world position closed and open and reports
+the largest displacement — motion-type agnostic, and immune to naming.
+
+Run it from the repo root so it resolves `playwright` from `node_modules`:
 
 ```
 node assets-src/geometry-studio/probe-viewer.mjs \
@@ -56,22 +64,22 @@ Exit 0 means meshes present, no console errors, no failed requests.
 | Fixed / direct-glaze | `fixed-model.js` | ✅ | in-viewer | 15 meshes, fixed |
 | Hung | `hung-model.js` | ✅ | `hung.json` | 36 meshes, Δ 0.67 m |
 | Slider / glider | `slider-model.js` | ✅ | `sliding.json` | 23 meshes, translates |
-| Casement door | `swing-door-model.js` | ✅ | `casement-door.json` | 42 meshes, swings |
+| Casement door | `swing-door-model.js` | ✅ | `casement-door.json` | 42 meshes, Δ 1.04 m |
+| French door | `swing-door-model.js` | ✅ | `french-door.json` | 72 meshes, Δ 1.08 m |
+| 90-series entry | `swing-door-model.js` | ✅ | `ninety-series.json` | 55 meshes, Δ 1.04 m |
 
 `swing-door-model.js` is shared: `buildSwingDoor({ type })` covers
-`casement-door`, `french`, and `ninety`, so the French and 90-series viewers
-need no further model work — only their own HTML.
+`casement-door`, `french`, and `ninety` from one builder.
 
-Two probe notes, so the numbers are not over-read:
+`maxDelta` is the largest distance any single mesh travels between the closed
+and open pose; `moved` is how many meshes travel more than 1 mm. A `null`
+means the viewer exposes no `#open` control at all — correct for `fixed`,
+which is turntable-only. `curtainwall` reads 0 because its default variant is
+all-fixed; switch on the awning insert and it moves.
 
-- The slider reports `poseDelta: null` because the probe looks for a node named
-  `*pivot*` and the glider's moving node is `panel_operable_carrier`. The panel
-  does translate; the probe simply has no hinge to measure. Widening that
-  heuristic is a small fix worth making before the remaining sliding systems
-  land.
-- One `hung` run reported 4 console errors; four subsequent runs reported zero.
-  It coincided with two viewers probed back to back, so it reads as a CDN
-  hiccup fetching the font or three.js, not a defect. Re-probe if it recurs.
+One `hung` run once reported 4 console errors; every run since has reported
+zero. It coincided with two viewers probed back to back, so it reads as a CDN
+hiccup fetching the font or three.js, not a defect. Re-probe if it recurs.
 
 All 14 motion configs are in and parse: `awning`, `casement`, `casement-door`,
 `combination`, `french-door`, `hung`, `lift-and-slide`, `ninety-series`,
@@ -83,16 +91,15 @@ studio lighting, orbit controls, OBJ/GLB export toolbar) and `support.js`
 
 ## Still to import
 
-6 models — `bifold`, `combination`, `lift-slide`, `multislide`, `sliding-door`,
-`special`.
+Six systems, each a model + its viewer: `sliding-door`, `lift-slide`,
+`multislide`, `bifold`, `combination`, `special`.
 
-8 viewers — `bifold`, `combination`, `french-door`, `lift-slide`, `multislide`,
-`ninety-series`, `sliding-door`, `special`.
+Plus `Canvas.dc.html` — the Claude Design canvas wrapper. It has **no reachable
+surface in this repo** (nothing imports it, it renders nothing here); it is an
+archival platform file, not a product item.
 
-Plus `Canvas.dc.html` (Claude Design canvas wrapper).
-
-`french-door-viewer.html` and `ninety-series-viewer.html` are the cheapest two
-left — their model is already in.
+Their motion configs are already in, so each system needs only its two source
+files.
 
 ## Not imported, deliberately
 
