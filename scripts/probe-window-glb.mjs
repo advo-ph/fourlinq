@@ -92,6 +92,30 @@ export const SYSTEM_ROOT = {
   fixed: ["fixed"],
   pivot: ["pivoting_frame", "pivoting_panel", "pivoting_handle"],
   revolving: ["revolving_frame", "revolving_door"],
+
+  /* Grille ("lattice") variants. Each is a COMPLETE alternate assembly sitting
+     elsewhere in the scene, not an overlay on the plain system — so each needs
+     its own center, scale and openTime, and the viewer swaps the whole visible
+     set rather than adding meshes. They are systems here and in SYSTEMS, but
+     the UI presents them as a Grille toggle on the base system, never as their
+     own tab: a grille is an option on a casement, not a tenth kind of window. */
+  "fixed-lattice": ["fixed_lattice"],
+  "sliding-lattice": [
+    "sliding_horizontal_lattice_frame",
+    "sliding_horizontal_lattice_windowL",
+    "sliding_horizontal_lattice_windowR",
+  ],
+  "hung-lattice": [
+    "sliding_vertical_lattice_frame",
+    "sliding_vertical_lattice_windowT",
+    "sliding_vertical_lattice_windowB",
+  ],
+  "awning-lattice": ["awning_lattice_frame", "awning_lattice_armature"],
+  "pivot-lattice": [
+    "pivoting_lattice_frame",
+    "pivoting_lattice_panel",
+    "pivoting_lattice_window",
+  ],
 };
 
 /* ─── GLB container ─── */
@@ -180,15 +204,20 @@ function readAccessor(json, bin, index) {
 /* ─── Main ─── */
 
 /**
- * Wrapped so that importing this module for SYSTEM_ROOT (the parity test in
- * src/test/window-3d.test.ts does) neither reads the GLB nor prints a report.
+ * Measure every group in SYSTEM_ROOT against the GLB.
+ *
+ * Separated from printing so src/test/window-3d.test.ts can assert against the
+ * real binary — the pinned numbers in window-system.ts, and which materials
+ * each system actually carries — rather than against a hand-copied fixture.
+ * Importing this module for SYSTEM_ROOT alone reads nothing and prints nothing.
  */
-function main() {
+export function probe() {
 
 
 const { json, bin } = readGlb(MODEL_PATH);
 const node = json.nodes ?? [];
 const mesh = json.meshes ?? [];
+const material = json.materials ?? [];
 
 const rootNode = node.find((n) => n.name === "RootNode");
 if (!rootNode) throw new Error("expected a node named RootNode");
@@ -216,6 +245,8 @@ for (const [id, names] of Object.entries(group)) {
 /* Bounding boxes, inheriting group ownership down the subtree exactly the way
    the component inherits visibility. */
 const box = {};
+/** group id -> the set of material names its meshes reference. */
+const materialOf = {};
 function walk(index, parentWorld, ownedBy) {
   const n = node[index];
   const world = multiply(parentWorld, localMatrix(n));
@@ -228,6 +259,9 @@ function walk(index, parentWorld, ownedBy) {
       meshCount: 0,
     });
     for (const primitive of mesh[n.mesh].primitives ?? []) {
+      if (primitive.material !== undefined) {
+        (materialOf[key] ??= new Set()).add(material[primitive.material]?.name ?? "");
+      }
       const position = primitive.attributes?.POSITION;
       if (position === undefined) continue;
       const accessor = json.accessors[position];
@@ -305,14 +339,35 @@ for (const id of Object.keys(group)) {
     meshCount: entry.meshCount,
     openTime: peak.length ? round(Math.max(...peak), 2) : 0,
     isOperable: peak.length > 0,
+    material: [...(materialOf[id] ?? [])].sort(),
   };
 }
 
+return {
+  model: MODEL_PATH,
+  report,
+  problem,
+  materialName: material.map((m) => m.name ?? "").sort(),
+  unclaimed: topName.filter((n) => !owner.has(n)),
+  stat: {
+    node: node.length,
+    mesh: mesh.length,
+    animation: json.animations?.length ?? 0,
+  },
+};
+
+}
+
+/* ─── CLI ─── */
+
+function main() {
+const { model, report, problem, materialName, unclaimed, stat } = probe();
+
 if (process.argv.includes("--json")) {
-  console.log(JSON.stringify({ model: MODEL_PATH, report, problem }, null, 2));
+  console.log(JSON.stringify({ model, report, problem, materialName, unclaimed }, null, 2));
 } else {
-  console.log(`model      ${MODEL_PATH}`);
-  console.log(`nodes ${node.length}  meshes ${mesh.length}  animations ${json.animations?.length ?? 0}`);
+  console.log(`model      ${model}`);
+  console.log(`nodes ${stat.node}  meshes ${stat.mesh}  animations ${stat.animation}`);
   console.log("");
   console.log("system            center (scene space)            scale    openTime  operable");
   for (const [id, r] of Object.entries(report)) {
@@ -321,8 +376,17 @@ if (process.argv.includes("--json")) {
       `  ${id.padEnd(16)} [${r.center.join(", ").padEnd(28)}] ${String(r.scale).padEnd(8)} ${String(r.openTime).padEnd(9)} ${r.isOperable ? "yes" : "no"}`,
     );
   }
+  if (process.argv.includes("--material")) {
+    // Which materials each system carries, so the frame-finish set in
+    // Window3D can be checked against the model rather than assumed. Anything
+    // outside frame1/frame2/frame3 is left in its own colour by design.
+    console.log(`\nmaterials in file: ${materialName.join(", ")}`);
+    console.log("\nsystem            materials");
+    for (const [id, r] of Object.entries(report)) {
+      if (r) console.log(`  ${id.padEnd(16)} ${r.material.join(", ")}`);
+    }
+  }
   if (process.argv.includes("--unclaimed")) {
-    const unclaimed = topName.filter((n) => !owner.has(n));
     console.log(`\nunclaimed top-level nodes (${unclaimed.length}):`);
     for (const n of unclaimed) console.log(`  ${n}`);
   }

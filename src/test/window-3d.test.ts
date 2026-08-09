@@ -14,15 +14,37 @@
  * Deliberately importing from window-system.ts, never Window3D.tsx: the former
  * is pure data, the latter drags in three/fiber/drei and a WebGL context.
  */
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   SYSTEMS,
   CATALOGUE_SYSTEM,
+  GRILLE_VARIANT,
   SYSTEM_FOR_PRODUCT_TYPE,
   type SystemType,
 } from "@/components/3d/window-system";
-import { SYSTEM_ROOT } from "../../scripts/probe-window-glb.mjs";
+import { SYSTEM_ROOT, probe } from "../../scripts/probe-window-glb.mjs";
 import { productTypes } from "@/data/configurator";
+
+/**
+ * Materials Window3D recolours to the chosen frame finish.
+ *
+ * Read out of the component's SOURCE rather than imported, because importing
+ * Window3D drags three/fiber/drei and a WebGL context into the test run — but
+ * a hand-copied duplicate would assert nothing about the component, which is
+ * exactly the shape of the bug being guarded (the config and the renderer
+ * disagreeing). Parsing the literal keeps one source of truth.
+ */
+const FRAME_MATERIAL = (() => {
+  const source = readFileSync(
+    resolve(__dirname, "../components/3d/Window3D.tsx"),
+    "utf8",
+  );
+  const match = source.match(/const FRAME_MATERIAL = new Set\(\[([^\]]*)\]\)/);
+  if (!match) throw new Error("could not find FRAME_MATERIAL in Window3D.tsx");
+  return [...match[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+})();
 
 /** Length of the model's single "Scene" clip, in seconds. */
 const CLIP_SECONDS = 4;
@@ -80,11 +102,13 @@ describe("Window3D system config", () => {
     expect(SYSTEMS.revolving.openTime).toBe(CLIP_SECONDS);
   });
 
-  it("fixed glazing is the only non-operable system, and carries no action labels", () => {
+  it("fixed glazing is the only non-operable family, and carries no action labels", () => {
     const nonOperable = systemId.filter((id) => SYSTEMS[id].openTime === 0);
-    expect(nonOperable).toEqual(["fixed"]);
-    expect(SYSTEMS.fixed.openLabel).toBe("");
-    expect(SYSTEMS.fixed.closeLabel).toBe("");
+    expect([...nonOperable].sort()).toEqual(["fixed", "fixed-lattice"]);
+    for (const id of nonOperable) {
+      expect(SYSTEMS[id].openLabel).toBe("");
+      expect(SYSTEMS[id].closeLabel).toBe("");
+    }
   });
 
   it("every operable system has both action labels", () => {
@@ -105,14 +129,40 @@ describe("Window3D system config", () => {
     }
   });
 
-  it("exact node names are never used as prefixes of each other", () => {
-    // "fixed" vs "fixed_lattice" is the trap: had visibility matched on
-    // startsWith, selecting Fixed would also have shown the lattice variant.
-    const all = systemId.flatMap((id) => SYSTEMS[id].visibleRoot);
-    for (const a of all) {
-      for (const b of all) {
-        if (a === b) continue;
-        expect(b.startsWith(a), `"${b}" starts with "${a}" — exact matching required`).toBe(false);
+  it("the model really does contain the prefix collision that forces exact matching", () => {
+    // Not a hypothetical. "fixed" is the plain lite and "fixed_lattice" is its
+    // grille twin, owned by a different system — so had visibility matched on
+    // startsWith, selecting Fixed would have shown both at once. This asserts
+    // the trap still exists, so the exact-matching requirement below keeps its
+    // reason for being.
+    const exactName = systemId.flatMap((id) => SYSTEMS[id].visibleRoot);
+    expect(exactName).toContain("fixed");
+    expect(exactName).toContain("fixed_lattice");
+    expect(SYSTEMS.fixed.visibleRoot).toEqual(["fixed"]);
+  });
+
+  it("no prefix escape hatch can reach another system's nodes", () => {
+    // visibleRootPrefix is the one place startsWith is still used, so it is
+    // the one place a collision would actually mis-render. Exact names may
+    // safely share a prefix with each other; a prefix may not.
+    const exactName = systemId.flatMap((id) => SYSTEMS[id].visibleRoot);
+    for (const id of systemId) {
+      for (const prefix of SYSTEMS[id].visibleRootPrefix ?? []) {
+        for (const name of exactName) {
+          expect(
+            name.startsWith(prefix),
+            `${id}'s prefix "${prefix}" also matches the exact node "${name}"`,
+          ).toBe(false);
+        }
+        for (const other of systemId) {
+          if (other === id) continue;
+          for (const otherPrefix of SYSTEMS[other].visibleRootPrefix ?? []) {
+            expect(
+              otherPrefix.startsWith(prefix) || prefix.startsWith(otherPrefix),
+              `prefixes "${prefix}" (${id}) and "${otherPrefix}" (${other}) overlap`,
+            ).toBe(false);
+          }
+        }
       }
     }
   });
@@ -126,18 +176,66 @@ describe("catalogue exposure", () => {
     }
   });
 
-  it("withholds systems FourlinQ has not confirmed it sells", () => {
-    // These render fine from the licensed model but must not be advertised
-    // until the client confirms the product exists. Promoting one is a
-    // deliberate edit to CATALOGUE_SYSTEM, not an accident.
-    for (const id of ["hung", "pivot", "revolving"] as SystemType[]) {
-      expect(SYSTEMS[id], `${id} should stay configured`).toBeDefined();
-      expect(CATALOGUE_SYSTEM, `${id} must not be exposed yet`).not.toContain(id);
+  it("exposes every plain system in the model", () => {
+    // "Build all" — the rail now offers all twelve non-grille systems. If a
+    // client answer removes one, this is the test that has to change with it,
+    // which is the point: dropping a tab should be a deliberate edit.
+    const plain = systemId.filter((id) => !SYSTEMS[id].grilleOf);
+    expect([...CATALOGUE_SYSTEM].sort()).toEqual([...plain].sort());
+  });
+
+  it("never puts a grille variant in the tab rail", () => {
+    // A grille is an option on a sliding window, not a tenth kind of window.
+    // Listing "Sliding" and "Sliding · grille" side by side would read as two
+    // products; the Grille toggle is the correct surface.
+    for (const id of systemId) {
+      if (!SYSTEMS[id].grilleOf) continue;
+      expect(CATALOGUE_SYSTEM, `${id} belongs on the toggle, not the rail`).not.toContain(id);
     }
   });
 
   it("louvre is exposed — it is a shipped product whose only art is a placeholder", () => {
     expect(CATALOGUE_SYSTEM).toContain("louvre");
+  });
+});
+
+describe("grille variants", () => {
+  it("every grille points at a real plain system, and never at another grille", () => {
+    for (const id of systemId) {
+      const base = SYSTEMS[id].grilleOf;
+      if (!base) continue;
+      expect(SYSTEMS[base], `${id} -> ${base} is not a system`).toBeDefined();
+      expect(SYSTEMS[base].grilleOf, `${base} is itself a grille`).toBeUndefined();
+    }
+  });
+
+  it("GRILLE_VARIANT is the exact inverse of grilleOf", () => {
+    const expected = Object.fromEntries(
+      systemId.filter((id) => SYSTEMS[id].grilleOf).map((id) => [SYSTEMS[id].grilleOf, id]),
+    );
+    expect(GRILLE_VARIANT).toEqual(expected);
+  });
+
+  it("no plain system has two grille variants", () => {
+    const base = systemId.filter((id) => SYSTEMS[id].grilleOf).map((id) => SYSTEMS[id].grilleOf);
+    expect(new Set(base).size).toBe(base.length);
+  });
+
+  it("a grille keeps its base system's operability", () => {
+    // Toggling a grille on must not turn a fixed lite into something that
+    // claims to open, or silence a sash's control.
+    for (const [base, grille] of Object.entries(GRILLE_VARIANT)) {
+      const baseOperable = SYSTEMS[base as SystemType].openTime > 0;
+      const grilleOperable = SYSTEMS[grille as SystemType].openTime > 0;
+      expect(grilleOperable, `${grille} vs ${base}`).toBe(baseOperable);
+    }
+  });
+
+  it("a grille's label names its base system", () => {
+    for (const [base, grille] of Object.entries(GRILLE_VARIANT)) {
+      const baseLabel = SYSTEMS[base as SystemType].label;
+      expect(SYSTEMS[grille as SystemType].label).toContain(baseLabel);
+    }
   });
 });
 
@@ -170,7 +268,80 @@ describe("configurator product type mapping", () => {
   });
 });
 
+describe("frame finish reaches every system", () => {
+  // Measured from the GLB, not asserted from memory: the finish picker was
+  // dead on louvre and pivot because FRAME_MATERIAL omitted `frame3`, and
+  // nothing noticed. These read the binary so the same class of miss fails.
+  const { report, materialName } = probe();
+
+  it("the model's material set is exactly the six the viewer knows about", () => {
+    // A re-export that adds `frame4` must fail here rather than ship a part
+    // the finish picker silently cannot recolour.
+    expect(materialName).toEqual([
+      "frame1",
+      "frame2",
+      "frame3",
+      "glass",
+      "parts",
+      "parts2",
+    ]);
+  });
+
+  it("every system carries at least one material the finish picker recolours", () => {
+    for (const id of systemId) {
+      const used = (report as Record<string, { material: string[] } | null>)[id];
+      expect(used, `${id} matched no mesh`).not.toBeNull();
+      const finishable = used!.material.filter((m) => FRAME_MATERIAL.includes(m));
+      expect(finishable.length, `${id} has no finishable material`).toBeGreaterThan(0);
+    }
+  });
+
+  it("uses no material outside the six, per system", () => {
+    const known = new Set([...FRAME_MATERIAL, "glass", "parts", "parts2"]);
+    for (const id of systemId) {
+      const used = (report as Record<string, { material: string[] } | null>)[id];
+      for (const m of used?.material ?? []) {
+        expect(known.has(m), `${id} uses unknown material "${m}"`).toBe(true);
+      }
+    }
+  });
+
+  it("every grille bar takes the finish — grilles are frame3", () => {
+    // The grille geometry is `frame3` in every variant. Were frame3 dropped
+    // from FRAME_MATERIAL again, grilles would stay factory white while the
+    // frame around them changed colour.
+    expect(FRAME_MATERIAL).toContain("frame3");
+    for (const grille of Object.values(GRILLE_VARIANT)) {
+      const used = (report as Record<string, { material: string[] } | null>)[grille as string];
+      expect(used?.material, `${grille} should carry frame3`).toContain("frame3");
+    }
+  });
+});
+
 describe("parity with scripts/probe-window-glb.mjs", () => {
+  it("every pinned number still matches what the model measures", () => {
+    // The bug in the header of this file was hand-typed numbers drifting from
+    // the binary. Now that the prober is importable, assert it directly:
+    // regenerate with `npm run probe:glb`, never edit SYSTEMS by hand.
+    const { report } = probe();
+    for (const id of systemId) {
+      const measured = (report as Record<string, {
+        center: number[]; scale: number; openTime: number;
+      } | null>)[id];
+      expect(measured, `${id} matched no mesh in the GLB`).not.toBeNull();
+      expect(SYSTEMS[id].center, `${id} center`).toEqual(measured!.center);
+      expect(SYSTEMS[id].scale, `${id} scale`).toBe(measured!.scale);
+      expect(SYSTEMS[id].openTime, `${id} openTime`).toBe(measured!.openTime);
+    }
+  });
+
+  it("leaves no top-level node in the model unclaimed", () => {
+    // Every assembly in the licensed file is now wired to a system. A future
+    // model drop that adds geometry should fail here rather than ship art
+    // nobody can reach.
+    expect(probe().unclaimed).toEqual([]);
+  });
+
   it("both files describe the same set of systems", () => {
     expect(Object.keys(SYSTEM_ROOT).sort()).toEqual([...systemId].sort());
   });

@@ -22,15 +22,27 @@ export type SystemType =
   | "louvre-wide"
   | "hung"
   | "pivot"
-  | "revolving";
+  | "revolving"
+  | "fixed-lattice"
+  | "sliding-lattice"
+  | "hung-lattice"
+  | "awning-lattice"
+  | "pivot-lattice";
 
 /**
  * Systems offered in the viewer's tab rail, in display order.
  *
- * Deliberately narrower than SystemType: only systems FourlinQ actually sells.
- * `hung`, `pivot`, and `revolving` are renderable from the same model but
- * withheld pending client confirmation that they are offered — a viewer tab is
- * a shop window, and putting one up for an unconfirmed product advertises it.
+ * Still narrower than SystemType, but for a different reason than it used to
+ * be. The grille variants are excluded because they are not separate systems —
+ * a grille is an option on a sliding window, not a tenth kind of window, so it
+ * belongs on the Grille toggle (see GRILLE_VARIANT) rather than beside its own
+ * plain twin in the rail.
+ *
+ * `hung`, `pivot` and `revolving` WERE withheld pending client confirmation
+ * that FourlinQ sells them; they are exposed now on explicit instruction. That
+ * is a product claim, not a rendering decision: a tab is a shop window. If the
+ * client says they do not fabricate one, delete its line here — nothing else
+ * needs to change, and the system stays measured and renderable.
  */
 export const CATALOGUE_SYSTEM: SystemType[] = [
   "casement",
@@ -41,7 +53,10 @@ export const CATALOGUE_SYSTEM: SystemType[] = [
   "slide-and-fold",
   "louvre",
   "louvre-wide",
+  "hung",
+  "pivot",
   "fixed",
+  "revolving",
 ];
 
 /**
@@ -102,6 +117,15 @@ export interface SystemConfig {
   /** Action labels; unused when openTime is 0. */
   openLabel: string;
   closeLabel: string;
+  /**
+   * Set on a grille variant only: the plain system it is a grille version of.
+   *
+   * The model ships each grille as a COMPLETE alternate assembly parked
+   * elsewhere in the scene, not as bars overlaid on the plain one — hence its
+   * own center/scale/openTime and its own entry here. The viewer swaps the
+   * whole visible set when the Grille toggle flips.
+   */
+  grilleOf?: SystemType;
 }
 
 /**
@@ -208,12 +232,6 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     closeLabel: "Close louvres",
   },
 
-  /* ── Measured and renderable, but NOT in the catalogue tab rail ──
-     These are real subtrees in the licensed model, kept here so the numbers
-     stay derived rather than rediscovered. They are absent from
-     CATALOGUE_SYSTEM because FourlinQ has no such product yet: showing a
-     viewer tab for something the company may not sell would advertise it.
-     Promote an entry by adding it to CATALOGUE_SYSTEM once confirmed. */
   hung: {
     label: "Hung",
     visibleRoot: [
@@ -245,4 +263,83 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Rotate",
     closeLabel: "Stop",
   },
+
+  /* ── Grille variants ──
+     Reached through the Grille toggle, never through the tab rail. Labels are
+     never shown as tabs, but they are what the viewer badge reads, so they
+     name the base system plus the option. */
+  "fixed-lattice": {
+    label: "Fixed · grille",
+    visibleRoot: ["fixed_lattice"],
+    center: [-0.9737, 0.787, -0.0289],
+    scale: 1.4754,
+    openTime: 0,
+    openLabel: "",
+    closeLabel: "",
+    grilleOf: "fixed",
+  },
+  "sliding-lattice": {
+    label: "Sliding · grille",
+    visibleRoot: [
+      "sliding_horizontal_lattice_frame",
+      "sliding_horizontal_lattice_windowL",
+      "sliding_horizontal_lattice_windowR",
+    ],
+    center: [-0.6041, 3.0908, -0.037],
+    scale: 1.4754,
+    openTime: 1.93,
+    openLabel: "Slide open",
+    closeLabel: "Slide closed",
+    grilleOf: "sliding",
+  },
+  "hung-lattice": {
+    label: "Hung · grille",
+    visibleRoot: [
+      "sliding_vertical_lattice_frame",
+      "sliding_vertical_lattice_windowT",
+      "sliding_vertical_lattice_windowB",
+    ],
+    center: [-0.6037, 4.2017, -0.0452],
+    scale: 1.4754,
+    openTime: 1.83,
+    openLabel: "Raise sash",
+    closeLabel: "Lower sash",
+    grilleOf: "hung",
+  },
+  "awning-lattice": {
+    label: "Awning · grille",
+    visibleRoot: ["awning_lattice_frame", "awning_lattice_armature"],
+    center: [0.2185, 2.2352, -0.0111],
+    scale: 1.4428,
+    openTime: 2,
+    openLabel: "Open awning",
+    closeLabel: "Close awning",
+    grilleOf: "awning",
+  },
+  "pivot-lattice": {
+    label: "Pivot · grille",
+    visibleRoot: [
+      "pivoting_lattice_frame",
+      "pivoting_lattice_panel",
+      "pivoting_lattice_window",
+    ],
+    center: [1.1249, 4.0513, -0.0289],
+    scale: 1.7292,
+    openTime: 1.97,
+    openLabel: "Pivot open",
+    closeLabel: "Pivot closed",
+    grilleOf: "pivot",
+  },
 };
+
+/**
+ * Plain system -> its grille variant, derived from `grilleOf` so there is one
+ * source of truth. A system absent here has no grille art and the viewer hides
+ * the toggle rather than offering a control that does nothing.
+ */
+export const GRILLE_VARIANT: Partial<Record<SystemType, SystemType>> =
+  Object.fromEntries(
+    (Object.entries(SYSTEMS) as [SystemType, SystemConfig][])
+      .filter(([, cfg]) => cfg.grilleOf)
+      .map(([id, cfg]) => [cfg.grilleOf as SystemType, id]),
+  );

@@ -9,19 +9,36 @@ that output, it needs wiring, not modelling.
 
 ## Already covered — do not commission
 
+Every assembly in the licensed binary is now wired — `npm run probe:glb --
+--unclaimed` reports **0 unclaimed top-level nodes**, and a test keeps it that
+way.
+
 | System | Status |
 | --- | --- |
 | Casement (plain, 2-lite) | animated, live |
-| Awning | animated, live |
-| Sliding (2-panel, 4-panel) | animated, live |
+| Awning | animated, live · grille option |
+| Sliding (2-panel, 4-panel) | animated, live · grille option on the 2-panel |
 | Slide & Fold | animated, live |
 | Louvre (narrow, wide blade) | animated, live — replaced a schematic placeholder |
-| Fixed / Picture / Direct Glaze | rendered, non-operable (correct) |
-| Hung, Pivot, Revolving | measured and renderable, withheld pending confirmation FourlinQ sells them |
+| Fixed / Picture / Direct Glaze | rendered, non-operable (correct) · grille option |
+| Hung | animated, live · grille option — this is the Marvin double-hung gap |
+| Pivot | animated, live · grille option |
+| Revolving | animated, live |
 
-Lattice/grille variants of fixed, sliding, awning and pivot also exist in the
-binary, unwired. Grille is arguably a per-system option rather than its own
-system; decide that before treating it as missing art.
+**Grilles are an option, not a system.** The model ships each as a complete
+alternate assembly, so each has its own entry in `SYSTEMS` with its own
+measured numbers — but the UI surfaces them as a Grille toggle beside the
+finish picker, never as their own tab. "Sliding" and "Sliding · grille" side by
+side in the rail would read as two products.
+
+Every grille bar is material `frame3`, so grilles take the frame finish along
+with everything else. Run `npm run probe:glb -- --material` to see which
+materials each system carries.
+
+**Hung, Pivot and Revolving are exposed on instruction, not on confirmation.**
+They render correctly, but a tab is a shop window: if FourlinQ does not
+fabricate one, remove its line from `CATALOGUE_SYSTEM` in
+`src/components/3d/window-system.ts`. Nothing else needs to change.
 
 ---
 
@@ -227,11 +244,10 @@ assembly with a roof, not a single window. **Confirm demand first.**
 
 ## Priority
 
-1. **Nothing** — wire the nine already-licensed systems and confirm hung/pivot.
-2. **Automated Windows** — actuator only, smallest asset, kills a live placeholder.
-3. **Glass Railing** and **SC-Door** — real products, live placeholders, self-contained.
-4. **Automated Door** — real product, live placeholder, more parts.
-5. **Corner**, then **Bay/Bow** — only after confirming FourlinQ fabricates them.
+1. **Automated Windows** — actuator only, smallest asset, kills a live placeholder.
+2. **Glass Railing** and **SC-Door** — real products, live placeholders, self-contained.
+3. **Automated Door** — real product, live placeholder, more parts.
+4. **Corner**, then **Bay/Bow** — only after confirming FourlinQ fabricates them.
 
 Four of the six above are placeholder-replacement for products already on the
 site. The two Marvin gaps are the only ones that add a product, and both are

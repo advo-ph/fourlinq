@@ -27,6 +27,26 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+### Session: 2026-08-09 — every assembly in the licensed model, wired
+
+#### Added
+
+- **All twelve systems in the tab rail, up from nine** — `hung`, `pivot` and `revolving` were measured and renderable but withheld pending client confirmation; they are exposed now on explicit instruction. `hung` is the Marvin double-hung gap, answered from art we already own. **This is a product claim, not a rendering decision**: if the client does not fabricate one, delete its line from `CATALOGUE_SYSTEM` and nothing else changes. [src/components/3d/window-system.ts](../src/components/3d/window-system.ts).
+- **Grille variants, as an option rather than five more tabs** — the model carries a complete alternate assembly for fixed, sliding, hung, awning and pivot with muntin bars, each with its own geometry, so each is its own `SYSTEMS` entry with its own measured numbers. The UI surfaces them through a **Grille** toggle beside the finish picker: "Sliding" and "Sliding · grille" side by side in the rail would read as two products, when a grille is an option on one. The toggle is hidden, not disabled, for the seven systems with no grille art.
+- **`npm run probe:glb -- --material`** — prints the material set per system, and `probe()` is now importable so tests can measure the binary directly instead of comparing against hand-copied numbers. [scripts/probe-window-glb.mjs](../scripts/probe-window-glb.mjs).
+- **Zero unclaimed geometry, asserted** — every one of the 70 top-level nodes in the GLB now belongs to a system, and a test fails if a future model drop adds art nobody can reach.
+
+#### Fixed
+
+- **Switching system left the incoming meshes with the model's authored colours** — the recolour effect only touches meshes that are currently `visible`, and visibility is set by a different effect; without `systemType` in its dependency array it never re-ran on a system change. It hid for months because the plain systems' frames are authored near-white, so a White finish looked correct by accident. Grilles exposed it immediately: `frame3` bars are authored dark, so White rendered a white frame with black bars. Caught in a browser, not by a test — the wrong colour is only visible on a canvas. [src/components/3d/Window3D.tsx](../src/components/3d/Window3D.tsx).
+- **Seven of twelve tabs looked unreachable** — the rail is 1162 px of tabs inside a ~526 px column in the Design Tool, scrollable but wearing `no-scrollbar`, which removed the only cue that more existed. Added edge fades that appear only on the side with more to show, so a rail that fits shows nothing.
+- **Three hardcoded hexes and a `bg-white/85` in the viewer** — the backdrop gradient and the two overlay chips are now built from `--canvas`, `--canvas-soft`, `--canvas-cream` and `--rule-strong`, and the finish picker's ring offset from `--canvas`. The gradient still has to darken past any single token so the contact shadow has something to sit on, so its last stop is a `color-mix` toward `--rule-strong` rather than an invented hex.
+
+#### Notes
+
+- **The finish now provably reaches every system.** The test suite reads `FRAME_MATERIAL` out of Window3D's source and checks it against the materials the binary actually uses, per system — so the class of bug that left the picker dead on louvre and pivot (`frame3` missing from the set) now fails the build. It also pins the model's material set to exactly six, so a re-export introducing a `frame4` fails rather than silently shipping an un-finishable part. Verified by mutation: removing `frame3` reddens two tests.
+- **`SYSTEMS`' pinned numbers are now asserted against the model itself**, not just against the probe's system list. Nudging one center by 0.1 fails. This closes the hand-tuning route that produced the original 278× unit bug.
+
 ### Session: 2026-08-08 — closing the open gaps: honest a11y gate, reachable door automation
 
 #### Added
