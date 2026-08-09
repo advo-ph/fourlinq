@@ -1393,7 +1393,14 @@ Ambitions parked for after the current redesign ships. Each is a distinct paid s
 
 **Estimated effort:** 1–2 weeks per system end-to-end if outsourced. Less if CAD files exist.
 
-**Workaround we shipped instead (this sprint):** a procedurally-built 3D casement window in Three.js — see §14 entry for `WindowExperience3D`. Not photoreal but interactive, real 3D, and demonstrates the pattern. Acts as proof-of-concept until commissioned models replace it.
+**Workaround we shipped instead (that sprint):** a procedurally-built 3D casement window in Three.js — see §14 entry for `WindowExperience3D`. Not photoreal but interactive, real 3D, and demonstrates the pattern.
+
+**Status: shipped 2026-08-09 — neither precondition was needed.** No manufacturer CAD files and no Blender commission. Twenty-two systems are live in the Design Tool, rotatable, click-to-actuate, and rendered in the selected finish. Two sources, neither of them the ones budgeted for above:
+
+- **Procedural three.js builders from a Claude Design handoff** — a `build*(opts)` returning `{ group, setOpen(t) }`, baked to per-system GLBs by `npm run handoff:export`. FourlinQ owns this geometry outright: no attribution, no domain restriction. Twenty of the twenty-two systems come from here.
+- **A licensed Sketchfab model** (makinwhat, commercial use granted 2026-05-22 for fourlinq.ph) — down from seventeen assemblies in use to six, all of them being retired as builders land. See [LICENSES.md](./LICENSES.md).
+
+The estimate above ("1–2 weeks per system, ₱75–300k") did not survive contact: the bake is generic across mechanisms, so a builder is a cheaper deliverable than a GLB — it authors its own animation clip and the node-naming rules stop mattering. **The remaining commission list is in [3D_ASSET_BRIEF.md](./3D_ASSET_BRIEF.md)**, and the one that matters is louvre — the last shipped product still drawn from the licensed file, and the only real obstacle to dropping the attribution entirely.
 
 ### 15.3 — AI-generated finish variants at scale
 
@@ -1436,7 +1443,7 @@ What the launch (this redesign branch) delivers:
 
 What §15 unlocks beyond that:
 - §15.1 Gaussian splat — category-defining, but needs flagship project
-- §15.2 Production-grade 3D models — needs CAD files or Blender budget
+- §15.2 Production-grade 3D models — **shipped 2026-08-09**, without the CAD files or the Blender budget this assumed were preconditions
 - §15.3 88 finish-variant photos — needs production time + AI credits
 - §15.4 Commissioned photography — needs Tita's project access + budget
 

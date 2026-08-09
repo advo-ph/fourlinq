@@ -101,7 +101,8 @@ fourlinq-fork/
 │   │   │   ├── CapizDivider.tsx      # Decorative divider
 │   │   │   └── Spacer.tsx            # Vertical spacing
 │   │   ├── 3d/
-│   │   │   └── Window3D.tsx          # Three.js interactive window (drag, click-open, finish swap)
+│   │   │   ├── Window3D.tsx          # Three.js interactive window (drag, click-open, finish swap)
+│   │   │   └── window-system.ts      # 22-system registry: measured numbers, model path, grille pairs
 │   │   ├── configurator/
 │   │   │   └── WindowPreview.tsx     # Live preview in DesignTool
 │   │   ├── chat/
@@ -166,7 +167,8 @@ fourlinq-fork/
 │   ├── favicon.svg, favicon.ico, apple-touch-icon.png
 │   ├── hero-bg.jpg, brand-story.jpg
 │   ├── videos/hero-loop.mp4
-│   ├── models/animated-window-systems.glb
+│   ├── models/animated-window-systems.glb    # Licensed (makinwhat) — 6 systems still drawn from it
+│   ├── models/system/*.glb                   # 20 per-system GLBs FourlinQ owns, baked from scripts/handoff/
 │   ├── wp-export/                    # 200+ product/project photos from WordPress
 │   ├── wp-export-originals/          # High-res originals
 │   ├── generated/                    # AI-generated hero images + benefit illustrations
@@ -695,8 +697,19 @@ DATABASE_URL=postgresql://<user>:<pass>@<host>/<db>   # Neon Postgres
 GEMINI_API_KEY=<key>                                   # Google Gemini API
 NODE_ENV=production|development
 API_PORT=3001                                          # Express port (default)
-ADMIN_PASSWORD=<password>                              # Default: FourlinQ@dmin2026
-ADMIN_JWT_SECRET=<secret>                              # Auto-generated if unset
+ADMIN_JWT_SECRET=<secret>                              # Auto-generated per process if unset
+                                                       # (so restarts log admins out — set in prod)
+VITE_API_URL=                                          # Frontend API base; empty = same-origin
+
+# Inquiry notification email. Unset = mailer no-ops, inquiries still save to DB.
+SMTP_HOST= / SMTP_PORT= / SMTP_USER= / SMTP_PASS= / SMTP_SECURE=
+MAIL_TO=sales@fourlinq.com                             # default
+MAIL_FROM= / MAIL_BCC=
+
+# Bootstrap script only (server/scripts/create-admin.ts), NOT read at runtime.
+# create-admin exits with an error if ADMIN_PASSWORD is unset — there is no default.
+ADMIN_EMAIL=<email>
+ADMIN_PASSWORD=<password>
 ```
 
 ---

@@ -27,6 +27,10 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 ## [Unreleased]
 
+> **Deploy checkpoint — 2026-08-09.** Everything above this line down to the `[2026-04-26]` heading is live on https://fourlinq.ph, shipped by the `feat/window-3d-systems` merge. Confirm the exact commit with `npm run deploy:status`.
+>
+> The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
+
 ### Session: 2026-08-09 — every assembly in the licensed model, wired
 
 #### Added
@@ -59,6 +63,7 @@ Keep entries concise — one line per change, written in past tense, focused on 
 - **`SYSTEMS`' pinned numbers are now asserted against the model itself**, not just against the probe's system list. Nudging one center by 0.1 fails. This closes the hand-tuning route that produced the original 278× unit bug.
 - **Three deliberate non-mappings, each asserted by test.** `french-door` in the configurator is "French **Sliding** Door" but the baked model is a hinged pair — right name, wrong mechanism, so the model stays in the rail and answers no product type. `special-shapes` and `custom-shapes` are catch-alls where any single model claims a geometry the customer did not choose. `tilt-turn` still has no honest match in either source, and is now the last gap in the configurator's type list.
 - **"Fixed — does not open" is no longer shown over a bay window.** The non-operable note is per system: true of direct glazing and a gable lite, false of a bay, whose flanking casements do open in reality — the model simply does not animate them. Those read "Assembly view — casements not animated" instead. A test fails if a `combination-*` system ever claims it cannot open.
+- 🔴 **None of the twenty baked models has been looked at.** Every check that ran on them is programmatic — bounding box, fit scale, material mapping, animation travel, node uniqueness — and all of it passes. Nobody has opened a browser and seen one render. The browser tooling dropped mid-session and did not come back. This matters here specifically because **this codebase has already produced two bugs whose only symptom was visual**: a viewer that rendered an invisible speck for months, and grille bars that came out black under a White finish. Both passed every check that was not a screenshot. **Do a visual pass on `/design-tool` before treating the 3D surface as verified** — it is live, so this is a production claim, not a staging one.
 - **The Marvin reference photography in the handoff was left out of the repo** and `docs/LICENSES.md` records why. Modelling your own profile from a competitor's photo is ordinary practice; publishing their photography as FourlinQ's product imagery is not, and only the builders and JSON specs were copied in.
 
 ### Session: 2026-08-08 — closing the open gaps: honest a11y gate, reachable door automation

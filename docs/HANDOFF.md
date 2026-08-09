@@ -1,24 +1,20 @@
 # Session Handoff
 
-Last updated: **2026-05-29 ~14:30 GMT+8** (backlog-close + deploy-hardening session)
+> **This file stopped being maintained after 2026-05-29.** Every session since — June, July and August — logged to [CHANGELOG.md](./CHANGELOG.md) instead, under dated `### Session:` headings. **Read the CHANGELOG for anything recent**; what follows is a May-and-earlier archive, kept because the architecture notes and the "rules for future sessions" at the bottom are still good. Header corrected 2026-08-09.
+>
+> Do not add new sessions here. Either revive this file deliberately or let the CHANGELOG keep the job it has actually been doing.
 
 ---
 
-## Branch state (current)
+## Branch state
 
-All three working branches in sync at **`1378871`** (deploy hardening + Phase 5 page body + sharp resize):
+**Single branch: `main`.** A push to `main` triggers [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml), which builds on the runner and reloads pm2 on the VPS — `./deploy.sh` is the manual equivalent, not a separate deploy branch. Verify what is live with `npm run deploy:status` (SSHes + cats `/opt/fourlinq/deployed-from.txt`).
 
-- `origin/main` ← FF-merged from supafinal so fresh clones land on the actual codebase (was 150 commits stale)
-- `origin/supafinal` ← deploy branch (what `./deploy.sh` ships)
-- `origin/cms-rag-multiuser` ← working branch (where day-to-day commits land before merging up)
-
-**Prod is on `1378871`** at https://fourlinq.ph. Verify with `npm run deploy:status` (SSHes + cats `/opt/fourlinq/deployed-from.txt`).
-
-Tell collaborators: `git fetch && git checkout main` to sync.
+The `supafinal` and `cms-rag-multiuser` branches described in the May-29 version of this section **no longer exist**; feature branches now merge straight into `main`.
 
 ---
 
-## What was done this session (May 29, ~9 AM → 2 PM)
+## Archive — what was done on May 29 (~9 AM → 2 PM)
 
 Theme: **close the backlog**. Phase-by-phase work that had been outstanding from the post-Tita-demo punch list. Outcome: roadmap reconciled with code reality, CMS editable surface expanded with safeguards so Tita can edit without breaking visuals, deploy pipeline hardened with branch guard + audit trail + opt-in pull-based fallback.
 

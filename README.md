@@ -30,12 +30,27 @@ npm run dev:all      # both concurrently
 
 ### Environment Variables
 
-Create a `.env` in the project root:
+Create a `.env` in the project root.
 
-```
-GEMINI_API_KEY=your_gemini_api_key
-DATABASE_URL=your_neon_postgres_connection_string
-```
+**Required:**
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Neon Postgres connection string |
+| `GEMINI_API_KEY` | Google Gemini key for the LinQ chat stream |
+
+**Optional:**
+
+| Variable | Purpose |
+|---|---|
+| `API_PORT` | Express port. Defaults to `3001` |
+| `ADMIN_JWT_SECRET` | Signs admin sessions. Auto-generated per process if unset, so every restart logs admins out — set it in production |
+| `VITE_API_URL` | API base for the frontend. Empty (same-origin) by default |
+| `SMTP_HOST` · `SMTP_PORT` · `SMTP_USER` · `SMTP_PASS` · `SMTP_SECURE` | Inquiry-notification email. With none set the mailer no-ops and logs a warning — inquiries still save to the DB |
+| `MAIL_TO` · `MAIL_FROM` · `MAIL_BCC` | Notification recipients. `MAIL_TO` defaults to `sales@fourlinq.com` |
+
+`ADMIN_EMAIL` and `ADMIN_PASSWORD` are read only by the one-off bootstrap script
+(`server/scripts/create-admin.ts`), not at runtime.
 
 ## Scripts
 
@@ -48,6 +63,9 @@ DATABASE_URL=your_neon_postgres_connection_string
 | `qa:a11y` | RM17 accessibility + fixed-layer scan (alt, control names, chat/banner overlap) |
 | `qa:viewport` | RM5 viewport-containment scan (no horizontal document overflow) |
 | `audit:prod-surface` | Read-only production-surface audit harness |
+| `probe:glb` | Measures every window system in the GLBs — bounding box, fit scale, open-pose clip time. The viewer's pinned numbers come from here, never from hand-tuning. `-- --material` prints the material set per system |
+| `handoff:export` | Bakes the procedural three.js builders in `scripts/handoff/model/` to `public/models/system/*.glb`, authoring each open/close clip from the builder's own `setOpen(t)` |
+| `handoff:verify` | Reads each baked clip's samplers back and fails if a mechanism travels less than 40 mm or 8° — a builder that silently stopped moving still exports a valid file |
 | `deploy` / `deploy:status` / `deploy:log` | VPS deploy helpers (`deploy.sh`) |
 
 ## Project Structure
@@ -59,11 +77,14 @@ DATABASE_URL=your_neon_postgres_connection_string
 │   ├── migrations/         # SQL migrations
 │   ├── llm/                # Gemini streaming
 │   └── auth.ts, db.ts      # admin auth, Postgres pool
-├── docs/                   # Design system, roadmap, runbooks, audits
-├── public/images/          # Product/project photos, hero, icons
+├── docs/                   # Design system, roadmap, runbooks, audits, licenses
+├── public/
+│   ├── images/             # Product/project photos, hero, icons
+│   └── models/             # Window-system GLBs (per-system + one licensed)
 ├── scripts/                # image generation, visual QA, viewport scan
+│   └── handoff/            # 3D builders + specs, and the GLB bake/verify pair
 ├── src/
-│   ├── components/         # chat, home, icons, layout, shared, ui
+│   ├── components/         # 3d, chat, home, icons, layout, shared, ui
 │   ├── data/               # product, taxonomy, project, configurator, brand
 │   ├── hooks/              # React Query hooks, analytics (consent-gated)
 │   ├── lib/                # utilities, consent, cms-api

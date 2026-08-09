@@ -45,7 +45,7 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 | 11 | French sliding door — wants this as a category | Blocked on Imie | Currently we have separate "French Door" + "Sliding Door". Unclear if she wants a combined "French Sliding Door" product (sliding instead of swinging) or just a rename. |
 | 12 | "Special designs" visual unclear | Blocked on Imie | She marked a photo 🖼 with that label but didn't say what's wrong. |
 | 13 | Curtain wall display "tall and wide" | Shipped 2026-05-29 (card spans 2 grid columns on /products) | n/a |
-| 14 | 3D interactive open/close on window/door designs | Planned (large effort — Three.js or animated SVG) | Apply to /products. Schedule as its own phase. |
+| 14 | 3D interactive open/close on window/door designs | Shipped 2026-08-09 (22 systems, rotate + click-to-actuate, finish-aware) | Lives in the Design Tool behind a Drawing/3D toggle. Twelve configurator types get a real preview; `tilt-turn` is the last type with no honest 3D match. Not yet applied to `/products`. |
 | 15 | Slide & Fold reference video — https://youtu.be/-8XwIKAtAAc | Shipped 2026-05-29 | YouTube embed renders in the Slide & Fold product detail panel on /products. Schema now supports `youtubeId` on any product. |
 | 16 | "International feel despite being a local fabricator" | Shipped 2026-05-29 (Brand hero + AuthorityStrip + Warranty + Finishes provenance copy). | Remaining copy uses "European-spec" / "European fenestration standards" framing. |
 | 17 | Design names — "Mali yung design niyo, check internet for meaning of each" | Blocked on Imie | She didn't enumerate which products. The brochure-verified names should stay until she points at specific ones. One certain bug fixed: `id="entrance-door"` → `casement-door` (matched the `name` field and FinishExplorer reference). |
@@ -210,7 +210,7 @@ These are genuine but should not block the current visual cleanup.
 | **Product-level project galleries and finish visuals** | Competitor research and Tita both point to project photos + finish variation per product, but drawers show mostly one image + swatches | ~2-4 days once assets are selected | **B18** | Planned |
 | **Aluminium spec/photo completion** | `/aluminium` exists, but sub-product specs/photos/spec sheets are still placeholders | ~0.5-1 day after Imie data | **B19** | Blocked on Imie |
 | **Architect resources surface** for spec sheets/CAD/BIM/downloads | Schüco/Milgard/Pella-style pro sites expose technical resources; FourlinQ cannot credibly do this until real documents exist | ~1-2 days after docs | **B20** | Blocked on assets |
-| **3D product open/close** | Tita asked for interactive open/close; this remains a larger signature surface and should not be faked with generic geometry | ~2-4 days once target systems are chosen | **B21** | Deferred |
+| **3D product open/close** | Tita asked for interactive open/close. Shipped in the Design Tool for 22 systems — not faked with generic geometry: each is measured from the binary and its travel asserted by `handoff:verify`. Remaining scope is surfacing it on `/products` and the drawers | ~0.5-1 day to extend to `/products` | **B21** | Shipped 2026-08-09 (Design Tool only) |
 
 ### P4 — Operational hardening
 
