@@ -75,6 +75,93 @@ if (typeof globalThis.FileReader === "undefined") {
  * fall back to a flat SVG.
  */
 const SYSTEM = [
+  /* ── Replacements for licensed systems ──
+     These duplicate assemblies in the makinwhat GLB, and that is the point:
+     each one exported here is one fewer system depending on a licence that
+     restricts us to fourlinq.ph and requires rendered attribution. They keep
+     the licensed systems' ids so the swap is a config change, not a new tab.
+
+     What still has no builder, and so still needs the licensed model: louvre
+     (narrow and wide), the 4-panel sliding window, and the sliding / hung /
+     awning grille variants. Louvre is the one that matters — it is a shipped
+     product. See docs/3D_ASSET_BRIEF.md. */
+  {
+    id: "casement",
+    type: "casement",
+    label: "Casement",
+    module: "window-model.js",
+    build: "buildCasement",
+    opts: { variant: "single" },
+    openLabel: "Open window",
+    closeLabel: "Close window",
+  },
+  {
+    id: "casement-2lite",
+    label: "Casement · 2-lite",
+    module: "window-model.js",
+    build: "buildCasement",
+    opts: { variant: "dual" },
+    openLabel: "Open window",
+    closeLabel: "Close window",
+  },
+  {
+    id: "awning",
+    type: "awning",
+    label: "Awning",
+    module: "awning-model.js",
+    build: "buildAwning",
+    opts: { variant: "vent" },
+    openLabel: "Open awning",
+    closeLabel: "Close awning",
+  },
+  {
+    id: "sliding",
+    type: "sliding",
+    label: "Sliding",
+    module: "slider-model.js",
+    build: "buildSlider",
+    opts: {},
+    openLabel: "Slide open",
+    closeLabel: "Slide closed",
+  },
+  {
+    id: "fixed",
+    type: "fixed",
+    label: "Fixed",
+    module: "fixed-model.js",
+    build: "buildFixed",
+    opts: { variant: "tall" },
+  },
+  {
+    // Replaces the licensed `fixed-lattice`. The builder has a grid option, so
+    // this grille comes free; the other four grilles do not have one.
+    id: "fixed-lattice",
+    label: "Fixed · grille",
+    module: "fixed-model.js",
+    build: "buildFixed",
+    opts: { variant: "tall", grid: true },
+  },
+  {
+    id: "hung",
+    label: "Hung",
+    module: "hung-model.js",
+    build: "buildHung",
+    opts: { variant: "double" },
+    openLabel: "Raise sash",
+    closeLabel: "Lower sash",
+  },
+  {
+    id: "slide-and-fold",
+    type: "bifold",
+    label: "Slide & Fold",
+    module: "bifold-model.js",
+    build: "buildBifoldDoor",
+    opts: {},
+    openLabel: "Fold open",
+    closeLabel: "Fold closed",
+  },
+
+  /* ── Systems the licensed model has no art for at all ── */
   {
     id: "sliding-door",
     type: "sliding-door",
@@ -317,11 +404,32 @@ function bakeClip(root, setOpen) {
 /** Every name MATERIAL_AS can produce — see the note in renameMaterial. */
 const MAPPED_NAME = new Set(Object.values(MATERIAL_AS));
 
+/**
+ * Pattern fallback, applied when the exact table misses.
+ *
+ * `makeBifoldMaterials` renames its profile materials to `upvc_<finish>` and
+ * `upvc_<finish>_rebate`, so the set of names depends on an option and cannot
+ * be enumerated — `upvc_white` slipped through the table and would have kept
+ * its authored colour, which is the same class of bug as the `frame3` omission
+ * that left the finish picker dead on louvre.
+ */
+const MATERIAL_PATTERN = [
+  [/^upvc_.*_rebate$/, "frame2"],
+  [/^upvc_/, "frame1"],
+  [/^alu_.*(clad|cap)/, "frame3"],
+  [/^alu_/, "frame1"],
+  [/^wood_.*_rebate$/, "frame2"],
+  [/^wood_/, "frame1"],
+  [/^glass/, "glass"],
+];
+
 function renameMaterial(root, unknown) {
   root.traverse((child) => {
     if (!child.isMesh || !child.material) return;
     for (const mat of Array.isArray(child.material) ? child.material : [child.material]) {
-      const mapped = MATERIAL_AS[mat.name];
+      const mapped =
+        MATERIAL_AS[mat.name] ??
+        MATERIAL_PATTERN.find(([re]) => re.test(mat.name))?.[1];
       if (mapped) mat.name = mapped;
       // The builders share one material instance across many meshes, so by the
       // time the traversal reaches the second mesh the rename has already

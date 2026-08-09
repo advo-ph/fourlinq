@@ -32,7 +32,17 @@ combinations — the systems the licensed model has no art for.
 - **Original license:** CC Attribution-NonCommercial 4.0 (CC-BY-NC)
 - **Use on this site:** Commercial — granted by author on **2026-05-22** via Sketchfab DM, specifically for use on fourlinq.ph and its preview deployments.
 - **Attribution rendered:** "3D model by makinwhat" with linked Sketchfab profile, shown beneath the viewer in the [Window3D component](../src/components/3d/Window3D.tsx) on every page that displays the model.
-- **Subtrees used (updated 2026-08-09):** **all of them.** Every one of the model's seventeen assemblies is now reachable — twelve systems in the viewer's tab rail (casement plain and bridged, awning, sliding 2- and 4-panel, slide-and-fold, louvre narrow and wide blade, hung, pivot, fixed, revolving) plus five grille variants reached through the Grille toggle. `npm run probe:glb -- --unclaimed` reports zero unclaimed top-level nodes, and a test keeps it there. The model file is unmodified from the original Sketchfab download.
+- **Subtrees used (updated 2026-08-09, second pass):** **six**, down from seventeen. Eight assemblies were replaced by GLBs FourlinQ owns (see the section above), and `pivot` + `revolving` were withdrawn from the tab rail. What still renders from this file:
+
+  | Still licensed | Why it cannot be replaced yet |
+  | --- | --- |
+  | `louvre`, `louvre-wide` | no builder exists — **and this is a shipped FourlinQ product** |
+  | `sliding-4panel` | `slider-model.js` is 2-panel only |
+  | `sliding-lattice`, `hung-lattice`, `awning-lattice` | only `fixed`'s grille has a builder option |
+
+  `pivot`, `pivot-lattice` and `revolving` stay configured but unreachable, so they render nowhere. The model file is unmodified from the original Sketchfab download, and a test asserts this exact list — the count can only go down deliberately.
+
+- **Path to dropping this dependency entirely:** one louvre builder, a panel-count option on `slider-model.js`, and grille options on the sliding / hung / awning builders. At that point neither the attribution nor the fourlinq.ph-only restriction applies to anything on the site — though the credit should stay in the changelog as historical record.
 
   The 2026-05-22 grant covers commercial use of *the model* on fourlinq.ph, not a
   single subtree, so displaying all of it stays inside the grant. Two limits

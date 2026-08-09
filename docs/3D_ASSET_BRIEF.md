@@ -44,7 +44,26 @@ but must not stand in for that product. Asserted by test.
 `special-shapes` and `custom-shapes` stay unmapped too — they are catch-alls,
 and any single model claims a geometry the customer did not choose.
 
-### From the licensed makinwhat model
+Eight more systems — casement, casement 2-lite, awning, sliding, fixed, the
+fixed grille, hung and slide & fold — were **moved off** the licensed model onto
+these builders on 2026-08-09. Same tabs, same ids, owned geometry.
+
+### Still from the licensed makinwhat model
+
+Only six assemblies still render from it, and clearing them is what ends the
+attribution requirement:
+
+| System | Blocker |
+| --- | --- |
+| **Louvre, narrow and wide** | **no builder — and it is a shipped product** |
+| Sliding · 4-panel | `slider-model.js` is 2-panel only |
+| Sliding / hung / awning grilles | only `fixed` has a builder grid option |
+
+`pivot` and `revolving` were withdrawn from the rail: neither is a confirmed
+FourlinQ product and a revolving door is not a uPVC window, so they were the
+cheapest two to give up.
+
+### Historical — the licensed model's full contents
 
 | System | Status |
 | --- | --- |
@@ -273,7 +292,16 @@ All four remaining items are placeholder-replacement for products already on
 the site. Nothing on this list adds a product, and nothing is blocked on a
 client answer — corner and bay/bow, which were, are now modelled.
 
-**Two things that are not commissions but are still open:**
+**The one that ends the licence dependency:**
+
+- **A louvre / jalousie builder.** It is the last shipped product still drawn
+  from the licensed model, and the only real blocker to removing the makinwhat
+  attribution. Narrow and wide blade, ~18 and ~9 fins, one fin per node, tilting
+  in unison from a control arm. Add it to `scripts/handoff/model/`, and the
+  bake handles the clip. A panel-count option on `slider-model.js` and grille
+  options on the sliding / hung / awning builders finish the job.
+
+**Two more that are not commissions but are still open:**
 
 - **`tilt-turn` has no 3D anywhere** — not in the licensed model, not in the
   handoff builders. It is a real configurator type, so it is the last honest

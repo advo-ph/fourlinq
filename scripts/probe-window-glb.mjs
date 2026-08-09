@@ -60,18 +60,18 @@ const MODEL_PATH = resolve(here, "..", "public", "models", "animated-window-syst
  * src/test/window-3d.test.ts fails if the two drift.
  */
 export const SYSTEM_ROOT = {
-  casement: ["casement_frame", "casement_panelL", "casement_panelR"],
-  "casement-2lite": [
-    "casement_bridged_frame",
-    "casement_bridged_panelL",
-    "casement_bridged_panelR",
-  ],
-  awning: ["awning_frame", "awning_armature"],
-  sliding: [
-    "sliding_horizontal_frame",
-    "sliding_horizontal_windowL",
-    "sliding_horizontal_windowR",
-  ],
+  /* Casement, casement-2lite, awning, sliding, fixed, fixed-lattice, hung and
+     slide-and-fold used to be measured here. They now come from GLBs FourlinQ
+     owns, baked by scripts/handoff/export-glb.mjs, so the assemblies below are
+     the only reason the licensed model is still shipped:
+
+       louvre, louvre-wide   no builder exists — and it is a shipped product
+       sliding-4panel        slider-model.js is 2-panel only
+       pivot, revolving      no builder, and both are unconfirmed products
+       *-lattice (4)         only fixed's grille has a builder option
+
+     Leaving a replaced id here would make it defined by two models, which
+     probe() reports as a problem rather than silently preferring one. */
   "sliding-4panel": [
     "sliding_horizontal_4panels_frame",
     "sliding_horizontal_4panels_windowL2",
@@ -79,17 +79,10 @@ export const SYSTEM_ROOT = {
     "sliding_horizontal_4panels_windowR1",
     "sliding_horizontal_4panels_windowR2",
   ],
-  hung: [
-    "sliding_vertical_frame",
-    "sliding_vertical_windowT",
-    "sliding_vertical_windowB",
-  ],
-  "slide-and-fold": ["holding_frame", "holding_panels"],
   // Louvre fins are one top-level node each (18 narrow, 9 wide) plus a frame
   // and a control arm, so these lists are generated rather than written out.
   louvre: "@Jalousie_narrow_",
   "louvre-wide": "@Jalousie_wide_",
-  fixed: ["fixed"],
   pivot: ["pivoting_frame", "pivoting_panel", "pivoting_handle"],
   revolving: ["revolving_frame", "revolving_door"],
 
@@ -99,7 +92,6 @@ export const SYSTEM_ROOT = {
      set rather than adding meshes. They are systems here and in SYSTEMS, but
      the UI presents them as a Grille toggle on the base system, never as their
      own tab: a grille is an option on a casement, not a tenth kind of window. */
-  "fixed-lattice": ["fixed_lattice"],
   "sliding-lattice": [
     "sliding_horizontal_lattice_frame",
     "sliding_horizontal_lattice_windowL",

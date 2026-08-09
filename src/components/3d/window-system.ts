@@ -65,11 +65,15 @@ export const MODEL_SYSTEM = (id: SystemType) => `/models/system/${id}.glb`;
  * belongs on the Grille toggle (see GRILLE_VARIANT) rather than beside its own
  * plain twin in the rail.
  *
- * `hung`, `pivot` and `revolving` WERE withheld pending client confirmation
- * that FourlinQ sells them; they are exposed now on explicit instruction. That
- * is a product claim, not a rendering decision: a tab is a shop window. If the
- * client says they do not fabricate one, delete its line here — nothing else
- * needs to change, and the system stays measured and renderable.
+ * `pivot` and `revolving` are configured and renderable but NOT listed. They
+ * exist only in the licensed model, FourlinQ has never confirmed it sells
+ * either, and a revolving door is not a uPVC window at all — so they are the
+ * cheapest two systems to give up while shrinking what the licence covers.
+ * `hung` stays because it answers the Marvin double-hung gap and now comes
+ * from geometry we own.
+ *
+ * Adding a tab is a product claim, not a rendering decision. Promote one only
+ * once the client confirms they fabricate it.
  */
 export const CATALOGUE_SYSTEM: SystemType[] = [
   "casement",
@@ -81,9 +85,7 @@ export const CATALOGUE_SYSTEM: SystemType[] = [
   "louvre",
   "louvre-wide",
   "hung",
-  "pivot",
   "fixed",
-  "revolving",
   "sliding-door",
   "lift-slide",
   "multislide",
@@ -212,45 +214,41 @@ export interface SystemConfig {
 export const SYSTEMS: Record<SystemType, SystemConfig> = {
   casement: {
     label: "Casement",
-    visibleRoot: ["casement_frame", "casement_panelL", "casement_panelR"],
-    center: [-0.8085, 1.9846, -0.0186],
-    scale: 1.4428,
-    openTime: 1.93,
+    visibleRoot: ["casement"],
+    model: MODEL_SYSTEM("casement"),
+    center: [0, 0.7122, -0.0145],
+    scale: 0.9583,
+    openTime: 2,
     openLabel: "Open window",
     closeLabel: "Close window",
   },
   "casement-2lite": {
     label: "Casement · 2-lite",
-    visibleRoot: [
-      "casement_bridged_frame",
-      "casement_bridged_panelL",
-      "casement_bridged_panelR",
-    ],
-    center: [-1.6964, 1.9846, -0.0186],
-    scale: 1.4428,
-    openTime: 1.97,
+    visibleRoot: ["casement-2lite"],
+    model: MODEL_SYSTEM("casement-2lite"),
+    center: [0, 0.7122, -0.0145],
+    scale: 0.8344,
+    openTime: 2,
     openLabel: "Open window",
     closeLabel: "Close window",
   },
   awning: {
     label: "Awning",
-    visibleRoot: ["awning_frame", "awning_armature"],
-    center: [0.2185, 1.7424, -0.0111],
-    scale: 1.4428,
+    visibleRoot: ["awning"],
+    model: MODEL_SYSTEM("awning"),
+    center: [0, 0.3622, -0.008],
+    scale: 1.3204,
     openTime: 2,
     openLabel: "Open awning",
     closeLabel: "Close awning",
   },
   sliding: {
     label: "Sliding",
-    visibleRoot: [
-      "sliding_horizontal_frame",
-      "sliding_horizontal_windowL",
-      "sliding_horizontal_windowR",
-    ],
-    center: [-1.42, 3.0908, -0.037],
-    scale: 1.4754,
-    openTime: 1.87,
+    visibleRoot: ["sliding"],
+    model: MODEL_SYSTEM("sliding"),
+    center: [0, 0.62, 0.0037],
+    scale: 0.9045,
+    openTime: 2,
     openLabel: "Slide open",
     closeLabel: "Slide closed",
   },
@@ -272,8 +270,9 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
   fixed: {
     label: "Fixed",
     visibleRoot: ["fixed"],
-    center: [-1.7443, 0.7829, -0.0289],
-    scale: 1.4754,
+    model: MODEL_SYSTEM("fixed"),
+    center: [0, 0.9145, -0.0102],
+    scale: 0.7485,
     // Fixed glazing does not open. The model has no animated channels here.
     openTime: 0,
     openLabel: "",
@@ -282,10 +281,11 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
   },
   "slide-and-fold": {
     label: "Slide & Fold",
-    visibleRoot: ["holding_frame", "holding_panels"],
-    center: [1.3259, 2.0633, -0.0656],
-    scale: 1.278,
-    openTime: 1.97,
+    visibleRoot: ["slide-and-fold"],
+    model: MODEL_SYSTEM("slide-and-fold"),
+    center: [0, 1.21, 0],
+    scale: 0.3759,
+    openTime: 2,
     openLabel: "Fold open",
     closeLabel: "Fold closed",
   },
@@ -312,14 +312,11 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
 
   hung: {
     label: "Hung",
-    visibleRoot: [
-      "sliding_vertical_frame",
-      "sliding_vertical_windowT",
-      "sliding_vertical_windowB",
-    ],
-    center: [-1.4099, 4.2054, -0.0452],
-    scale: 1.4754,
-    openTime: 1.83,
+    visibleRoot: ["hung"],
+    model: MODEL_SYSTEM("hung"),
+    center: [0, 0.77, 0.0015],
+    scale: 0.9045,
+    openTime: 2,
     openLabel: "Raise sash",
     closeLabel: "Lower sash",
   },
@@ -348,9 +345,10 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
      name the base system plus the option. */
   "fixed-lattice": {
     label: "Fixed · grille",
-    visibleRoot: ["fixed_lattice"],
-    center: [-0.9737, 0.787, -0.0289],
-    scale: 1.4754,
+    visibleRoot: ["fixed-lattice"],
+    model: MODEL_SYSTEM("fixed-lattice"),
+    center: [0, 0.9145, -0.0102],
+    scale: 0.7485,
     openTime: 0,
     openLabel: "",
     closeLabel: "",

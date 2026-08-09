@@ -157,16 +157,24 @@ describe("Window3D system config", () => {
     }
   });
 
-  it("the model really does contain the prefix collision that forces exact matching", () => {
-    // Not a hypothetical. "fixed" is the plain lite and "fixed_lattice" is its
-    // grille twin, owned by a different system — so had visibility matched on
-    // startsWith, selecting Fixed would have shown both at once. This asserts
-    // the trap still exists, so the exact-matching requirement below keeps its
-    // reason for being.
-    const exactName = systemId.flatMap((id) => SYSTEMS[id].visibleRoot);
-    expect(exactName).toContain("fixed");
-    expect(exactName).toContain("fixed_lattice");
-    expect(SYSTEMS.fixed.visibleRoot).toEqual(["fixed"]);
+  it("no two systems sharing a model claim the same node", () => {
+    // Visibility is matched by node name within whichever file is loaded, so a
+    // collision only matters between systems in the SAME model. Across files
+    // it is harmless — several baked GLBs would otherwise be barred from
+    // reusing a sensible name.
+    const byModel = new Map<string, Map<string, string>>();
+    for (const id of systemId) {
+      const model = SYSTEMS[id].model ?? "licensed";
+      const owner = byModel.get(model) ?? new Map<string, string>();
+      byModel.set(model, owner);
+      for (const name of SYSTEMS[id].visibleRoot) {
+        expect(
+          owner.has(name),
+          `"${name}" claimed by ${owner.get(name)} and ${id} in ${model}`,
+        ).toBe(false);
+        owner.set(name, id);
+      }
+    }
   });
 
   it("no prefix escape hatch can reach another system's nodes", () => {
@@ -204,12 +212,23 @@ describe("catalogue exposure", () => {
     }
   });
 
-  it("exposes every plain system in the model", () => {
-    // "Build all" — the rail now offers all twelve non-grille systems. If a
-    // client answer removes one, this is the test that has to change with it,
-    // which is the point: dropping a tab should be a deliberate edit.
+  it("exposes every plain system except the two deliberately withheld", () => {
     const plain = systemId.filter((id) => !SYSTEMS[id].grilleOf);
-    expect([...CATALOGUE_SYSTEM].sort()).toEqual([...plain].sort());
+    const withheld: SystemType[] = ["pivot", "revolving"];
+    expect([...CATALOGUE_SYSTEM].sort()).toEqual(
+      plain.filter((id) => !withheld.includes(id)).sort(),
+    );
+  });
+
+  it("keeps pivot and revolving configured but unlisted", () => {
+    // Both exist only in the licensed model and neither is a confirmed
+    // FourlinQ product — a revolving door is not a uPVC window at all — so
+    // they are the cheapest systems to give up while shrinking the licence's
+    // footprint. Still configured, so promoting one is a one-line edit.
+    for (const id of ["pivot", "revolving"] as SystemType[]) {
+      expect(SYSTEMS[id], `${id} should stay configured`).toBeDefined();
+      expect(CATALOGUE_SYSTEM, `${id} must not be exposed`).not.toContain(id);
+    }
   });
 
   it("never puts a grille variant in the tab rail", () => {
@@ -383,11 +402,66 @@ describe("parity with scripts/probe-window-glb.mjs", () => {
     }
   });
 
-  it("leaves no top-level node in the model unclaimed", () => {
-    // Every assembly in the licensed file is now wired to a system. A future
-    // model drop that adds geometry should fail here rather than ship art
-    // nobody can reach.
-    expect(probe().unclaimed).toEqual([]);
+  it("the only unclaimed licensed nodes are the ones we replaced with our own", () => {
+    // Eight systems moved off the licensed model onto GLBs FourlinQ owns, so
+    // their assemblies are still in that file but nothing points at them any
+    // more. That is the goal, not a leak — but it must stay an exact list, so
+    // a future model drop that adds unreachable art still fails here.
+    expect([...probe().unclaimed].sort()).toEqual([
+      "awning_armature",
+      "awning_frame",
+      "casement_bridged_frame",
+      "casement_bridged_panelL",
+      "casement_bridged_panelR",
+      "casement_frame",
+      "casement_panelL",
+      "casement_panelR",
+      "fixed",
+      "fixed_lattice",
+      "holding_frame",
+      "holding_panels",
+      "sliding_horizontal_frame",
+      "sliding_horizontal_windowL",
+      "sliding_horizontal_windowR",
+      "sliding_vertical_frame",
+      "sliding_vertical_windowB",
+      "sliding_vertical_windowT",
+    ]);
+  });
+
+  it("counts how much of the site still depends on the licensed model", () => {
+    // The attribution and the fourlinq.ph-only restriction come from this
+    // file. Every system moved off it is progress toward dropping both, so
+    // this states the remaining debt out loud rather than leaving it implicit.
+    const licensed = systemId.filter((id) => !SYSTEMS[id].model);
+    expect([...licensed].sort()).toEqual([
+      "awning-lattice",
+      "hung-lattice",
+      "louvre",
+      "louvre-wide",
+      "pivot",
+      "pivot-lattice",
+      "revolving",
+      "sliding-4panel",
+      "sliding-lattice",
+    ]);
+
+    // Of those, only these are actually reachable in the UI. Louvre is the
+    // blocker: a shipped product with no builder.
+    // Reachable = a tab, or a grille whose base system has a tab. A grille of
+    // a withheld system (pivot-lattice) can never be shown.
+    const reachable = licensed.filter((id) => {
+      const base = SYSTEMS[id].grilleOf;
+      return base ? CATALOGUE_SYSTEM.includes(base) : CATALOGUE_SYSTEM.includes(id);
+    });
+    expect([...reachable].sort()).toEqual([
+      "awning-lattice",
+      "hung-lattice",
+      "louvre",
+      "louvre-wide",
+      "sliding-4panel",
+      "sliding-lattice",
+    ]);
   });
 
   it("the licensed model's systems are exactly those SYSTEM_ROOT describes", () => {
