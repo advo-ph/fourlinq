@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { panelLayoutForFamily, SLIDING_DOOR_FAMILY } from "@/data/configurator";
 import { Link, useSearchParams } from "react-router-dom";
 import { Loader2, CheckCircle, X } from "lucide-react";
 import WindowPreview from "@/components/configurator/WindowPreview";
+import { SYSTEM_FOR_PRODUCT_TYPE } from "@/components/3d/window-system";
 import FinishSwatch from "@/components/shared/FinishSwatch";
 import { trackConfigChange } from "@/hooks/useAnalytics";
 import {
@@ -16,6 +17,13 @@ import {
   SpecialShapesIcon, LargePanelIcon, NinetySeriesIcon,
   ArchIcon, CurtainWallIcon, CustomShapesIcon,
 } from "@/components/icons/WindowIcons";
+
+/**
+ * The 3D viewer drags in three + @react-three/fiber + drei. Load it only when a
+ * visitor actually switches to 3D, so the Design Tool's first paint is
+ * unaffected for the majority of types that have no model.
+ */
+const Window3D = lazy(() => import("@/components/3d/Window3D"));
 
 const iconMap: Record<string, React.FC<{ className?: string; size?: number; strokeWidth?: number }>> = {
   casement: CasementIcon,
@@ -181,6 +189,11 @@ const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
 
   const slidingDoorLayout = panelLayoutForFamily(SLIDING_DOOR_FAMILY);
   const showPanelLayout = config.type === SLIDING_DOOR_FAMILY;
+
+  // undefined when the licensed model has nothing that honestly depicts this
+  // type, which is the majority of them — those keep the SVG drawing.
+  const model3dSystem = SYSTEM_FOR_PRODUCT_TYPE[config.type];
+  const [previewMode, setPreviewMode] = useState<"2d" | "3d">("2d");
 
   // Switching material re-scopes the finish set, so snap the finish to the first
   // valid one for the new material, otherwise a uPVC finish id would linger on
@@ -429,17 +442,58 @@ const DesignTool = ({ embedded = false }: { embedded?: boolean }) => {
             </div>
 
             <div className="bg-card rounded-xl border border-border p-5 sm:p-8 min-w-0 flex flex-col items-center justify-center">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/50 mb-6">Live Preview</h3>
-              <WindowPreview
-                type={config.type}
-                frameColor={selectedFinish.color}
-                finishId={config.finish}
-                glassTint={glassVisual.tint}
-                glassOpacity={glassVisual.opacity}
-                width={config.width}
-                height={config.height}
-                panelLayoutId={showPanelLayout ? config.panelLayoutId : undefined}
-              />
+              <div className="w-full flex items-center justify-between gap-4 mb-6">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-primary/50">Live Preview</h3>
+                {/* Only offered where the licensed model genuinely depicts this
+                    type — see SYSTEM_FOR_PRODUCT_TYPE. Types without a model
+                    show no toggle at all rather than a disabled one. */}
+                {model3dSystem && (
+                  <div className="flex items-center gap-1 rounded-lg bg-muted p-1" role="group" aria-label="Preview mode">
+                    {(["2d", "3d"] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setPreviewMode(mode)}
+                        aria-pressed={previewMode === mode}
+                        className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider rounded-md transition-colors ${
+                          previewMode === mode
+                            ? "bg-card text-primary shadow-sm"
+                            : "text-primary/50 hover:text-primary"
+                        }`}
+                      >
+                        {mode === "2d" ? "Drawing" : "3D"}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {model3dSystem && previewMode === "3d" ? (
+                <Suspense
+                  fallback={
+                    <div className="w-full aspect-[4/5] flex items-center justify-center text-primary/40">
+                      <Loader2 className="animate-spin" size={28} />
+                      <span className="sr-only">Loading 3D model</span>
+                    </div>
+                  }
+                >
+                  <Window3D
+                    className="w-full"
+                    initialSystem={model3dSystem}
+                    initialFinishId={config.finish}
+                  />
+                </Suspense>
+              ) : (
+                <WindowPreview
+                  type={config.type}
+                  frameColor={selectedFinish.color}
+                  finishId={config.finish}
+                  glassTint={glassVisual.tint}
+                  glassOpacity={glassVisual.opacity}
+                  width={config.width}
+                  height={config.height}
+                  panelLayoutId={showPanelLayout ? config.panelLayoutId : undefined}
+                />
+              )}
               <div className="mt-8 w-full border-t border-border pt-6 space-y-2">
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Type</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedType.name}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-[color:var(--ink-muted)]">Material</span><span className="text-[color:var(--ink-primary)] font-medium">{selectedMaterial.name}</span></div>

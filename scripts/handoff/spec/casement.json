@@ -1,0 +1,6 @@
+{
+  "id": "casement",
+  "motion": "hinge_outswing_vertical",
+  "max_angle_deg": 70,
+  "handing": "LH"
+}

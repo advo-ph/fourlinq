@@ -1,0 +1,5 @@
+{
+  "id": "sliding",
+  "motion": "translate_x",
+  "open_ratio": 0.45
+}

@@ -32,7 +32,10 @@
     "start": "NODE_ENV=production node --import tsx server/index.ts",
     "deploy": "./deploy.sh",
     "deploy:status": "ssh advo \"cat /opt/fourlinq/deployed-from.txt\"",
-    "deploy:log": "ssh advo \"tail -50 /var/log/fourlinq-auto-deploy.log 2>/dev/null || echo (auto-deploy not enabled — see scripts/vps-auto-deploy.sh)\""
+    "deploy:log": "ssh advo \"tail -50 /var/log/fourlinq-auto-deploy.log 2>/dev/null || echo (auto-deploy not enabled — see scripts/vps-auto-deploy.sh)\"",
+    "probe:glb": "node scripts/probe-window-glb.mjs",
+    "handoff:export": "node scripts/handoff/export-glb.mjs",
+    "handoff:verify": "node scripts/handoff/verify-glb.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

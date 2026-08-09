@@ -1,5 +1,27 @@
 # Third-party Asset Licenses
 
+## Own work — no third-party terms
+
+### `public/models/system/*.glb` (12 files)
+
+Baked by `npm run handoff:export` from the procedural three.js builders in
+[scripts/handoff/model/](../scripts/handoff/model/), which came out of a Claude
+Design handoff commissioned for FourlinQ on 2026-08-08. **FourlinQ owns this
+geometry outright** — no attribution requirement, no non-commercial clause, no
+domain restriction, unlike the licensed model below. The builders are committed
+so the GLBs stay reproducible rather than being binary drops.
+
+Covers sliding, lift-slide and multislide doors, casement/french/90-series
+swing doors, curtain wall, arch and triangle special shapes, and bay/bow/corner
+combinations — the systems the licensed model has no art for.
+
+> **The reference images that came with that handoff are not in this repo, and
+> must not be.** The bundle shipped ~130 Marvin product photographs used as
+> modelling reference while the geometry was authored. Looking at a competitor's
+> photo to model your own profile is ordinary practice; publishing their
+> photography as FourlinQ's product imagery is not. Only `*-model.js` and the
+> JSON specs were copied in. If the bundle is re-imported, keep `uploads/` out.
+
 ## 3D Models
 
 ### `public/models/animated-window-systems.glb`
@@ -9,8 +31,29 @@
 - **Source URL:** https://sketchfab.com/3d-models/animated-window-systems-ffa9e879cdd04c3ba49d894f2f2ef5d3
 - **Original license:** CC Attribution-NonCommercial 4.0 (CC-BY-NC)
 - **Use on this site:** Commercial — granted by author on **2026-05-22** via Sketchfab DM, specifically for use on fourlinq.ph and its preview deployments.
-- **Attribution rendered:** "3D model by makinwhat" with linked Sketchfab profile, shown in the top-right corner of the [CasementWindow3D component](../src/components/3d/CasementWindow3D.tsx) on every page that displays the model.
-- **Used only the casement subtree** from the original 10-window-type model. All other window types (jalousie, sliding, awning, pivoting, fixed, holding, revolving, etc.) are hidden at render time but remain in the GLB binary. The model file is unmodified from the original Sketchfab download.
+- **Attribution rendered:** "3D model by makinwhat" with linked Sketchfab profile, shown beneath the viewer in the [Window3D component](../src/components/3d/Window3D.tsx) on every page that displays the model.
+- **Subtrees used (updated 2026-08-09, second pass):** **six**, down from seventeen. Eight assemblies were replaced by GLBs FourlinQ owns (see the section above), and `pivot` + `revolving` were withdrawn from the tab rail. What still renders from this file:
+
+  | Still licensed | Why it cannot be replaced yet |
+  | --- | --- |
+  | `louvre`, `louvre-wide` | no builder exists — **and this is a shipped FourlinQ product** |
+  | `sliding-4panel` | `slider-model.js` is 2-panel only |
+  | `sliding-lattice`, `hung-lattice`, `awning-lattice` | only `fixed`'s grille has a builder option |
+
+  `pivot`, `pivot-lattice` and `revolving` stay configured but unreachable, so they render nowhere. The model file is unmodified from the original Sketchfab download, and a test asserts this exact list — the count can only go down deliberately.
+
+- **Path to dropping this dependency entirely:** one louvre builder, a panel-count option on `slider-model.js`, and grille options on the sliding / hung / awning builders. At that point neither the attribution nor the fourlinq.ph-only restriction applies to anything on the site — though the credit should stay in the changelog as historical record.
+
+  The 2026-05-22 grant covers commercial use of *the model* on fourlinq.ph, not a
+  single subtree, so displaying all of it stays inside the grant. Two limits
+  still bite: the grant names **fourlinq.ph and its preview deployments only**,
+  so any other domain or a client's own site needs a fresh permission; and the
+  attribution must remain rendered wherever the model shows. Run
+  `npm run probe:glb` to see every assembly in the binary.
+
+  Separate from the licence: showing a system is a **product claim**. Hung,
+  pivot and revolving are exposed without the client having confirmed FourlinQ
+  fabricates them — see the note in `window-system.ts`.
 
 **If the model is ever replaced** with our own commissioned 3D work or manufacturer CAD files (§15.2 of REDESIGN_ROADMAP), the attribution should remain on the project changelog as historical credit, even after the asset is no longer in use.
 
