@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import {
   CATALOGUE_SYSTEM,
   GRILLE_VARIANT,
+  MODEL_LICENSED,
   SYSTEMS,
   type SystemType,
 } from "./window-system";
@@ -30,8 +31,12 @@ export type { SystemType };
  * fourlinq.ph (see docs/LICENSES.md).
  */
 
-const MODEL_URL = "/models/animated-window-systems.glb";
-useGLTF.preload(MODEL_URL);
+/**
+ * Only the licensed multi-system file is preloaded. The baked per-system files
+ * are fetched on demand by useGLTF when their tab is opened — preloading all
+ * twelve would pull 2.7 MB nobody asked for.
+ */
+useGLTF.preload(MODEL_LICENSED);
 
 /**
  * Materials that take the frame finish. `parts`/`parts2` are hardware and
@@ -59,7 +64,10 @@ interface WindowModelProps {
 function WindowModel({ finish, isOpen, systemType }: WindowModelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const innerRef = useRef<THREE.Group>(null);
-  const { scene, animations } = useGLTF(MODEL_URL);
+  // Systems live in one of two places: the licensed file that packs seventeen
+  // assemblies, or a per-system baked file. useGLTF caches per URL, so
+  // switching between tabs that share a file costs nothing.
+  const { scene, animations } = useGLTF(SYSTEMS[systemType].model ?? MODEL_LICENSED);
 
   // Fresh clone per system — avoids cross-pollution of material overrides.
   const sceneClone = useMemo(() => scene.clone(true), [scene]);
@@ -406,7 +414,7 @@ const Window3D = ({
             className="absolute bottom-4 right-4 px-3 py-2 backdrop-blur-sm text-[11px] uppercase tracking-[0.08em] text-[color:var(--ink-muted)]"
             style={{ backgroundColor: "color-mix(in srgb, var(--canvas) 85%, transparent)" }}
           >
-            Fixed — does not open
+            {config.staticNote}
           </p>
         )}
 

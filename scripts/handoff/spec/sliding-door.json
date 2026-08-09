@@ -1,0 +1,6 @@
+{
+  "id": "sliding-door",
+  "motion": "translate_x",
+  "open_ratio": 0.5,
+  "panel_count": 2
+}

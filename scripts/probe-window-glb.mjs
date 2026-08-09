@@ -40,7 +40,7 @@
  *   node scripts/probe-window-glb.mjs --json      # machine-readable
  *   node scripts/probe-window-glb.mjs --unclaimed # list top nodes no group owns
  */
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
@@ -211,21 +211,26 @@ function readAccessor(json, bin, index) {
  * each system actually carries — rather than against a hand-copied fixture.
  * Importing this module for SYSTEM_ROOT alone reads nothing and prints nothing.
  */
-export function probe() {
+export function probeModel(modelPath, groupSpec) {
 
 
-const { json, bin } = readGlb(MODEL_PATH);
+const { json, bin } = readGlb(modelPath);
 const node = json.nodes ?? [];
 const mesh = json.meshes ?? [];
 const material = json.materials ?? [];
 
+// The licensed model wraps everything in a "RootNode" (an FBX import artefact)
+// and each system is one of its children. The handoff exports have no such
+// wrapper — the scene's own nodes are the top level, and each file holds
+// exactly one system. Both shapes reduce to "a list of top-level node names".
 const rootNode = node.find((n) => n.name === "RootNode");
-if (!rootNode) throw new Error("expected a node named RootNode");
-const topName = (rootNode.children ?? []).map((i) => node[i].name ?? "");
+const sceneNode = json.scenes?.[json.scene ?? 0]?.nodes ?? [];
+const topIndex = rootNode ? (rootNode.children ?? []) : sceneNode;
+const topName = topIndex.map((i) => node[i].name ?? "");
 
 // Expand the generated groups, then assert every group name is a real top node.
 const group = {};
-for (const [id, spec] of Object.entries(SYSTEM_ROOT)) {
+for (const [id, spec] of Object.entries(groupSpec)) {
   group[id] = typeof spec === "string" && spec.startsWith("@")
     ? topName.filter((n) => n.startsWith(spec.slice(1)))
     : spec;
@@ -236,7 +241,7 @@ const problem = [];
 for (const [id, names] of Object.entries(group)) {
   if (!names.length) problem.push(`group "${id}" matched no top-level node`);
   for (const name of names) {
-    if (!topName.includes(name)) problem.push(`group "${id}" names "${name}", which is not a child of RootNode`);
+    if (!topName.includes(name)) problem.push(`group "${id}" names "${name}", which is not a top-level node`);
     if (owner.has(name)) problem.push(`"${name}" claimed by both "${owner.get(name)}" and "${id}"`);
     owner.set(name, id);
   }
@@ -291,12 +296,15 @@ const animation = json.animations?.[0];
 if (animation && bin) {
   // node index -> owning group, resolved through ancestry.
   const groupOfNode = new Map();
-  (function assign(index, ownedBy) {
+  const assign = (index, ownedBy) => {
     const n = node[index];
     const key = ownedBy ?? owner.get(n.name ?? "") ?? null;
     if (key) groupOfNode.set(index, key);
     for (const c of n.children ?? []) assign(c, key);
-  })(node.indexOf(rootNode), null);
+  };
+  // Walk from the wrapper when there is one, otherwise from each scene root.
+  if (rootNode) assign(node.indexOf(rootNode), null);
+  else for (const index of sceneNode) assign(index, null);
 
   for (const channel of animation.channels ?? []) {
     const target = channel.target?.node;
@@ -344,7 +352,7 @@ for (const id of Object.keys(group)) {
 }
 
 return {
-  model: MODEL_PATH,
+  model: modelPath,
   report,
   problem,
   materialName: material.map((m) => m.name ?? "").sort(),
@@ -358,10 +366,60 @@ return {
 
 }
 
+/* ─── Aggregate across every model the viewer can load ─── */
+
+/** Directory of the per-system GLBs baked by scripts/handoff/export-glb.mjs. */
+const HANDOFF_DIR = resolve(here, "..", "public", "models", "system");
+
+/**
+ * Measure the licensed multi-system model and every baked per-system file, and
+ * merge them into one report keyed by system id.
+ *
+ * Two shapes, one output. The licensed GLB packs seventeen assemblies into one
+ * file and needs SYSTEM_ROOT to say which nodes belong to which system; a baked
+ * file holds exactly one system, so its group spec is just "everything at the
+ * top level". Callers — the CLI and src/test/window-3d.test.ts — do not care
+ * which file a system came from, only that its numbers are measured.
+ */
+export function probe() {
+  const base = probeModel(MODEL_PATH, SYSTEM_ROOT);
+  const report = { ...base.report };
+  const problem = [...base.problem];
+  const materialName = new Set(base.materialName);
+  const source = Object.fromEntries(Object.keys(base.report).map((id) => [id, MODEL_PATH]));
+
+  for (const file of readdirSync(HANDOFF_DIR, { withFileTypes: true })) {
+    if (!file.isFile() || !file.name.endsWith(".glb")) continue;
+    const id = file.name.replace(/\.glb$/, "");
+    const path = resolve(HANDOFF_DIR, file.name);
+
+    // Whole file = one system, so claim every top-level node it has.
+    const { json } = readGlb(path);
+    const top = (json.scenes?.[json.scene ?? 0]?.nodes ?? []).map((i) => json.nodes[i].name ?? "");
+    const one = probeModel(path, { [id]: top });
+
+    if (report[id]) problem.push(`system "${id}" is defined by two models`);
+    report[id] = one.report[id];
+    problem.push(...one.problem);
+    for (const m of one.materialName) materialName.add(m);
+    source[id] = path;
+  }
+
+  return {
+    model: MODEL_PATH,
+    report,
+    problem,
+    source,
+    materialName: [...materialName].sort(),
+    unclaimed: base.unclaimed,
+    stat: base.stat,
+  };
+}
+
 /* ─── CLI ─── */
 
 function main() {
-const { model, report, problem, materialName, unclaimed, stat } = probe();
+const { model, report, problem, materialName, unclaimed, stat, source } = probe();
 
 if (process.argv.includes("--json")) {
   console.log(JSON.stringify({ model, report, problem, materialName, unclaimed }, null, 2));

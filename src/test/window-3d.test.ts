@@ -76,11 +76,15 @@ describe("Window3D system config", () => {
   });
 
   it("scales are plausible frame-fitting factors", () => {
-    // Systems are ~0.4-1.2 units tall and must fill ~1.36 units of frame, so
-    // every factor lands near 1. The original 0.0014 was ~1000x too small.
+    // Windows land near 1: ~0.4-1.2 units tall, fitted to ~1.36 of frame.
+    // Doors and curtain walls legitimately go lower — a 9.6 m three-storey
+    // curtain wall fits at 0.14 — so the floor here is loose. It still
+    // separates a real factor from the original 0.0014, which was ~1000x out
+    // because the numbers were in the wrong space entirely. The exact value is
+    // checked against the model in the parity suite below.
     for (const id of systemId) {
       const { scale } = SYSTEMS[id];
-      expect(scale, `${id} scale`).toBeGreaterThan(0.5);
+      expect(scale, `${id} scale`).toBeGreaterThan(0.05);
       expect(scale, `${id} scale`).toBeLessThan(5);
     }
   });
@@ -102,12 +106,36 @@ describe("Window3D system config", () => {
     expect(SYSTEMS.revolving.openTime).toBe(CLIP_SECONDS);
   });
 
-  it("fixed glazing is the only non-operable family, and carries no action labels", () => {
+  it("non-operable systems carry no action labels, and say why", () => {
     const nonOperable = systemId.filter((id) => SYSTEMS[id].openTime === 0);
-    expect([...nonOperable].sort()).toEqual(["fixed", "fixed-lattice"]);
+    expect([...nonOperable].sort()).toEqual([
+      "combination-bay",
+      "combination-bow",
+      "combination-corner",
+      "fixed",
+      "fixed-lattice",
+      "special-arch",
+      "special-triangle",
+    ]);
     for (const id of nonOperable) {
-      expect(SYSTEMS[id].openLabel).toBe("");
-      expect(SYSTEMS[id].closeLabel).toBe("");
+      expect(SYSTEMS[id].openLabel, `${id} openLabel`).toBe("");
+      expect(SYSTEMS[id].closeLabel, `${id} closeLabel`).toBe("");
+      expect(SYSTEMS[id].staticNote?.length, `${id} needs a static note`).toBeGreaterThan(0);
+    }
+  });
+
+  it("only truly fixed glazing claims it does not open", () => {
+    // A bay window's flanking casements DO open in reality — our model just
+    // does not animate them. Saying "Fixed — does not open" over a bay is a
+    // false product claim, so the combination assemblies say something else.
+    for (const id of ["fixed", "fixed-lattice"] as SystemType[]) {
+      expect(SYSTEMS[id].staticNote).toMatch(/does not open/i);
+    }
+    for (const id of systemId) {
+      if (!id.startsWith("combination-")) continue;
+      expect(SYSTEMS[id].staticNote, `${id} must not claim it cannot open`).not.toMatch(
+        /does not open/i,
+      );
     }
   });
 
@@ -255,10 +283,28 @@ describe("configurator product type mapping", () => {
 
   it("never maps a type to a merely similar system", () => {
     // A wrong model reads as authoritative, which is worse than a schematic.
-    // tilt-turn is not a pivot window; a sliding door is not a window sash.
-    expect(SYSTEM_FOR_PRODUCT_TYPE["tilt-turn"]).toBeUndefined();
-    expect(SYSTEM_FOR_PRODUCT_TYPE["sliding-door"]).toBeUndefined();
-    expect(SYSTEM_FOR_PRODUCT_TYPE["lift-slide"]).toBeUndefined();
+    expect(SYSTEM_FOR_PRODUCT_TYPE["tilt-turn"], "no tilt-turn art exists").toBeUndefined();
+
+    // "French Sliding Door" is the product; the baked french-door model is a
+    // hinged pair from buildSwingDoor. Right name, wrong mechanism.
+    expect(SYSTEM_FOR_PRODUCT_TYPE["french-door"]).toBeUndefined();
+
+    // Catch-all types: any single model claims a geometry the customer did
+    // not choose.
+    expect(SYSTEM_FOR_PRODUCT_TYPE["special-shapes"]).toBeUndefined();
+    expect(SYSTEM_FOR_PRODUCT_TYPE["custom-shapes"]).toBeUndefined();
+  });
+
+  it("maps the door and curtain-wall types the baked models genuinely depict", () => {
+    // These fell back to a flat SVG before the handoff builders were baked.
+    expect(SYSTEM_FOR_PRODUCT_TYPE["sliding-door"]).toBe("sliding-door");
+    expect(SYSTEM_FOR_PRODUCT_TYPE["lift-slide"]).toBe("lift-slide");
+    expect(SYSTEM_FOR_PRODUCT_TYPE["large-panel-doors"]).toBe("multislide");
+    expect(SYSTEM_FOR_PRODUCT_TYPE["90-series"]).toBe("ninety-series");
+    expect(SYSTEM_FOR_PRODUCT_TYPE["curtain-wall"]).toBe("curtain-wall");
+    expect(SYSTEM_FOR_PRODUCT_TYPE["arch-shapes"]).toBe("special-arch");
+    // `entrance` is labelled "Casement Door" in the configurator.
+    expect(SYSTEM_FOR_PRODUCT_TYPE["entrance"]).toBe("casement-door");
   });
 
   it("every mapped system is one the tab rail also offers", () => {
@@ -274,17 +320,16 @@ describe("frame finish reaches every system", () => {
   // nothing noticed. These read the binary so the same class of miss fails.
   const { report, materialName } = probe();
 
-  it("the model's material set is exactly the six the viewer knows about", () => {
-    // A re-export that adds `frame4` must fail here rather than ship a part
-    // the finish picker silently cannot recolour.
-    expect(materialName).toEqual([
-      "frame1",
-      "frame2",
-      "frame3",
-      "glass",
-      "parts",
-      "parts2",
-    ]);
+  it("every frame slot in every model is one the finish picker recolours", () => {
+    // The real invariant, and the one the original bug broke: a material named
+    // like a frame slot that FRAME_MATERIAL does not know about is a part the
+    // picker silently cannot recolour. Stated as a pattern rather than a fixed
+    // list so it still holds when a new model arrives.
+    const frameSlot = materialName.filter((m: string) => /^frame\d+$/.test(m));
+    expect(frameSlot.length, "no frame materials found — check the probe").toBeGreaterThan(0);
+    for (const slot of frameSlot) {
+      expect(FRAME_MATERIAL, `${slot} exists in a model but takes no finish`).toContain(slot);
+    }
   });
 
   it("every system carries at least one material the finish picker recolours", () => {
@@ -296,8 +341,11 @@ describe("frame finish reaches every system", () => {
     }
   });
 
-  it("uses no material outside the six, per system", () => {
-    const known = new Set([...FRAME_MATERIAL, "glass", "parts", "parts2"]);
+  it("uses no material the viewer has no policy for", () => {
+    // Everything not in FRAME_MATERIAL keeps its authored colour. That is
+    // correct for glazing, hardware and gaskets, and wrong for anything else,
+    // so an unrecognised name has to fail rather than quietly stay grey.
+    const known = new Set([...FRAME_MATERIAL, "glass", "parts", "parts2", "gasket"]);
     for (const id of systemId) {
       const used = (report as Record<string, { material: string[] } | null>)[id];
       for (const m of used?.material ?? []) {
@@ -342,8 +390,35 @@ describe("parity with scripts/probe-window-glb.mjs", () => {
     expect(probe().unclaimed).toEqual([]);
   });
 
-  it("both files describe the same set of systems", () => {
-    expect(Object.keys(SYSTEM_ROOT).sort()).toEqual([...systemId].sort());
+  it("the licensed model's systems are exactly those SYSTEM_ROOT describes", () => {
+    // SYSTEM_ROOT only covers the multi-assembly licensed file; baked systems
+    // each own their whole file and are discovered from disk instead.
+    const licensed = systemId.filter((id) => !SYSTEMS[id].model);
+    expect(Object.keys(SYSTEM_ROOT).sort()).toEqual([...licensed].sort());
+  });
+
+  it("every baked system points at a file that exists and holds it", () => {
+    const { source } = probe();
+    for (const id of systemId) {
+      const model = SYSTEMS[id].model;
+      if (!model) continue;
+      // `model` is a public/ URL; the probe reports the file it measured from.
+      expect(source[id], `${id} was not measured from any model`).toBeDefined();
+      expect(
+        source[id].replace(/\\/g, "/").endsWith(model),
+        `${id} declares ${model} but was measured from ${source[id]}`,
+      ).toBe(true);
+    }
+  });
+
+  it("a baked system shows its whole file", () => {
+    // Each baked GLB wraps everything in one node named for the system id, so
+    // visibleRoot is that id and the visibility pass has nothing to hide.
+    for (const id of systemId) {
+      if (!SYSTEMS[id].model) continue;
+      expect(SYSTEMS[id].visibleRoot, `${id} roots`).toEqual([id]);
+      expect(SYSTEMS[id].visibleRootPrefix).toBeUndefined();
+    }
   });
 
   it("each system's subtree list matches the probe's", () => {
@@ -351,8 +426,9 @@ describe("parity with scripts/probe-window-glb.mjs", () => {
     // whatever SYSTEMS says. If they drift, the pinned center and scale
     // silently describe a different set of meshes than the ones on screen.
     for (const id of systemId) {
-      const spec = (SYSTEM_ROOT as Record<string, string | string[]>)[id];
       const cfg = SYSTEMS[id];
+      if (cfg.model) continue; // baked systems own their file; covered above
+      const spec = (SYSTEM_ROOT as Record<string, string | string[]>)[id];
       if (typeof spec === "string") {
         expect(spec.startsWith("@"), `${id} probe spec must be a @prefix`).toBe(true);
         expect(cfg.visibleRootPrefix, `${id} prefix`).toEqual([spec.slice(1)]);

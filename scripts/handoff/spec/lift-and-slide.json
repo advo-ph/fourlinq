@@ -1,0 +1,42 @@
+{
+  "id": "lift-and-slide",
+  "motion": "lift_then_translate_x",
+  "lift_mm": 10,
+  "lift_phase": [
+    0,
+    0.2
+  ],
+  "slide_phase": [
+    0.2,
+    1
+  ],
+  "open_ratio": 0.5,
+  "panel_count": 2,
+  "sill": "flush",
+  "sill_options": [
+    "flush",
+    "recessed",
+    "flat",
+    "half"
+  ],
+  "clip": {
+    "name": "open",
+    "frames": 28,
+    "easing": "ease-in-out"
+  },
+  "meshes": [
+    "frame",
+    "sill",
+    "track",
+    "panel_fixed",
+    "panel_operable",
+    "glass_fixed",
+    "glass_operable",
+    "handle",
+    "handle_flush_pull",
+    "carriage_1",
+    "carriage_2",
+    "meeting_interlock"
+  ],
+  "units": "meters"
+}

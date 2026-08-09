@@ -1,5 +1,27 @@
 # Third-party Asset Licenses
 
+## Own work — no third-party terms
+
+### `public/models/system/*.glb` (12 files)
+
+Baked by `npm run handoff:export` from the procedural three.js builders in
+[scripts/handoff/model/](../scripts/handoff/model/), which came out of a Claude
+Design handoff commissioned for FourlinQ on 2026-08-08. **FourlinQ owns this
+geometry outright** — no attribution requirement, no non-commercial clause, no
+domain restriction, unlike the licensed model below. The builders are committed
+so the GLBs stay reproducible rather than being binary drops.
+
+Covers sliding, lift-slide and multislide doors, casement/french/90-series
+swing doors, curtain wall, arch and triangle special shapes, and bay/bow/corner
+combinations — the systems the licensed model has no art for.
+
+> **The reference images that came with that handoff are not in this repo, and
+> must not be.** The bundle shipped ~130 Marvin product photographs used as
+> modelling reference while the geometry was authored. Looking at a competitor's
+> photo to model your own profile is ordinary practice; publishing their
+> photography as FourlinQ's product imagery is not. Only `*-model.js` and the
+> JSON specs were copied in. If the bundle is re-imported, keep `uploads/` out.
+
 ## 3D Models
 
 ### `public/models/animated-window-systems.glb`

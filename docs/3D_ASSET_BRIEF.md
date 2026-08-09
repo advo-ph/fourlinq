@@ -1,17 +1,50 @@
-# 3D asset brief — the systems the licensed model does not cover
+# 3D asset brief — what still needs making
 
-Nine systems already animate in `Window3D` from the licensed makinwhat GLB
-(see [LICENSES.md](LICENSES.md)). This document briefs only what that model
-**cannot** supply, so nobody commissions art we already own.
+> **Updated 2026-08-09.** A Claude Design handoff supplied procedural builders
+> for twelve more systems, all now baked to GLB and live (`npm run
+> handoff:export`). That removed **corner** and **bay/bow** from this document's
+> commission list — they were already modelled. What remains below is genuinely
+> unmade.
+
+
+Twenty-nine systems animate or render in `Window3D`, from two sources: the
+licensed makinwhat GLB and twelve GLBs FourlinQ owns outright, baked from the
+handoff builders (see [LICENSES.md](LICENSES.md)). This document briefs only
+what neither supplies, so nobody commissions art we already have.
 
 Run `npm run probe:glb` before commissioning anything. If a system appears in
 that output, it needs wiring, not modelling.
 
 ## Already covered — do not commission
 
-Every assembly in the licensed binary is now wired — `npm run probe:glb --
+Every assembly in the licensed binary is wired — `npm run probe:glb --
 --unclaimed` reports **0 unclaimed top-level nodes**, and a test keeps it that
 way.
+
+### From the handoff builders — FourlinQ-owned
+
+| System | Answers configurator type | Status |
+| --- | --- | --- |
+| Sliding Door | `sliding-door` | animated |
+| Lift & Slide | `lift-slide` | animated |
+| Large Panel · multislide | `large-panel-doors` | animated, 4-panel |
+| Casement Door | `entrance` (labelled "Casement Door") | animated |
+| 90 Series | `90-series` | animated |
+| Curtain Wall | `curtain-wall` | animated vent insert |
+| Arch / Round-top | `arch-shapes` | non-operable |
+| Triangle Gable | — | non-operable |
+| French Door | **none — see below** | animated |
+| Bay · Bow · Corner | — | assembly view, casements not animated |
+
+**French Door is deliberately unmapped.** The configurator's `french-door` is
+"French *Sliding* Door"; the baked model is a hinged pair from
+`buildSwingDoor`. Right name, wrong mechanism, so it stays in the viewer's rail
+but must not stand in for that product. Asserted by test.
+
+`special-shapes` and `custom-shapes` stay unmapped too — they are catch-alls,
+and any single model claims a geometry the customer did not choose.
+
+### From the licensed makinwhat model
 
 | System | Status |
 | --- | --- |
@@ -74,6 +107,24 @@ needs component changes.
    `SYSTEM_ROOT` in the probe script. `src/test/window-3d.test.ts` fails if the
    two drift. **Never hand-tune the numbers** — that produced the 278× unit bug
    the probe script exists to prevent.
+
+### If the asset is a builder rather than a file
+
+A procedural three.js builder is the better delivery, and the pipeline already
+takes them. Export a `build*(opts)` returning `{ group, setOpen(t) }` where `t`
+runs 0 (closed) to 1 (open), drop it in `scripts/handoff/model/`, add an entry
+to the registry in `scripts/handoff/export-glb.mjs`, then:
+
+```
+npm run handoff:export    # bakes the clip and writes public/models/system/<id>.glb
+npm run handoff:verify    # fails if the clip exists but nothing actually moves
+npm run probe:glb         # measures center / scale / openTime
+```
+
+The bake samples `setOpen` and keeps only channels that move, so points 2 and 4
+above are handled for you — you do not author the clip, and node names only
+need to be unique within the file. Material names still matter: map them in
+`MATERIAL_AS`.
 
 ---
 
@@ -196,49 +247,19 @@ commissioning a whole window.
 > to the sash. A small square white wall switch plate beside the frame. [shared
 > constraints]
 
-### 5. Corner Window — no product id yet
+### 5. Corner, Bay and Bow — retired 2026-08-09
 
-A Marvin-catalogue gap. **Confirm FourlinQ fabricates these before
-commissioning** — a structural corner needs a specific mullion detail, and if
-they do not make it, this is wasted spend.
+**Do not commission.** These were briefed here as Marvin-catalogue gaps blocked
+on a client answer. The handoff builders already model all three
+(`combination_corner`, `combination_bay`, `combination_bow`), and they are
+live in the viewer. The remaining question is a product one — does FourlinQ
+fabricate them — not an art one.
 
-**3D brief**
-> Model a two-plane corner window meeting at 90°, each plane 1 200 mm ×
-> 1 400 mm. The defining feature is the corner joint: model a butt-glazed
-> post-free corner where the two glass planes meet directly, with a slim
-> concealed structural post behind. Each plane is one fixed lite over one
-> operable casement.
-> Nodes: `corner_frameL`, `corner_frameR`, `corner_post`, `corner_panelL`,
-> `corner_panelR`.
-> Animation: both `corner_panel*` rotate outward 60° between t=0 and t≈1.9 s.
-
-**Image prompt**
-> A corner window where two glazed planes meet at a right angle with no visible
-> corner post, glass butting directly to glass, in slim white uPVC frames. Each
-> plane has a fixed upper lite and a lower opening casement. Shown as a
-> free-standing corner unit. [shared constraints]
-
-### 6. Bay / Bow Window — no product id yet
-
-A Marvin-catalogue gap, and the most expensive to model — a multi-unit
-assembly with a roof, not a single window. **Confirm demand first.**
-
-**3D brief**
-> Model a three-facet bay window projecting 600 mm from a 2 400 mm wall
-> opening. Centre facet 1 200 mm fixed; two 30° angled flanking facets each
-> 600 mm, each an operable casement. Include the head board and a sloped lead-
-> finish roof over the projection, plus the seat board below. Bow variant: five
-> facets on a shallow arc, all equal width.
-> Nodes: `bay_frameC`, `bay_frameL`, `bay_frameR`, `bay_panelL`, `bay_panelR`,
-> `bay_roof`, `bay_seat`. Roof and seat `parts`.
-> Animation: `bay_panelL` and `bay_panelR` rotate outward 60° between t=0 and
-> t≈1.9 s.
-
-**Image prompt**
-> A three-panel bay window projecting outward from a flat wall, with a wide
-> fixed centre panel and two angled side casements, slim white uPVC frames, a
-> sloped grey metal roof over the projection and a wooden seat board beneath.
-> [shared constraints]
+One genuine limitation: the combination assemblies are static. A bay’s flanking
+lites are casements and do open; the model does not animate them, which is why
+the viewer says "Assembly view — casements not animated" rather than claiming
+the unit is fixed. Animating them is a change to
+`scripts/handoff/model/combination-model.js`, not a new commission.
 
 ---
 
@@ -247,8 +268,17 @@ assembly with a roof, not a single window. **Confirm demand first.**
 1. **Automated Windows** — actuator only, smallest asset, kills a live placeholder.
 2. **Glass Railing** and **SC-Door** — real products, live placeholders, self-contained.
 3. **Automated Door** — real product, live placeholder, more parts.
-4. **Corner**, then **Bay/Bow** — only after confirming FourlinQ fabricates them.
 
-Four of the six above are placeholder-replacement for products already on the
-site. The two Marvin gaps are the only ones that add a product, and both are
-blocked on a client answer, not on art.
+All four remaining items are placeholder-replacement for products already on
+the site. Nothing on this list adds a product, and nothing is blocked on a
+client answer — corner and bay/bow, which were, are now modelled.
+
+**Two things that are not commissions but are still open:**
+
+- **`tilt-turn` has no 3D anywhere** — not in the licensed model, not in the
+  handoff builders. It is a real configurator type, so it is the last honest
+  gap in the type list. A tilt-turn is a casement plus a bottom-hung tilt
+  position; `window-model.js` is the natural place to add it, which makes it a
+  builder change rather than an asset commission.
+- **Bay, bow and corner are static.** Their flanking lites are casements that
+  open in reality. Animating them is a change to `combination-model.js`.

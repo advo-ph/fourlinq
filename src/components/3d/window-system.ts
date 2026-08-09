@@ -27,7 +27,34 @@ export type SystemType =
   | "sliding-lattice"
   | "hung-lattice"
   | "awning-lattice"
-  | "pivot-lattice";
+  | "pivot-lattice"
+  // Baked from the Claude Design handoff builders — see MODEL_SYSTEM below.
+  | "sliding-door"
+  | "lift-slide"
+  | "multislide"
+  | "casement-door"
+  | "french-door"
+  | "ninety-series"
+  | "curtain-wall"
+  | "special-arch"
+  | "special-triangle"
+  | "combination-bay"
+  | "combination-bow"
+  | "combination-corner";
+
+/** The licensed makinwhat model: seventeen assemblies in one file. */
+export const MODEL_LICENSED = "/models/animated-window-systems.glb";
+
+/**
+ * Per-system models baked from `scripts/handoff/model/*.js` by
+ * `node scripts/handoff/export-glb.mjs`.
+ *
+ * Unlike the licensed file these are one system each, so a page downloads only
+ * what it shows — 2.7 MB across twelve files, none of it fetched unless that
+ * tab is opened. FourlinQ owns this geometry outright: no attribution, no
+ * domain restriction, unlike the licensed model.
+ */
+export const MODEL_SYSTEM = (id: SystemType) => `/models/system/${id}.glb`;
 
 /**
  * Systems offered in the viewer's tab rail, in display order.
@@ -57,6 +84,18 @@ export const CATALOGUE_SYSTEM: SystemType[] = [
   "pivot",
   "fixed",
   "revolving",
+  "sliding-door",
+  "lift-slide",
+  "multislide",
+  "casement-door",
+  "french-door",
+  "ninety-series",
+  "curtain-wall",
+  "special-arch",
+  "special-triangle",
+  "combination-bay",
+  "combination-bow",
+  "combination-corner",
 ];
 
 /**
@@ -74,6 +113,26 @@ export const SYSTEM_FOR_PRODUCT_TYPE: Record<string, SystemType> = {
   sliding: "sliding",
   fixed: "fixed",
   bifold: "slide-and-fold",
+  // From the baked handoff models. Each of these types previously fell back to
+  // a flat SVG because the licensed model has no door or curtain-wall art.
+  "sliding-door": "sliding-door",
+  "lift-slide": "lift-slide",
+  "large-panel-doors": "multislide",
+  "90-series": "ninety-series",
+  "curtain-wall": "curtain-wall",
+  "arch-shapes": "special-arch",
+  // `entrance` is labelled "Casement Door" in the configurator, so it is the
+  // hinged casement door, not a separate entry product.
+  entrance: "casement-door",
+
+  /* Deliberately unmapped, and each for a reason:
+     - `french-door` is "French SLIDING Door" here. The baked `french-door`
+       model is a hinged pair from buildSwingDoor — right name, wrong
+       mechanism. It stays available in the viewer's rail but must not stand
+       in for this product type.
+     - `special-shapes` and `custom-shapes` are catch-alls. Any single model
+       claims a specific geometry the customer did not choose.
+     - `tilt-turn` still has no honest match anywhere. */
 };
 
 export interface SystemConfig {
@@ -86,6 +145,14 @@ export interface SystemConfig {
    * matches "fixed_lattice", and "Jalousie_narrow_fin1" also matches "fin10".
    */
   visibleRoot: string[];
+  /**
+   * Which GLB this system lives in. Defaults to the licensed multi-system file.
+   *
+   * Baked systems each have their own file whose single top-level node is named
+   * for the system id, so their `visibleRoot` is just `[id]` — the visibility
+   * pass still runs, it simply has nothing to hide.
+   */
+  model?: string;
   /**
    * Prefix escape hatch, for systems whose parts are one top-level node each
    * (the louvre fins: 18 narrow, 9 wide). ONLY safe when no other top-level
@@ -117,6 +184,16 @@ export interface SystemConfig {
   /** Action labels; unused when openTime is 0. */
   openLabel: string;
   closeLabel: string;
+  /**
+   * Shown in place of the open/close control when `openTime` is 0.
+   *
+   * Not one shared string, because "Fixed — does not open" is a product claim.
+   * It is true of direct glazing and of a gable lite; it is false of a bay
+   * window, whose flanking casements do open in reality — our model just does
+   * not animate them. Saying otherwise over a bay would misdescribe the
+   * product to someone about to request a quote for it.
+   */
+  staticNote?: string;
   /**
    * Set on a grille variant only: the plain system it is a grille version of.
    *
@@ -201,6 +278,7 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     openTime: 0,
     openLabel: "",
     closeLabel: "",
+    staticNote: "Fixed — does not open",
   },
   "slide-and-fold": {
     label: "Slide & Fold",
@@ -276,6 +354,7 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     openTime: 0,
     openLabel: "",
     closeLabel: "",
+    staticNote: "Fixed — does not open",
     grilleOf: "fixed",
   },
   "sliding-lattice": {
@@ -329,6 +408,138 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Pivot open",
     closeLabel: "Pivot closed",
     grilleOf: "pivot",
+  },
+
+  /* ── Baked from the handoff builders ──
+     One file each, top-level node named for the system id. Every openTime is
+     2 s because the bake authors the clip: 0 → open at 2 s → closed at 4 s.
+     Numbers from `npm run probe:glb`, same as everything above. */
+  "sliding-door": {
+    label: "Sliding Door",
+    visibleRoot: ["sliding-door"],
+    model: MODEL_SYSTEM("sliding-door"),
+    center: [0, 1.212, 0.028],
+    scale: 0.5179,
+    openTime: 2,
+    openLabel: "Slide open",
+    closeLabel: "Slide closed",
+  },
+  "lift-slide": {
+    label: "Lift & Slide",
+    visibleRoot: ["lift-slide"],
+    model: MODEL_SYSTEM("lift-slide"),
+    center: [0, 1.3759, 0],
+    scale: 0.4172,
+    openTime: 2,
+    openLabel: "Lift & slide open",
+    closeLabel: "Lower & close",
+  },
+  multislide: {
+    label: "Large Panel · multislide",
+    visibleRoot: ["multislide"],
+    model: MODEL_SYSTEM("multislide"),
+    center: [0, 1.314, 0],
+    scale: 0.2255,
+    openTime: 2,
+    openLabel: "Stack open",
+    closeLabel: "Close panels",
+  },
+  "casement-door": {
+    label: "Casement Door",
+    visibleRoot: ["casement-door"],
+    model: MODEL_SYSTEM("casement-door"),
+    center: [0, 1.168, 0],
+    scale: 0.5904,
+    openTime: 2,
+    openLabel: "Open door",
+    closeLabel: "Close door",
+  },
+  "french-door": {
+    label: "French Door",
+    visibleRoot: ["french-door"],
+    model: MODEL_SYSTEM("french-door"),
+    center: [0, 1.068, 0],
+    scale: 0.6465,
+    openTime: 2,
+    openLabel: "Open doors",
+    closeLabel: "Close doors",
+  },
+  "ninety-series": {
+    label: "90 Series",
+    visibleRoot: ["ninety-series"],
+    model: MODEL_SYSTEM("ninety-series"),
+    center: [0, 1.093, 0],
+    scale: 0.6315,
+    openTime: 2,
+    openLabel: "Open door",
+    closeLabel: "Close door",
+  },
+  "curtain-wall": {
+    label: "Curtain Wall",
+    visibleRoot: ["curtain-wall"],
+    model: MODEL_SYSTEM("curtain-wall"),
+    center: [0, 4.8037, 0.079],
+    scale: 0.1402,
+    openTime: 2,
+    openLabel: "Open vent",
+    closeLabel: "Close vent",
+  },
+  "special-arch": {
+    label: "Arch / Round-top",
+    visibleRoot: ["special-arch"],
+    model: MODEL_SYSTEM("special-arch"),
+    center: [0, 0.942, -0.008],
+    scale: 0.7087,
+    openTime: 0,
+    openLabel: "",
+    closeLabel: "",
+    staticNote: "Fixed — does not open",
+  },
+  "special-triangle": {
+    label: "Triangle Gable",
+    visibleRoot: ["special-triangle"],
+    model: MODEL_SYSTEM("special-triangle"),
+    center: [0, 0.2723, -0.008],
+    scale: 0.8344,
+    openTime: 0,
+    openLabel: "",
+    closeLabel: "",
+    staticNote: "Fixed — does not open",
+  },
+  "combination-bay": {
+    label: "Bay — 3 panel",
+    visibleRoot: ["combination-bay"],
+    model: MODEL_SYSTEM("combination-bay"),
+    center: [0, 0.694, -0.1587],
+    scale: 0.5446,
+    openTime: 0,
+    openLabel: "",
+    closeLabel: "",
+    // A bay's flanking lites are casements and DO open; this model just does
+    // not animate them. Never claim the product is fixed.
+    staticNote: "Assembly view — casements not animated",
+  },
+  "combination-bow": {
+    label: "Bow — arc",
+    visibleRoot: ["combination-bow"],
+    model: MODEL_SYSTEM("combination-bow"),
+    center: [0, 0.694, -0.2191],
+    scale: 0.4569,
+    openTime: 0,
+    openLabel: "",
+    closeLabel: "",
+    staticNote: "Assembly view — casements not animated",
+  },
+  "combination-corner": {
+    label: "Corner — 90°",
+    visibleRoot: ["combination-corner"],
+    model: MODEL_SYSTEM("combination-corner"),
+    center: [-0.5278, 0.694, 0.5278],
+    scale: 0.959,
+    openTime: 0,
+    openLabel: "",
+    closeLabel: "",
+    staticNote: "Assembly view — casements not animated",
   },
 };
 
