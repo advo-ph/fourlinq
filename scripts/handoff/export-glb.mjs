@@ -81,10 +81,10 @@ const SYSTEM = [
      restricts us to fourlinq.ph and requires rendered attribution. They keep
      the licensed systems' ids so the swap is a config change, not a new tab.
 
-     What still has no builder, and so still needs the licensed model: louvre
-     (narrow and wide), the 4-panel sliding window, and the sliding / hung /
-     awning grille variants. Louvre is the one that matters — it is a shipped
-     product. See docs/3D_ASSET_BRIEF.md. */
+     Nothing in the tab rail needs the licensed model any more. Louvre (narrow
+     and wide), the 4-panel sliding window and the sliding / hung / awning
+     grilles were the last six, and all six are baked here now. Keep it that
+     way: a new system with no builder is a new licence dependency. */
   {
     id: "casement",
     type: "casement",
@@ -115,12 +115,44 @@ const SYSTEM = [
     closeLabel: "Close awning",
   },
   {
+    // Replaces the licensed `awning-lattice`. Bars ride with the sash.
+    id: "awning-lattice",
+    label: "Awning · grille",
+    module: "awning-model.js",
+    build: "buildAwning",
+    opts: { variant: "vent", grid: true },
+    openLabel: "Open awning",
+    closeLabel: "Close awning",
+  },
+  {
     id: "sliding",
     type: "sliding",
     label: "Sliding",
     module: "slider-model.js",
     build: "buildSlider",
     opts: {},
+    openLabel: "Slide open",
+    closeLabel: "Slide closed",
+  },
+  {
+    // Replaces the licensed `sliding-4panel`. OXXO on the same twin track as the
+    // 2-panel: fixed outers on the exterior rail, two operables sharing the
+    // interior rail and parting from the centre.
+    id: "sliding-4panel",
+    label: "Sliding · 4-panel",
+    module: "slider-model.js",
+    build: "buildSlider",
+    opts: { panel: 4 },
+    openLabel: "Slide open",
+    closeLabel: "Slide closed",
+  },
+  {
+    // Replaces the licensed `sliding-lattice`. Same grille option as fixed-lattice.
+    id: "sliding-lattice",
+    label: "Sliding · grille",
+    module: "slider-model.js",
+    build: "buildSlider",
+    opts: { grid: true },
     openLabel: "Slide open",
     closeLabel: "Slide closed",
   },
@@ -149,6 +181,37 @@ const SYSTEM = [
     opts: { variant: "double" },
     openLabel: "Raise sash",
     closeLabel: "Lower sash",
+  },
+  {
+    // Replaces the licensed `hung-lattice`.
+    id: "hung-lattice",
+    label: "Hung · grille",
+    module: "hung-model.js",
+    build: "buildHung",
+    opts: { variant: "double", grid: true },
+    openLabel: "Raise sash",
+    closeLabel: "Lower sash",
+  },
+  {
+    // Replaces the licensed `louvre` — the last SHIPPED product that depended on
+    // the makinwhat file, and so the entry that ends the attribution.
+    id: "louvre",
+    type: "louvre",
+    label: "Louvre",
+    module: "louvre-model.js",
+    build: "buildLouvre",
+    opts: { variant: "narrow" },
+    openLabel: "Open louvres",
+    closeLabel: "Close louvres",
+  },
+  {
+    id: "louvre-wide",
+    label: "Louvre · wide blade",
+    module: "louvre-model.js",
+    build: "buildLouvre",
+    opts: { variant: "wide" },
+    openLabel: "Open louvres",
+    closeLabel: "Close louvres",
   },
   {
     id: "slide-and-fold",

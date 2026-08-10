@@ -14,7 +14,7 @@
  * Deliberately importing from window-system.ts, never Window3D.tsx: the former
  * is pure data, the latter drags in three/fiber/drei and a WebGL context.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -97,20 +97,32 @@ describe("Window3D system config", () => {
     }
   });
 
-  it("openTime is not a shared constant — louvre peaks far earlier than a sash", () => {
-    // Regression guard for the single global OPEN_TIME = 2.0. At t=2.0 the
-    // louvre fins have already swung back toward shut, so a shared constant
-    // renders the louvre as barely-open.
-    expect(SYSTEMS.louvre.openTime).toBeLessThan(1.5);
-    expect(SYSTEMS.casement.openTime).toBeGreaterThan(1.5);
+  it("openTime is measured, not assumed — the licensed leftovers still differ", () => {
+    // This began as a guard against a single global OPEN_TIME = 2.0, because the
+    // licensed model's authored clips peak at different instants and louvre at
+    // t=2.0 had already swung back toward shut.
+    //
+    // Every system the site shows is now baked by export-glb.mjs, which writes
+    // the open pose at exactly OPEN_AT = 2, so 2 is now the correct answer for
+    // all of them — including louvre, which has its own builder. That makes the
+    // old assertion untrue rather than unmet, so it is restated instead of
+    // deleted: the numbers must still come from probe:glb, and the systems still
+    // read out of the licensed binary must still carry their own measured times.
+    for (const id of systemId) {
+      if (SYSTEMS[id].model) expect(SYSTEMS[id].openTime, `${id}`).toBeOneOf([0, 2]);
+    }
     expect(SYSTEMS.revolving.openTime).toBe(CLIP_SECONDS);
+    expect(SYSTEMS.pivot.openTime).not.toBe(2);
   });
 
   it("non-operable systems carry no action labels, and say why", () => {
     const nonOperable = systemId.filter((id) => SYSTEMS[id].openTime === 0);
     expect([...nonOperable].sort()).toEqual([
-      "combination-bay",
-      "combination-bow",
+      // Bay and bow left this list once combination-model.js grew a real
+      // setOpen — their flanking lites are outswing casements and now animate.
+      // Corner stays: scripts/handoff/spec/combination.json describes it as
+      // "two fixed lites mitred at 90°" and specifies no sash or handing, so
+      // no mechanism was invented for it.
       "combination-corner",
       "fixed",
       "fixed-lattice",
@@ -125,17 +137,19 @@ describe("Window3D system config", () => {
   });
 
   it("only truly fixed glazing claims it does not open", () => {
-    // A bay window's flanking casements DO open in reality — our model just
-    // does not animate them. Saying "Fixed — does not open" over a bay is a
-    // false product claim, so the combination assemblies say something else.
+    // A bay window's flanking casements DO open in reality — and now animate.
+    // Corner still bakes static, but "Fixed — does not open" over any
+    // combination assembly would be a product claim we cannot support, so they
+    // all say something else.
     for (const id of ["fixed", "fixed-lattice"] as SystemType[]) {
       expect(SYSTEMS[id].staticNote).toMatch(/does not open/i);
     }
     for (const id of systemId) {
       if (!id.startsWith("combination-")) continue;
-      expect(SYSTEMS[id].staticNote, `${id} must not claim it cannot open`).not.toMatch(
-        /does not open/i,
-      );
+      // Bay and bow now animate and so carry no note at all — an absent note is
+      // the correct state for an operable system, not a missing one.
+      const note = SYSTEMS[id].staticNote ?? "";
+      expect(note, `${id} must not claim it cannot open`).not.toMatch(/does not open/i);
     }
   });
 
@@ -373,15 +387,52 @@ describe("frame finish reaches every system", () => {
     }
   });
 
-  it("every grille bar takes the finish — grilles are frame3", () => {
-    // The grille geometry is `frame3` in every variant. Were frame3 dropped
-    // from FRAME_MATERIAL again, grilles would stay factory white while the
-    // frame around them changed colour.
-    expect(FRAME_MATERIAL).toContain("frame3");
-    for (const grille of Object.values(GRILLE_VARIANT)) {
-      const used = (report as Record<string, { material: string[] } | null>)[grille as string];
-      expect(used?.material, `${grille} should carry frame3`).toContain("frame3");
+  it("every grille bar takes the finish — asserted at the builder, not the binary", () => {
+    // This used to assert `frame3` on every grille variant, which held only while
+    // fixed-lattice was the sole grille: it is alu-clad, so its bars are aluDark
+    // -> frame3. The uPVC grilles that followed correctly use the uPVC rebate
+    // profile instead (upvcInner -> frame2), because an alu-clad bar on a uPVC
+    // window would be the wrong part.
+    //
+    // The material SET of a baked GLB cannot catch the bug that matters here.
+    // sliding-lattice declares exactly the same six materials as plain sliding,
+    // so bars authored on the hardware material — which never recolours — would
+    // produce an identical set and sail through. That is precisely how grille
+    // bars once shipped black under a White finish. So assert at the source: the
+    // material every grid mesh is built from must map to a frame slot.
+    const FRAME_MAPPED = new Set(["upvc", "upvcInner", "aluDark", "aluClad"]);
+    const modelDir = resolve(__dirname, "../../scripts/handoff/model");
+    const withGrid = readdirSync(modelDir).filter((f) =>
+      readFileSync(resolve(modelDir, f), "utf8").includes("opts.grid"),
+    );
+    // Every grille the site can REACH needs a builder that can actually make one.
+    // pivot-lattice is excluded on purpose: pivot is withheld from the tab rail as
+    // an unconfirmed product, so its grille is unreachable and has no builder.
+    const reachableGrille = Object.values(GRILLE_VARIANT).filter(
+      (g) => SYSTEMS[g as SystemType].model,
+    );
+    expect(withGrid.length, "a reachable grille has no builder").toBeGreaterThanOrEqual(
+      new Set(reachableGrille).size,
+    );
+
+    for (const file of withGrid) {
+      const src = readFileSync(resolve(modelDir, file), "utf8");
+      // Line-based on purpose: builders name their bars by concatenation
+      // (`name + '_grid_bar_v_' + side`) as well as by template literal, so a
+      // regex anchored on a quote right after the material silently matched
+      // nothing in slider-model.js and the check passed while testing zero bars.
+      const barMaterial = src
+        .split(/\r?\n/)
+        .filter((line) => line.includes("mesh(") && /grid|bar_[vh]|spacer/.test(line))
+        .flatMap((line) => [...line.matchAll(/M\.(\w+)/g)].map((m) => m[1]));
+      expect(barMaterial.length, `${file}: found no grid bar meshes to check`).toBeGreaterThan(0);
+      for (const mat of barMaterial) {
+        expect(FRAME_MAPPED.has(mat), `${file}: grid bar uses M.${mat}, which the finish picker never reaches`).toBe(true);
+      }
     }
+    // And the slots those materials bake into must all still be recoloured.
+    expect(FRAME_MATERIAL).toContain("frame2");
+    expect(FRAME_MATERIAL).toContain("frame3");
   });
 });
 
@@ -402,31 +453,42 @@ describe("parity with scripts/probe-window-glb.mjs", () => {
     }
   });
 
-  it("the only unclaimed licensed nodes are the ones we replaced with our own", () => {
-    // Eight systems moved off the licensed model onto GLBs FourlinQ owns, so
-    // their assemblies are still in that file but nothing points at them any
-    // more. That is the goal, not a leak — but it must stay an exact list, so
-    // a future model drop that adds unreachable art still fails here.
-    expect([...probe().unclaimed].sort()).toEqual([
-      "awning_armature",
-      "awning_frame",
-      "casement_bridged_frame",
-      "casement_bridged_panelL",
-      "casement_bridged_panelR",
-      "casement_frame",
-      "casement_panelL",
-      "casement_panelR",
-      "fixed",
-      "fixed_lattice",
-      "holding_frame",
-      "holding_panels",
-      "sliding_horizontal_frame",
-      "sliding_horizontal_windowL",
-      "sliding_horizontal_windowR",
-      "sliding_vertical_frame",
-      "sliding_vertical_windowB",
-      "sliding_vertical_windowT",
-    ]);
+  it("the makinwhat credit renders exactly when the licensed model does", () => {
+    // The grant requires the attribution wherever that model shows — and equally,
+    // crediting makinwhat for geometry FourlinQ authored would be wrong in the
+    // other direction. The component gates the credit on `config.model` being
+    // absent, which is true only for the licensed systems, so both directions
+    // hold automatically. Asserted against the source because this is a licence
+    // obligation, not a rendering preference.
+    const source = readFileSync(
+      resolve(__dirname, "../components/3d/Window3D.tsx"),
+      "utf8",
+    );
+    expect(source, "credit must be conditional").toMatch(/\{!config\.model && \(/);
+    expect(source).toContain("sketchfab.com/makinwhat");
+    // And the licensed file must not be preloaded: nothing renders it, so pulling
+    // it on every visit is 4.89 MB of dead weight.
+    expect(source).not.toMatch(/useGLTF\.preload\(MODEL_LICENSED\)/);
+  });
+
+  it("the licensed model is claimed only by the two withheld products", () => {
+    // Sixty-two of the seventy top-level nodes in the makinwhat file are now
+    // unreachable, because every assembly the site actually shows was replaced
+    // by a builder FourlinQ owns. Pinning all sixty-two names would be brittle
+    // and would say nothing; what matters is the inverse — which nodes are STILL
+    // claimed. Only pivot, pivot-lattice and revolving are, and all three are
+    // withheld from CATALOGUE_SYSTEM as unconfirmed products, so nothing draws
+    // from this file on any page.
+    const claimed = Object.entries(SYSTEM_ROOT).map(([id]) => id);
+    expect([...claimed].sort()).toEqual(["pivot", "pivot-lattice", "revolving"]);
+    for (const id of claimed) {
+      expect(CATALOGUE_SYSTEM, `${id} must stay off the rail`).not.toContain(id);
+    }
+
+    // Stated as a number so it can only move deliberately. It went 0 -> 18 -> 62
+    // as systems migrated; it can never go down without a system moving BACK
+    // onto the licence.
+    expect(probe().unclaimed.length).toBe(62);
   });
 
   it("counts how much of the site still depends on the licensed model", () => {
@@ -434,34 +496,22 @@ describe("parity with scripts/probe-window-glb.mjs", () => {
     // file. Every system moved off it is progress toward dropping both, so
     // this states the remaining debt out loud rather than leaving it implicit.
     const licensed = systemId.filter((id) => !SYSTEMS[id].model);
-    expect([...licensed].sort()).toEqual([
-      "awning-lattice",
-      "hung-lattice",
-      "louvre",
-      "louvre-wide",
-      "pivot",
-      "pivot-lattice",
-      "revolving",
-      "sliding-4panel",
-      "sliding-lattice",
-    ]);
+    expect([...licensed].sort()).toEqual(["pivot", "pivot-lattice", "revolving"]);
 
-    // Of those, only these are actually reachable in the UI. Louvre is the
-    // blocker: a shipped product with no builder.
-    // Reachable = a tab, or a grille whose base system has a tab. A grille of
-    // a withheld system (pivot-lattice) can never be shown.
+    // Of those, these are reachable in the UI. Reachable = a tab, or a grille
+    // whose base system has a tab.
+    //
+    // It is EMPTY, and that is the headline: no page on this site renders the
+    // licensed model any more. Louvre was the last shipped product drawn from
+    // it and now has its own builder. The three above stay configured but
+    // withheld, so neither the attribution nor the fourlinq.ph-only restriction
+    // binds anything that ships. If this list is ever non-empty again, the
+    // makinwhat credit has to go back under the viewer.
     const reachable = licensed.filter((id) => {
       const base = SYSTEMS[id].grilleOf;
       return base ? CATALOGUE_SYSTEM.includes(base) : CATALOGUE_SYSTEM.includes(id);
     });
-    expect([...reachable].sort()).toEqual([
-      "awning-lattice",
-      "hung-lattice",
-      "louvre",
-      "louvre-wide",
-      "sliding-4panel",
-      "sliding-lattice",
-    ]);
+    expect(reachable).toEqual([]);
   });
 
   it("the licensed model's systems are exactly those SYSTEM_ROOT describes", () => {

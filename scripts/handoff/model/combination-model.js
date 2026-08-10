@@ -33,9 +33,19 @@ const FACE_INT = 0.058;
 
 /**
  * One glazed panel, centred on its own origin, plane = XY, exterior = −Z.
- * Fixed / direct-glazed for v1; `sash: true` adds a casement sash + lever for later.
+ *
+ * `hinge` = 0 builds a fixed / direct-glazed lite (the centre picture unit).
+ * `hinge` = −1 | +1 builds an operable outswing casement hinged on that side
+ * stile (−1 = hinged at −x, +1 = hinged at +x), and returns the pivot group so
+ * the caller can swing it.
+ *
+ * Sign convention matches window-model.js buildCasement: interior = +Z, so an
+ * outswing leaf travels toward −Z, which is `pivot.rotation.y = -hinge * angle`
+ * (hinged at −x ⇒ the leaf hangs at +x ⇒ +y rotation carries it to −Z).
+ *
+ * Returns { group, pivot, lever } — pivot/lever are null on a fixed lite.
  */
-function buildPanel(M, w, h, name, sash) {
+function buildPanel(M, w, h, name, hinge = 0) {
   const g = new THREE.Group();
   g.name = name;
   const zExt = -D / 2 + CLAD_D / 2;
@@ -47,6 +57,8 @@ function buildPanel(M, w, h, name, sash) {
   const woodD = D - CLAD_D;
   g.add(mesh(ringGeo(w - 0.004, h - 0.004, FACE_INT, woodD), M.wood, name + '_liner_int',
     [0, 0, -D / 2 + CLAD_D + woodD / 2]));
+  /* Interior stop: on a casement this is what the leaf closes against, so it
+     stays on the frame either way. */
   g.add(mesh(ringGeo(w - FACE_INT * 2 + 0.016, h - FACE_INT * 2 + 0.016, 0.020, 0.014), M.woodDeep,
     name + '_stop_int', [0, 0, D / 2 - 0.007]));
 
@@ -54,22 +66,56 @@ function buildPanel(M, w, h, name, sash) {
   const gh = h - FACE_EXT * 2 + 0.014;
   const gt = 0.026;
   const zg = -D / 2 + CLAD_D + gt / 2 - 0.004;
-  g.add(mesh(new THREE.BoxGeometry(gw, gh, gt), M.glass, name + '_glass', [0, 0, zg]));
-  g.add(mesh(ringGeo(gw + 0.010, gh + 0.010, 0.012, 0.010, 0), M.gasket, name + '_gasket_ext',
-    [0, 0, zg - gt / 2 - 0.004]));
-  g.add(mesh(ringGeo(gw + 0.010, gh + 0.010, 0.012, 0.010, 0), M.gasket, name + '_gasket_int',
-    [0, 0, zg + gt / 2 + 0.004]));
-  g.add(mesh(ringGeo(gw - 0.004, gh - 0.004, 0.009, gt - 0.008, 0), M.aluDark, name + '_igu_spacer',
-    [0, 0, zg]));
 
-  if (sash) {
-    const sw = gw + 0.030, sh = gh + 0.030;
-    g.add(mesh(ringGeo(sw, sh, 0.058, 0.050), M.alu, name + '_sash', [0, 0, -D / 2 + 0.050 / 2 + 0.004]));
-    const lev = mesh(new THREE.BoxGeometry(0.016, 0.092, 0.018), M.hardware, name + '_lever',
-      [sw / 2 - 0.05, -0.04, D / 2 - 0.006]);
-    g.add(lev);
+  const glazing = [
+    [new THREE.BoxGeometry(gw, gh, gt), M.glass, '_glass', zg],
+    [ringGeo(gw + 0.010, gh + 0.010, 0.012, 0.010, 0), M.gasket, '_gasket_ext', zg - gt / 2 - 0.004],
+    [ringGeo(gw + 0.010, gh + 0.010, 0.012, 0.010, 0), M.gasket, '_gasket_int', zg + gt / 2 + 0.004],
+    [ringGeo(gw - 0.004, gh - 0.004, 0.009, gt - 0.008, 0), M.aluDark, '_igu_spacer', zg],
+  ];
+
+  if (!hinge) {
+    glazing.forEach(([geo, mat, suffix, z]) => g.add(mesh(geo, mat, name + suffix, [0, 0, z])));
+    return { group: g, pivot: null, lever: null };
   }
-  return g;
+
+  /* ---- operable outswing casement ---- */
+  const sw = gw + 0.030, sh = gh + 0.030;
+  const sashD = 0.050;
+  const sashZ = -D / 2 + sashD / 2 + 0.004;
+
+  /* Hinge axis sits just outboard of the leaf's hinge stile, on the exterior
+     face — the pin an outswing butt hinge actually turns on. */
+  const pinX = hinge * (w / 2 - 0.010);
+  const pinZ = sashZ - 0.028;
+
+  const pivot = new THREE.Group();
+  pivot.name = name + '_pivot';
+  pivot.position.set(pinX, 0, pinZ);
+  g.add(pivot);
+
+  const ox = -pinX;                       // leaf centre relative to the pin
+  const oz = (z) => z - pinZ;             // panel-local z → pivot-local z
+
+  pivot.add(mesh(ringGeo(sw, sh, 0.058, sashD), M.alu, name + '_sash', [ox, 0, oz(sashZ)]));
+  glazing.forEach(([geo, mat, suffix, z]) => pivot.add(mesh(geo, mat, name + suffix, [ox, 0, oz(z)])));
+
+  /* Lever on the lock stile, opposite the hinge, sitting on the leaf's
+     interior face so it travels with the sash. */
+  const lever = mesh(new THREE.BoxGeometry(0.016, 0.092, 0.018), M.hardware, name + '_lever',
+    [ox - hinge * (sw / 2 - 0.050), -0.04, oz(sashZ + sashD / 2 + 0.010)]);
+  pivot.add(lever);
+
+  /* Butt hinges: jamb knuckle stays on the frame, strap rides the leaf. */
+  [0.34, -0.34].forEach((hy, k) => {
+    const tag = name + '_hinge_' + (k + 1);
+    g.add(mesh(new THREE.CylinderGeometry(0.0085, 0.0085, 0.084, 16), M.steel, tag + '_knuckle',
+      [pinX, hy, pinZ]));
+    pivot.add(mesh(new THREE.BoxGeometry(0.052, 0.070, 0.005), M.steel, tag + '_strap',
+      [ox + hinge * (sw / 2 - 0.026), hy, oz(sashZ) - sashD / 2 - 0.003]));
+  });
+
+  return { group: g, pivot, lever };
 }
 
 /* Horizontal board (seat / head) from a plan polygon, thickness up from y = 0. */
@@ -148,7 +194,18 @@ function layout(variant, o) {
  *   angleDeg  30 | 45           (bay side splay off the wall)
  *   facets    4 | 5             (bow)
  *   joint     'post' | 'butt'   (corner)
+ *   sashSides default true on bay/bow — the flanking lites are operable
+ *             outswing casements; pass false for a fully direct-glazed box.
  * Metres, y-up, base of the glazed panels at y = 0, wall plane at z = 0.
+ *
+ * OPERABILITY, per scripts/handoff/spec/combination.json:
+ *   bay / bow — the flanking (first + last) lites are casements, outswing,
+ *     70° (spec `roadmap.v2`: "casement sashes on bay/bow side lites
+ *     (outswing, 70°)"). The centre facets stay picture-fixed.
+ *   corner    — the spec says "Two fixed lites mitred at 90°" and gives no
+ *     sash, hinge or handing anywhere. It stays STATIC. No mechanism is
+ *     invented for it here; if the real product has an operable corner leg,
+ *     that has to come from the client, not from this file.
  */
 export function buildCombination(opts = {}) {
   const variant = COMBO_VARIANTS[opts.variant] ? opts.variant : 'bay';
@@ -167,12 +224,19 @@ export function buildCombination(opts = {}) {
   const root = new THREE.Group();
   root.name = 'combination_' + variant;
 
+  /* Flanking lites are the operable ones: first and last facet of a bay or a
+     bow, hinged on their wall-side jamb so they swing out clear of the box. */
+  const sashSide = variant !== 'corner' && opts.sashSides !== false;
+  const leaf = [];
+
   L.panels.forEach((p, i) => {
-    const sash = !!opts.sashSides && variant === 'bay' && i !== 1;
-    const g = buildPanel(M, p.w, H, 'panel_' + (i + 1), sash);
-    g.position.set(p.x, H / 2, p.z);
-    g.rotation.y = p.ry;
-    root.add(g);
+    const flanking = sashSide && (i === 0 || i === L.panels.length - 1);
+    const hinge = flanking ? (i === 0 ? -1 : 1) : 0;
+    const panel = buildPanel(M, p.w, H, 'panel_' + (i + 1), hinge);
+    panel.group.position.set(p.x, H / 2, p.z);
+    panel.group.rotation.y = p.ry;
+    root.add(panel.group);
+    if (panel.pivot) leaf.push({ pivot: panel.pivot, lever: panel.lever, hinge, index: i });
   });
 
   /* mullion / corner post at every plan joint */
@@ -231,6 +295,22 @@ export function buildCombination(opts = {}) {
   function setSeat(on) { (root.userData.seat || []).forEach(m => (m.visible = !!on)); }
   function setYaw(deg) { turntable.rotation.y = THREE.MathUtils.degToRad(deg); }
 
+  /* ---- mechanism: outswing casement on the flanking lites ---- */
+  const MAX = THREE.MathUtils.degToRad(70);
+  const LEVER = THREE.MathUtils.degToRad(90);
+  /** t: 0 = closed, 1 = flanking casements at 70° outswing. Centre stays fixed. */
+  function setOpen(t) {
+    const c = Math.min(1, Math.max(0, t));
+    const eased = c * c * (3 - 2 * c);
+    /* Handle throws through its first 15% of travel, then the leaf swings. */
+    const throwT = Math.min(1, c / 0.15);
+    leaf.forEach((l) => {
+      l.pivot.rotation.y = -l.hinge * eased * MAX;
+      l.lever.rotation.z = -l.hinge * throwT * LEVER;
+    });
+  }
+  setOpen(0);
+
   const plan = {
     variant,
     walk: L.walk,
@@ -245,10 +325,16 @@ export function buildCombination(opts = {}) {
     group: turntable,
     unit: root,
     setSeat, setYaw, plan,
+    /* Corner has no leaf, so it exposes no setOpen and bakes static — which is
+       what the spec describes. Handing it a no-op setOpen would read as
+       "animated" to anything that only checks for the function. */
+    ...(leaf.length ? { setOpen, leaf } : {}),
     config: {
       id: 'combination_' + variant,
-      motion: 'none',
-      operable: false,
+      motion: leaf.length ? 'hinge_outswing_vertical' : 'none',
+      operable: leaf.length > 0,
+      operable_panel: leaf.map((l) => l.index + 1),
+      max_angle_deg: leaf.length ? 70 : null,
       assembly: variant,
       panels: L.panels.length,
       plan_angle_deg: plan.angleDeg,

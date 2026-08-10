@@ -14,6 +14,7 @@ import {
   CATALOGUE_SYSTEM,
   GRILLE_VARIANT,
   MODEL_LICENSED,
+  MODEL_SYSTEM,
   SYSTEMS,
   type SystemType,
 } from "./window-system";
@@ -23,20 +24,28 @@ export type { SystemType };
 /**
  * Interactive 3D viewer for FourlinQ window systems.
  *
- * Loads makinwhat's "Animated Window Systems" GLB and shows ONE subtree at a
- * time, configurable via the `systemType` prop. Same underlying model is
- * reused across all types (drei's useGLTF caches the load).
+ * Loads one baked GLB per system and shows it, configurable via the `systemType`
+ * prop. drei's useGLTF caches per URL, so switching between tabs that share a
+ * file costs nothing.
  *
- * Original license CC-BY-NC; commercial use granted by makinwhat for
- * fourlinq.ph (see docs/LICENSES.md).
+ * Every system the site exposes now comes from geometry FourlinQ owns, baked from
+ * scripts/handoff/model/. The licensed makinwhat file is still in the repo and
+ * still configured for `pivot` and `revolving`, but both are withheld from the
+ * tab rail as unconfirmed products, so nothing draws from it — which is why the
+ * attribution below is conditional rather than unconditional. See
+ * docs/LICENSES.md.
  */
 
 /**
- * Only the licensed multi-system file is preloaded. The baked per-system files
- * are fetched on demand by useGLTF when their tab is opened — preloading all
- * twelve would pull 2.7 MB nobody asked for.
+ * Preload the system the viewer opens on, and nothing else. The rest are fetched
+ * on demand when their tab is opened.
+ *
+ * This used to preload the licensed multi-system file, which is now 4.89 MB that
+ * no page renders: every reachable system has its own baked GLB, so the licensed
+ * file was being pulled on every visit to the Design Tool purely out of habit —
+ * more bytes than all twenty-six owned models put together.
  */
-useGLTF.preload(MODEL_LICENSED);
+useGLTF.preload(MODEL_SYSTEM("casement"));
 
 /**
  * Materials that take the frame finish. `parts`/`parts2` are hardware and
@@ -281,6 +290,11 @@ const Window3D = ({
       <div
         ref={railRef}
         onScroll={syncRailEdge}
+        // Named so the visual QA harness can drive the rail directly. Its tab
+        // labels collide with the configurator's product-type cards ("Casement",
+        // "Sliding"), so selecting by accessible name alone is ambiguous and can
+        // click the wrong control entirely.
+        data-system-rail=""
         className="flex items-end gap-6 border-b border-[color:var(--rule-soft)] overflow-x-auto no-scrollbar"
       >
         {CATALOGUE_SYSTEM.map((id) => {
@@ -288,6 +302,7 @@ const Window3D = ({
           return (
             <button
               key={id}
+              data-system={id}
               onClick={() => setSystemType(id)}
               className={cn(
                 "pb-3 text-body-sm font-medium whitespace-nowrap transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end",
@@ -364,7 +379,23 @@ const Window3D = ({
               polar={[-Math.PI / 6, Math.PI / 6]}
               azimuth={[-Math.PI / 2.5, Math.PI / 2.5]}
             >
-              <WindowModel finish={selected} isOpen={isOpen} systemType={shownSystem} />
+              {/* `key` remounts on every system change, and that is load-bearing.
+                  Without it the open/close control silently stopped working the
+                  moment you switched tabs: the new clip's action was created and
+                  its bindings resolved without warning, but the pose never
+                  updated, so the button toggled its label over a model that did
+                  not move. It survived every programmatic check — handoff:verify
+                  still measured 88 degrees of travel inside awning.glb, because
+                  the clip was fine; only the browser was not. Measured: awning
+                  opened on a fresh mount (pixel delta 0.0117) and did not after a
+                  switch (0.0025, which is just the button's own label redrawing).
+                  Casement passed by accident, being the system mounted first. */}
+              <WindowModel
+                key={shownSystem}
+                finish={selected}
+                isOpen={isOpen}
+                systemType={shownSystem}
+              />
             </PresentationControls>
 
             <ContactShadows
@@ -405,6 +436,11 @@ const Window3D = ({
         {isOperable ? (
           <button
             onClick={() => setIsOpen((v) => !v)}
+            // Labelled for the QA harness: the visible text is per-system
+            // ("Slide open", "Raise sash", "Fold open", "Open louvres"), so
+            // matching on it means the harness silently skips whichever systems
+            // it forgot to enumerate — which is exactly what it did.
+            data-open-toggle=""
             className="absolute bottom-4 right-4 px-4 py-3 bg-[color:var(--accent)] text-white text-body-sm font-medium hover:bg-[color:var(--accent-hover)] transition-colors duration-300 ease-marvin"
           >
             {isOpen ? config.closeLabel : config.openLabel}
@@ -482,20 +518,27 @@ const Window3D = ({
         )}
       </div>
 
-      {/* Attribution — small microline below the viewer; CC-BY satisfied
-          without compromising authorship of the FourlinQ surface. */}
-      <p className="mt-6 text-[10px] tracking-[0.06em] text-[color:var(--ink-muted)] text-right">
-        3D model by{" "}
-        <a
-          href="https://sketchfab.com/makinwhat"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline-offset-2 hover:underline"
-        >
-          makinwhat
-        </a>
-        {" "}· used with commercial permission
-      </p>
+      {/* Attribution — shown only when the system on screen actually comes from
+          the licensed file. It used to render unconditionally, which was correct
+          while every system did; now that all twenty-two are baked from geometry
+          FourlinQ owns, an unconditional credit would attribute our own work to
+          someone else. The condition is deliberately on `model` rather than a
+          hardcoded list, so re-exposing a licensed system brings the credit back
+          on its own instead of relying on anyone remembering. */}
+      {!config.model && (
+        <p className="mt-6 text-[10px] tracking-[0.06em] text-[color:var(--ink-muted)] text-right">
+          3D model by{" "}
+          <a
+            href="https://sketchfab.com/makinwhat"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline-offset-2 hover:underline"
+          >
+            makinwhat
+          </a>
+          {" "}· used with commercial permission
+        </p>
+      )}
     </div>
   );
 };

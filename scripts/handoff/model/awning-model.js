@@ -27,6 +27,33 @@ function mesh(geo, mat, name, pos) {
   return m;
 }
 
+/**
+ * Applied muntin grid, 2 × 2, mirroring buildFixed's grid in fixed-model.js:
+ * a bar pair on each glass face plus a thin shadow bar in the cavity so the
+ * grille reads through the pane instead of floating on it.
+ *
+ * Material is M.upvcInner (`upvc_white_rebate`), the same profile material the
+ * glazing bead uses. That name maps to the `frame2` slot at bake time, so the
+ * finish picker recolours the bars with the rest of the profile — a bar built
+ * from a hardware or gasket material would stay black under a White finish.
+ *
+ * `zGlass` / `glassT` are the pane's centre and thickness in the parent's
+ * local space, so the caller decides which moving node the grid hangs off.
+ */
+function gridGroup(M, name, gw, gh, zGlass, glassT) {
+  const g = new THREE.Group();
+  g.name = name;
+  const BAR = 0.024, BAR_T = 0.012;
+  const spanW = gw + 0.004, spanH = gh + 0.004;
+  [['ext', zGlass - glassT / 2 - BAR_T / 2], ['int', zGlass + glassT / 2 + BAR_T / 2]].forEach(([side, z]) => {
+    g.add(mesh(new THREE.BoxGeometry(BAR, spanH, BAR_T), M.upvcInner, `${name}_bar_v_${side}`, [0, 0, z]));
+    g.add(mesh(new THREE.BoxGeometry(spanW, BAR, BAR_T), M.upvcInner, `${name}_bar_h_${side}`, [0, 0, z]));
+  });
+  g.add(mesh(new THREE.BoxGeometry(BAR - 0.008, spanH, 0.003), M.upvcInner, `${name}_spacer_v`, [0, 0, zGlass]));
+  g.add(mesh(new THREE.BoxGeometry(spanW, BAR - 0.008, 0.003), M.upvcInner, `${name}_spacer_h`, [0, 0, zGlass]));
+  return g;
+}
+
 /* Cam lever on the sill rail — lever turns about the sash normal (Z). */
 function buildHandle(M, name) {
   const g = new THREE.Group();
@@ -57,14 +84,17 @@ function buildHandle(M, name) {
 }
 
 /**
- * buildAwning({ variant: 'vent' | 'wide' })
+ * buildAwning({ variant: 'vent' | 'wide', grid })
  * Top-hinged outswing sash: pivot on the HEAD, horizontal axis, 0 → 32°.
- * Returns { group, setOpen(t), sash, arms, animNodes, config }
+ * Returns { group, setOpen(t), setGrid(on), sash, arms, animNodes, config }
  * Metres, y-up, base at y = 0. Interior = +Z, exterior = −Z.
+ * `grid: true` adds a 2 × 2 applied bar set parented to the sash pivot, so it
+ * swings out with the sash rather than staying flat in the frame.
  */
 export function buildAwning(opts = {}) {
   const variant = opts.variant === 'wide' ? 'wide' : 'vent';
   const M = opts.materials || makeMaterials();
+  const grid = !!opts.grid;
 
   const W = variant === 'wide' ? 1.40 : 1.00;
   const H = variant === 'wide' ? 0.60 : 0.70;
@@ -72,7 +102,7 @@ export function buildAwning(opts = {}) {
   const FACE = 0.062;
 
   const root = new THREE.Group();
-  root.name = 'awning_' + variant;
+  root.name = 'awning_' + variant + (grid ? '_grid' : '');
 
   root.add(mesh(ringGeo(W, H, FACE, D), M.upvc, 'frame'));
 
@@ -117,6 +147,14 @@ export function buildAwning(opts = {}) {
   pivot.add(mesh(new THREE.BoxGeometry(glassW, glassH, 0.006), M.glass, 'glass', [0, oy, oz - 0.008]));
   pivot.add(mesh(ringGeo(glassW + 0.008, glassH + 0.008, 0.014, 0.013), M.upvcInner,
     'glazing_bead', [0, oy, oz + 0.012]));
+
+  /* Grid hangs off the sash pivot, alongside the glass and bead, so it rotates
+     with the sash. Hidden rather than omitted when `grid` is false:
+     GLTFExporter skips invisible nodes, so the no-grid bake is unchanged. */
+  const gridBar = gridGroup(M, 'grid_2x2', glassW, glassH, oz - 0.008, 0.006);
+  gridBar.position.y = oy;
+  gridBar.visible = grid;
+  pivot.add(gridBar);
 
   /* ---- top hinges: barrels on the head, axis along X ---- */
   const hingeTop = new THREE.Group(); hingeTop.name = 'hinge_top';
@@ -219,8 +257,13 @@ export function buildAwning(opts = {}) {
   const animNodes = [pivot, h.lever];
   arms.forEach((a) => animNodes.push(a.bar, a.shoe));
 
+  function setGrid(on) { gridBar.visible = !!on; }
+
   return {
-    group: root, setOpen, sash: { pivot, lever: h.lever }, arms, animNodes,
-    config: { id: 'awning', motion: 'hinge_outswing_horizontal', max_angle_deg: 32 },
+    group: root, setOpen, setGrid, sash: { pivot, lever: h.lever }, arms, animNodes,
+    config: {
+      id: 'awning', motion: 'hinge_outswing_horizontal', max_angle_deg: 32,
+      grid: grid ? '2x2_applied' : null,
+    },
   };
 }

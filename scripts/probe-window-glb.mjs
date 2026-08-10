@@ -60,29 +60,18 @@ const MODEL_PATH = resolve(here, "..", "public", "models", "animated-window-syst
  * src/test/window-3d.test.ts fails if the two drift.
  */
 export const SYSTEM_ROOT = {
-  /* Casement, casement-2lite, awning, sliding, fixed, fixed-lattice, hung and
-     slide-and-fold used to be measured here. They now come from GLBs FourlinQ
-     owns, baked by scripts/handoff/export-glb.mjs, so the assemblies below are
-     the only reason the licensed model is still shipped:
+  /* Everything the site actually shows now comes from GLBs FourlinQ owns, baked
+     by scripts/handoff/export-glb.mjs. What remains here is ONLY the two systems
+     that were never reachable in the first place:
 
-       louvre, louvre-wide   no builder exists — and it is a shipped product
-       sliding-4panel        slider-model.js is 2-panel only
-       pivot, revolving      no builder, and both are unconfirmed products
-       *-lattice (4)         only fixed's grille has a builder option
+       pivot, revolving      no builder, and both are unconfirmed products, so
+                             both are withheld from CATALOGUE_SYSTEM
 
-     Leaving a replaced id here would make it defined by two models, which
-     probe() reports as a problem rather than silently preferring one. */
-  "sliding-4panel": [
-    "sliding_horizontal_4panels_frame",
-    "sliding_horizontal_4panels_windowL2",
-    "sliding_horizontal_4panels_windowL1",
-    "sliding_horizontal_4panels_windowR1",
-    "sliding_horizontal_4panels_windowR2",
-  ],
-  // Louvre fins are one top-level node each (18 narrow, 9 wide) plus a frame
-  // and a control arm, so these lists are generated rather than written out.
-  louvre: "@Jalousie_narrow_",
-  "louvre-wide": "@Jalousie_wide_",
+     Louvre (narrow and wide), the 4-panel slider and the sliding / hung / awning
+     grilles were the last shipped assemblies drawn from the licensed file, and
+     all six now have builders. Leaving a replaced id here would make it defined
+     by two models, which probe() reports as a problem rather than silently
+     preferring one — that check is what caught this migration mid-flight. */
   pivot: ["pivoting_frame", "pivoting_panel", "pivoting_handle"],
   revolving: ["revolving_frame", "revolving_door"],
 
@@ -92,17 +81,6 @@ export const SYSTEM_ROOT = {
      set rather than adding meshes. They are systems here and in SYSTEMS, but
      the UI presents them as a Grille toggle on the base system, never as their
      own tab: a grille is an option on a casement, not a tenth kind of window. */
-  "sliding-lattice": [
-    "sliding_horizontal_lattice_frame",
-    "sliding_horizontal_lattice_windowL",
-    "sliding_horizontal_lattice_windowR",
-  ],
-  "hung-lattice": [
-    "sliding_vertical_lattice_frame",
-    "sliding_vertical_lattice_windowT",
-    "sliding_vertical_lattice_windowB",
-  ],
-  "awning-lattice": ["awning_lattice_frame", "awning_lattice_armature"],
   "pivot-lattice": [
     "pivoting_lattice_frame",
     "pivoting_lattice_panel",

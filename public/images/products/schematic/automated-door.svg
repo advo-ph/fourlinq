@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Automated door access schematic placeholder">
-  <rect width="1200" height="900" fill="#F9F7F1"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Automated door access schematic — a door leaf with a glazed upper panel, a lever handle, a keypad reader on the frame, and a motorised outward swing arc">
+  <rect width="1200" height="900" fill="#FFFFFF"/>
   <!-- Outer frame -->
   <rect x="380" y="120" width="440" height="660" fill="none" stroke="#242424" stroke-width="8"/>
   <!-- Door leaf -->
@@ -21,6 +21,4 @@
   <!-- Motorised swing arc, outward -->
   <path d="M 800 700 A 240 240 0 0 0 1040 460" fill="none" stroke="#242424" stroke-width="3" stroke-dasharray="12 8" opacity="0.5"/>
   <polygon points="1032,472 1048,458 1032,444" fill="#242424" opacity="0.5"/>
-  <!-- Placeholder caption -->
-  <text x="600" y="850" font-family="Georgia, serif" font-size="30" fill="#6B6B6B" text-anchor="middle">Automated Door Access — schematic placeholder</text>
 </svg>

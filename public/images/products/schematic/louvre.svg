@@ -1,5 +1,5 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Louvre Windows schematic placeholder">
-  <rect width="1200" height="900" fill="#F9F7F1"/>
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Louvre window schematic — six adjustable horizontal glass blades set in a square frame">
+  <rect width="1200" height="900" fill="#FFFFFF"/>
   <rect x="300" y="140" width="600" height="600" fill="none" stroke="#242424" stroke-width="8"/>
   <g stroke="#242424" stroke-width="5" fill="#D9E8F2" fill-opacity="0.5">
     <rect x="330" y="180" width="540" height="40" transform="rotate(-8 600 200)"/>
@@ -9,5 +9,4 @@
     <rect x="330" y="500" width="540" height="40" transform="rotate(-8 600 520)"/>
     <rect x="330" y="580" width="540" height="40" transform="rotate(-8 600 600)"/>
   </g>
-  <text x="600" y="820" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#686868">Louvre Windows — schematic placeholder</text>
 </svg>

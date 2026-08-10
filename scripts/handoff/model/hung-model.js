@@ -27,6 +27,33 @@ function mesh(geo, mat, name, pos) {
   return m;
 }
 
+/**
+ * Applied muntin grid, 2 × 2, mirroring buildFixed's grid in fixed-model.js:
+ * a bar pair on each glass face plus a thin shadow bar in the cavity so the
+ * grille reads through the pane instead of floating on it.
+ *
+ * Material is M.upvcInner (`upvc_white_rebate`), the same profile material the
+ * glazing bead uses. That name maps to the `frame2` slot at bake time, so the
+ * finish picker recolours the bars with the rest of the profile — a bar built
+ * from a hardware or gasket material would stay black under a White finish.
+ *
+ * `zGlass` / `glassT` are the pane's centre and thickness in the parent's
+ * local space, so the caller decides which moving node the grid hangs off.
+ */
+function gridGroup(M, name, gw, gh, zGlass, glassT) {
+  const g = new THREE.Group();
+  g.name = name;
+  const BAR = 0.024, BAR_T = 0.012;
+  const spanW = gw + 0.004, spanH = gh + 0.004;
+  [['ext', zGlass - glassT / 2 - BAR_T / 2], ['int', zGlass + glassT / 2 + BAR_T / 2]].forEach(([side, z]) => {
+    g.add(mesh(new THREE.BoxGeometry(BAR, spanH, BAR_T), M.upvcInner, `${name}_bar_v_${side}`, [0, 0, z]));
+    g.add(mesh(new THREE.BoxGeometry(spanW, BAR, BAR_T), M.upvcInner, `${name}_bar_h_${side}`, [0, 0, z]));
+  });
+  g.add(mesh(new THREE.BoxGeometry(BAR - 0.008, spanH, 0.003), M.upvcInner, `${name}_spacer_v`, [0, 0, zGlass]));
+  g.add(mesh(new THREE.BoxGeometry(spanW, BAR - 0.008, 0.003), M.upvcInner, `${name}_spacer_h`, [0, 0, zGlass]));
+  return g;
+}
+
 /* Cam sash lock: base plate + pivoting lever, sits on the lower meeting rail. */
 function buildSashLock(M, name) {
   const g = new THREE.Group();
@@ -51,14 +78,17 @@ function buildTiltLatch(M, name) {
 }
 
 /**
- * buildHung({ variant: 'double' | 'single' })
+ * buildHung({ variant: 'double' | 'single', grid })
  * Two stacked sashes in vertical jamb channels, meeting rail at mid-height.
  * Metres, y-up, interior = +Z. Lower sash rides the interior plane and laps the
  * upper sash's bottom rail at the meeting rail, so the overlap reads at rest.
+ * `grid: true` adds a 2 × 2 applied bar set to EACH sash, parented to the sash
+ * carrier so it travels with the sash when setOpen runs.
  */
 export function buildHung(opts = {}) {
   const M = opts.materials || makeMaterials();
   const variant = opts.variant === 'single' ? 'single' : 'double';
+  const grid = !!opts.grid;
   const LOWER_RATIO = opts.lowerRatio ?? 0.50;   // lower sash rises 50% of the clear opening
   const UPPER_RATIO = opts.upperRatio ?? 0.30;   // upper sash drops 30% (double-hung only)
 
@@ -71,7 +101,7 @@ export function buildHung(opts = {}) {
   const SASH_FACE = 0.070;    // sash stile / rail face
 
   const root = new THREE.Group();
-  root.name = 'hung_window';
+  root.name = 'hung_window' + (grid ? '_grid' : '');
 
   const openW = W - FACE * 2;
   const openH = H - FACE * 2;
@@ -102,6 +132,8 @@ export function buildHung(opts = {}) {
   const sashW = openW - 0.006;
   const sashH = (openH + OVERLAP) / 2;
 
+  const bar = [];
+
   function buildSash(name, z) {
     const g = new THREE.Group();
     g.name = name + '_carrier';
@@ -114,6 +146,14 @@ export function buildHung(opts = {}) {
     g.add(mesh(ringGeo(gw + 0.008, gh + 0.008, 0.013, 0.012), M.upvcInner, name + '_bead', [0, 0, 0.011]));
     g.add(mesh(ringGeo(sashW + 0.005, sashH + 0.005, 0.012, 0.008, 0), M.gasket, name + '_weatherstrip',
       [0, 0, -SASH_D / 2 - 0.002]));
+
+    /* Grid lives ON the sash carrier, so it rides every sash movement. Hidden
+       rather than omitted when `grid` is false: GLTFExporter skips invisible
+       nodes, so the no-grid bake is byte-identical to what ships today. */
+    const grid2x2 = gridGroup(M, name.replace('sash', 'grid') + '_2x2', gw, gh, -0.004, 0.006);
+    grid2x2.visible = grid;
+    g.add(grid2x2);
+    bar.push(grid2x2);
     return g;
   }
 
@@ -170,13 +210,16 @@ export function buildHung(opts = {}) {
   }
   setOpen(0);
 
+  function setGrid(on) { bar.forEach((b) => { b.visible = !!on; }); }
+
   return {
-    group: root, setOpen, variant,
+    group: root, setOpen, setGrid, variant,
     upper, lower, upperClosedY, lowerClosedY, upperTravel, lowerTravel, split: SPLIT, ease,
     dims: { W, H, D, openW, openH, sashW, sashH, overlap: OVERLAP, clearOpen: lowerTravel + upperTravel },
     config: {
       id: 'hung', motion: 'translate_y',
       variant, lower_ratio: LOWER_RATIO, upper_ratio: variant === 'single' ? 0 : UPPER_RATIO, phase_split: SPLIT,
+      grid: grid ? '2x2_applied_per_sash' : null,
     },
   };
 }

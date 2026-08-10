@@ -35,7 +35,8 @@
     "deploy:log": "ssh advo \"tail -50 /var/log/fourlinq-auto-deploy.log 2>/dev/null || echo (auto-deploy not enabled — see scripts/vps-auto-deploy.sh)\"",
     "probe:glb": "node scripts/probe-window-glb.mjs",
     "handoff:export": "node scripts/handoff/export-glb.mjs",
-    "handoff:verify": "node scripts/handoff/verify-glb.mjs"
+    "handoff:verify": "node scripts/handoff/verify-glb.mjs",
+    "qa:3d": "node scripts/qa-3d-systems.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
