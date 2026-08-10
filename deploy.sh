@@ -54,6 +54,15 @@ ssh -o ConnectTimeout=5 -q "${VPS_SSH}" "echo ok" >/dev/null 2>&1 || err "Cannot
 log "Building frontend (vite build)..."
 npm run build || err "Build failed"
 
+# The server/ rsync below runs with --delete, and pm2 executes
+# server/index.bundle.cjs (see ecosystem.config.cjs). The bundle is a gitignored
+# build artifact, so any tree that has not built it locally would have the sync
+# DELETE it from the VPS, leaving pm2 in a restart loop on a missing module and
+# the site returning 502. Rebuilding here keeps the artifact and the sync in step.
+log "Building server bundle (esbuild)..."
+npm run build:server || err "Server bundle build failed"
+[ -s server/index.bundle.cjs ] || err "server/index.bundle.cjs missing or empty after build — refusing to sync a --delete that would remove it from the VPS"
+
 log "Setting up remote directory..."
 ssh "${VPS_SSH}" "mkdir -p ${REMOTE_DIR}/logs"
 
@@ -115,8 +124,20 @@ ssh "${VPS_SSH}" "cd ${REMOTE_DIR} && npm install --no-save --no-audit --no-fund
 log "Starting fourlinq via PM2..."
 ssh "${VPS_SSH}" "cd ${REMOTE_DIR} && pm2 startOrRestart ecosystem.config.cjs && pm2 save" || err "pm2 start failed"
 
+# A single unguarded curl 2 s after pm2 start reported a hard failure and the
+# script still printed "Done", which is how a 502'd site once read as a clean
+# deploy. Retry to allow for boot time, then FAIL loudly if it never answers.
 log "Health check..."
-sleep 2
-ssh "${VPS_SSH}" "curl -fsS http://localhost:3001/api/health" && echo
+HEALTH_OK=0
+for attempt in 1 2 3 4 5 6 7 8 9 10; do
+  sleep 2
+  if ssh "${VPS_SSH}" "curl -fsS --max-time 5 http://localhost:3001/api/health" 2>/dev/null; then
+    echo
+    HEALTH_OK=1
+    log "Healthy after ${attempt} attempt(s)."
+    break
+  fi
+done
+[ "${HEALTH_OK}" = "1" ] || err "Health check FAILED — service is not answering on port 3001. Check: ssh ${VPS_SSH} 'pm2 logs fourlinq --err --lines 40 --nostream'"
 
 log "Done. Site live on port 3001 (proxied by nginx → https://fourlinq.ph)."
