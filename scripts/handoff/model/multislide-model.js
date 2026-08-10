@@ -59,24 +59,36 @@ function buildFlushPull(M, name, withLatch) {
 }
 
 /**
- * buildMultiSlide({ panels: 3 | 4, width, height, stackSide, scaleRef })
+ * buildMultiSlide({ panels: 3 | 4 | 6, width, height, stackSide, scaleRef })
  *
  * Multi-slide door wall. Metres, y-up, interior = +Z, origin at the outer frame centre.
  * Every panel rides its own track plane, so the panels pass one another and build a
  * stack against the fixed end panel. Motion is staggered: the lead panel leaves first
  * and the following panels are picked up in turn, so the stack visibly assembles.
+ *
+ * `panels: 6` builds the bi-parting FIXED-Slide-Slide-Slide-Slide-FIXED run: a fixed
+ * leaf at BOTH ends, four sliders between them, parting at the centre and stacking two
+ * deep behind each fixed end. It needs only three track planes, not six — each half
+ * mirrors the other onto the same three, which is how a real bi-part is built and what
+ * keeps the frame depth at 264 mm instead of an absurd 456 mm. The two lead leaves
+ * (3 and 4) therefore share the interior-most plane and meet on a butt joint at the
+ * centre rather than lapping, so they never interpenetrate when closed.
  */
 export function buildMultiSlide(opts = {}) {
   const M = opts.materials || makeMaterials();
-  const N = opts.panels === 3 ? 3 : 4;
-  const W = Math.min(6.0, Math.max(3.6, opts.width ?? 6.0));
+  const N = opts.panels === 3 ? 3 : opts.panels === 6 ? 6 : 4;
+  const isBipart = N === 6;
+  const W = isBipart
+    ? Math.min(10.8, Math.max(5.4, opts.width ?? 9.0))
+    : Math.min(6.0, Math.max(3.6, opts.width ?? 6.0));
   const H = opts.height ?? 2.60;
   const stackSide = opts.stackSide === -1 ? -1 : 1;      // +1 = stacks right
 
   const FACE = 0.086;                 // frame face
   const PITCH = 0.064;                // track-to-track pitch
   const PANEL_D = 0.052;
-  const D = N * PITCH + 0.072;        // frame depth swallows every track
+  const planeCount = isBipart ? 3 : N; // bi-part mirrors both halves onto three planes
+  const D = planeCount * PITCH + 0.072; // frame depth swallows every track
   const OVERLAP = 0.030;              // interlock lap, closed
   const PANEL_FACE = 0.104;
   const BOTTOM_RAIL = 0.148;
@@ -87,11 +99,16 @@ export function buildMultiSlide(opts = {}) {
 
   const openW = W - FACE * 2;
   const openH = H - FACE * 2;
-  const panelW = (openW + OVERLAP * (N - 1)) / N;
+  /* one lap per panel joint, minus the centre butt joint on a bi-part */
+  const lapTotal = OVERLAP * (isBipart ? N - 2 : N - 1);
+  const panelW = (openW + lapTotal) / N;
   const panelH = openH - 0.010;
 
-  /* track planes: index 0 = interior-most (lead), N-1 = exterior-most (fixed end) */
-  const zAt = i => (N - 1) / 2 * PITCH - i * PITCH;
+  /* track planes: index 0 = interior-most (lead), planeCount-1 = exterior-most (fixed end) */
+  const zAt = i => (planeCount - 1) / 2 * PITCH - i * PITCH;
+  /* panel index → track plane. Straight run: one plane each. Bi-part: 0,1,2 count in
+     from the left fixed leaf and 5,4,3 mirror in from the right. */
+  const planeOf = i => (isBipart ? (i <= 2 ? 2 - i : i - 3) : i);
 
   root.add(mesh(ringGeo(W, H, FACE, D), M.upvc, 'frame'));
 
@@ -102,7 +119,7 @@ export function buildMultiSlide(opts = {}) {
   track.add(mesh(new THREE.BoxGeometry(W - 0.004, 0.024, D - 0.012), M.upvcInner, 'sill', [0, sillY, 0]));
   track.add(mesh(new THREE.BoxGeometry(W + 0.030, 0.011, D + 0.034), M.upvc, 'sill_nose', [0, sillY - 0.015, 0]));
   const headY = openH / 2 + 0.008;
-  for (let i = 0; i < N; i++) {
+  for (let i = 0; i < planeCount; i++) {
     const z = zAt(i);
     track.add(mesh(new THREE.BoxGeometry(openW + 0.034, 0.015, PITCH - 0.014), M.upvcInner,
       'track_channel_' + (i + 1), [0, sillY + 0.011, z]));
@@ -114,11 +131,11 @@ export function buildMultiSlide(opts = {}) {
   root.add(track);
 
   /* ---- panels ---- */
-  function buildPanel(idx) {
+  function buildPanel(idx, lapDir = stackSide) {
     const name = 'panel_' + (idx + 1);
     const g = new THREE.Group();
     g.name = name + '_carrier';
-    g.position.z = zAt(idx);
+    g.position.z = zAt(planeOf(idx));
     g.add(mesh(ringGeo(panelW, panelH, PANEL_FACE, PANEL_D), M.upvc, name));
     g.add(mesh(new THREE.BoxGeometry(panelW - 0.004, BOTTOM_RAIL, PANEL_D - 0.004), M.upvc,
       name + '_bottom_rail', [0, -panelH / 2 + BOTTOM_RAIL / 2, 0]));
@@ -134,7 +151,7 @@ export function buildMultiSlide(opts = {}) {
     /* interlock stile on both leading edges — reads as the closed weather seal */
     [-1, 1].forEach((s, k) => {
       g.add(mesh(new THREE.BoxGeometry(0.013, panelH - 0.014, PITCH - 0.016), M.upvcInner,
-        name + '_interlock_' + (k + 1), [s * (panelW / 2 - 0.0065), 0, -s * stackSide * (PITCH / 2 - 0.004)]));
+        name + '_interlock_' + (k + 1), [s * (panelW / 2 - 0.0065), 0, -s * lapDir * (PITCH / 2 - 0.004)]));
     });
 
     /* rollers under each panel */
@@ -150,28 +167,73 @@ export function buildMultiSlide(opts = {}) {
   const panels = [];
   const closedX = [];
   const openX = [];
-  for (let i = 0; i < N; i++) {
-    const p = buildPanel(i);
-    /* index 0 = the panel furthest from the stack side */
-    const cx = -stackSide * (openW / 2 - panelW / 2) + stackSide * i * (panelW - OVERLAP);
-    closedX.push(cx);
-    p.position.x = cx;
-    root.add(p);
-    panels.push(p);
-  }
-  const fixedX = closedX[N - 1];
-  for (let i = 0; i < N; i++) openX.push(fixedX - stackSide * (N - 1 - i) * STACK_STEP);
+  /* which way this leaf's interlock stile leans, and where each leaf parks */
+  const lapOf = i => (isBipart ? (i <= 2 ? 1 : -1) : stackSide);
 
-  /* flush pulls on the lead panel's leading stile, both faces */
-  const lead = panels[0];
-  const leadEdge = stackSide * (panelW / 2 - PANEL_FACE / 2);
-  const pullIn = buildFlushPull(M, 'handle_interior', true);
-  pullIn.position.set(leadEdge, -0.06, PANEL_D / 2 + 0.001);
-  pullIn.rotation.y = Math.PI;
-  lead.add(pullIn);
-  const pullOut = buildFlushPull(M, 'handle_exterior', false);
-  pullOut.position.set(leadEdge, -0.06, -PANEL_D / 2 - 0.001);
-  lead.add(pullOut);
+  if (isBipart) {
+    /* left→right in x. 0 and 5 are fixed; 1,2 part left and 3,4 part right.
+       The centre joint (2|3) butts, every other joint laps. */
+    let cx = -(openW / 2 - panelW / 2);
+    /* The centre pair butts rather than laps, so it is spaced by the panel width
+       PLUS the ring bevel on each side. ringGeo() extrudes with bevelSize 0.0018,
+       which pushes each ring 1.8 mm proud of its nominal width; spacing the butt
+       joint by exactly panelW therefore drove the two leaves 3.6 mm into each
+       other over the full 2.42 m height. Every other joint laps by OVERLAP, which
+       swallows the bevel, so this is the only joint where it shows. */
+    const RING_BEVEL = 0.0018;
+    for (let i = 0; i < N; i++) {
+      if (i > 0) cx += panelW - (i === 3 ? -RING_BEVEL * 2 : OVERLAP);
+      const p = buildPanel(i, lapOf(i));
+      closedX.push(cx);
+      p.position.x = cx;
+      root.add(p);
+      panels.push(p);
+    }
+    /* each slider parks behind its own fixed end, fanned by STACK_STEP; the lead
+       leaf ends up outermost in the stack so the leaves never cross planes */
+    openX.push(closedX[0]);
+    openX.push(closedX[0] + STACK_STEP);
+    openX.push(closedX[0] + STACK_STEP * 2);
+    openX.push(closedX[5] - STACK_STEP * 2);
+    openX.push(closedX[5] - STACK_STEP);
+    openX.push(closedX[5]);
+  } else {
+    for (let i = 0; i < N; i++) {
+      const p = buildPanel(i);
+      /* index 0 = the panel furthest from the stack side */
+      const cx = -stackSide * (openW / 2 - panelW / 2) + stackSide * i * (panelW - OVERLAP);
+      closedX.push(cx);
+      p.position.x = cx;
+      root.add(p);
+      panels.push(p);
+    }
+    const fixedX = closedX[N - 1];
+    for (let i = 0; i < N; i++) openX.push(fixedX - stackSide * (N - 1 - i) * STACK_STEP);
+  }
+
+  /* which leaves move, in departure order (lead first), and which stay put */
+  const moverPlan = isBipart
+    ? [{ index: 2, delay: 0 }, { index: 3, delay: 0 }, { index: 1, delay: 0.21 }, { index: 4, delay: 0.21 }]
+    : Array.from({ length: N - 1 }, (_, i) => ({ index: i, delay: (i / Math.max(1, N - 1)) * 0.42 }));
+  const fixedIndex = isBipart ? [0, 5] : [N - 1];
+
+  /* flush pulls on each lead panel's leading stile, both faces */
+  function addPull(leaf, edgeSign, suffix = '') {
+    const edgeX = edgeSign * (panelW / 2 - PANEL_FACE / 2);
+    const pullIn = buildFlushPull(M, 'handle_interior' + suffix, true);
+    pullIn.position.set(edgeX, -0.06, PANEL_D / 2 + 0.001);
+    pullIn.rotation.y = Math.PI;
+    leaf.add(pullIn);
+    const pullOut = buildFlushPull(M, 'handle_exterior' + suffix, false);
+    pullOut.position.set(edgeX, -0.06, -PANEL_D / 2 - 0.001);
+    leaf.add(pullOut);
+  }
+  if (isBipart) {
+    addPull(panels[2], 1, '_left');   // left lead, meeting stile on its +x edge
+    addPull(panels[3], -1, '_right'); // right lead, meeting stile on its -x edge
+  } else {
+    addPull(panels[0], stackSide);
+  }
 
   root.position.y = H / 2 + 0.014;
 
@@ -193,29 +255,32 @@ export function buildMultiSlide(opts = {}) {
   }
 
   /* staggered stack motion: lead leaves first, each follower is picked up later */
-  const delays = [];
-  for (let i = 0; i < N - 1; i++) delays.push((i / Math.max(1, N - 1)) * 0.42);
+  const delays = moverPlan.map(m => m.delay);
   function setOpen(t) {
     const c = Math.min(1, Math.max(0, t));
-    for (let i = 0; i < N - 1; i++) {
-      const d = delays[i];
+    for (const m of moverPlan) {
+      const d = m.delay;
       const local = Math.min(1, Math.max(0, (c - d) / (1 - d)));
       const e = local * local * (3 - 2 * local);
-      panels[i].position.x = closedX[i] + (openX[i] - closedX[i]) * e;
+      panels[m.index].position.x = closedX[m.index] + (openX[m.index] - closedX[m.index]) * e;
     }
-    panels[N - 1].position.x = closedX[N - 1];
+    for (const i of fixedIndex) panels[i].position.x = closedX[i];
   }
   setOpen(0);
 
-  const stackW = panelW + (N - 1) * STACK_STEP;
-  const clearOpen = openW - stackW;
+  const stackPerSide = isBipart ? 2 : N - 1;
+  const stackW = panelW + stackPerSide * STACK_STEP;
+  const clearOpen = openW - stackW * (isBipart ? 2 : 1);
 
   return {
     group: root, setOpen, panels, closedX, openX, delays, scaleRef,
     dims: { W, H, D, openW, openH, panelW, panelH, overlap: OVERLAP, stackW, clearOpen, panels: N },
     config: {
-      id: 'multislide-door', motion: 'translate_x_staggered',
-      panel_count: N, stack_side: stackSide === 1 ? 'right' : 'left',
+      id: isBipart ? 'multislide-door-6panel' : 'multislide-door',
+      motion: isBipart ? 'translate_x_biparting' : 'translate_x_staggered',
+      panel_count: N,
+      ...(isBipart ? { layout: 'F-S-S-S-S-F' } : {}),
+      stack_side: isBipart ? 'both' : (stackSide === 1 ? 'right' : 'left'),
       clear_open_ratio: +(clearOpen / openW).toFixed(3),
     },
   };

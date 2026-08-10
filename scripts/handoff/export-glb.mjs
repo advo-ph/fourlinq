@@ -256,6 +256,18 @@ const SYSTEM = [
     closeLabel: "Close panels",
   },
   {
+    // The client's 2026-08-07 item 6, "Fixed-Slide-Slide-Slide-Slide-Fixed": a
+    // fixed lite at BOTH ends with four sliding leaves bi-parting from the centre.
+    // It already existed in the 2D configurator; this is the 3D counterpart.
+    id: "multislide-6panel",
+    label: "Large Panel · 6-panel",
+    module: "multislide-model.js",
+    build: "buildMultiSlide",
+    opts: { panels: 6 },
+    openLabel: "Stack open",
+    closeLabel: "Close panels",
+  },
+  {
     id: "casement-door",
     type: "casement-door",
     label: "Casement Door",

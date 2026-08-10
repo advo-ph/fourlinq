@@ -32,6 +32,7 @@ export type SystemType =
   | "sliding-door"
   | "lift-slide"
   | "multislide"
+  | "multislide-6panel"
   | "casement-door"
   | "french-door"
   | "ninety-series"
@@ -89,6 +90,7 @@ export const CATALOGUE_SYSTEM: SystemType[] = [
   "sliding-door",
   "lift-slide",
   "multislide",
+  "multislide-6panel",
   "casement-door",
   "french-door",
   "ninety-series",
@@ -428,6 +430,16 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     model: MODEL_SYSTEM("multislide"),
     center: [0, 1.314, 0],
     scale: 0.2255,
+    openTime: 2,
+    openLabel: "Stack open",
+    closeLabel: "Close panels",
+  },
+  "multislide-6panel": {
+    label: "Large Panel · 6-panel",
+    visibleRoot: ["multislide-6panel"],
+    model: MODEL_SYSTEM("multislide-6panel"),
+    center: [0, 1.314, 0],
+    scale: 0.1506,
     openTime: 2,
     openLabel: "Stack open",
     closeLabel: "Close panels",

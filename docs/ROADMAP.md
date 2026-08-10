@@ -1,6 +1,6 @@
 # FourlinQ Roadmap
 
-**Last updated: 2026-07-10** (post-meeting production/Marvin realignment; the July 5 four-card build shipped and is now superseded as the final taxonomy by Tita's By type + By material direction.)
+**Last updated: 2026-08-11** (recorded the 2026-05-31 sales-rep lead-scoping commitment, which had never been tracked here. The prior substantive revision was 2026-07-10: post-meeting production/Marvin realignment; the July 5 four-card build shipped and is now superseded as the final taxonomy by Tita's By type + By material direction.)
 
 This document tracks planned and in-progress improvements to the FourlinQ codebase beyond day-to-day client requests. It is a living document. Update phase status as work lands, and move completed phases to the bottom under "Shipped."
 
@@ -50,6 +50,37 @@ Second round of feedback after the demo. Mostly visual/photo work — deferred u
 | 16 | "International feel despite being a local fabricator" | Shipped 2026-05-29 (Brand hero + AuthorityStrip + Warranty + Finishes provenance copy). | Remaining copy uses "European-spec" / "European fenestration standards" framing. |
 | 17 | Design names — "Mali yung design niyo, check internet for meaning of each" | Blocked on Imie | She didn't enumerate which products. The brochure-verified names should stay until she points at specific ones. One certain bug fixed: `id="entrance-door"` → `casement-door` (matched the `name` field and FinishExplorer reference). |
 | 18 | AI photo cleanup (remove objects on project sites) | Blocked on Imie | Needs her to flag specific photos + objects. |
+
+---
+
+## Open client requests (from Imie 2026-05-31) — sales-rep lead scoping
+
+**This was promised to Imie in writing on 2026-05-31 and described to her as already in progress. It was never scoped into this roadmap, no ticket was opened, and the assignment half of it has no code.** Recording it here is the point of this section — the commitment has been outstanding and invisible for over two months.
+
+Item numbers continue the global sequence (19–25 were claimed by chat round 3 below, which is dated later).
+
+| # | Request | Status | Notes |
+|---|---|---|---|
+| 26 | Per-rep login, and a lead visible only to its assigned rep | Blocked — partially unbuilt, promised as in progress | Per-user login exists; **rep scoping does not**. There is no assignment column anywhere in the codebase, so "visible only to the assigned rep" cannot be expressed today. See the breakdown below. |
+| 27 | Per-lead status tagging (contacted / quoted / won / lost) | **Shipped** (date unrecorded; predates this entry) | Already live end to end — `server/routes/inquiries.ts:36` defines `VALID_STATUSES = ["new", "contacted", "quoted", "won", "lost"]`, `PATCH /api/admin/inquiries/:id` (`:221-271`) writes it, and `src/pages/Admin.tsx:724-735` renders the five buttons wired to `updateStatus` (`:414-423`). The four tags she named all exist. Do not re-promise this as future work. |
+| 28 | Inquiry auto-email to sales@fourlinq.com (same promise, same conversation) | Blocked on credentials since May — see Phase 2 / item 4 / **B26** | Code is complete and wired into all three POST handlers (`server/routes/inquiries.ts:75`, `:110`, `:148`). It has been a no-op every day since, because SMTP credentials were never supplied: `server/lib/mailer.ts:42` still logs `[mailer] SMTP credentials missing — inquiry notifications will be skipped.` on the VPS to this day. Zero dev hours remain; only the credentials are missing. |
+
+### What actually exists, and what does not
+
+Split the promise into its three parts, because they are in three different states and conflating them is how this stayed invisible.
+
+**Per-rep login — partial.** Per-user accounts, bcrypt hashing, JWT-in-cookie, and `requireRole` all shipped in Phase 4. A **`agent` / "Sales Agent" role row is already seeded** (`server/migrations/002_seed.sql:1000-1024`, alongside `super_admin`, `admin`, `customer`). What is missing is that the inquiry surface does not use any of it: `server/index.ts:77` mounts the admin routes as `app.use("/api/admin", requireAdmin, inquiriesRouter)`, and `server/index.ts:58` documents `requireAdmin` as *"any authenticated user"*. `requireRole` is applied to CMS, uploads, users, and project-images (`server/index.ts:64-74`) but **not** to inquiries. So a rep logging in today sees the same view an admin does.
+
+**A lead visible only to its assigned rep — no code at all.** There is no assignment concept in the running system. A repo-wide grep for `assigned_to|assigned_rep|sales_rep|rep_id` returns exactly one hit, and it is inside a design document: `docs/BACKEND_SCHEMA.md:1590`. The list query is unscoped — `server/routes/inquiries.ts:183` builds `SELECT * FROM inquiries WHERE 1=1` and filters only on `type` and `status`, never on an owner.
+
+**Do not cite BACKEND_SCHEMA.md as progress.** That document designs the whole feature — a `lead` table with `assigned_agent_id` (`:962-967`), plus `lead_assignment` (`:1033`), `lead_activity` (`:1011`), an RLS policy literally named `agent_lead_access` (`:1555-1565`), and a supporting index (`:1590`). **None of it is implemented.** No migration creates `lead`; migration `001_schema.sql` creates 23 tables ending at `project` and the live table the code actually writes to is `inquiries`, which has **no DDL in this repo at all** — only an INSERT at `scripts/seed.sql:24`. This is the same doc-vs-database drift the read-only audit in `1961d1c` flagged. The design is real work and a good starting point, but it is a paper architecture; it is not shipped, and it must not be reported to the client as if it were.
+
+### Before the next client conversation
+
+- Say plainly that status tagging is live and the other half is not. The honest position is that one of the three parts shipped, one is half-built on top of existing auth, and one was never started.
+- The mailer and this ask are the **same promise to the same person** and should be raised together — she has been told twice that lead handling was moving.
+- Two decisions are needed before any build: whether a rep is modelled on the existing `agent` row or as a new `role`, and whether an unassigned lead is visible to everyone or to admin only (the current behaviour is "everyone authenticated", which is the status quo by omission, not by decision).
+- No benchmark is written yet. Per the validation rule used elsewhere in this document, this should not be promoted to an active build item until it has a falsifiable one — at minimum: a test proving a rep-role session receives only its own assigned lead from `GET /api/admin/inquiries`, and receives 403 or an empty set for another rep's.
 
 ---
 

@@ -31,6 +31,28 @@ Keep entries concise — one line per change, written in past tense, focused on 
 >
 > The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
 
+### Session: 2026-08-11 — the client's Aug-7 list, closed where it could be
+
+#### Added
+
+- **Fixed-Slide-Slide-Slide-Slide-Fixed, in 3D** — item 6 of the client's 2026-08-07 list existed in the 2D configurator but had no 3D counterpart; `multislide-model.js` was hard-clamped to 3 or 4 panels and only ever fixed ONE leaf. It now builds a true six-panel bi-parting run: a fixed lite at both ends, four sliders parting from the centre, 2799 mm of travel. [scripts/handoff/model/multislide-model.js](../scripts/handoff/model/multislide-model.js).
+- **Product tiles rendered from geometry we own.** `scripts/render-product-tile.mjs` drives the viewer in a real browser, hides the overlay chrome, and captures the canvas — which three.js creates with `alpha: true`, so the output has a genuinely transparent background, trimmed to the model with a margin. Louvre's tile is no longer a line drawing: it is the actual system in Charcoal Gray, 1200×675, 37 KB, 79% transparent.
+- **Two internal sheets for the 08-12 meeting** — [MEETING_2026-08-12.md](./MEETING_2026-08-12.md) walks the client's nine items with an evidence-backed status for each, and [ATTENDANCE_APP_QUESTIONS.md](./ATTENDANCE_APP_QUESTIONS.md) answers her four questions on the separate attendance project — including the tension in her first one: face recognition on a co-worker's phone is the mechanism of buddy-punching, so "yes" and "the record is trustworthy" cannot both hold without a device or supervision constraint.
+- **The 2026-05-31 sales-rep commitment is now in the roadmap**, where it had never been recorded despite being promised to the client in writing and described as already in progress. Auditing it turned up better news than expected: per-lead status tagging (contacted / quoted / won / lost) is already shipped end to end — `VALID_STATUSES` in `server/routes/inquiries.ts:36`, the PATCH route, and the five buttons in Admin. Only per-rep assignment and scoping are missing. [docs/ROADMAP.md](./ROADMAP.md).
+
+#### Fixed
+
+- **The six-panel run's centre leaves interpenetrated by 3.6 mm** over the full 2.42 m height. `ringGeo` extrudes with `bevelSize` 0.0018, pushing each ring 1.8 mm proud of its nominal width, and the butt joint was spaced by exactly `panelW`. Every other joint laps by 36 mm on a separate track and swallows the bevel, which is why this was the only joint where it showed. Now spaced by the bevel: measured gap −0.000 mm.
+- **The 3D viewer follows the finish the host page passes in, explicitly.** `selectedId` was seeded from `initialFinishId` by `useState`, which reads a prop once and ignores every later value. It worked anyway — measured, clicking Jet Black in the configurator's own finish list moves 16% of the canvas and the viewer's label follows — but only because the component happens to remount. That is a bad thing to discover mid-demo.
+- **The tile renderer defaulted to 4:3, and `/products` renders the grid card at 16:9 with `object-cover`** — which crops rather than letterboxes, so a 4:3 tile lost 113 px off the top and 113 off the bottom: exactly the head rail and the sill, the two details that identify a window system. Default is now 16:9, lossless on the card and safe in the 4:3 detail drawer because that one uses `object-contain`.
+
+#### Notes
+
+- **Item 1 was reported as broken and is not.** An audit pass concluded from reading the source that the configurator's finish picker did not reach the 3D model, and the meeting sheet said so. A browser check refuted it: three consecutive finishes, each with a real pixel delta and the viewer's label tracking, using a control proven to sit outside the viewer. The sheet was corrected before it could talk down working software in front of the client.
+- **`npm run handoff:export` is not byte-deterministic.** Re-baking rewrote `combination-bay.glb` and `combination-bow.glb` with identical byte counts but different content, from an unchanged builder. They were restored rather than committed. Worth fixing before the bake is ever used as a diff signal.
+- **The by-area photo work is built but nearly empty.** `project-area.ts` implements the client's exact "village — city" convention and the UI groups by region, but of 61 projects only 19 carry a region and just one carries a village. Six of the seven areas she named have no project at all. Only she can close that gap.
+- **The louvre tile is a CG render sitting beside 14 photographs**, and `ROADMAP` item 20 records a client preference for real photography over synthetic renders. It replaces a drawing captioned "schematic placeholder", so it improves on what shipped — but it is not a photograph, and swapping it for one is a one-line change to `products.ts`.
+
 ### Session: 2026-08-10 — the licensed model renders nothing, and the open button works again
 
 #### Fixed

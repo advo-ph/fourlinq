@@ -247,6 +247,18 @@ const Window3D = ({
     setIsOpen(false);
   }, [shownSystem]);
 
+  // Follow the finish the host page passes in, not just the one it passed first.
+  // `selectedId` is seeded from `initialFinishId` by useState, which reads it once
+  // and ignores every later value — so the configurator's own finish step only
+  // reaches the model because the viewer happens to remount when it changes.
+  // Measured: it does work today (clicking Jet Black in the left-hand panel moves
+  // 0.16 of the canvas and the chip follows), but it works by accident of
+  // reconciliation rather than by anything stated here, and a demo is a bad place
+  // to discover that a parent stopped remounting. This makes it explicit.
+  useEffect(() => {
+    setSelectedId(initialFinishId);
+  }, [initialFinishId]);
+
   const selected = useMemo(
     () => FRAME_FINISHES.find((f) => f.id === selectedId) ?? FRAME_FINISHES.find((f) => f.id === "white")!,
     [selectedId]

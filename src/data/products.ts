@@ -333,9 +333,19 @@ export const products: Product[] = [
     description:
       "Operable louvre windows with adjustable horizontal blades for controlled ventilation. Blades open together so air moves even when you want the opening to stay rain-aware. Common in kitchens, bathrooms, utility rooms, and tropical facades that need airflow without a full sash swing. Available in glass louvre blades; project consultation for blade count, frame finish, and insect-screen options.",
     shortDescription: "Blade-by-blade ventilation for tropical rooms.",
-    // Schematic placeholder — no verified client product photo in-repo yet.
-    // See docs/AUG07_ASSET_REQUEST.md.
-    image: "/images/products/schematic/louvre.svg",
+    // CG RENDER, not a photograph. Rendered off the louvre GLB this repo owns
+    // (scripts/handoff/model/louvre-model.js → public/models/system/louvre.glb)
+    // by `npm run tile:render -- --system louvre --open --finish charcoal-gray`.
+    // It is the same geometry the 3D viewer shows, captured open so the blade
+    // tilt is legible, on a transparent background. It replaces the line-art
+    // schematic, NOT a client photo request: a still of our own model beside
+    // real photographs reads as CG, and the client has already pushed back on
+    // exactly that — docs/ROADMAP.md:109 (item 20, "Use REAL project
+    // photography on the cards, not synthetic 3D renders") and :452 ("Imie
+    // rejects the white-bg renders"). The photo ask in
+    // docs/AUG07_ASSET_REQUEST.md therefore still stands; this is a better
+    // placeholder, not a delivery.
+    image: "/images/products/render/louvre.png",
     specs: [
       "Adjustable horizontal louvre blades",
       "Ventilation with partial rain protection when angled",
