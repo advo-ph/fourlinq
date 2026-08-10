@@ -32,6 +32,11 @@ export interface MergedProjectImagesResponse {
   /** projectId → aspect ratio string ('16:9' | '4:3'). Used by /inspiration card thumbnails. */
   projectRatios?: Record<string, string>;
 
+  /** projectId → admin-set display name. Rendered instead of the static/CMS name on
+   *  /inspiration cards and the /projects/:slug title. Only renamed projects appear
+   *  here; the project's slug and image paths are unaffected by a rename. */
+  projectNames?: Record<string, string>;
+
   /** projectIds with project_flagged override. Public payload only — no automation. */
   flaggedProjects?: string[];
 

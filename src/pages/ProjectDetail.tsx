@@ -40,6 +40,9 @@ const ProjectDetail = () => {
   // projectRatios from the merged API — same endpoint as Inspiration.tsx.
   // Defaults to empty so the hero falls back to 16:9 while the request is in flight.
   const [projectRatios, setProjectRatios] = useState<MergedProjectImagesResponse["projectRatios"]>({});
+  // Admin-set display names from the merged API. Empty until the fetch settles, so
+  // the static/CMS name renders first and is replaced only when a rename exists.
+  const [projectNames, setProjectNames] = useState<MergedProjectImagesResponse["projectNames"]>({});
   // Hidden/deleted state from the merged API. Used to filter gallery images and
   // exclude hidden/deleted projects from the "Adjacent projects" section.
   const [hiddenImages, setHiddenImages] = useState<MergedProjectImagesResponse["hiddenImages"]>({});
@@ -81,6 +84,7 @@ const ProjectDetail = () => {
       .then((data) => {
         if (!active) return;
         setProjectRatios(data.projectRatios ?? {});
+        setProjectNames(data.projectNames ?? {});
         setHiddenImages(data.hiddenImages ?? {});
         setHiddenProjectIds(
           new Set([...(data.hiddenProjects ?? []), ...(data.deletedProjects ?? [])])
@@ -142,6 +146,9 @@ const ProjectDetail = () => {
   // which matches the paths stored in projects.ts, so no normalization is needed.
   const projectHiddenSet = new Set(hiddenImages[selectedProject.id] ?? []);
 
+  // Admin rename wins over the static/CMS name for the title and every alt string.
+  const displayName = projectNames?.[selectedProject.id] ?? selectedProject.name;
+
   // --- Gallery source of truth ---
   //
   // Live-first: if the merged API has resolved and returned a gallery list for
@@ -177,7 +184,7 @@ const ProjectDetail = () => {
     // alt text: first image is the project name; subsequent images are numbered.
     visibleGalleryPhotos = liveGalleryPaths.map((src, i) => ({
       src,
-      alt: i === 0 ? selectedProject.name : `${selectedProject.name} detail ${i}`,
+      alt: i === 0 ? displayName : `${displayName} detail ${i}`,
     }));
   } else {
     // Static fallback: API responded but this project is not in projectGalleryImages
@@ -189,16 +196,16 @@ const ProjectDetail = () => {
     })();
 
     const baseGalleryPhotos: Array<{ src: string; alt: string }> = [
-      { src: selectedProject.image, alt: selectedProject.name },
+      { src: selectedProject.image, alt: displayName },
       ...(selectedProject.gallery ?? []).map((src, i) => ({
         src,
-        alt: `${selectedProject.name} detail ${i + 1}`,
+        alt: `${displayName} detail ${i + 1}`,
       })),
     ].filter((photo) => !projectHiddenSet.has(photo.src));
 
     visibleGalleryPhotos = adminCoverPath
       ? [
-          { src: adminCoverPath, alt: selectedProject.name },
+          { src: adminCoverPath, alt: displayName },
           ...baseGalleryPhotos.filter((p) => p.src !== adminCoverPath),
         ]
       : baseGalleryPhotos;
@@ -207,7 +214,7 @@ const ProjectDetail = () => {
   // Guard: if everything is hidden/empty, keep at least the baseline hero so
   // we never render a blank gallery.
   if (visibleGalleryPhotos.length === 0) {
-    visibleGalleryPhotos = [{ src: selectedProject.image, alt: selectedProject.name }];
+    visibleGalleryPhotos = [{ src: selectedProject.image, alt: displayName }];
   }
 
   // versionedImage appends ?v=<hash> to bust stale cached copies after a
@@ -226,7 +233,7 @@ const ProjectDetail = () => {
       {/* Full-width immersive hero gallery — outside container-editorial */}
       <ProjectHeroGallery
         photos={galleryPhotos}
-        title={selectedProject.name}
+        title={displayName}
         ratio={heroRatio}
       />
 
@@ -350,13 +357,15 @@ const ProjectDetail = () => {
                 Adjacent projects.
               </h2>
               <ul className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-10">
-                {otherProjects.map((other) => (
+                {otherProjects.map((other) => {
+                  const otherName = projectNames?.[other.id] ?? other.name;
+                  return (
                   <li key={other.id}>
                     <Link to={`/projects/${other.id}`} className="group block">
                       <div className="aspect-[4/3] bg-[color:var(--canvas-soft)] overflow-hidden">
                         <img
                           src={versionedImage(other.image)}
-                          alt={other.name}
+                          alt={otherName}
                           loading="lazy"
                           decoding="async"
                           className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
@@ -364,11 +373,12 @@ const ProjectDetail = () => {
                       </div>
                       <p className="mt-4 eyebrow">{projectLocationLabel(other.area, other.location)}</p>
                       <p className="mt-2 font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
-                        {other.name}
+                        {otherName}
                       </p>
                     </Link>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </div>
           )}

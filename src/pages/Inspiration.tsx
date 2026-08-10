@@ -61,7 +61,8 @@ type ViewProject = {
 function toView(p: Project, mergedData: MergedProjectImagesResponse): ViewProject {
   return {
     id: p.id,
-    name: p.name,
+    // An admin rename wins over the static/CMS name; everything else falls through.
+    name: mergedData.projectNames?.[p.id] ?? p.name,
     location: p.location,
     locationLabel: projectLocationLabel(p.area, p.location),
     area: p.area,

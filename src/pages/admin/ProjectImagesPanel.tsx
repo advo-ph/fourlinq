@@ -54,6 +54,7 @@ import {
   Ratio as RatioIcon,
   Bookmark,
   RefreshCw,
+  Pencil,
 } from "lucide-react";
 import { toThumbPath } from "@/lib/project-thumbs";
 import { versionedImage } from "@/lib/image-version";
@@ -109,6 +110,8 @@ interface BaselineProject {
   hidden: boolean;
   deleted: boolean;
   ratio: string;
+  /** Admin-set display name, or null when the project has never been renamed. */
+  name: string | null;
 }
 
 interface BaselineResponse {
@@ -341,6 +344,7 @@ function ProjectOrderRow({
   checked,
   hidden,
   deleted,
+  name,
   onOpen,
 }: {
   pid: string;
@@ -351,9 +355,10 @@ function ProjectOrderRow({
   checked: boolean;
   hidden: boolean;
   deleted: boolean;
+  name?: string | null;
   onOpen: (id: string) => void;
 }) {
-  const displayName = projectDisplayName(pid);
+  const displayName = name ?? projectDisplayName(pid);
   const inner = (
     <>
       <span className="text-[10px] text-muted-foreground w-5 text-right shrink-0">{index + 1}</span>
@@ -517,7 +522,7 @@ function ProjectListView({
                 </div>
                 {/* Info */}
                 <div className="px-3.5 py-2.5">
-                  <p className="text-sm font-medium text-foreground truncate">{projectDisplayName(proj.id)}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{proj.name ?? projectDisplayName(proj.id)}</p>
                   <p className="text-xs text-muted-foreground truncate font-mono">{proj.id}</p>
                   <div className="flex gap-1 mt-1.5 flex-wrap">
                     {proj.derivedTags.map((tag) => (
@@ -955,6 +960,13 @@ function ProjectDetailView({
   const [orderTab, setOrderTab] = useState<"all" | Category | "hidden">("all");
   const [lightbox, setLightbox] = useState<LightboxData | null>(null);
 
+  // Inline rename state. `name` is null until the project has been renamed, so the
+  // static catalog name is the display fallback and also the seed for the draft.
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
+  const [savingName, setSavingName] = useState(false);
+  const currentName = project.name ?? projectDisplayName(project.id);
+
   // Compute per-image override state early — needed for computeImageOrder
   const projectOverrides = overrides.filter((r) => r.project_id === project.id);
 
@@ -975,6 +987,9 @@ function ProjectDetailView({
       project.images,
       overrides.filter((r) => r.project_id === project.id),
     ));
+    // Close any open rename editor — a draft left over from the previous project
+    // would otherwise appear to belong to the newly selected one.
+    setEditingName(false);
   }
   const hiddenSet = new Set(projectOverrides.filter((r) => r.override_type === "hidden").map((r) => r.image_path));
   const replacedMap = new Map(projectOverrides.filter((r) => r.override_type === "replaced").map((r) => [r.image_path, r.value_text ?? ""]));
@@ -1208,6 +1223,26 @@ function ProjectDetailView({
     });
   }
 
+  async function handleSaveName() {
+    const trimmed = nameDraft.trim();
+    // Nothing to persist for a blank or unchanged draft — just close the editor.
+    if (trimmed.length === 0 || trimmed === currentName) {
+      setEditingName(false);
+      return;
+    }
+    setSavingName(true);
+    try {
+      await handleAddProjectOverride("project_name", trimmed);
+      onShowToast("Project renamed", "success");
+      setEditingName(false);
+    } catch {
+      // Keep the editor open so the typed name survives a failed save.
+      onShowToast("Rename failed — name not saved", "error");
+    } finally {
+      setSavingName(false);
+    }
+  }
+
   async function handleDeleteProjectOverride(type: string) {
     const row = projectOverrides.find(
       (r) => r.override_type === type && r.image_path === "__project__"
@@ -1259,7 +1294,64 @@ function ProjectDetailView({
           </button>
         )}
         <div>
-          <h2 className="text-base font-semibold">{projectDisplayName(project.id)}</h2>
+          {editingName ? (
+            <div className="flex items-center gap-1.5">
+              <input
+                autoFocus
+                value={nameDraft}
+                maxLength={120}
+                disabled={savingName}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void handleSaveName();
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    setEditingName(false);
+                  }
+                }}
+                aria-label="Project display name"
+                className="text-base font-semibold bg-background border border-border rounded px-2 py-1 min-w-0 w-56 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50"
+              />
+              <button
+                type="button"
+                onClick={() => void handleSaveName()}
+                disabled={savingName}
+                aria-label="Save name"
+                title="Save name"
+                className="p-1 rounded text-green-600 hover:bg-green-500/15 disabled:opacity-50 transition-colors"
+              >
+                {savingName ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingName(false)}
+                disabled={savingName}
+                aria-label="Cancel rename"
+                title="Cancel"
+                className="p-1 rounded text-destructive hover:bg-destructive/15 disabled:opacity-50 transition-colors"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <h2 className="text-base font-semibold">{currentName}</h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setNameDraft(currentName);
+                  setEditingName(true);
+                }}
+                aria-label={`Rename ${currentName}`}
+                title="Rename project"
+                className="p-1 rounded text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
+              >
+                <Pencil size={13} />
+              </button>
+            </div>
+          )}
           <p className="text-xs text-muted-foreground font-mono">{project.id}</p>
           <p className="text-xs text-muted-foreground">
             {project.images.length} images · {projectOverrides.length} override{projectOverrides.length !== 1 ? "s" : ""}
@@ -1346,6 +1438,19 @@ function ProjectDetailView({
             >
               <RatioIcon size={13} /> Ratio: {project.ratio}
             </button>
+
+            {/* Reset name — only meaningful once a rename override exists. Drops the
+                override so the static/CMS catalog name applies again. */}
+            {project.name && (
+              <button
+                type="button"
+                onClick={() => handleDeleteProjectOverride("project_name")}
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-muted text-muted-foreground hover:bg-border transition-colors"
+                title={`Restore the original name (${projectDisplayName(project.id)})`}
+              >
+                <RotateCcw size={13} /> Reset name
+              </button>
+            )}
 
             {/* Hide toggle */}
             <button
@@ -1578,6 +1683,7 @@ function ProjectDetailView({
                             checked={p.checked}
                             hidden={p.hidden}
                             deleted={p.deleted}
+                            name={p.name}
                             onOpen={onSelectProject}
                           />
                         </div>
@@ -1641,6 +1747,7 @@ function ProjectDetailView({
                                 checked={p?.checked ?? false}
                                 hidden={p?.hidden ?? false}
                                 deleted={p?.deleted ?? false}
+                                name={p?.name ?? null}
                                 onOpen={onSelectProject}
                               />
                             )}
@@ -1708,6 +1815,7 @@ function ProjectDetailView({
                                 checked={p?.checked ?? false}
                                 hidden={p?.hidden ?? false}
                                 deleted={p?.deleted ?? false}
+                                name={p?.name ?? null}
                                 onOpen={onSelectProject}
                               />
                             )}
@@ -1785,7 +1893,7 @@ export default function ProjectImagesPanel() {
   // update without a manual page refresh (Gap B fix).
   const PROJECT_LEVEL_TYPES = new Set([
     "project_flagged", "project_checked", "project_hidden", "project_deleted", "project_ratio",
-    "score_override",
+    "score_override", "project_name",
   ]);
 
   const addOverrideMutation = useMutation({

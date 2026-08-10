@@ -91,6 +91,10 @@ export interface MergedResponse {
   hiddenProjects: string[];
   deletedProjects: string[];
   projectRatios: Record<string, string>;
+  /** projectId → admin-set display name. Rendered instead of the static/CMS name
+   *  on /inspiration cards and the /projects/:slug title. The project_id is
+   *  unaffected — renaming never moves a slug, directory, or image path. */
+  projectNames: Record<string, string>;
   /** projectId → cover image path for All-projects cards, project hero, and InspirationStrip tiles.
    *  Derived server-side as the first non-hidden image in the project's effective image_order
    *  (with replaced value applied). Never requires a manual override — reordering images in
@@ -232,6 +236,7 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
   const hiddenProjectSet = new Set<string>(); // projectIds with project_hidden override
   const deletedProjectSet = new Set<string>(); // projectIds with project_deleted override
   const projectRatioMap = new Map<string, string>(); // projectId → value_text ('16:9' | '4:3')
+  const projectNameMap = new Map<string, string>(); // projectId → value_text (display name)
   const scoreOverrideMap = new Map<string, Map<string, number>>(); // "projectId|imagePath" → category → value_int
 
   for (const row of overrides) {
@@ -274,6 +279,9 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
         break;
       case "project_ratio":
         if (row.value_text) projectRatioMap.set(row.project_id, row.value_text);
+        break;
+      case "project_name":
+        if (row.value_text) projectNameMap.set(row.project_id, row.value_text);
         break;
       case "score_override":
         if (row.category && row.value_int !== null) {
@@ -439,6 +447,13 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     projectRatios[id] = ratio;
   }
 
+  // Build projectNames for public payload — only renamed projects appear here;
+  // clients fall back to the static/CMS name for everything else.
+  const projectNames: Record<string, string> = {};
+  for (const [id, name] of projectNameMap.entries()) {
+    projectNames[id] = name;
+  }
+
   // Derive projectCoverImages and projectGalleryImages for public payload.
   //
   // For each covered project the server builds an "effective image list" that:
@@ -504,6 +519,7 @@ function buildMergedResponse(baseline: BaselineData, overrides: OverrideRow[]): 
     hiddenProjects: [...hiddenProjectSet],
     deletedProjects: [...deletedProjectSet],
     projectRatios,
+    projectNames,
     projectCoverImages,
     projectGalleryImages,
   };
@@ -624,7 +640,7 @@ projectImagesAdmin.post("/overrides", async (req, res) => {
       "hidden", "replaced", "best_for_category",
       "project_order", "category_order", "image_order",
       "project_flagged", "project_checked", "project_hidden", "project_deleted",
-      "project_ratio", "score_override", "image_flagged",
+      "project_ratio", "score_override", "image_flagged", "project_name",
     ];
     if (!validTypes.includes(override_type)) {
       return res.status(400).json({ error: `Invalid override_type: ${override_type}` });
@@ -633,6 +649,18 @@ projectImagesAdmin.post("/overrides", async (req, res) => {
     const validCategories = ["windows", "doors", "interior", "exterior", null];
     if (!validCategories.includes(category)) {
       return res.status(400).json({ error: `Invalid category: ${category}` });
+    }
+
+    // A rename carries the entire user-visible value, so it is validated rather
+    // than stored blind: a blank or oversized name would silently break the card
+    // and detail-page titles with no way to tell it apart from "not renamed".
+    let normalizedValueText: string | null = value_text;
+    if (override_type === "project_name") {
+      const trimmed = typeof value_text === "string" ? value_text.trim() : "";
+      if (trimmed.length === 0 || trimmed.length > 120) {
+        return res.status(400).json({ error: "project_name requires a non-empty value_text (max 120 chars)" });
+      }
+      normalizedValueText = trimmed;
     }
 
     // Get the requesting user's ID from req.user (set by requireRole middleware)
@@ -648,7 +676,7 @@ projectImagesAdmin.post("/overrides", async (req, res) => {
          value_int  = EXCLUDED.value_int,
          updated_at = NOW()
        RETURNING *`,
-      [project_id, image_path, override_type, category, value_text, value_int, createdBy]
+      [project_id, image_path, override_type, category, normalizedValueText, value_int, createdBy]
     );
 
     res.json({ override: rows[0] });
@@ -738,6 +766,7 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
     const baselineHiddenProjectSet = new Set<string>();
     const baselineDeletedProjectSet = new Set<string>();
     const baselineProjectRatioMap = new Map<string, string>();
+    const baselineProjectNameMap = new Map<string, string>();
     const baselineScoreOverrideMap = new Map<string, Map<string, number>>();
 
     for (const row of overrideRows) {
@@ -756,6 +785,9 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
           break;
         case "project_ratio":
           if (row.value_text) baselineProjectRatioMap.set(row.project_id, row.value_text);
+          break;
+        case "project_name":
+          if (row.value_text) baselineProjectNameMap.set(row.project_id, row.value_text);
           break;
         case "score_override":
           if (row.category && row.value_int !== null) {
@@ -799,6 +831,8 @@ projectImagesAdmin.get("/baseline", async (req, res) => {
           hidden: baselineHiddenProjectSet.has(c.id),
           deleted: baselineDeletedProjectSet.has(c.id),
           ratio: baselineProjectRatioMap.get(c.id) ?? "4:3",
+          // null = never renamed; the admin panel falls back to the static catalog name.
+          name: baselineProjectNameMap.get(c.id) ?? null,
         };
       });
 
