@@ -2,7 +2,7 @@
  * Data integrity tests — catch the kinds of bugs that the 2026-05-29 Tita
  * revision pass surfaced (id/name mismatch, missing video, parochial copy).
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { products } from "@/data/products";
@@ -21,6 +21,24 @@ export const AUG07_PRODUCT_ID = [
 export function publicImageExists(publicPath: string): boolean {
   const relative = publicPath.replace(/^\//, "");
   return existsSync(resolve(process.cwd(), "public", relative));
+}
+
+/**
+ * SQL of the highest-numbered migration that writes a `description` for `slug`.
+ * Copy gets revised in later migrations, so the newest one is the authority the
+ * static catalog has to agree with. Returns null when no migration sets it.
+ */
+export function newestMigrationCopyFor(slug: string): string | null {
+  const dir = resolve(process.cwd(), "server/migrations");
+  const ordered = readdirSync(dir)
+    .filter((name) => /^\d+_.*\.sql$/.test(name))
+    .sort((a, b) => Number.parseInt(b, 10) - Number.parseInt(a, 10));
+
+  for (const name of ordered) {
+    const sql = readFileSync(resolve(dir, name), "utf8");
+    if (sql.includes(`'${slug}'`) && /description/.test(sql)) return sql;
+  }
+  return null;
 }
 
 describe("products data integrity", () => {
@@ -179,7 +197,7 @@ describe("Aug 8 door-automation split (automated-door)", () => {
   });
 });
 
-describe("migration 020 ↔ static catalog parity", () => {
+describe("migration ↔ static catalog parity", () => {
   it("020 seeds automated-door and narrows automated-window", () => {
     const migrationPath = resolve(
       process.cwd(),
@@ -197,17 +215,20 @@ describe("migration 020 ↔ static catalog parity", () => {
     expect(sql).not.toMatch(/\bDROP\b/i);
   });
 
-  it("the static description and the migration description agree for automated-door", () => {
-    const sql = readFileSync(
-      resolve(process.cwd(), "server/migrations/020_automated_door_split.sql"),
-      "utf8",
-    );
-    const product = products.find((p) => p.id === "automated-door")!;
-    // Static catalog is the fallback when /api/products errors, so a drift
-    // between the two ships two different products under one id.
-    expect(sql).toContain(product.description);
-    expect(sql).toContain(product.shortDescription);
-  });
+  it.each(["automated-door", "automated-window"])(
+    "the static copy for %s matches the newest migration that sets it",
+    (slug) => {
+      // Static catalog is the fallback when /api/products errors, so a drift
+      // between the two ships two different products under one id. Copy gets
+      // revised, so the authority is the HIGHEST-numbered migration that writes
+      // a description for the slug, not one hard-coded file.
+      const sql = newestMigrationCopyFor(slug);
+      expect(sql, `no migration writes a description for ${slug}`).not.toBeNull();
+      const product = products.find((p) => p.id === slug)!;
+      expect(sql).toContain(product.description);
+      expect(sql).toContain(product.shortDescription);
+    },
+  );
 });
 
 describe("migration 019 ↔ static catalog id parity", () => {

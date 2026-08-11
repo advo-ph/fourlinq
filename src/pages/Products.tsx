@@ -136,7 +136,7 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
           )}
 
           {/* Finishes */}
-          <p className="eyebrow mb-4">Listed finish entries · confirm</p>
+          <p className="eyebrow mb-4">Listed finish entries</p>
           {product.finishes.some((f) => FRAME_FINISHES.find((v) => v.label === f.name)?.category === "wood-grain") && (
             <>
               <p className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--ink-muted)] mb-3">Wood grain</p>
@@ -184,7 +184,7 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
           )}
 
           {/* Glass */}
-          <p className="eyebrow mb-4">Listed glass entries · confirm</p>
+          <p className="eyebrow mb-4">Listed glass entries</p>
           {product.glassOptions.length > 0 ? (
             <div className="flex gap-2 flex-wrap mb-10">
               {product.glassOptions.map((glass) => (

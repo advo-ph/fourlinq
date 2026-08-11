@@ -293,15 +293,16 @@ export const products: Product[] = [
     description:
       "Frameless or minimal-framed glass railing and balcony systems for residential and commercial openings. Tempered safety glass panels with discrete hardware, suited to balconies, mezzanines, stair edges, and terrace edges where the view should stay open. Project-specified: panel height, mounting detail, and glass type are set per drawing. Consultation required for structural fixings and local code.",
     shortDescription: "Open views. Safety glass at the edge.",
-    // Schematic placeholder — no verified client product photo in-repo yet.
-    // See docs/AUG07_ASSET_REQUEST.md.
-    image: "/images/products/schematic/glass-railing.svg",
+    // Client-approved RENDER (2026-08-12), not a photograph — hence render/,
+    // not real/. ROADMAP item 20 / R4 record the client rejecting white-bg
+    // renders in general; she approved this one specifically. The real-photo
+    // ask in docs/AUG07_ASSET_REQUEST.md still stands.
+    image: "/images/products/render/glass-railing.webp",
     specs: [
       "Tempered safety glass panels",
       "Frameless or minimal-frame hardware options",
       "Balcony, mezzanine, and terrace applications",
       "Project-specified height and mounting",
-      "⚠️ Indicative only — structural fixings and code compliance by project consultation",
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
@@ -333,19 +334,17 @@ export const products: Product[] = [
     description:
       "Operable louvre windows with adjustable horizontal blades for controlled ventilation. Blades open together so air moves even when you want the opening to stay rain-aware. Common in kitchens, bathrooms, utility rooms, and tropical facades that need airflow without a full sash swing. Available in glass louvre blades; project consultation for blade count, frame finish, and insect-screen options.",
     shortDescription: "Blade-by-blade ventilation for tropical rooms.",
-    // CG RENDER, not a photograph. Rendered off the louvre GLB this repo owns
-    // (scripts/handoff/model/louvre-model.js → public/models/system/louvre.glb)
-    // by `npm run tile:render -- --system louvre --open --finish charcoal-gray`.
-    // It is the same geometry the 3D viewer shows, captured open so the blade
-    // tilt is legible, on a transparent background. It replaces the line-art
-    // schematic, NOT a client photo request: a still of our own model beside
-    // real photographs reads as CG, and the client has already pushed back on
-    // exactly that — docs/ROADMAP.md:109 (item 20, "Use REAL project
-    // photography on the cards, not synthetic 3D renders") and :452 ("Imie
-    // rejects the white-bg renders"). The photo ask in
-    // docs/AUG07_ASSET_REQUEST.md therefore still stands; this is a better
-    // placeholder, not a delivery.
-    image: "/images/products/render/louvre.png",
+    // Client-approved RENDER (2026-08-12), not a photograph — hence render/,
+    // not real/. Supersedes the CG render 2e9f874 built off our own louvre GLB
+    // (public/images/products/render/louvre.png, still produced by
+    // `npm run tile:render -- --system louvre --open --finish charcoal-gray`),
+    // swapped by client instruction. 2e9f874's caveat still holds and is worth
+    // repeating: docs/ROADMAP.md:109 (item 20, "Use REAL project photography on
+    // the cards, not synthetic 3D renders") and :452 ("Imie rejects the
+    // white-bg renders") record the general rejection. She approved this
+    // specific image, so it is the documented exception, not a reversal. The
+    // photo ask in docs/AUG07_ASSET_REQUEST.md is still open.
+    image: "/images/products/render/louvre.webp",
     specs: [
       "Adjustable horizontal louvre blades",
       "Ventilation with partial rain protection when angled",
@@ -361,16 +360,15 @@ export const products: Product[] = [
     name: "Automated Windows",
     category: "windows",
     description:
-      "Motorised window opening devices for operable windows. Open high or hard-to-reach sashes without climbing; pair with wall switches, remotes, or building controls where specified. Answers the window opening devices ask from the 2026-07-10 client meeting (00:21:11) — door automation and digital access is a separate product, Automated Door Access, filed under doors. Hardware and control scope are project-specified — not a single SKU. Consultation required for load, travel, and power.",
+      "Motorised openers for windows that are hard to reach. Open and close a high or oversized sash from a wall switch, a remote, or your home automation system, so nobody needs a ladder or a pole. A good fit for stairwell windows, clerestory glazing, and tall living room openings. We match the opener and the power supply to your window during consultation.",
     shortDescription: "Open a high window without the ladder.",
     // Schematic placeholder — no verified client product photo in-repo yet.
     // See docs/AUG07_ASSET_REQUEST.md.
     image: "/images/products/schematic/automated-window.svg",
     specs: [
-      "Motorised window opening devices",
-      "Wall switch, remote, or building-control integration (project-specified)",
-      "Suited to high, large, or hard-to-reach operable units",
-      "⚠️ Indicative only — actuator load, travel, and power by project consultation",
+      "Motorised opener for operable windows",
+      "Wall switch, remote, or smart home control",
+      "Suited to high, large, or hard to reach windows",
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
@@ -386,17 +384,16 @@ export const products: Product[] = [
     name: "Automated Door Access",
     category: "doors",
     description:
-      "Digital access and motorised operation for door leaves — keypad, card, fob, or app entry, with automatic opening where the leaf and frame allow it. For main entries, offices, and shared entrances that should open without a key and close without being pulled. Answers the automate-your-door / digital access ask from the 2026-07-10 client meeting (00:20:47). Lock integration, power, and control scope are project-specified — not a single SKU. Consultation required for leaf weight, fire-egress rules, and power provision.",
+      "Keyless entry and powered opening for your doors. Get in with a keypad code, a card, a fob, or your phone, and add automatic opening where the door and frame allow it. A good fit for main entrances, offices, and shared lobbies where people arrive with their hands full. We match the lock, the power, and the controls to your door during consultation.",
     shortDescription: "Enter without a key. Close without a pull.",
     // Schematic placeholder — no verified client product photo in-repo yet.
     // See docs/AUG07_ASSET_REQUEST.md.
     image: "/images/products/schematic/automated-door.svg",
     specs: [
-      "Digital access: keypad, card, fob, or app (project-specified)",
-      "Motorised opening for compatible door leaves",
-      "Integrates with multi-point locking",
+      "Keypad, card, fob, or phone access",
+      "Powered opening for compatible doors",
+      "Works with multi-point locking",
       "Suited to main entries and shared entrances",
-      "⚠️ Indicative only — leaf weight, egress compliance, and power by project consultation",
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Frosted Privacy", "Low-E Coated", "Laminated Safety"],
