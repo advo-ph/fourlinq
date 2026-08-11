@@ -49,3 +49,4 @@ scripts/gpt-image-out/
 # public/docs, written by npx tsx scripts/generate-system-catalog.ts
 output/
 .qa-3d*/
+.qa-look/
