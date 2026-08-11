@@ -1,0 +1,91 @@
+{
+  "id": "sc_door",
+  "motion": "translate_x",
+  "units": "m",
+  "size_mm": {
+    "opening_width": 1800,
+    "opening_height": 2400,
+    "outer_frame": [1924, 2524, 140],
+    "leaf": [894, 2286, 62],
+    "fixed_lite": [930, 2338, 70],
+    "stile_rail_width": 100,
+    "plane_separation": 69
+  },
+  "panel_count": 2,
+  "open_ratio": 0.9,
+  "handing": "RH — operable leaf parks on the right (+X), travels toward −X to open; pass \"LH\" to mirror the assembly and the travel direction",
+  "hardware": [
+    "head_track_plate",
+    "head_track_rail_int",
+    "head_track_rail_ext",
+    "floor_track_plate",
+    "floor_track_rail_int",
+    "floor_track_rail_ext",
+    "leaf_01_roller_01",
+    "leaf_01_roller_02",
+    "leaf_01_roller_cheek_01_01..02",
+    "leaf_01_roller_cheek_02_01..02",
+    "leaf_01_head_guide_01_01..02",
+    "leaf_01_head_guide_02_01..02",
+    "handle_backplate",
+    "handle_standoff_01..02",
+    "handle_bar",
+    "lock_body",
+    "lock_thumbturn"
+  ],
+  "meshes": {
+    "static": [
+      "outer_frame",
+      "outer_frame_rebate",
+      "head_track_plate",
+      "head_track_rail_int",
+      "head_track_rail_ext",
+      "floor_track_plate",
+      "floor_track_rail_int",
+      "floor_track_rail_ext",
+      "jamb_seal_01",
+      "interlock_seal_01"
+    ],
+    "fixed_lite_01": [
+      "fixed_lite_01_frame",
+      "fixed_lite_01_rebate",
+      "fixed_lite_01_glazing_bead_01",
+      "fixed_lite_01_glazing_bead_02",
+      "fixed_lite_01_gasket",
+      "fixed_lite_01_glass"
+    ],
+    "leaf_01": [
+      "leaf_01_frame",
+      "leaf_01_rebate",
+      "leaf_01_glazing_bead_01",
+      "leaf_01_glazing_bead_02",
+      "leaf_01_gasket",
+      "leaf_01_glass",
+      "leaf_01_roller_01",
+      "leaf_01_roller_02",
+      "leaf_01_roller_cheek_01_01",
+      "leaf_01_roller_cheek_01_02",
+      "leaf_01_roller_cheek_02_01",
+      "leaf_01_roller_cheek_02_02",
+      "leaf_01_head_guide_01_01",
+      "leaf_01_head_guide_01_02",
+      "leaf_01_head_guide_02_01",
+      "leaf_01_head_guide_02_02",
+      "handle_backplate",
+      "handle_standoff_01",
+      "handle_standoff_02",
+      "handle_bar",
+      "lock_body",
+      "lock_thumbturn"
+    ]
+  },
+  "clip": {
+    "samples": 61,
+    "nodes": ["leaf_01"],
+    "property": "position.x",
+    "leaf_01": [0, -0.8046],
+    "travel_mm": 805,
+    "travel_mm_max": 894
+  },
+  "note": "Sliding casement door: one tall operable leaf with 100 mm stiles and rails around a single large lite, plus a fixed lite of the same proportion beside it. Not hinged and not a two-panel patio slider. The leaf runs on the interior track at z = +0.033 and the fixed lite sits on the exterior track at z = −0.036, so they pass 69 mm apart with a 3 mm clearance between profiles. Straight linear travel along X only — no lift, no tilt, nothing rotates and nothing moves toward +Z (interior). Travel is 894 mm of clear run x openRatio, i.e. 805 mm at the default 0.9, leaving the leaf 6 mm clear of the far jamb. Two rollers on the leaf bottom ride the interior floor rail; two pairs of head guides straddle the interior head rail. Closed pose: the leaf's closing stile meets jamb_seal_01 on the right jamb and its trailing stile overlaps the fixed lite by 30 mm at interlock_seal_01."
+}

@@ -1,0 +1,49 @@
+{
+  "id": "glass_railing",
+  "motion": "static_balustrade_with_optional_side_hung_gate",
+  "units": "m",
+  "size_mm": {
+    "run": 3000,
+    "height": 1100,
+    "glass_thickness": 12,
+    "shadow_gap": 15,
+    "panel_width": 990,
+    "base_channel": [90, 100],
+    "channel_glass_slot": 28,
+    "handrail_diameter": 50,
+    "rail_saddle": [34, 21.5],
+    "spigot": [76, 130],
+    "gate_leaf": [910, 923],
+    "newel_post_diameter": 56
+  },
+  "panel_count": 3,
+  "max_angle_deg": 90,
+  "open_ratio": 0.33,
+  "handing": "gate:false — nothing moves. gate:true — the leaf at gateIndex is hung on two patch fittings at the stile nearest the end of the run and swings out (toward -Z) about that stile's vertical axis; gateIndex in the left half hinges left, otherwise right.",
+  "hardware": [
+    "spigot_01..06_front / _rear",
+    "spigot_01..06_grub_screw",
+    "gate_patch_01..02_front / _rear",
+    "gate_hinge_collar_01..02",
+    "gate_newel_post",
+    "gate_newel_base",
+    "gate_pull_bar",
+    "gate_pull_post_01..02",
+    "gate_latch_front / _rear",
+    "gate_latch_bolt",
+    "gate_latch_keep_front / _rear"
+  ],
+  "meshes": {
+    "base": ["base_channel_NN", "channel_cover_trim_NN_front", "channel_cover_trim_NN_rear", "channel_setting_gasket_NN"],
+    "panels": ["panel_NN (group) → panel_NN_glass", "rail_saddle_NN"],
+    "handrail": ["handrail_NN"],
+    "gate_leaf": ["gate_glass", "gate_rail_saddle", "gate_handrail", "gate_patch_01_front", "gate_patch_01_rear", "gate_hinge_collar_01", "gate_patch_02_front", "gate_patch_02_rear", "gate_hinge_collar_02", "gate_pull_bar", "gate_pull_post_01", "gate_pull_post_02", "gate_latch_front", "gate_latch_rear", "gate_latch_bolt"]
+  },
+  "clip": {
+    "samples": 61,
+    "nodes": ["gate_leaf"],
+    "gate_leaf": { "property": "rotation.y", "range_rad": [0, 1.5708], "range_deg": [0, 90], "sign": "+ for a left-hung leaf, − for a right-hung leaf; both swing toward -Z" },
+    "static_variant": "with gate:false the clip is flat — setOpen(t) is a no-op and no node moves"
+  },
+  "note": "A frameless balustrade does not move, so nothing was invented to make it move: with gate:false, setOpen is a no-op and the whole assembly is rigid. With gate:true the run is cut for a gate bay — the base channel stops 55 mm short of the pivot line (clearing the 96 mm newel base) and the handrail 45 mm short; the leaf hangs on a 56 mm stainless newel post at the pivot line, gripped by two patch fittings whose collars ride 2 mm clear of the post, and carries its own 50 mm cap rail and saddle starting 55 mm out from the pivot. Leaf width is panel − 30 mm and the static run resumes at the neighbouring panel edge, so the leaf and its latch bolt clear every fixed part through the full 90° — the free stile travels 714 mm out. Glass is seated 5 mm off the slot floor on a setting gasket; spigots are half-shell clamps offset 1.5 mm each side of the glass, so no part interpenetrates another at any t. Finish-bearing parts (channel, cover trim, handrail, saddles) are on upvc_white_matte / upvc_white_rebate; only clamps, patches and the pull are steel or matte black."
+}

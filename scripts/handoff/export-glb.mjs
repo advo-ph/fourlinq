@@ -299,6 +299,50 @@ const SYSTEM = [
     closeLabel: "Close door",
   },
   {
+    /* ── Second Claude Design handoff, 2026-08-11 ──
+       Four products the client named on 2026-08-07 that had no geometry at all
+       and shipped as line drawings. Same contract as the first handoff, same
+       material palette, and each mechanism was measured before it was wired:
+       door leaves bipart 582 mm each, the awning sash opens exactly 35 degrees
+       (a chain actuator, not a crank), the SC-Door leaf slides 805 mm. */
+    id: "automated-door",
+    label: "Automated Door Access",
+    module: "automated-door-model.js",
+    build: "buildAutomatedDoor",
+    opts: {},
+    openLabel: "Open door",
+    closeLabel: "Close door",
+  },
+  {
+    id: "automated-window",
+    label: "Automated Window",
+    module: "automated-window-model.js",
+    build: "buildAutomatedWindow",
+    opts: {},
+    openLabel: "Open window",
+    closeLabel: "Close window",
+  },
+  {
+    id: "sc-door",
+    label: "SC-Door",
+    module: "sc-door-model.js",
+    build: "buildSCDoor",
+    opts: {},
+    openLabel: "Slide open",
+    closeLabel: "Slide closed",
+  },
+  {
+    /* Baked WITHOUT the gate. The builder offers `gate: true`, which swings a
+       leaf 90 degrees, but the product page sells a balustrade run and says
+       nothing about a gate — animating one here would assert a product option
+       the client has not described. Static is the honest bake. */
+    id: "glass-railing",
+    label: "Glass Railing",
+    module: "railing-model.js",
+    build: "buildGlassRailing",
+    opts: {},
+  },
+  {
     id: "curtain-wall",
     type: "curtain-wall",
     label: "Curtain Wall",

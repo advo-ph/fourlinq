@@ -1,0 +1,50 @@
+{
+  "id": "automated_door",
+  "motion": "bipart_translate_x",
+  "units": "m",
+  "size_mm": {
+    "width": 2400,
+    "height": 2400,
+    "depth": 160,
+    "header_box": [2400, 180, 150],
+    "leaf": [594, 2360, 62],
+    "sidelite": [580, 2400, 70]
+  },
+  "panel_count": 4,
+  "open_ratio": 0.97,
+  "handing": "bi-parting, two active leaves, two fixed sidelites",
+  "hardware": [
+    "head_track_rail_01",
+    "head_track_rail_02",
+    "head_track_plate",
+    "track_bracket_01..04",
+    "floor_guide_rail_01",
+    "floor_guide_rail_02",
+    "floor_guide_base",
+    "leaf_01_roller_01..04",
+    "leaf_02_roller_01..04",
+    "leaf_01_carrier_01..02",
+    "leaf_02_carrier_01..02",
+    "leaf_01_bottom_guide",
+    "leaf_02_bottom_guide",
+    "sensor_housing_01..02",
+    "sensor_lens_01..02",
+    "sensor_bracket_01..02"
+  ],
+  "meshes": {
+    "header_assembly": ["header_box", "header_fascia", "header_top_cap", "header_endcap_01", "header_endcap_02"],
+    "leaf_01": ["leaf_01_frame", "leaf_01_rebate", "leaf_01_glazing_bead_01", "leaf_01_glazing_bead_02", "leaf_01_gasket", "leaf_01_glass", "leaf_01_leading_seal", "leaf_01_carrier_01", "leaf_01_carrier_02", "leaf_01_hanger_01", "leaf_01_hanger_02", "leaf_01_roller_01", "leaf_01_roller_02", "leaf_01_roller_03", "leaf_01_roller_04", "leaf_01_bottom_guide"],
+    "leaf_02": ["leaf_02_frame", "leaf_02_rebate", "leaf_02_glazing_bead_01", "leaf_02_glazing_bead_02", "leaf_02_gasket", "leaf_02_glass", "leaf_02_leading_seal", "leaf_02_carrier_01", "leaf_02_carrier_02", "leaf_02_hanger_01", "leaf_02_hanger_02", "leaf_02_roller_01", "leaf_02_roller_02", "leaf_02_roller_03", "leaf_02_roller_04", "leaf_02_bottom_guide"],
+    "sidelite_01": ["sidelite_01_frame", "sidelite_01_rebate", "sidelite_01_glazing_bead_01", "sidelite_01_glazing_bead_02", "sidelite_01_gasket", "sidelite_01_glass", "jamb_01", "jamb_seal_01"],
+    "sidelite_02": ["sidelite_02_frame", "sidelite_02_rebate", "sidelite_02_glazing_bead_01", "sidelite_02_glazing_bead_02", "sidelite_02_gasket", "sidelite_02_glass", "jamb_02", "jamb_seal_02"]
+  },
+  "clip": {
+    "samples": 61,
+    "nodes": ["leaf_01", "leaf_02"],
+    "property": "position.x",
+    "leaf_01": [0, -0.582],
+    "leaf_02": [0, 0.582],
+    "travel_mm": 582
+  },
+  "note": "Panels are quartered off the opening width (600 mm each at 2400), so leaf travel is 0.97 x (halfWidth - panelWidth) = 582 mm per leaf, 1164 mm of clear opening. Leaves run on a plane 78 mm behind the sidelites and slide fully behind them; header, sidelites, head track and floor guide are static. No manual operating hardware — an automatic operator has none. Everything opens along X only; nothing swings inward."
+}

@@ -126,6 +126,9 @@ describe("Window3D system config", () => {
       "combination-corner",
       "fixed",
       "fixed-lattice",
+      // A balustrade run. Its builder can swing a gate leaf, but the product the
+      // page sells is the run, so the bake is static and says so.
+      "glass-railing",
       "special-arch",
       "special-triangle",
     ]);

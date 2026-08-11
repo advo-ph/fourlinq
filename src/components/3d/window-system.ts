@@ -37,6 +37,10 @@ export type SystemType =
   | "french-door"
   | "ninety-series"
   | "curtain-wall"
+  | "automated-door"
+  | "automated-window"
+  | "sc-door"
+  | "glass-railing"
   | "special-arch"
   | "special-triangle"
   | "combination-bay"
@@ -95,6 +99,10 @@ export const CATALOGUE_SYSTEM: SystemType[] = [
   "french-door",
   "ninety-series",
   "curtain-wall",
+  "automated-door",
+  "automated-window",
+  "sc-door",
+  "glass-railing",
   "special-arch",
   "special-triangle",
   "combination-bay",
@@ -483,6 +491,56 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     openTime: 2,
     openLabel: "Open vent",
     closeLabel: "Close vent",
+  },
+  /* Second Claude Design handoff, 2026-08-11. Four products the client named on
+     2026-08-07 that previously had no 3D at all and shipped as line drawings.
+     Numbers from `npm run probe:glb`, never hand-typed. */
+  "automated-door": {
+    label: "Automated Door Access",
+    visibleRoot: ["automated-door"],
+    model: MODEL_SYSTEM("automated-door"),
+    center: [0, 0.0865, -0.001],
+    scale: 0.5201,
+    openTime: 2,
+    openLabel: "Open door",
+    closeLabel: "Close door",
+  },
+  "automated-window": {
+    label: "Automated Window",
+    visibleRoot: ["automated-window"],
+    model: MODEL_SYSTEM("automated-window"),
+    center: [0, 0, 0.016],
+    scale: 1.1333,
+    openTime: 2,
+    openLabel: "Open window",
+    closeLabel: "Close window",
+  },
+  "sc-door": {
+    label: "SC-Door",
+    visibleRoot: ["sc-door"],
+    model: MODEL_SYSTEM("sc-door"),
+    center: [0, 0, 0.024],
+    scale: 0.5388,
+    openTime: 2,
+    openLabel: "Slide open",
+    closeLabel: "Slide closed",
+  },
+  "glass-railing": {
+    label: "Glass Railing",
+    visibleRoot: ["glass-railing"],
+    model: MODEL_SYSTEM("glass-railing"),
+    // -0 on Y is not a typo: probe:glb measures the balustrade as symmetric about
+    // the origin and reports negative zero, and the parity test compares with
+    // Object.is, which distinguishes it from +0. Paste what the prober prints.
+    center: [0, -0, 0.003],
+    scale: 0.4533,
+    openTime: 0,
+    openLabel: "",
+    closeLabel: "",
+    // The builder can swing a gate leaf 90 degrees, but the product sold is a
+    // balustrade run and the page says nothing about a gate. A fixed run is the
+    // truth about this product, so it says that rather than claiming it opens.
+    staticNote: "Balustrade — fixed run",
   },
   "special-arch": {
     label: "Arch / Round-top",

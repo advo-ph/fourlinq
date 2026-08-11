@@ -31,6 +31,22 @@ Keep entries concise — one line per change, written in past tense, focused on 
 >
 > The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
 
+### Session: 2026-08-11 (second) — four more products get real 3D
+
+#### Added
+
+- **Automated door, automated window, SC-Door and glass railing, from a second Claude Design handoff.** All four were products the client named on 2026-08-07 that had no geometry at all and shipped as line drawings. The viewer now covers **27 systems**. [scripts/handoff/model/](../scripts/handoff/model/).
+- **`npm run qa:3d` filmstrip companion** — `scripts/qa-3d-filmstrip.mjs` samples the transition rather than the endpoints, because endpoints are exactly where a bad mechanism looks fine: a leaf can pass through a frame at t=0.5 and arrive somewhere sensible. See the honest limitation in Notes.
+
+#### Notes
+
+- **The handoff arrived conforming, and was measured before it was trusted.** All seven material names matched the contract and were set via `m[k].name = k`; the spec JSONs introduced **zero keys** the first handoff had not already used. Every mechanism was sampled independently: the door leaves bipart **−582 / +582 mm** symmetrically, the awning sash opens **exactly 35.0°** with 44 chain links following it, the SC-Door leaf slides **805 mm**, and the gate leaf swings **90.0°** when `gate: true`.
+- **The railing does not move, and that is the accepted result.** Its prompt said a fixed balustrade should return a no-op `setOpen` and not invent a wobble to clear the 8°/40 mm threshold. It returned a no-op. It is baked static with the note "Balustrade — fixed run" rather than with the gate animated, because the product page sells a run and says nothing about a gate — animating one would assert an option the client has not described.
+- **`ringGeometry` here takes a face width per side** (`left, right, bottom, top`) where the house `ringGeo` takes one uniform width. That is strictly more capable — a door with a deep bottom rail needs it.
+- **No reference photography this time.** The first handoff shipped ~130 Marvin product photos that had to be kept out of the repo; this one is 17 files, all code and specs.
+- 🔴 **The filmstrip cannot see the middle of an animation, and should not be read as if it can.** The scrub completes in ~0.8 s and a single canvas screenshot costs 1.1–1.9 s on this machine — measured, not assumed, which is why the script prints the real elapsed time per frame. Frames 2–4 are all post-animation. Catching a leaf that clips *through* a frame mid-swing needs the clip sampled numerically in Node, not photographed in a browser. Not built yet.
+- **`glass-railing`'s pinned centre is `[0, -0, 0.003]` and the `-0` is deliberate** — the prober reports negative zero for a run symmetric about the origin, and the parity test compares with `Object.is`, which distinguishes it from `+0`.
+
 ### Session: 2026-08-11 — the client's Aug-7 list, closed where it could be
 
 #### Added

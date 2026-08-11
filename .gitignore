@@ -50,3 +50,5 @@ scripts/gpt-image-out/
 output/
 .qa-3d*/
 .qa-look/
+.qa-film*/
+.handoff-new/

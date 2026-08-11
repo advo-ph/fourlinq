@@ -1,0 +1,44 @@
+{
+  "id": "automated_window",
+  "motion": "hinge_outswing_top_hung",
+  "units": "m",
+  "size_mm": {
+    "width": 1200,
+    "height": 700,
+    "depth": 70,
+    "aperture": [1076, 576],
+    "sash": [1070, 570, 52],
+    "actuator_housing": [300, 40, 40],
+    "chain_link_pitch": 18
+  },
+  "panel_count": 1,
+  "max_angle_deg": 35,
+  "handing": "top-hung awning, single sash, hinged on the top rail, opens outward (-Z)",
+  "hardware": [
+    "actuator_housing",
+    "actuator_endcap_01..02",
+    "actuator_mount_01..02",
+    "actuator_face_groove",
+    "chain_guide_nose",
+    "chain_sprocket",
+    "chain_link_01..22",
+    "chain_bracket_plate",
+    "chain_bracket_ear",
+    "hinge_knuckle_01..02",
+    "frame_hinge_leaf_01..02",
+    "sash_hinge_leaf_01..02"
+  ],
+  "meshes": {
+    "frame": ["frame_outer", "frame_rebate", "frame_stop", "perimeter_seal"],
+    "sash": ["sash_frame", "sash_rebate", "sash_glazing_bead_01", "sash_glazing_bead_02", "sash_glazing_gasket", "sash_glass", "sash_hinge_leaf_01", "sash_hinge_leaf_02", "chain_bracket_plate", "chain_bracket_ear"],
+    "actuator_assembly": ["actuator_housing", "actuator_endcap_01", "actuator_endcap_02", "actuator_face_groove", "actuator_mount_01", "actuator_mount_02", "chain_guide_nose", "chain_sprocket"],
+    "chain": ["chain_link_01 .. chain_link_22 (each a group holding chain_link_plate_NN)"]
+  },
+  "clip": {
+    "samples": 61,
+    "nodes": ["sash", "chain_link_01 .. chain_link_22"],
+    "sash": { "property": "rotation.x", "range_rad": [0, 0.6109], "range_deg": [0, 35] },
+    "chain": { "property": "position + rotation.x", "chain_length_mm": [26, 327], "stroke_mm": 301 }
+  },
+  "note": "Chain actuator mounted centred on the interior face of the sill; the sash is hinged on the exterior line of its top rail at y=285 mm, z=-41 mm, so every sash point travels down and outward and nothing re-enters the frame at any t. The chain is 22 discrete links of 18 mm pitch: setOpen(t) lays the first floor(len/18) of them along the live line from the sprocket to the sash bracket and parks the rest side by side inside the housing, so the chain visibly pays out and retracts. 35 deg is the honest limit of a chain actuator; a crank would go further. No handle or crank is modelled — an actuated sash has none."
+}
