@@ -33,7 +33,14 @@ export type RegionCode = keyof typeof REGION_CODE;
 /** Grouping key for projects with no confirmed region_code. */
 export const UNKNOWN_REGION_CODE = "unknown" as const;
 
-export const UNKNOWN_REGION_LABEL = "Area to be confirmed";
+/**
+ * Heading and filter chip for projects with no confirmed region.
+ *
+ * Was "Area to be confirmed", which read as an internal to-do on a public
+ * page. "Other areas" says the same thing to a visitor without promising a
+ * later correction.
+ */
+export const UNKNOWN_REGION_LABEL = "Other areas";
 
 /** Where the install is. Every part optional — omit what is not confirmed. */
 export interface ProjectArea {
@@ -129,7 +136,7 @@ function regionLabel(code: RegionCode | typeof UNKNOWN_REGION_CODE): string {
 /**
  * Group projects by region_code. Only regions that actually have ≥1 project
  * appear. Empty client-named regions are omitted. Unknown (no region_code)
- * lands in a single "Area to be confirmed" bucket when present.
+ * lands in a single "Other areas" bucket when present.
  */
 export function groupProjectByArea<T extends { area?: ProjectArea }>(
   project: readonly T[],

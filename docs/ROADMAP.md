@@ -480,7 +480,7 @@ Only the four below had **zero** coverage in any roadmap doc.
 
 **2026-08-07 (`project-photo` lane).** `/inspiration` now has a **geographic area axis** alongside
 the tag axis: filter + section groups for regions that actually have projects (Metro Manila, Cebu,
-…), an explicit **"Area to be confirmed"** bucket, and card labels from
+…), an explicit catch-all bucket (**"Other areas"**; "Area to be confirmed" until 2026-08-12), and card labels from
 `projectLocationLabel`. Structured `ProjectArea` is populated
 only from verified Facebook `location`/caption strings, or from what the client has explicitly
 released — never invented. Client fill-in table:
@@ -529,7 +529,7 @@ Promote-on-build.
 ### D-B4 — Projects expose a geographic region axis (Tier 1, gate-excluded, shipped)
 **Pass, 2026-08-07 (`project-photo` lane).** `/inspiration` exposes a **region** axis distinct from
 the tag axis; only populated regions appear; unknown projects fall into an explicit
-"Area to be confirmed" bucket and are never guessed into a region;
+"Other areas" bucket and are never guessed into a region;
 `src/test/project-area.test.ts` locks label derivation and the confirmed-area count at 38.
 This is **additional to** D-B1, not a discharge of it.
 
