@@ -90,18 +90,28 @@ export function projectLocationLabel(
 }
 
 /**
- * Display name for a project: the area label when anything is confirmed,
- * otherwise the catalog's own name (which is "Private Residence" for every
- * project with no confirmed place).
+ * Display name for a project.
  *
- * Passing "" as the location suppresses the fall-through in
- * projectLocationLabel, so "no usable area parts" comes back as "" and the
- * fallback takes over. That keeps one derivation instead of two.
+ * **A village is what earns a derived name.** "Amara, Cebu" works because the
+ * village identifies the house; a bare place does not. Without a village the
+ * catalog's own residence name is kept — "Cebu M. Residence", "Las Piñas
+ * Residence", "Private Residence" — because replacing that with just "Cebu"
+ * throws away the only part that says *which* house it is, and leaves several
+ * projects sharing one meaningless name.
+ *
+ * That is a regression this function shipped with on 2026-08-12 and it is the
+ * reason for the village check: it flattened 24 projects to bare place names.
+ *
+ * Those residence names already carry their location ("Cebu M. Residence"), so
+ * nothing is lost by leaving them alone.
  */
 export function projectAreaName(
   area: ProjectArea | undefined,
   fallbackName: string,
 ): string {
+  if (!area?.village?.trim()) return fallbackName;
+  // "" suppresses the location fall-through in projectLocationLabel, so an
+  // unusable area comes back empty and the residence name still wins.
   return projectLocationLabel(area, "") || fallbackName;
 }
 

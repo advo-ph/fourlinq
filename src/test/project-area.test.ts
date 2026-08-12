@@ -132,6 +132,10 @@ describe("projectAreaName", () => {
     { name: "empty area", area: {} satisfies ProjectArea },
     // region_code alone yields no label parts - it must not leak "Cebu" as a name.
     { name: "region_code with no place parts", area: { region_code: "cebu" as const } },
+    // The regression case: a confirmed city is NOT enough to rename a project.
+    // Deriving here would have turned "Cebu M. Residence" into "Cebu".
+    { name: "city and region but no village", area: { city: "Cebu", region_code: "cebu" as const } },
+    { name: "province but no village", area: { province: "Bataan" } satisfies ProjectArea },
   ])("falls back to the catalog name for $name", ({ area }) => {
     expect(projectAreaName(area, "Private Residence")).toBe("Private Residence");
   });
@@ -216,13 +220,41 @@ describe("no invented project area data", () => {
   });
 
   /**
-   * The point of the rename: a located project is named for its place, never
-   * for the client's initials ("Cebu S. Residence", "Liloan C. Residence").
+   * The point of the rename: once a village is known, the project is named for
+   * the place, not the client's initials ("Liloan C. Residence" -> "Amara,
+   * Cebu"). Without a village there is nothing to put in front, so the
+   * residence name stays — see the next test.
    */
-  it("never names a located project with client initials", () => {
-    for (const p of projects.filter((p) => hasConfirmedArea(p.area))) {
+  it("names every village project for its place, never client initials", () => {
+    const village = projects.filter((p) => p.area?.village);
+    expect(village.length).toBeGreaterThan(0);
+    for (const p of village) {
+      expect(p.name, p.id).toBe(projectLocationLabel(p.area, p.location));
       expect(p.name, p.id).not.toMatch(/\b[A-Z]{1,3}\.\s/);
     }
+  });
+
+  /**
+   * Regression guard. The first cut of the derivation replaced the name with
+   * the area label whenever *any* area part was confirmed, which flattened 24
+   * projects to a bare place — "Cebu M. Residence" became "Cebu", and four
+   * unrelated houses all ended up called "Cebu". A project with no village
+   * must keep the residence name that says which house it is.
+   */
+  it("keeps the residence name when there is no village", () => {
+    const noVillage = projects.filter((p) => !p.area?.village);
+    expect(noVillage.length).toBeGreaterThan(0);
+    for (const p of noVillage) {
+      // Never a bare place: every one of these names identifies a residence.
+      expect(p.name, p.id).toMatch(/Residence/);
+    }
+    // The specific projects that regressed.
+    const named = (id: string) => projects.find((p) => p.id === id)?.name;
+    expect(named("cebu-maratas-residence")).toBe("Cebu M. Residence");
+    expect(named("cebu-cmsprs")).toBe("Cebu Residence");
+    expect(named("cebu-t-residence-cebu-city")).toBe("Cebu T. Residence");
+    expect(named("las-pinas-residence")).toBe("Las Piñas Residence");
+    expect(named("bataan-s-residence")).toBe("Bataan S. Residence");
   });
 
   /**

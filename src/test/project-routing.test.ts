@@ -94,6 +94,24 @@ describe("merging CMS rows over the verified fallback", () => {
     expect(merged.find((p) => p.id === "portfolio-residence-01")?.name).toBe("Editorial Title");
   });
 
+  /**
+   * Only village projects are area-named. A project with a city but no village
+   * keeps an editorial residence name, so the CMS must stay in charge of it —
+   * gating on `area` alone would freeze 24 projects nobody could rename.
+   */
+  it("lets the CMS title through for an area project that has no village", () => {
+    const verified = fallbackProject.find((p) => p.id === "cebu-maratas-residence");
+    expect(verified?.area?.city).toBe("Cebu");
+    expect(verified?.area?.village).toBeUndefined();
+    expect(verified?.name).toBe("Cebu M. Residence");
+    const merged = mergeProject(fallbackProject, [
+      cmsRow({ slug: "cebu-maratas-residence", title: "Cebu Maratas Residence" }),
+    ]);
+    expect(merged.find((p) => p.id === "cebu-maratas-residence")?.name).toBe(
+      "Cebu Maratas Residence",
+    );
+  });
+
   it("drops a CMS-only row too incomplete to render", () => {
     const merged = mergeProject(fallbackProject, [
       cmsRow({ slug: "ghost-project", cover_path: null, location: null }),

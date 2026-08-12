@@ -61,17 +61,19 @@ export function projectFromCms(row: CmsProject, fallback?: Project): Project {
 
   return {
     id: projectId,
-    // A confirmed area outranks cms_project.title. The catalog derives `name`
-    // from structured ProjectArea ("Amara, Cebu"); the title column has no
-    // area awareness and still holds the pre-2026-08-12 rows that
-    // migrate-cms-data.ts seeded — i.e. exactly the client-initial names
-    // ("Liloan C. Residence") this convention exists to retire. Letting the
-    // title win would silently undo the rename in production.
-    // The supported way to override a name is the `project_name` override row,
-    // which is applied by callers after this merge and still takes precedence.
-    // Same reasoning as `area` below: CMS owns editorial copy, not geography.
+    // A confirmed VILLAGE outranks cms_project.title, and only that. Those are
+    // the projects whose name the catalog derives from structured ProjectArea
+    // ("Amara, Cebu"); the title column has no area awareness and still holds
+    // the pre-2026-08-12 rows migrate-cms-data.ts seeded — i.e. exactly the
+    // client-initial names ("Liloan C. Residence") the convention retires. Let
+    // the title win there and the rename silently undoes itself in production.
+    // Everything else keeps its editorial name, so the CMS stays in charge of
+    // it — gating on `area` alone would freeze the 24 projects that have a city
+    // but no village and are not area-named at all.
+    // The `project_name` override row still beats both; callers apply it after
+    // this merge.
     name:
-      fallback?.area && fallback.name
+      fallback?.area?.village && fallback.name
         ? fallback.name
         : textValue(row.title, fallback?.name ?? projectId),
     location: textValue(row.location, fallback?.location),
