@@ -3,13 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import PageHeader from "@/components/shared/PageHeader";
 import { projects as fallbackProject, tagFromCategory, type InspirationTag, type Project } from "@/data/projects";
-import {
-  groupProjectByArea,
-  populatedRegionFilter,
-  UNKNOWN_REGION_CODE,
-  type ProjectArea,
-  type RegionCode,
-} from "@/data/project-area";
+import { groupProjectByArea, type ProjectArea } from "@/data/project-area";
 import {
   projectCategoryImages as BASELINE_projectCategoryImages,
   projectDerivedTags as BASELINE_projectDerivedTags,
@@ -25,7 +19,6 @@ import { versionedImage } from "@/lib/image-version";
 import { fetchMergedProjectImages, fetchMergedProjectImagesFresh } from "@/lib/merged-project-images";
 
 type Filter = "all" | InspirationTag;
-type AreaFilter = "all" | RegionCode | typeof UNKNOWN_REGION_CODE;
 
 // The initial merged state comes from the baked static baseline. The runtime API
 // fetch in the component's useEffect updates this with live DB overrides.
@@ -181,23 +174,15 @@ function CardImage({ src, alt, className }: CardImageProps) {
 }
 
 const Inspiration = () => {
-  // Filters live in the URL (?filter=windows&area=cebu) so the nav can
-  // deep-link a category/area and the back button restores the previous view.
+  // The category filter lives in the URL (?filter=windows) so the nav can
+  // deep-link one and the back button restores the previous view.
   const [searchParams, setSearchParams] = useSearchParams();
   const paramFilter = searchParams.get("filter");
   const active: Filter = isFilter(paramFilter) ? paramFilter : "all";
-  const paramArea = searchParams.get("area");
 
-  const writeParams = (next: { filter?: Filter; area?: AreaFilter }) => {
-    const filter = next.filter ?? active;
-    const area = next.area ?? (paramArea as AreaFilter | null) ?? "all";
-    const params: Record<string, string> = {};
-    if (filter !== "all") params.filter = filter;
-    if (area !== "all") params.area = area;
-    setSearchParams(params);
+  const setActive = (f: Filter) => {
+    setSearchParams(f === "all" ? {} : { filter: f });
   };
-  const setActive = (f: Filter) => writeParams({ filter: f });
-  const setArea = (a: AreaFilter) => writeParams({ area: a });
 
   // mergedReady tracks whether the live merged fetch has resolved at least once.
   // Cards are NOT rendered until mergedReady is true — skeleton grid shows instead.
@@ -323,23 +308,8 @@ const Inspiration = () => {
     };
   }, [mergedReady, mergedData]); // fires once merged data is live; re-primes on updates
 
-  const areaOption = useMemo(() => populatedRegionFilter(items), [items]);
-  const activeArea: AreaFilter = useMemo(() => {
-    if (!paramArea) return "all";
-    if (paramArea === UNKNOWN_REGION_CODE) return UNKNOWN_REGION_CODE;
-    if (areaOption.some((o) => o.code === paramArea)) return paramArea as AreaFilter;
-    return "all";
-  }, [paramArea, areaOption]);
-
   const filtered = useMemo(() => {
-    let base = active === "all" ? items : items.filter((p) => p.tag.includes(active));
-    if (activeArea !== "all") {
-      base = base.filter((p) =>
-        activeArea === UNKNOWN_REGION_CODE
-          ? !p.area?.region_code
-          : p.area?.region_code === activeArea,
-      );
-    }
+    const base = active === "all" ? items : items.filter((p) => p.tag.includes(active));
     // Best pictures first: "All projects" orders by AI hero-quality (or admin override);
     // a category view orders by each project's best image FOR THAT category.
     // Unranked projects (e.g. a CMS-only entry not yet analyzed) sort to the end, stably.
@@ -349,14 +319,12 @@ const Inspiration = () => {
     const rank = new Map((order ?? []).map((id, i) => [id, i]));
     const rankOf = (id: string) => rank.get(id) ?? Number.MAX_SAFE_INTEGER;
     return [...base].sort((a, b) => rankOf(a.id) - rankOf(b.id));
-  }, [active, activeArea, items, mergedData]);
+  }, [active, items, mergedData]);
 
-  // When no specific area is selected, render one section per populated region
-  // (empty client-named regions never appear — groupProjectByArea omits them).
-  const areaGroup = useMemo(
-    () => (activeArea === "all" ? groupProjectByArea(filtered) : null),
-    [activeArea, filtered],
-  );
+  // Always one section per populated region — area is how the page is
+  // organised, not something the visitor filters by (empty client-named
+  // regions never appear; groupProjectByArea omits them).
+  const areaGroup = useMemo(() => groupProjectByArea(filtered), [filtered]);
 
   const cardImageSrc = (p: ViewProject) =>
     active !== "all"
@@ -397,8 +365,8 @@ const Inspiration = () => {
 
       <section className="pb-section-mobile md:pb-section-tablet lg:pb-section-desktop">
         <div className="container-editorial">
-          {/* Tag filter rail (existing axis) */}
-          <div className="flex flex-wrap items-end gap-x-8 gap-y-3 border-b border-[color:var(--rule-soft)] mb-6 overflow-x-auto no-scrollbar">
+          {/* Tag filter rail — the only filter axis on this page */}
+          <div className="flex flex-wrap items-end gap-x-8 gap-y-3 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16 overflow-x-auto no-scrollbar">
             {filters.map((f) => {
               const isActive = active === f.value;
               return (
@@ -419,43 +387,9 @@ const Inspiration = () => {
             })}
           </div>
 
-          {/* Area filter rail — only regions that actually have ≥1 project */}
-          <div
-            className="flex flex-wrap items-end gap-x-8 gap-y-3 border-b border-[color:var(--rule-soft)] mb-12 lg:mb-16 overflow-x-auto no-scrollbar"
-            role="navigation"
-            aria-label="Filter projects by area"
-          >
-            <button
-              type="button"
-              onClick={() => setArea("all")}
-              className={cn(
-                "pb-4 text-body-sm font-medium whitespace-nowrap transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end",
-                activeArea === "all"
-                  ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
-                  : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
-              )}
-            >
-              All areas
-            </button>
-            {areaOption.map((o) => {
-              const isActive = activeArea === o.code;
-              return (
-                <button
-                  key={o.code}
-                  type="button"
-                  onClick={() => setArea(o.code)}
-                  className={cn(
-                    "pb-4 text-body-sm font-medium whitespace-nowrap transition-colors duration-300 ease-marvin border-b-2 -mb-px min-h-[44px] flex items-end",
-                    isActive
-                      ? "text-[color:var(--ink-primary)] border-[color:var(--accent)]"
-                      : "text-[color:var(--ink-muted)] border-transparent hover:text-[color:var(--ink-primary)]"
-                  )}
-                >
-                  {o.label}
-                </button>
-              );
-            })}
-          </div>
+          {/* No area rail: the region headings below already announce each area
+              as you scroll, and a second rail next to the tag filter read as
+              two competing ways to narrow the same grid. */}
 
           {/* Skeleton grid — shown while the live merged fetch is in-flight.
               18 placeholders ≈ 3 rows × 6 cols (desktop) so the page height

@@ -169,16 +169,6 @@ export function groupProjectByArea<T extends { area?: ProjectArea }>(
   return ordered;
 }
 
-/** Region filter options that actually have projects (plus optional "all"). */
-export function populatedRegionFilter(
-  project: readonly { area?: ProjectArea }[],
-): { code: RegionCode | typeof UNKNOWN_REGION_CODE; label: string }[] {
-  return groupProjectByArea(project).map((g) => ({
-    code: g.region_code,
-    label: g.label,
-  }));
-}
-
 /** True when any structured area part is present. */
 export function hasConfirmedArea(area: ProjectArea | undefined): boolean {
   if (!area) return false;

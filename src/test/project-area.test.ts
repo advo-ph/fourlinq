@@ -3,7 +3,6 @@ import { projects } from "@/data/projects";
 import {
   groupProjectByArea,
   hasConfirmedArea,
-  populatedRegionFilter,
   projectAreaName,
   projectLocationLabel,
   REGION_CODE,
@@ -304,18 +303,12 @@ describe("area grouping axis", () => {
     }
   });
 
-  it("populatedRegionFilter matches only non-empty groups", () => {
-    const filter = populatedRegionFilter(projects);
-    const group = groupProjectByArea(projects);
-    expect(filter.map((f) => f.code)).toEqual(group.map((g) => g.region_code));
-    expect(filter.every((f) => f.label.length > 0)).toBe(true);
-  });
-
   it("includes Metro Manila and Cebu when catalog has those region_codes", () => {
-    const filter = populatedRegionFilter(projects);
-    const code = filter.map((f) => f.code);
+    const group = groupProjectByArea(projects);
+    const code = group.map((g) => g.region_code);
     expect(code).toContain("metro_manila");
     expect(code).toContain("cebu");
     expect(code).toContain(UNKNOWN_REGION_CODE);
+    expect(group.every((g) => g.label.length > 0)).toBe(true);
   });
 });
