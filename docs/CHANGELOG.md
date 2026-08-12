@@ -31,6 +31,22 @@ Keep entries concise — one line per change, written in past tense, focused on 
 >
 > The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
 
+### Session: 2026-08-12 (sixth) — the SC-Door is named for what it does
+
+#### Changed
+
+- **"SC-Door System (Sliding Casement Door)" is now "Soft Closing Sliding Door"** (migration `025`). Client instruction. The old name led with an acronym and then spent a parenthetical expanding it; the new one leads with the feature. The card copy, short description, and spec list were rewritten to match, with a new `Soft-close damper on the active leaf` bullet at the top. [src/data/products.ts](../src/data/products.ts), [src/components/3d/window-system.ts](../src/components/3d/window-system.ts).
+- **It also has its own render now** (migration `026`), replacing the `/images/wp-export/slidingdoor.webp` it briefly shared with `sliding-door`. Client-supplied, same 1672×941 batch as the rest of `render/`. The leaf sits on its own top track with the roller hangers visible, so the card shows the track-hung system rather than an ordinary slider. `public/images/products/render/sc-door.webp`.
+
+#### Notes
+
+- **The product did not change — only the name did.** It is still the Sliding Casement Door, and the description still says so in its first clause. `data-integrity.test.ts` asserts the copy keeps the Sliding Casement claim (and still never says "glider"), so a future edit that quietly turns it into an ordinary slider fails the build.
+- **The `sc-door` id is unchanged, deliberately.** It keys the 3D model, the `product_type` row, migrations `019`/`024`, and any deep link already shared. Renaming it would break four things to fix nothing a visitor sees. Expect to keep reading `sc-door` in code and paths.
+- **The image sharing introduced by migration `024` lasted about an hour.** For that window the card showed a plain two-panel slider above a paragraph explaining the product is not one. Migration `026` ends it.
+- **This mostly closes the standing `sc-door` asset ask, and that row is no longer urgent.** `AUG07_ASSET_REQUEST.md` wanted a shot defined by *not* being a standard two-panel slider; this is that shot. What remains wanted is smaller: a real photograph rather than a render, and the leaf caught mid-travel rather than closed head-on.
+- **`sliding-door` is untouched and keeps the shared file.** Only the `sc-door` row moved, so the other product's card is unaffected.
+- Still a **render, not a photograph**, on the same approved-exception footing as the rest of `render/` — ROADMAP item 20 records the general rejection of white-bg renders; these specific images are the client's own.
+
 ### Session: 2026-08-12 (fifth) — two cards get new pictures
 
 #### Changed

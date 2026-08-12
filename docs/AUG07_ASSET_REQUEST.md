@@ -19,13 +19,15 @@ Products shipped in migration `019` and `src/data/products.ts` started on **sche
 
 | Product id | Display name | Current path | Shot still wanted from client |
 |---|---|---|---|
-| `sc-door` | SC-Door System (Sliding Casement Door) | `/images/wp-export/slidingdoor.webp` (shared) | Sliding Casement door leaf mid-travel on its track (not a swing casement, not a standard two-panel slider). Interior or exterior, full leaf visible. **Now the most urgent of these, not the least.** See the note below. |
+| `sc-door` | Soft Closing Sliding Door | `/images/products/render/sc-door.webp` (own render) | **Mostly answered** by the client render of 2026-08-12 (migration `026`), which shows the track and roller hangers rather than a plain slider. Still wanted eventually: a real photograph, and the leaf caught mid-travel rather than closed head-on. No longer urgent. |
 | `automated-window` | Automated Windows | render (above) | Close detail of a motorised opener / chain actuator on a FourlinQ sash. The approved render shows a chain actuator generically; a real one on a real sash is still better. |
 | `automated-door` | Automated Door Access | render (above) | Digital-access hardware close-up (keypad, reader, or fob plate) on a FourlinQ leaf. Same reasoning as above. |
 | `fixed-slide-door` | Fixed & Slide Door | render (above) | An installed six-panel run, ideally part-open so the stacking reads. |
 | `slim-door` | Slim Door | render (above) | The five-shot list in [AUG07_PROJECT_AREA_REQUEST.md](./AUG07_PROJECT_AREA_REQUEST.md) still stands. |
 
-> **SC-Door shares the sliding-door picture as of 2026-08-12, by client instruction** (migration `024`). No schematic line drawings remain in the catalogue. But note what the sharing costs: the shot requested in the row above is defined by *not* being a standard two-panel slider, and the image now on the card **is** that slider. The SC-Door description spends a paragraph explaining that it is a Sliding Casement rather than an ordinary slider, and the picture above it now shows an ordinary slider. Two products rest on one master. The instruction was followed; the ask is not closed by it.
+> **`sc-door` no longer shares the sliding-door picture** (migration `026`, 2026-08-12). For about an hour that day it did: migration `024` put `/images/wp-export/slidingdoor.webp` on both this product and `sliding-door`, which meant the card showed a plain two-panel slider directly above a paragraph explaining that the product is a Sliding Casement and *not* an ordinary slider. The client then supplied a dedicated render — leaf on its own top track, roller hangers visible — and that contradiction is resolved. `sliding-door` keeps the shared file; nothing else moved.
+>
+> The `sc-door` id, used in this table and in the paths above, is deliberately unchanged despite the rename to "Soft Closing Sliding Door" (migration `025`). It keys the 3D model, the `product_type` row, and earlier migrations.
 
 ## Rules (do not bypass)
 

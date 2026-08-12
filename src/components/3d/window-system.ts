@@ -516,7 +516,7 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     closeLabel: "Close window",
   },
   "sc-door": {
-    label: "SC-Door",
+    label: "Soft Closing Sliding Door",
     visibleRoot: ["sc-door"],
     model: MODEL_SYSTEM("sc-door"),
     center: [0, 0, 0.024],

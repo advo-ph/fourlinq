@@ -102,7 +102,7 @@ describe("Aug 7 product additions (glass-railing, sc-door, automated-window, lou
   > = {
     "glass-railing": { name: "Glass Railing", category: "specialist" },
     "sc-door": {
-      name: "SC-Door System (Sliding Casement Door)",
+      name: "Soft Closing Sliding Door",
       category: "doors",
     },
     "automated-window": { name: "Automated Windows", category: "windows" },
