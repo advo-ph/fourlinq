@@ -17,7 +17,7 @@
 // To add more projects: re-scrape the FourlinQ FB page, download the
 // referenced images, append a new entry here.
 
-import type { ProjectArea } from "@/data/project-area";
+import { projectAreaName, type ProjectArea } from "@/data/project-area";
 
 export type { ProjectArea };
 export type ProjectCategory =
@@ -56,7 +56,13 @@ export function tagFromCategory(category: string): InspirationTag[] {
 
 export interface Project {
   id: string;
-  /** Real location from the FourlinQ Facebook caption. */
+  /**
+   * Display name. On the exported `projects` array this is DERIVED from
+   * `area` ("Amara, Cebu"); the string written on each row below is only the
+   * fallback used when no area is confirmed, where it reads "Private
+   * Residence". Edit `area`, not this, to change what a located project is
+   * called.
+   */
   name: string;
   /** Specific area (city/municipality) when posted by the FourlinQ team. */
   location: string;
@@ -1084,9 +1090,34 @@ const projectRow: Project[] = [
  * - Caption/description text that already names the place (e.g. San Lorenzo,
  *   Nuvali Laguna)
  * - Showroom-verified Mandaue City → Cebu (fourlinq-data BRANCHES, read-only)
+ * - Client instruction of 2026-08-12 (see below)
  *
- * No village/city/province/region is inferred from filenames, slugs, or
- * plausibility. Philippines-only rows are intentionally absent.
+ * Philippines-only rows are intentionally absent.
+ *
+ * ── 2026-08-12: villages released by the client ──────────────────────────────
+ * Until this date no village was recorded, because the only place they existed
+ * was inside project slugs and we would not infer from a filename. The client
+ * then asked for project names in "village, location" form and gave "amara -
+ * cebu" as an example — releasing the subdivision names the slugs carry. Eleven
+ * villages were promoted on that authority:
+ *
+ *   Monterrazas, Maria Luisa, Kishanta, Vista Grande, Molave, Amara, Nuvali
+ *   (San Lorenzo was already confirmed from a caption.)
+ *
+ * `region_code: "cebu"` was backfilled onto the Liloan, Talisay, Consolacion
+ * and Oslob rows. That is a geographic fact about those municipalities, not a
+ * plausibility guess, and it is what makes them read "…, Cebu".
+ *
+ * Deliberately NOT promoted — slug fragments that are not places:
+ *   "fortunado" (cebu-f-residence-fortunado) — reads as a client surname
+ *   "maratas"   (cebu-maratas-residence)     — reads as a client surname
+ *   "cmsprs"    (cebu-cmsprs)                — initials
+ *   "pardo"     (cebu-n-residence-pardo, -b) — a Cebu City barangay, not a
+ *                                              subdivision; "Pardo, Cebu" is
+ *                                              less precise than "Cebu City"
+ *
+ * The count of projects carrying any area is unchanged at 38 — this pass added
+ * parts to rows that already had one. Nothing gained an area it did not have.
  */
 const DEFENDABLE_AREA: Readonly<Record<string, ProjectArea>> = {
   // Metro Manila (NCR cities named in verified location)
@@ -1103,43 +1134,97 @@ const DEFENDABLE_AREA: Readonly<Record<string, ProjectArea>> = {
   "cebu-r-residences": { city: "Cebu City", region_code: "cebu" },
   "cebu-n-residence-pardo": { city: "Cebu City", region_code: "cebu" },
   "cebu-n-residence-pardo-b": { city: "Cebu City", region_code: "cebu" },
-  "cebu-sch-residence-monterrazas": { city: "Cebu City", region_code: "cebu" },
-  "cebu-s-residence-maria-luisa": { city: "Cebu City", region_code: "cebu" },
-  "cebu-es-residence-maria-luisa": { city: "Cebu City", region_code: "cebu" },
-  "cebu-ta-residence-monterrazas": { city: "Cebu City", region_code: "cebu" },
+  "cebu-sch-residence-monterrazas": {
+    village: "Monterrazas",
+    city: "Cebu City",
+    region_code: "cebu",
+  },
+  "cebu-s-residence-maria-luisa": {
+    village: "Maria Luisa",
+    city: "Cebu City",
+    region_code: "cebu",
+  },
+  "cebu-es-residence-maria-luisa": {
+    village: "Maria Luisa",
+    city: "Cebu City",
+    region_code: "cebu",
+  },
+  "cebu-ta-residence-monterrazas": {
+    village: "Monterrazas",
+    city: "Cebu City",
+    region_code: "cebu",
+  },
   "cebu-t-residence-cebu-city": { city: "Cebu City", region_code: "cebu" },
   "cebu-cmsprs": { city: "Cebu", region_code: "cebu" },
   "cebu-m-residence-2": { city: "Cebu", region_code: "cebu" },
   "cebu-f-residence-fortunado": { city: "Cebu", region_code: "cebu" },
   "cebu-maratas-residence": { city: "Cebu", region_code: "cebu" },
-  "cebu-residence-monterrazas": { city: "Cebu", region_code: "cebu" },
+  "cebu-residence-monterrazas": {
+    village: "Monterrazas",
+    city: "Cebu",
+    region_code: "cebu",
+  },
   "cebu-d-residence-mandaue": { city: "Mandaue City", region_code: "cebu" },
 
   // City/municipality known from location; region not stated on caption
   "taytay-rizal-residence": { city: "Taytay" },
-  "nuvali-laguna-residence": { city: "Nuvali" },
-  "nuvali-laguna-residence-b": { city: "Nuvali", province: "Laguna" },
-  "nuvali-laguna-residence-c": { city: "Nuvali", province: "Laguna" },
+  "nuvali-laguna-residence": { village: "Nuvali", province: "Laguna" },
+  "nuvali-laguna-residence-b": { village: "Nuvali", province: "Laguna" },
+  "nuvali-laguna-residence-c": { village: "Nuvali", province: "Laguna" },
   "tagaytay-cavite-residence": { city: "Tagaytay City" },
-  "cebu-g-residences": { city: "Talisay City" },
-  "cebu-p-residence-kishanta": { city: "Talisay City" },
-  "cebu-ds-residence-talisay": { city: "Talisay City" },
-  "cebu-aa-residence-vista-grande": { city: "Talisay City" },
-  "cebu-a-residences": { city: "Oslob" },
+  "cebu-g-residences": { city: "Talisay City", region_code: "cebu" },
+  "cebu-p-residence-kishanta": {
+    village: "Kishanta",
+    city: "Talisay City",
+    region_code: "cebu",
+  },
+  "cebu-ds-residence-talisay": { city: "Talisay City", region_code: "cebu" },
+  "cebu-aa-residence-vista-grande": {
+    village: "Vista Grande",
+    city: "Talisay City",
+    region_code: "cebu",
+  },
+  "cebu-a-residences": { city: "Oslob", region_code: "cebu" },
   "batangas-c-residences": { city: "Batangas" },
   "bulacan-n-residence": { province: "Bulacan" },
-  "cebu-as-residence-consolacion": { city: "Consolacion" },
-  "cebu-m-residence-molave": { city: "Consolacion" },
-  "cebu-c-residence-amara": { city: "Liloan" },
-  "cebu-residence-vista-grande-talisay": { city: "Talisay" },
+  "cebu-as-residence-consolacion": { city: "Consolacion", region_code: "cebu" },
+  "cebu-m-residence-molave": {
+    village: "Molave",
+    city: "Consolacion",
+    region_code: "cebu",
+  },
+  "cebu-c-residence-amara": {
+    village: "Amara",
+    city: "Liloan",
+    region_code: "cebu",
+  },
+  "cebu-residence-vista-grande-talisay": {
+    village: "Vista Grande",
+    city: "Talisay",
+    region_code: "cebu",
+  },
   "binan-residence": { city: "Biñan" },
   "bataan-s-residence": { province: "Bataan" },
   "sarangani-s-residence": { province: "Sarangani" },
   "cabanatuan-t-residence": { city: "Cabanatuan" },
 };
 
-/** Catalog with defendable `area` attached. Philippines-only rows stay bare. */
+/**
+ * Catalog with defendable `area` attached, and `name` derived from it.
+ *
+ * The display name IS the area label ("Amara, Cebu") — that is the naming
+ * convention as of 2026-08-12. Deriving it here rather than hand-writing 38
+ * strings means `name` can never drift out of sync with `area`, and every
+ * consumer (gallery, detail, search, admin) picks it up without a call-site
+ * change. The `name` written on each row above survives as the fallback for
+ * projects with no confirmed place, where it already reads "Private Residence".
+ *
+ * An admin rename still wins over this: callers resolve
+ * `projectNames?.[id] ?? p.name` after reading this array.
+ *
+ * Philippines-only rows stay bare and keep their written name.
+ */
 export const projects: Project[] = projectRow.map((p) => {
   const area = DEFENDABLE_AREA[p.id];
-  return area ? { ...p, area } : p;
+  return area ? { ...p, area, name: projectAreaName(area, p.name) } : p;
 });

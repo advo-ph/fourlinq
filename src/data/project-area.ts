@@ -1,9 +1,19 @@
 /**
  * Structured project area + label derivation for /inspiration.
  *
- * Labels follow the client convention (village then city with an em dash).
+ * Labels follow the client convention: village then location, joined by a
+ * comma ("Amara, Cebu"). The separator was an em dash until 2026-08-12, when
+ * the client asked for a comma instead — it reads cleaner on the cards, and it
+ * makes the village and no-village forms ("Lipa, Batangas") one convention
+ * rather than two. `SEPARATOR` is the single owner of that choice.
+ *
  * Region codes drive the area axis. Every part of ProjectArea is optional —
- * omit what the client has not confirmed. Never invent a place name here.
+ * omit what the client has not confirmed.
+ *
+ * Place names are client-confirmed only. The village names now present were
+ * authorized by the client on 2026-08-12, which released the subdivision names
+ * already encoded in project slugs; see the DEFENDABLE_AREA note in
+ * `projects.ts` for what was promoted and what was deliberately withheld.
  */
 
 /** Client-named regions plus room to extend (she said "etc."). One-line add. */
@@ -33,13 +43,26 @@ export interface ProjectArea {
   region_code?: RegionCode;
 }
 
+/** The one place the label separator is decided. Comma since 2026-08-12. */
+const SEPARATOR = ", ";
+
+const join = (a: string, b: string): string => `${a}${SEPARATOR}${b}`;
+
 /**
  * Single owner of the card/detail location label.
  *
- * - village + city → "Amara — Cebu" (em dash U+2014)
- * - village only → village
- * - no village → "city, province" when those parts exist
- * - nothing confirmed → existing verified location string, unchanged
+ * A village is paired with the widest place the client names it by: the city
+ * for Metro Manila ("San Lorenzo, Makati"), the region everywhere else
+ * ("Amara, Cebu" — not "Amara, Liloan"). That asymmetry is the client's, and
+ * it is why region_code is consulted before city.
+ *
+ * - village + metro_manila + city → "San Lorenzo, Makati"
+ * - village + region_code        → "Amara, Cebu"
+ * - village + city               → "Amara, Liloan"      (no region confirmed)
+ * - village + province           → "Nuvali, Laguna"
+ * - village only                 → "Ayala Alabang"
+ * - no village                   → "Lipa, Batangas" / "Cebu City" / "Bataan"
+ * - nothing confirmed            → verified location string, unchanged
  */
 export function projectLocationLabel(
   area: ProjectArea | undefined,
@@ -50,13 +73,36 @@ export function projectLocationLabel(
   const village = area.village?.trim();
   const city = area.city?.trim();
   const province = area.province?.trim();
+  const region = area.region_code ? REGION_CODE[area.region_code] : undefined;
 
-  if (village && city) return `${village} — ${city}`;
-  if (village) return village;
-  if (city && province) return `${city}, ${province}`;
+  if (village) {
+    if (area.region_code === "metro_manila" && city) return join(village, city);
+    if (region) return join(village, region);
+    if (city) return join(village, city);
+    if (province) return join(village, province);
+    return village;
+  }
+
+  if (city && province) return join(city, province);
   if (city) return city;
   if (province) return province;
   return location;
+}
+
+/**
+ * Display name for a project: the area label when anything is confirmed,
+ * otherwise the catalog's own name (which is "Private Residence" for every
+ * project with no confirmed place).
+ *
+ * Passing "" as the location suppresses the fall-through in
+ * projectLocationLabel, so "no usable area parts" comes back as "" and the
+ * fallback takes over. That keeps one derivation instead of two.
+ */
+export function projectAreaName(
+  area: ProjectArea | undefined,
+  fallbackName: string,
+): string {
+  return projectLocationLabel(area, "") || fallbackName;
 }
 
 export interface AreaGroup<T> {

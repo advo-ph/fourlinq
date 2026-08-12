@@ -65,35 +65,39 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("project rename override on /projects/:slug", () => {
-  it("renders the static name when the project has never been renamed", async () => {
-    renderAt("cebu-s-residences");
+  // Fixture note: this project's catalog name is derived from its area
+  // ("Amara, Cebu"), so these cases also prove the derived default and the
+  // admin override coexist — the override wins, and clearing it lands back on
+  // the derived name rather than a stale hand-written one.
+  it("renders the derived catalog name when the project has never been renamed", async () => {
+    renderAt("cebu-c-residence-amara");
     await waitFor(() =>
       expect(
-        screen.getAllByRole("heading", { level: 1 }).some((h) => h.textContent === "Cebu F. Residence"),
+        screen.getAllByRole("heading", { level: 1 }).some((h) => h.textContent === "Amara, Cebu"),
       ).toBe(true),
     );
   });
 
   it("renders the admin-set name instead of the static one", async () => {
-    state.projectNames = { "cebu-s-residences": "Renamed In Admin" };
-    renderAt("cebu-s-residences");
+    state.projectNames = { "cebu-c-residence-amara": "Renamed In Admin" };
+    renderAt("cebu-c-residence-amara");
     await waitFor(() =>
       expect(
         screen.getAllByRole("heading", { level: 1 }).some((h) => h.textContent === "Renamed In Admin"),
       ).toBe(true),
     );
     expect(
-      screen.queryAllByRole("heading", { level: 1 }).some((h) => h.textContent === "Cebu F. Residence"),
+      screen.queryAllByRole("heading", { level: 1 }).some((h) => h.textContent === "Amara, Cebu"),
     ).toBe(false);
   });
 
   it("leaves other projects on their static names", async () => {
     // A rename is keyed by project id — it must not leak onto siblings.
     state.projectNames = { "some-other-project": "Should Not Appear" };
-    renderAt("cebu-s-residences");
+    renderAt("cebu-c-residence-amara");
     await waitFor(() =>
       expect(
-        screen.getAllByRole("heading", { level: 1 }).some((h) => h.textContent === "Cebu F. Residence"),
+        screen.getAllByRole("heading", { level: 1 }).some((h) => h.textContent === "Amara, Cebu"),
       ).toBe(true),
     );
     expect(screen.queryByText("Should Not Appear")).not.toBeInTheDocument();
@@ -101,8 +105,8 @@ describe("project rename override on /projects/:slug", () => {
 
   it("still resolves the project by its unchanged slug after a rename", async () => {
     // The whole point of the override: the URL keeps working.
-    state.projectNames = { "cebu-s-residences": "Renamed In Admin" };
-    renderAt("cebu-s-residences");
+    state.projectNames = { "cebu-c-residence-amara": "Renamed In Admin" };
+    renderAt("cebu-c-residence-amara");
     await waitFor(() => expect(screen.getAllByRole("heading", { level: 1 }).length).toBeGreaterThan(0));
     expect(screen.queryByText("INSPIRATION GALLERY")).not.toBeInTheDocument();
   });

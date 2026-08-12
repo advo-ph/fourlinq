@@ -473,7 +473,7 @@ Only the four below had **zero** coverage in any roadmap doc.
 
 | # | Item | What it closes | Effort | Benchmark | Status |
 |---|---|---|---|---|---|
-| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. Geographic axis shipped 2026-08-07 (`project-photo` lane): `/inspiration` region filter + grouping (Metro Manila, Cebu, … + unknown bucket) and `Amara — Cebu` labels from structured `ProjectArea`. Room-level (MBR/Living) and residential/commercial — the two axes she actually named — still need records. | ~0.5d | **D-B1** (Tier 1, gate-excluded) + **D-B4** (shipped) | **Blocked — D-B4 (geographic) shipped, but that is a substitute axis; D-B1 as asked is unbuilt** |
+| **D1** | Projects browsable **by area**, not only by system type | Meeting `00:23:14`: *"just plot it by area. Kaya, **MBR, Living**"* / *"pwede **residential, commercial**"* — her interim answer to having too few photos for Collections. Geographic axis shipped 2026-08-07 (`project-photo` lane): `/inspiration` region filter + grouping (Metro Manila, Cebu, … + unknown bucket) and `Amara, Cebu` labels from structured `ProjectArea`. Room-level (MBR/Living) and residential/commercial — the two axes she actually named — still need records. | ~0.5d | **D-B1** (Tier 1, gate-excluded) + **D-B4** (shipped) | **Blocked — D-B4 (geographic) shipped, but that is a substitute axis; D-B1 as asked is unbuilt** |
 | **D3** | `/inspiration` is a 5th surface with a mixed-axis filter over a single-vocabulary field | **Verified 2026-07-17.** `src/data/projects.ts` gives each project ONE `category` string drawn from two different vocabularies — system (`casement`/`sliding`/`doors`/`specialist`, 4 projects) **or** view (`interior`/`exterior`, 8 projects), **never both**. `Inspiration.tsx:24-32` then renders all seven as one peer row. Two consequences: (a) it repeats the exact mixed-axis error Imie rejected on `/products` (*"Aluminium is like uPVC — they are both profile systems"*), and (b) **the filter silently lies** — selecting *Interior* hides every casement/doors project that is also interior. RM4 governs this but lists only nav, home, product, and footer; `/inspiration` is an uncovered fifth surface. | ~0.5d + data | **D-B3** (Tier 1, gate-excluded) | Blocked on per-project axis values |
 
 ### D1 — geographic area shipped; room/occupancy still blocked
@@ -481,10 +481,18 @@ Only the four below had **zero** coverage in any roadmap doc.
 **2026-08-07 (`project-photo` lane).** `/inspiration` now has a **geographic area axis** alongside
 the tag axis: filter + section groups for regions that actually have projects (Metro Manila, Cebu,
 …), an explicit **"Area to be confirmed"** bucket, and card labels from
-`projectLocationLabel` (`Amara — Cebu` em-dash convention). Structured `ProjectArea` is populated
-only from verified Facebook `location`/caption strings — never invented. Client fill-in table:
+`projectLocationLabel`. Structured `ProjectArea` is populated
+only from verified Facebook `location`/caption strings, or from what the client has explicitly
+released — never invented. Client fill-in table:
 [AUG07_PROJECT_AREA_REQUEST.md](./AUG07_PROJECT_AREA_REQUEST.md). Tripwire test locks the confirmed
 count at 38.
+
+**2026-08-12 update.** The label is now the project **name**, not a line above it, and the
+separator is a **comma** (`Amara, Cebu`) — the em dash was dropped at the client's request. She
+also released the subdivision names already carried in project slugs, taking villages from 1 to
+14; `region_code: "cebu"` was backfilled onto the Liloan/Talisay/Consolacion/Oslob rows. Slug
+fragments that read as client surnames (`fortunado`, `maratas`) were deliberately not promoted.
+The confirmed-area count is still 38 — this added parts to rows that already had an area.
 
 **Still blocked (unchanged):**
 

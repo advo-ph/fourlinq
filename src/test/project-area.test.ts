@@ -4,6 +4,7 @@ import {
   groupProjectByArea,
   hasConfirmedArea,
   populatedRegionFilter,
+  projectAreaName,
   projectLocationLabel,
   REGION_CODE,
   UNKNOWN_REGION_CODE,
@@ -15,22 +16,38 @@ import {
  * Tripwire: count of catalog projects with any defendable structured area.
  * Bump only when a newly confirmed client address is added — never to
  * paper over a quiet backfill of guessed places.
+ *
+ * Deliberately unchanged by the 2026-08-12 village pass: that added village
+ * and region_code parts to rows that already carried an area. No project
+ * gained an area it did not have, so this number must not move for it.
  */
 const CONFIRMED_AREA_COUNT = 38;
 
 describe("projectLocationLabel", () => {
   it.each([
     {
-      name: "village + city uses em dash",
-      area: { village: "Amara", city: "Cebu" } satisfies ProjectArea,
+      name: "village + region pairs with the region, not the municipality",
+      area: { village: "Amara", city: "Liloan", region_code: "cebu" as const },
       location: "Liloan",
-      expected: "Amara — Cebu",
+      expected: "Amara, Cebu",
     },
     {
-      name: "San Lorenzo — Makati",
+      name: "village + city when no region is confirmed",
+      area: { village: "Amara", city: "Cebu" } satisfies ProjectArea,
+      location: "Liloan",
+      expected: "Amara, Cebu",
+    },
+    {
+      name: "Metro Manila villages pair with the city, not the region",
       area: { village: "San Lorenzo", city: "Makati", region_code: "metro_manila" as const },
       location: "Makati",
-      expected: "San Lorenzo — Makati",
+      expected: "San Lorenzo, Makati",
+    },
+    {
+      name: "village + province",
+      area: { village: "Nuvali", province: "Laguna" } satisfies ProjectArea,
+      location: "Nuvali",
+      expected: "Nuvali, Laguna",
     },
     {
       name: "village only",
@@ -51,6 +68,12 @@ describe("projectLocationLabel", () => {
       expected: "Cebu City",
     },
     {
+      name: "province only",
+      area: { province: "Bataan" } satisfies ProjectArea,
+      location: "Bataan",
+      expected: "Bataan",
+    },
+    {
       name: "empty area falls back to verified location",
       area: {} satisfies ProjectArea,
       location: "Philippines",
@@ -66,12 +89,51 @@ describe("projectLocationLabel", () => {
     expect(projectLocationLabel(area, location)).toBe(expected);
   });
 
-  it("uses the Unicode em dash (U+2014), not a hyphen or en dash", () => {
-    const label = projectLocationLabel({ village: "Amara", city: "Cebu" }, "Liloan");
-    expect(label).toBe("Amara — Cebu");
-    expect(label).toContain("\u2014");
-    expect(label).not.toContain("-");
-    expect(label).not.toContain("\u2013");
+  /**
+   * The separator was an em dash until the client asked for a comma on
+   * 2026-08-12 ("Amara, Cebu"). Docs written before that date still quote the
+   * em dash convention, so this guards against it being "restored" by someone
+   * reading those instead of this.
+   */
+  it("joins with a comma, never an em dash or en dash", () => {
+    const area: ProjectArea[] = [
+      { village: "Amara", city: "Liloan", region_code: "cebu" },
+      { village: "San Lorenzo", city: "Makati", region_code: "metro_manila" },
+      { village: "Nuvali", province: "Laguna" },
+      { city: "Lipa", province: "Batangas" },
+    ];
+    for (const a of area) {
+      const label = projectLocationLabel(a, "unused");
+      expect(label).toContain(", ");
+      expect(label).not.toContain("\u2014");
+      expect(label).not.toContain("\u2013");
+    }
+    expect(
+      projectLocationLabel({ village: "Amara", city: "Liloan", region_code: "cebu" }, "Liloan"),
+    ).toBe("Amara, Cebu");
+  });
+
+  it("renders no em dash anywhere in the live catalog", () => {
+    for (const p of projects) {
+      expect(p.name, p.id).not.toContain("\u2014");
+    }
+  });
+});
+
+describe("projectAreaName", () => {
+  it("uses the area label when a place is confirmed", () => {
+    expect(projectAreaName({ village: "Amara", region_code: "cebu" }, "Private Residence")).toBe(
+      "Amara, Cebu",
+    );
+  });
+
+  it.each([
+    { name: "undefined area", area: undefined },
+    { name: "empty area", area: {} satisfies ProjectArea },
+    // region_code alone yields no label parts - it must not leak "Cebu" as a name.
+    { name: "region_code with no place parts", area: { region_code: "cebu" as const } },
+  ])("falls back to the catalog name for $name", ({ area }) => {
+    expect(projectAreaName(area, "Private Residence")).toBe("Private Residence");
   });
 });
 
@@ -97,10 +159,82 @@ describe("no invented project area data", () => {
     }
   });
 
-  it("does not invent village Amara on the Liloan project without client confirmation", () => {
+  /**
+   * Replaces the pre-2026-08-12 test that asserted Amara was NOT set. The
+   * client released the subdivision names carried in project slugs on that
+   * date and gave "amara - cebu" as the worked example, so Amara is now
+   * confirmed. The guard is inverted rather than deleted: the exact set of
+   * villages is locked, so a twelfth one cannot be added quietly.
+   */
+  const CONFIRMED_VILLAGE: Readonly<Record<string, string>> = {
+    "san-lorenzo-makati-aluminium": "San Lorenzo",
+    "nuvali-laguna-residence": "Nuvali",
+    "nuvali-laguna-residence-b": "Nuvali",
+    "nuvali-laguna-residence-c": "Nuvali",
+    "cebu-sch-residence-monterrazas": "Monterrazas",
+    "cebu-ta-residence-monterrazas": "Monterrazas",
+    "cebu-residence-monterrazas": "Monterrazas",
+    "cebu-s-residence-maria-luisa": "Maria Luisa",
+    "cebu-es-residence-maria-luisa": "Maria Luisa",
+    "cebu-p-residence-kishanta": "Kishanta",
+    "cebu-aa-residence-vista-grande": "Vista Grande",
+    "cebu-residence-vista-grande-talisay": "Vista Grande",
+    "cebu-m-residence-molave": "Molave",
+    "cebu-c-residence-amara": "Amara",
+  };
+
+  it("locks the exact set of client-confirmed villages", () => {
+    const actual = Object.fromEntries(
+      projects.filter((p) => p.area?.village).map((p) => [p.id, p.area!.village!]),
+    );
+    expect(actual).toEqual(CONFIRMED_VILLAGE);
+  });
+
+  it("confirms Amara on the Liloan project and renders it as the client asked", () => {
     const amara = projects.find((p) => p.id === "cebu-c-residence-amara");
     expect(amara).toBeDefined();
-    expect(amara!.area?.village).toBeUndefined();
+    expect(amara!.area?.village).toBe("Amara");
+    expect(amara!.name).toBe("Amara, Cebu");
+  });
+
+  /**
+   * Privacy guard. These slug fragments read as client surnames or initials,
+   * not places, so they were deliberately not promoted to villages. "pardo" is
+   * a Cebu City barangay — real, but not a subdivision, and "Pardo, Cebu"
+   * would be less precise than "Cebu City".
+   */
+  it.each([
+    "cebu-f-residence-fortunado",
+    "cebu-maratas-residence",
+    "cebu-cmsprs",
+    "cebu-n-residence-pardo",
+    "cebu-n-residence-pardo-b",
+  ])("does not promote the non-place slug fragment in %s", (id) => {
+    const project = projects.find((p) => p.id === id);
+    expect(project, id).toBeDefined();
+    expect(project!.area?.village, id).toBeUndefined();
+  });
+
+  /**
+   * The point of the rename: a located project is named for its place, never
+   * for the client's initials ("Cebu S. Residence", "Liloan C. Residence").
+   */
+  it("never names a located project with client initials", () => {
+    for (const p of projects.filter((p) => hasConfirmedArea(p.area))) {
+      expect(p.name, p.id).not.toMatch(/\b[A-Z]{1,3}\.\s/);
+    }
+  });
+
+  /**
+   * Duplicate names are expected and correct — three projects really are in
+   * Monterrazas, and "Private Residence" already repeats 23 times because that
+   * is the client's own anonymising convention. Ids are the identifier; the
+   * name is a location. Do not "fix" this by adding II/III suffixes, which
+   * would assert an ordering the catalog does not have.
+   */
+  it("keeps ids unique (names are deliberately not)", () => {
+    const id = projects.map((p) => p.id);
+    expect(new Set(id).size).toBe(id.length);
   });
 });
 

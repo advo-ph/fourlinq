@@ -4,7 +4,6 @@ import Layout from "@/components/layout/Layout";
 import ProjectHeroGallery from "@/components/shared/ProjectHeroGallery";
 import EditorialButton from "@/components/primitives/Button";
 import { projects as fallbackProject, type Project } from "@/data/projects";
-import { projectLocationLabel } from "@/data/project-area";
 import { products } from "@/data/products";
 import { fetchProjects, mergeProject, canonicalProjectSlug } from "@/lib/cms-api";
 import { versionedImage } from "@/lib/image-version";
@@ -149,6 +148,28 @@ const ProjectDetail = () => {
   // Admin rename wins over the static/CMS name for the title and every alt string.
   const displayName = projectNames?.[selectedProject.id] ?? selectedProject.name;
 
+  // Fact rows beside the description. The name is now the location itself
+  // ("Amara, Cebu"), so a Location row only earns its place when it says
+  // something the heading has not: the municipality ("Liloan"), or
+  // "Philippines" on a project with no confirmed area. Built as a list rather
+  // than conditional JSX because the divider belongs to *position*, not to a
+  // particular row — the first visible row must have no top border.
+  const locationText = selectedProject.location?.trim();
+  const factRow: { label: string; value: string }[] = [];
+  if (locationText && !displayName.includes(locationText)) {
+    factRow.push({ label: "Location", value: locationText });
+  }
+  if (selectedProject.year) {
+    factRow.push({ label: "Completed", value: String(selectedProject.year) });
+  }
+  if (selectedProject.architect) {
+    factRow.push({ label: "Architect", value: selectedProject.architect });
+  }
+  factRow.push({
+    label: "Category",
+    value: categoryLabel[selectedProject.category] ?? selectedProject.category,
+  });
+
   // --- Gallery source of truth ---
   //
   // Live-first: if the merged API has resolved and returned a gallery list for
@@ -253,30 +274,15 @@ const ProjectDetail = () => {
             </div>
             <div className="lg:col-span-4 lg:col-start-9">
               <dl className="space-y-6">
-                <div>
-                  <dt className="eyebrow mb-2">Location</dt>
-                  <dd className="text-body text-[color:var(--ink-primary)]">
-                    {projectLocationLabel(selectedProject.area, selectedProject.location)}
-                  </dd>
-                </div>
-                {selectedProject.year && (
-                  <div className="border-t border-[color:var(--rule-soft)] pt-6">
-                    <dt className="eyebrow mb-2">Completed</dt>
-                    <dd className="text-body text-[color:var(--ink-primary)]">{selectedProject.year}</dd>
+                {factRow.map((row, i) => (
+                  <div
+                    key={row.label}
+                    className={i > 0 ? "border-t border-[color:var(--rule-soft)] pt-6" : undefined}
+                  >
+                    <dt className="eyebrow mb-2">{row.label}</dt>
+                    <dd className="text-body text-[color:var(--ink-primary)]">{row.value}</dd>
                   </div>
-                )}
-                {selectedProject.architect && (
-                  <div className="border-t border-[color:var(--rule-soft)] pt-6">
-                    <dt className="eyebrow mb-2">Architect</dt>
-                    <dd className="text-body text-[color:var(--ink-primary)]">{selectedProject.architect}</dd>
-                  </div>
-                )}
-                <div className="border-t border-[color:var(--rule-soft)] pt-6">
-                  <dt className="eyebrow mb-2">Category</dt>
-                  <dd className="text-body text-[color:var(--ink-primary)]">
-                    {categoryLabel[selectedProject.category] ?? selectedProject.category}
-                  </dd>
-                </div>
+                ))}
               </dl>
             </div>
           </div>
@@ -371,8 +377,8 @@ const ProjectDetail = () => {
                           className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
                         />
                       </div>
-                      <p className="mt-4 eyebrow">{projectLocationLabel(other.area, other.location)}</p>
-                      <p className="mt-2 font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
+                      {/* No location eyebrow: the name is already the location. */}
+                      <p className="mt-4 font-serif text-h5 text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
                         {otherName}
                       </p>
                     </Link>

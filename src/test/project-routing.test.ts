@@ -71,6 +71,29 @@ describe("merging CMS rows over the verified fallback", () => {
     expect(project?.name).toBe(verified?.name);
   });
 
+  /**
+   * Production cms_project.title still holds the pre-2026-08-12 names that
+   * migrate-cms-data.ts seeded ("Liloan C. Residence"). Those are exactly what
+   * the village-location convention retires, and the title column has no area
+   * awareness, so a confirmed area must outrank it. Without this the rename
+   * ships as a visual no-op in production.
+   */
+  it("does not let a stale CMS title override a name derived from confirmed area", () => {
+    const verified = fallbackProject.find((p) => p.id === "cebu-c-residence-amara");
+    expect(verified?.name).toBe("Amara, Cebu");
+    const merged = mergeProject(fallbackProject, [
+      cmsRow({ slug: "cebu-c-residence-amara", title: "Liloan C. Residence" }),
+    ]);
+    expect(merged.find((p) => p.id === "cebu-c-residence-amara")?.name).toBe("Amara, Cebu");
+  });
+
+  it("still lets the CMS title through for a project with no confirmed area", () => {
+    const merged = mergeProject(fallbackProject, [
+      cmsRow({ slug: "portfolio-residence-01", title: "Editorial Title" }),
+    ]);
+    expect(merged.find((p) => p.id === "portfolio-residence-01")?.name).toBe("Editorial Title");
+  });
+
   it("drops a CMS-only row too incomplete to render", () => {
     const merged = mergeProject(fallbackProject, [
       cmsRow({ slug: "ghost-project", cover_path: null, location: null }),

@@ -1,12 +1,26 @@
 # Project area request — 2026-08-07
 
+> **Partly answered 2026-08-12.** Two things changed after this table was sent:
+>
+> - **The separator is now a comma**, not an em dash — `Amara, Cebu`. The examples
+>   below are rewritten to match.
+> - **Fourteen villages are filled in.** Asking for projects to be renamed
+>   "village, location" released the subdivision names already carried in our
+>   project filenames, so Monterrazas, Maria Luisa, Kishanta, Vista Grande,
+>   Molave, Amara and Nuvali are now set without needing this table.
+>
+> The table below is still worth completing — **23 of 61 projects have no area at
+> all** and show as "Private Residence", and six of the seven areas you named
+> (Davao, Zamboanga, Butuan, Cagayan de Oro, Tacloban, Ilocos) still have no
+> projects assigned. The open question further down is also **still open.**
+
 Client deliverable from the **project-photo** lane. Fill the blank columns so
 `/inspiration` can group every install by area and label cards with the
 convention you named:
 
 ```
-Amara — Cebu                (subdivision/village, then the city)
-San Lorenzo — Makati
+Amara, Cebu                 (subdivision/village, then the area)
+San Lorenzo, Makati         (Metro Manila pairs with the city)
 Ayala Alabang
 Lipa, Batangas              (not inside a subdivision → just the place)
 Anvaya Cove, Bataan

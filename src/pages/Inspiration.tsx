@@ -6,7 +6,6 @@ import { projects as fallbackProject, tagFromCategory, type InspirationTag, type
 import {
   groupProjectByArea,
   populatedRegionFilter,
-  projectLocationLabel,
   UNKNOWN_REGION_CODE,
   type ProjectArea,
   type RegionCode,
@@ -48,10 +47,9 @@ const BASELINE_MERGED: MergedProjectImagesResponse = {
 // runtime state (baseline or live API result) rather than module-level imports.
 type ViewProject = {
   id: string;
+  /** Already the area label ("Amara, Cebu") — the card needs no second line. */
   name: string;
   location: string;
-  /** Derived card label (village — city convention). */
-  locationLabel: string;
   area?: ProjectArea;
   image: string;
   caption?: string;
@@ -64,7 +62,6 @@ function toView(p: Project, mergedData: MergedProjectImagesResponse): ViewProjec
     // An admin rename wins over the static/CMS name; everything else falls through.
     name: mergedData.projectNames?.[p.id] ?? p.name,
     location: p.location,
-    locationLabel: projectLocationLabel(p.area, p.location),
     area: p.area,
     image: p.image,
     caption: p.caption,
@@ -383,8 +380,9 @@ const Inspiration = () => {
             className="w-full h-full object-cover transition-transform duration-700 ease-marvin group-hover:scale-[1.03]"
           />
         </div>
+        {/* One line only: the name IS the location ("Amara, Cebu"), and the
+            region already appears in the section heading above the grid. */}
         <div className="mt-3">
-          <p className="eyebrow mb-1">{p.locationLabel}</p>
           <h3 className="font-serif text-body text-[color:var(--ink-primary)] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin">
             {p.name}
           </h3>
