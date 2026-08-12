@@ -6,6 +6,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { products } from "@/data/products";
+import { getSystemAnimation } from "@/data/systemAnimations";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
 import { benefits, comparisonData } from "@/data/benefits";
 
@@ -273,6 +274,51 @@ describe("Aug 12 door additions (fixed-slide-door, slim-door)", () => {
       expect(publicImageExists(product.image), `${id} image missing`).toBe(true);
     },
   );
+});
+
+describe("hover animations resolve to frames on disk", () => {
+  // A system registered in systemAnimations.ts with no frames behind it fails
+  // silently: the card renders, hover reveals a broken <img>, and nothing in
+  // the build complains. Cheap to guard, so guard it.
+  const ANIMATED_ID = [
+    "casement",
+    "sliding",
+    "awning",
+    "sliding-door",
+    "slide-and-fold",
+    "casement-door",
+    "french-door",
+    "large-panel-doors",
+    "lift-and-slide",
+    "90-series",
+    "automated-door",
+    "slim-door",
+  ] as const;
+
+  it.each(ANIMATED_ID)("%s has every frame it claims", (id) => {
+    const anim = getSystemAnimation(id);
+    expect(anim, `${id} is not registered in systemAnimations.ts`).not.toBeNull();
+    for (const frame of anim!.frames) {
+      expect(publicImageExists(frame), `${id} missing frame: ${frame}`).toBe(true);
+    }
+  });
+
+  it("every animated id is a real product id", () => {
+    const productId = new Set(products.map((p) => p.id));
+    for (const id of ANIMATED_ID) {
+      expect(productId.has(id), `${id} animates but is not a product`).toBe(true);
+    }
+  });
+
+  it("the first frame is the one the resting image crossfades into", () => {
+    // SystemCardMedia fades the frame layer over the resting <img>, so frame 01
+    // must exist for every animated product or the reveal starts on a gap.
+    for (const id of ANIMATED_ID) {
+      const frames = getSystemAnimation(id)!.frames;
+      expect(frames[0]).toMatch(/\/01\.webp$/);
+      expect(publicImageExists(frames[0])).toBe(true);
+    }
+  });
 });
 
 describe("migration ↔ static catalog parity", () => {

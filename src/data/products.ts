@@ -314,9 +314,14 @@ export const products: Product[] = [
     description:
       "Sliding Casement Door system — a casement door that slides rather than swings. The leaf travels on a track to free floor space while keeping the sealed, multi-point character of a casement door. For main and secondary entries, lanai access, and rooms where a swinging leaf would block furniture or circulation. We call it sliding. Custom-specified per opening.",
     shortDescription: "Casement seal and security, sliding operation.",
-    // Schematic placeholder — no verified client product photo in-repo yet.
-    // See docs/AUG07_ASSET_REQUEST.md.
-    image: "/images/products/schematic/sc-door.svg",
+    // Shares the sliding-door master by client instruction (2026-08-12), which
+    // retires the schematic. Read the caveat before changing or defending this:
+    // docs/AUG07_ASSET_REQUEST.md asks for a shot that is specifically NOT a
+    // standard two-panel slider, because SC-Door is a Sliding Casement and this
+    // image is the plain slider. Two products now rest on one picture. The ask
+    // for a distinguishing photo is still open, and this makes it more urgent,
+    // not less.
+    image: "/images/wp-export/slidingdoor.webp",
     specs: [
       "Sliding Casement operation (not a swing leaf)",
       "Multi-point locking on the active leaf",

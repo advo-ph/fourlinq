@@ -31,6 +31,22 @@ Keep entries concise — one line per change, written in past tense, focused on 
 >
 > The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
 
+### Session: 2026-08-12 (fourth) — the new doors open on hover
+
+#### Added
+
+- **Hover-open animations for Automated Door Access and Slim Door**, cut from the two client videos supplied 2026-08-12. Same mechanism as the other ten animated systems: WebP frame sequences under `public/systems/anim/<id>/`, played forward on pointer-enter and reversed on leave by [SystemCardMedia](../src/components/shared/SystemCardMedia.tsx). Both source clips already ran closed → open, which is the direction the player requires. [src/data/systemAnimations.ts](../src/data/systemAnimations.ts).
+- **A test that animation frames actually exist on disk.** A system registered in `systemAnimations.ts` with no frames behind it fails silently — the card renders, hover reveals a broken image, and nothing in the build complains.
+
+#### Changed
+
+- **SC-Door shares the sliding-door image** (migration `024`), retiring the last schematic line drawing in the catalogue. Client instruction.
+
+#### Notes
+
+- **Frame count is now per-system, and that is deliberate.** The first ten systems were all cut to 28. These two keep what their source video had — 30 frames and 25 at 30fps — rather than being resampled to match, which would have dropped two from one clip and duplicated three in the other for no visible gain. `SystemCardMedia` fixes playback *duration*, so a different count plays at the same speed.
+- 🔴 **The SC-Door card now shows a product the SC-Door is not.** `AUG07_ASSET_REQUEST.md` defines the wanted SC-Door shot as one that is specifically *not* a standard two-panel slider, because SC-Door is a Sliding Casement; the image now on the card is that slider, and the description directly beneath it spends a paragraph drawing the distinction. Two products rest on one master. The instruction was the client's and is followed; the ask for a distinguishing photo is not closed by it and is now the most urgent asset outstanding.
+
 ### Session: 2026-08-12 (third) — projects named for where they are
 
 #### Changed

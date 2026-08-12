@@ -11,7 +11,16 @@
 const FRAME_COUNT = 28;
 const BASE = "/systems/anim";
 
-/** product id (slug) → number of frames available */
+/**
+ * product id (slug) → number of frames available
+ *
+ * Count is per-system on purpose. The first ten were all cut to 28; the two
+ * 2026-08-12 additions keep whatever their source video actually had (30 and
+ * 25 at 30fps) rather than being resampled to match, which would have dropped
+ * two frames from one and duplicated three in the other for no visible gain.
+ * Playback duration is fixed in SystemCardMedia, so a different count plays at
+ * the same speed — it does not need to be uniform.
+ */
 const ANIMATED: Record<string, number> = {
   casement: FRAME_COUNT,
   sliding: FRAME_COUNT,
@@ -23,6 +32,8 @@ const ANIMATED: Record<string, number> = {
   "large-panel-doors": FRAME_COUNT,
   "lift-and-slide": FRAME_COUNT,
   "90-series": FRAME_COUNT,
+  "automated-door": 30,
+  "slim-door": 25,
 };
 
 export interface SystemAnimation {
