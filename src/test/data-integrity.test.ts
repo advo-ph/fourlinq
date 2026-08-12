@@ -24,9 +24,14 @@ export function publicImageExists(publicPath: string): boolean {
 }
 
 /**
- * SQL of the highest-numbered migration that writes a `description` for `slug`.
- * Copy gets revised in later migrations, so the newest one is the authority the
- * static catalog has to agree with. Returns null when no migration sets it.
+ * SQL of the newest statement that writes a `description` for `slug`.
+ *
+ * Copy gets revised in later migrations, so the highest-numbered write is the
+ * authority the static catalog has to agree with. Scoped to a single statement,
+ * not the whole file: a later migration may touch the same slug for an
+ * unrelated reason (023 repoints thumbnail_url and nothing else), and a
+ * file-wide match would treat that as the copy authority and fail every
+ * product it names. Returns null when no migration writes one.
  */
 export function newestMigrationCopyFor(slug: string): string | null {
   const dir = resolve(process.cwd(), "server/migrations");
@@ -36,7 +41,14 @@ export function newestMigrationCopyFor(slug: string): string | null {
 
   for (const name of ordered) {
     const sql = readFileSync(resolve(dir, name), "utf8");
-    if (sql.includes(`'${slug}'`) && /description/.test(sql)) return sql;
+    // Split on statement-terminating semicolons only. Product copy contains
+    // mid-sentence semicolons ("...blades; project consultation..."), and a
+    // naive split on ";" would cut a description in half.
+    const statement = sql.split(/;\s*\r?\n/);
+    const writesCopy = statement.find(
+      (s) => s.includes(`'${slug}'`) && /\bdescription\b/.test(s),
+    );
+    if (writesCopy) return writesCopy;
   }
   return null;
 }
@@ -197,6 +209,72 @@ describe("Aug 8 door-automation split (automated-door)", () => {
   });
 });
 
+describe("Aug 12 door additions (fixed-slide-door, slim-door)", () => {
+  const NEW_DOOR = ["fixed-slide-door", "slim-door"] as const;
+
+  it.each(NEW_DOOR)(
+    "%s is reachable from the doors filter, which is the whole point of carding it",
+    (id) => {
+      // fixed-slide-door existed only as a design-tool layout and slim-door not
+      // at all, so neither was findable by someone browsing /products.
+      const product = products.find((p) => p.id === id);
+      expect(product, `missing product id ${id}`).toBeDefined();
+      expect(product!.category).toBe("doors");
+    },
+  );
+
+  it.each(NEW_DOOR)("%s is fully specified with an image on disk", (id) => {
+    const product = products.find((p) => p.id === id)!;
+    expect(product.description.trim().length).toBeGreaterThan(0);
+    expect(product.shortDescription.trim().length).toBeGreaterThan(0);
+    expect(product.specs.length).toBeGreaterThan(0);
+    expect(product.finishes.length).toBeGreaterThan(0);
+    expect(product.glassOptions.length).toBeGreaterThan(0);
+    expect(publicImageExists(product.image), `${id} image missing: ${product.image}`).toBe(
+      true,
+    );
+  });
+
+  it("fixed-slide-door describes the six-panel layout the client named", () => {
+    const product = products.find((p) => p.id === "fixed-slide-door")!;
+    const copy = `${product.description} ${product.specs.join(" ")}`.toLowerCase();
+    expect(copy).toContain("six panels");
+    expect(copy).toMatch(/four slid/);
+  });
+
+  it("fixed-slide-door quotes no opening width", () => {
+    // The 9 m default in the handoff geometry is our engineering choice, not a
+    // confirmed product spec. A width on the card is the site promising a size
+    // nobody with product authority signed off (MEETING_2026-08-12 §6).
+    const product = products.find((p) => p.id === "fixed-slide-door")!;
+    const copy = `${product.description} ${product.shortDescription} ${product.specs.join(" ")}`;
+    expect(copy).not.toMatch(/\d+\s*(m|mm|metre|meter|ft|foot|feet)\b/i);
+  });
+
+  it("slim-door commits to swinging, and offers only glass the catalog carries", () => {
+    // The image the client supplied on 2026-08-12 settled the swing-or-slide
+    // question MEETING_2026-08-12 §8 left open. Guard against it drifting back
+    // to a sliding claim.
+    const product = products.find((p) => p.id === "slim-door")!;
+    const copy = `${product.description} ${product.specs.join(" ")}`;
+    expect(copy).toMatch(/swing/i);
+    expect(copy).not.toMatch(/slid(e|ing)/i);
+
+    // Reeded glass shows in the render but is not a FourlinQ glass option, so
+    // the copy must not sell it.
+    expect(copy).not.toMatch(/reeded|fluted|ribbed/i);
+  });
+
+  it.each(["automated-window", "automated-door", "fixed-slide-door", "slim-door"])(
+    "%s points at an approved render, not a schematic stand-in",
+    (id) => {
+      const product = products.find((p) => p.id === id)!;
+      expect(product.image).toMatch(/^\/images\/products\/render\//);
+      expect(publicImageExists(product.image), `${id} image missing`).toBe(true);
+    },
+  );
+});
+
 describe("migration ↔ static catalog parity", () => {
   it("020 seeds automated-door and narrows automated-window", () => {
     const migrationPath = resolve(
@@ -215,7 +293,30 @@ describe("migration ↔ static catalog parity", () => {
     expect(sql).not.toMatch(/\bDROP\b/i);
   });
 
-  it.each(["automated-door", "automated-window"])(
+  it("023 seeds the two new doors and repoints the automation renders", () => {
+    const migrationPath = resolve(
+      process.cwd(),
+      "server/migrations/023_fixed_slide_and_slim_door.sql",
+    );
+    expect(existsSync(migrationPath), "migration 023 file must exist").toBe(true);
+    const sql = readFileSync(migrationPath, "utf8");
+
+    expect(sql).toContain("'fixed-slide-door'");
+    expect(sql).toContain("'slim-door'");
+    expect(sql).toContain("/images/products/render/automated-window.webp");
+    expect(sql).toContain("/images/products/render/automated-door.webp");
+    // Same no-DELETE discipline as 019/020/022 — withdrawal is is_active =
+    // false in a later migration, never a DELETE here (the 017 failure mode).
+    expect(sql).not.toMatch(/\bDELETE\b/i);
+    expect(sql).not.toMatch(/\bDROP\b/i);
+  });
+
+  it.each([
+    "automated-door",
+    "automated-window",
+    "fixed-slide-door",
+    "slim-door",
+  ])(
     "the static copy for %s matches the newest migration that sets it",
     (slug) => {
       // Static catalog is the fallback when /api/products errors, so a drift

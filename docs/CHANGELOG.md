@@ -31,6 +31,42 @@ Keep entries concise — one line per change, written in past tense, focused on 
 >
 > The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
 
+### Session: 2026-08-12 (third) — projects named for where they are
+
+#### Changed
+
+- **Projects are named by place, not by client initial.** "Liloan C. Residence" is now **"Amara, Cebu"**; "Cebu S. Residence" is "Maria Luisa, Cebu". The name is **derived** from structured `ProjectArea` inside the `projects` export rather than hand-written, so it can never drift from the area data, and every surface — gallery, detail page, site search, admin panel — picked it up without a call-site change. Projects with no confirmed place keep "Private Residence". [src/data/projects.ts](../src/data/projects.ts), [src/data/project-area.ts](../src/data/project-area.ts).
+- **Separator is a comma, not an em dash** — the client asked for it on aesthetic grounds. `SEPARATOR` in `project-area.ts` is the only place it is decided, and a test fails if an em dash returns. This also unified the two forms: `Amara, Cebu` and `Lipa, Batangas` are now one convention rather than two.
+- **A village now pairs with the region, except in Metro Manila where it pairs with the city** — `Amara, Cebu` (not `Amara, Liloan`), but `San Lorenzo, Makati`. That asymmetry is the client's, taken from her own two examples.
+- **Fourteen villages promoted from project slugs**, on the client's 2026-08-12 instruction — Monterrazas, Maria Luisa, Kishanta, Vista Grande, Molave, Amara, Nuvali. Until then the catalog refused to read a place out of a filename, and a test asserted Amara was *not* set; that test is now inverted and locks the exact village set so a fifteenth cannot appear quietly. `region_code: "cebu"` was backfilled onto the Liloan/Talisay/Consolacion/Oslob rows, shrinking "Area to be confirmed" by 9. The confirmed-area count is unchanged at **38** — this added parts to rows that already had an area.
+- **Slug fragments that read as client surnames were not promoted** — `fortunado`, `maratas`, plus `cmsprs` (initials) and `pardo` (a Cebu City barangay, where "Pardo, Cebu" would be less precise than "Cebu City"). A test asserts all five stay village-less.
+- **A confirmed area now outranks `cms_project.title`.** [src/lib/cms-api.ts](../src/lib/cms-api.ts) let a CMS title beat the static name while trusting the static `area` — and production still holds all 61 pre-rename titles that `migrate-cms-data.ts` seeded, so without this the rename would have been a **visual no-op in production**. Editorial titles still win for projects with no confirmed area, and the admin `project_name` override still wins over everything.
+- **Cards and detail pages show the location once.** The name is now the location, so the eyebrow above it was duplicate text and is gone. On the detail page the Location row appears only when it adds something the heading does not (municipality, e.g. "Liloan"); the `<dl>` divider moved to a position-based rule so the first visible row never carries a stray top border. [src/pages/Inspiration.tsx](../src/pages/Inspiration.tsx), [src/pages/ProjectDetail.tsx](../src/pages/ProjectDetail.tsx).
+
+#### Notes
+
+- **Duplicate names are intentional.** Three projects read "Monterrazas, Cebu" and two "Maria Luisa, Cebu", because that is where they are. "Private Residence" already repeated 23 times — the client's own anonymising convention. Ids stay unique and are what routing and React keys use; a test asserts id uniqueness and explicitly does *not* assert name uniqueness.
+- **Four projects now read just "Cebu"** (`cebu-cmsprs`, `cebu-m-residence-2`, `cebu-f-residence-fortunado`, `cebu-maratas-residence`) — they carry only `city: "Cebu"`. Honest, but thin as a name; they need a village or municipality from the client.
+- The chatbot knowledge base at `server/cms-config.ts:165` embeds `cms_project.title`, so its chunks carry the old names until `cms_project` is re-synced.
+
+### Session: 2026-08-12 (second) — two doors the catalogue had no card for
+
+#### Added
+
+- **Fixed & Slide Door** (`fixed-slide-door`, under doors). The six-panel Fixed-Slide-Slide-Slide-Slide-Fixed run had a 2D design-tool layout and 3D geometry, but no product card — so the one place a shopper would look for it, `/products?filter=doors`, did not have it. The same reachability gap migration `020` closed for door automation. [src/data/products.ts](../src/data/products.ts), [server/migrations/023_fixed_slide_and_slim_door.sql](../server/migrations/023_fixed_slide_and_slim_door.sql).
+- **Slim Door** (`slim-door`, under doors) — item 8 of the client's Aug-7 list, and the one that had moved least. The client supplied an image on 2026-08-12 showing a hinged leaf on a narrow frame, which settles the swing-or-slide question that had blocked the page; [MEETING_2026-08-12.md](./MEETING_2026-08-12.md) §8 recorded us declining to guess it.
+
+#### Changed
+
+- **Automated Windows and Automated Door Access carry client-approved renders** instead of the schematic line drawings from `019`/`020`. `sc-door` is now the only product still on a schematic. [docs/AUG07_ASSET_REQUEST.md](./AUG07_ASSET_REQUEST.md).
+
+#### Notes
+
+- **Neither new card states a dimension.** The 9 m opening in the FSSSSF handoff geometry is our engineering choice, not a confirmed product spec, and a width printed on a card is the site promising a size nobody with product authority has signed off. A test asserts the copy carries no length unit.
+- **The slim-door render shows reeded glass; the catalogue does not sell reeded glass.** The copy says "clear or privacy glass", which maps to real `glassOptions`, and a test guards against the picture leaking into the spec list.
+- **`newestMigrationCopyFor` was matching whole files and broke on the first migration that touched a slug without rewriting its copy.** `023` repoints `thumbnail_url` for `automated-window`, which made it the newest file mentioning that slug, so the parity test demanded it contain copy it was never meant to carry. Now scoped to a single statement — split on statement-terminating semicolons only, because product copy contains mid-sentence ones ("...blades; project consultation..."). [src/test/data-integrity.test.ts](../src/test/data-integrity.test.ts).
+- **These are renders, not photographs.** Same approved-exception status as `glass-railing` and `louvre` in `022`: ROADMAP item 20 / R4 record the client rejecting white-bg renders in general, and she approved these four specifically. Item 20 stays **Partial**.
+
 ### Session: 2026-08-11 (second) — four more products get real 3D
 
 #### Added
@@ -66,7 +102,7 @@ Keep entries concise — one line per change, written in past tense, focused on 
 
 - **Item 1 was reported as broken and is not.** An audit pass concluded from reading the source that the configurator's finish picker did not reach the 3D model, and the meeting sheet said so. A browser check refuted it: three consecutive finishes, each with a real pixel delta and the viewer's label tracking, using a control proven to sit outside the viewer. The sheet was corrected before it could talk down working software in front of the client.
 - **`npm run handoff:export` is not byte-deterministic.** Re-baking rewrote `combination-bay.glb` and `combination-bow.glb` with identical byte counts but different content, from an unchanged builder. They were restored rather than committed. Worth fixing before the bake is ever used as a diff signal.
-- **The by-area photo work is built but nearly empty.** `project-area.ts` implements the client's exact "village — city" convention and the UI groups by region, but of 61 projects only 19 carry a region and just one carries a village. Six of the seven areas she named have no project at all. Only she can close that gap.
+- **The by-area photo work is built but nearly empty.** `project-area.ts` implements the client's "village then city" convention and the UI groups by region, but of 61 projects only 19 carry a region and just one carries a village. Six of the seven areas she named have no project at all. Only she can close that gap. *(Partly closed 2026-08-12 — she released the subdivision names carried in project slugs, taking villages from 1 to 14 and regions from 19 to 23. The six empty areas remain empty. The separator also changed from an em dash to a comma.)*
 - **The louvre tile is a CG render sitting beside 14 photographs**, and `ROADMAP` item 20 records a client preference for real photography over synthetic renders. It replaces a drawing captioned "schematic placeholder", so it improves on what shipped — but it is not a photograph, and swapping it for one is a one-line change to `products.ts`.
 
 ### Session: 2026-08-10 — the licensed model renders nothing, and the open button works again
@@ -184,7 +220,7 @@ Client feedback products that had no `/products` home. Glass stays a product lin
 
 #### Added
 
-- **Geographic area axis on `/inspiration`** — second filter rail (Metro Manila, Cebu, …) and section groups driven by structured `ProjectArea`; empty regions stay hidden; projects without a confirmed `region_code` land in **Area to be confirmed**. Card and detail labels use one derivation helper (`Amara — Cebu` em dash). [src/data/project-area.ts](../src/data/project-area.ts), [src/pages/Inspiration.tsx](../src/pages/Inspiration.tsx), [src/test/project-area.test.ts](../src/test/project-area.test.ts).
+- **Geographic area axis on `/inspiration`** — second filter rail (Metro Manila, Cebu, …) and section groups driven by structured `ProjectArea`; empty regions stay hidden; projects without a confirmed `region_code` land in **Area to be confirmed**. Card and detail labels use one derivation helper (`Amara — Cebu` em dash; **separator changed to a comma on 2026-08-12** — see that session's entry). [src/data/project-area.ts](../src/data/project-area.ts), [src/pages/Inspiration.tsx](../src/pages/Inspiration.tsx), [src/test/project-area.test.ts](../src/test/project-area.test.ts).
 - **Client area request doc** — one row per project with blank village/city/province/region columns, Anvaya Cove Batangas-vs-Bataan question open, slim-door shot list. [docs/AUG07_PROJECT_AREA_REQUEST.md](./AUG07_PROJECT_AREA_REQUEST.md).
 
 #### Changed

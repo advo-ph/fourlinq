@@ -362,9 +362,12 @@ export const products: Product[] = [
     description:
       "Motorised openers for windows that are hard to reach. Open and close a high or oversized sash from a wall switch, a remote, or your home automation system, so nobody needs a ladder or a pole. A good fit for stairwell windows, clerestory glazing, and tall living room openings. We match the opener and the power supply to your window during consultation.",
     shortDescription: "Open a high window without the ladder.",
-    // Schematic placeholder — no verified client product photo in-repo yet.
-    // See docs/AUG07_ASSET_REQUEST.md.
-    image: "/images/products/schematic/automated-window.svg",
+    // Client-approved RENDER (2026-08-12), not a photograph — hence render/,
+    // not real/. Same approved-exception status as glass-railing and louvre:
+    // ROADMAP item 20 / R4 record the client rejecting white-bg renders in
+    // general, and she approved this one specifically. The real-photo ask in
+    // docs/AUG07_ASSET_REQUEST.md still stands.
+    image: "/images/products/render/automated-window.webp",
     specs: [
       "Motorised opener for operable windows",
       "Wall switch, remote, or smart home control",
@@ -386,14 +389,64 @@ export const products: Product[] = [
     description:
       "Keyless entry and powered opening for your doors. Get in with a keypad code, a card, a fob, or your phone, and add automatic opening where the door and frame allow it. A good fit for main entrances, offices, and shared lobbies where people arrive with their hands full. We match the lock, the power, and the controls to your door during consultation.",
     shortDescription: "Enter without a key. Close without a pull.",
-    // Schematic placeholder — no verified client product photo in-repo yet.
-    // See docs/AUG07_ASSET_REQUEST.md.
-    image: "/images/products/schematic/automated-door.svg",
+    // Client-approved RENDER (2026-08-12), not a photograph — hence render/,
+    // not real/. Same approved-exception status as automated-window above.
+    image: "/images/products/render/automated-door.webp",
     specs: [
       "Keypad, card, fob, or phone access",
       "Powered opening for compatible doors",
       "Works with multi-point locking",
       "Suited to main entries and shared entrances",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Frosted Privacy", "Low-E Coated", "Laminated Safety"],
+  },
+  // ─── Aug 12 — two doors the catalog had no card for ───
+  // F-S-S-S-S-F existed only as a DESIGN TOOL layout (configurator.ts id
+  // `fixed-slide-slide-slide-slide-fixed`) and as handoff geometry. A shopper
+  // browsing /products?filter=doors could not find it. Slim doors had neither
+  // a card nor an image until the client supplied one.
+  {
+    id: "fixed-slide-door",
+    name: "Fixed & Slide Door",
+    category: "doors",
+    description:
+      "A wide glazed run in six panels: a fixed panel at each end, and four sliding panels in the middle that part from the centre. Opens most of the wall without a swinging leaf eating into the room, and closes to an even, continuous line of glass. A good fit for lanais, living rooms, and any wall you want to open onto a garden or a view. Panel widths and the overall opening are set for your space during consultation.",
+    shortDescription: "Four panels slide. Two stay put.",
+    // Client-approved RENDER (2026-08-12), not a photograph — hence render/,
+    // not real/. Same approved-exception status as the automation pair above.
+    image: "/images/products/render/fixed-slide-door.webp",
+    // No opening width here on purpose. The 9 m default in the handoff geometry
+    // is OUR engineering choice, not a confirmed product spec — printing it on
+    // the card would be the site promising a size nobody with product authority
+    // has signed off. See docs/MEETING_2026-08-12.md §6.
+    specs: [
+      "Six panels: fixed, four sliders, fixed",
+      "Sliding panels part from the centre",
+      "Fixed panels at both ends",
+      "Full-height glazing across the run",
+      "Panel widths set per opening",
+    ],
+    finishes: productFinishes,
+    glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
+  },
+  {
+    id: "slim-door",
+    name: "Slim Door",
+    category: "doors",
+    description:
+      "A swing door on a narrow frame, so the glass reads as the whole panel and the border almost disappears. Suited to entries, studies, and interior rooms where you want light to carry from one space into the next without a heavy frame around it. Glass is chosen per opening: clear where light should pass through, privacy glass where it should not. Handing, glass, and finish are set during consultation.",
+    shortDescription: "Maximum glass. Minimum frame.",
+    // Client-approved RENDER (2026-08-12), not a photograph — hence render/,
+    // not real/. This image also settles the mechanism question that
+    // docs/MEETING_2026-08-12.md §8 left open: it swings, it does not slide.
+    image: "/images/products/render/slim-door.webp",
+    specs: [
+      "Slim sightline frame",
+      "Single swing leaf",
+      "Full-height glazing",
+      "Clear or privacy glass",
+      "Handing and finish set per opening",
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Frosted Privacy", "Low-E Coated", "Laminated Safety"],
