@@ -36,6 +36,7 @@ Keep entries concise — one line per change, written in past tense, focused on 
 #### Changed
 
 - **Louvre Windows and Fixed & Slide Door carry new client-supplied renders**, replacing the ones that landed earlier the same day. Same products, shot smaller in the frame with more margin around the unit. Client instruction. `public/images/products/render/louvre.webp`, `public/images/products/render/fixed-slide-door.webp`.
+- **The Fixed & Slide Door render was then replaced again**, minutes after the first swap went live, with a wider crop that fills more of the frame. Client instruction. Recorded as its own line rather than folded into the one above, because the first version did ship to production and someone reading back a cache complaint needs to know two different images were served that day.
 
 #### Notes
 
