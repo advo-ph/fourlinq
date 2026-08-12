@@ -31,6 +31,17 @@ Keep entries concise — one line per change, written in past tense, focused on 
 >
 > The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
 
+### Session: 2026-08-12 (fifth) — two cards get new pictures
+
+#### Changed
+
+- **Louvre Windows and Fixed & Slide Door carry new client-supplied renders**, replacing the ones that landed earlier the same day. Same products, shot smaller in the frame with more margin around the unit. Client instruction. `public/images/products/render/louvre.webp`, `public/images/products/render/fixed-slide-door.webp`.
+
+#### Notes
+
+- **No migration and no code change, because the filenames did not move.** `products.ts`, migrations `022`/`023`, and `AUG07_ASSET_REQUEST.md` all already point at these two paths, so overwriting the bytes was the whole change. The tradeoff is that a stable URL is a cacheable URL: `public/` is copied through the Vite build without content hashing, so anyone holding the old image — browser or CDN edge — keeps it until that cache expires. Hard-refresh before judging the deploy.
+- These remain **renders, not photographs**, on the same approved-exception footing as the rest of `render/`. ROADMAP item 20 records the general rejection of white-bg renders; these specific images are the client's own. The real-photography ask in `AUG07_ASSET_REQUEST.md` is untouched by this swap.
+
 ### Session: 2026-08-12 (fourth) — the new doors open on hover
 
 #### Added
