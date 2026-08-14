@@ -2,8 +2,7 @@ module.exports = {
   apps: [{
     // Process name matches the pre-existing pm2 entry on the advo VPS, so the
     // deploy updates that process in-place rather than spawning a duplicate.
-    // Nginx site `fourlinq` already proxies to 127.0.0.1:3001 with an SSL
-    // cert, so we keep that port.
+    // Nginx site `fourlinq` proxies to 127.0.0.1:6207 (claimed fourlinq api).
     name: 'fourlinq',
 
     // CLUSTER, not fork — this is what makes `pm2 reload` zero-downtime. pm2
@@ -41,7 +40,7 @@ module.exports = {
     max_memory_restart: '768M',
     env: {
       NODE_ENV: 'production',
-      API_PORT: 3001,
+      API_PORT: 6207,
     },
     log_date_format: 'YYYY-MM-DD HH:mm:ss',
     merge_logs: true,

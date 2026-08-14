@@ -10,7 +10,7 @@ A production website for FourlinQ, a windows-and-doors fabricator in the Philipp
 - **Backend:** Express 5 (`server/`) — same server in dev and production
 - **Database:** Neon Postgres (PostgreSQL 15+)
 - **AI Chat:** Google Gemini API (server-side streaming, "LinQ" assistant)
-- **Deployment:** VPS + pm2, via GitHub Actions on push to `main` (mirrors `./deploy.sh`: build on the runner → rsync to the VPS → pm2 restart). No Vercel.
+- **Deployment:** host `advo` (`/opt/fourlinq`, PM2 `fourlinq`). GitHub Actions on push to `main` mirrors `./deploy.sh` (build on the runner → rsync → pm2 reload). No Vercel.
 
 ## Design System
 
@@ -24,7 +24,7 @@ A production website for FourlinQ, a windows-and-doors fabricator in the Philipp
 ```sh
 npm install
 npm run dev          # Vite frontend on http://localhost:8080
-npm run dev:api      # Express API on port 3001
+npm run dev:api      # Express API on port 6207
 npm run dev:all      # both concurrently
 ```
 
@@ -110,7 +110,9 @@ Create a `.env` in the project root.
 
 ## Deployment
 
-Production runs on the advo VPS under pm2. A push to `main` triggers `.github/workflows/deploy.yml`, which builds on the runner, rsyncs artifacts to the VPS, and **reloads** pm2 — the same flow as `./deploy.sh`. Check status with `npm run deploy:status`.
+Host: `advo` (SSH alias). Remote path: `/opt/fourlinq`. PM2 process: `fourlinq`.
+
+`./deploy.sh` defaults to `VPS_SSH=advo`. A push to `main` triggers `.github/workflows/deploy.yml`, which builds on the runner, rsyncs artifacts to `/opt/fourlinq`, and **reloads** pm2 — the same flow as `./deploy.sh`. Check status with `npm run deploy:status`.
 
 **Deploys are zero-downtime.** pm2 runs the app in cluster mode: a reload starts the replacement worker, waits for it to signal `ready` (`process.send("ready")` in `server/index.ts`), and only then stops the old one. Measured on the VPS under a 10/s poll, a fork-mode restart dropped 6 requests; a cluster reload drops 0.
 

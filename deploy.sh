@@ -10,7 +10,7 @@ set -e
 
 # Target: advo VPS (root@62.146.237.12, Contabo Singapore). Uses the `advo`
 # SSH alias from ~/.ssh/config so it picks up the right identity file.
-VPS_SSH="advo"
+VPS_SSH="${VPS_SSH:-advo}"
 REMOTE_DIR="/opt/fourlinq"
 
 GREEN='\033[0;32m'
