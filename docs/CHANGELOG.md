@@ -31,6 +31,12 @@ Keep entries concise — one line per change, written in past tense, focused on 
 >
 > The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
 
+### Session: 2026-08-14 — deploy host is `advo`, API binds 6207
+
+#### Changed
+
+- **SSH default is the `advo` host alias**, not a raw Contabo IP. `API_PORT` is **6207** (claimed 6200–6299). Same box as `advo-api` / fourlinq-hr. User: *"i want to change the name of my contabo repos"*. Contract: `booted/docs/vps.md`. Ledger: `~/Antigravity/PORTS.md`.
+
 ### Session: 2026-08-12 (sixth) — the SC-Door is named for what it does
 
 #### Changed
