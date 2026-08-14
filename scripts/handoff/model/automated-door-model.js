@@ -229,10 +229,33 @@ export function buildAutomatedDoor(opts = {}) {
   const maxTravel = halfW - panelW;                 // 0.6 m at 2400 wide
   const travel = maxTravel * openRatio;             // 582 mm
 
+  /**
+   * Trapezoidal velocity: ramp up over the first fifth, constant through the
+   * middle, ramp down over the last fifth.
+   *
+   * Deliberately NOT the smoothstep every other builder here uses. A symmetric
+   * ease never reaches a constant speed — it accelerates and decelerates the
+   * whole way, which is what a person pushing a leaf looks like. An operator
+   * runs at a set speed with soft ends, and that difference is the only visual
+   * evidence in the whole assembly that a motor is driving it. It was linear
+   * before, which reads as neither.
+   */
+  const RAMP = 0.2;
+  function motorEase(k) {
+    const area = 1 - RAMP;
+    if (k < RAMP) return (k * k) / (2 * RAMP) / area;
+    if (k > 1 - RAMP) {
+      const u = 1 - k;
+      return (1 - RAMP - (u * u) / (2 * RAMP)) / area;
+    }
+    return (RAMP / 2 + (k - RAMP)) / area;
+  }
+
   function setOpen(t) {
     const k = Math.min(1, Math.max(0, t));
-    leaves[0].position.x = -travel * k;
-    leaves[1].position.x = travel * k;
+    const e = motorEase(k);
+    leaves[0].position.x = -travel * e;
+    leaves[1].position.x = travel * e;
   }
   setOpen(0);
 

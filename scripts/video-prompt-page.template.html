@@ -1,0 +1,271 @@
+<title>FourlinQ — every system, prompted for video</title>
+<style>
+  :root {
+    --ground: #ffffff; --surface: #f6f7f8; --sunk: #eef1f3;
+    --ink: #16181a; --ink-2: #4a5054; --ink-3: #767d82;
+    --rule: #dce1e4; --rule-2: #c3cace;
+    --steel: #5d6b73; --steel-bright: #8b989f;
+    --flag: #9a4a18; --flag-bg: #fbf2ec;
+    --gen: #1f5d4c; --gen-bg: #eef5f2;
+    --mono-bg: #14171a; --mono-ink: #d8dde0; --mono-dim: #7d878d; --mono-rule: #2a3238;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #101315; --surface: #171b1e; --sunk: #1d2226;
+      --ink: #e8ecee; --ink-2: #a8b1b6; --ink-3: #7b858b;
+      --rule: #282f34; --rule-2: #39434a;
+      --steel: #9fb0b9; --steel-bright: #c2d0d7;
+      --flag: #d98d5c; --flag-bg: #241a13;
+      --gen: #7fbfa8; --gen-bg: #14211d;
+      --mono-bg: #0a0c0e; --mono-ink: #d8dde0; --mono-dim: #6f797f; --mono-rule: #232b31;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #101315; --surface: #171b1e; --sunk: #1d2226;
+    --ink: #e8ecee; --ink-2: #a8b1b6; --ink-3: #7b858b;
+    --rule: #282f34; --rule-2: #39434a;
+    --steel: #9fb0b9; --steel-bright: #c2d0d7;
+    --flag: #d98d5c; --flag-bg: #241a13;
+    --gen: #7fbfa8; --gen-bg: #14211d;
+    --mono-bg: #0a0c0e; --mono-ink: #d8dde0; --mono-dim: #6f797f; --mono-rule: #232b31;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 3.5rem 1.5rem 6rem; display: flex; flex-direction: column; gap: 3rem; }
+  .display { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; margin: 0; }
+  .eyebrow { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin: 0; }
+  p { margin: 0; }
+  hr.rule { height: 1px; background: var(--rule); border: 0; margin: 0; }
+
+  header { display: flex; flex-direction: column; gap: 1rem; }
+  header h1 { font-size: clamp(2.25rem, 6vw, 3.5rem); line-height: 1.02; }
+  .lede { font-size: 1.125rem; color: var(--ink-2); max-width: 42rem; }
+
+  .brief { background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--steel); padding: 1.5rem 1.75rem; display: flex; flex-direction: column; gap: 0.85rem; }
+  .brief p + p { color: var(--ink-2); }
+
+  section { display: flex; flex-direction: column; gap: 1.25rem; }
+  section > h2 { font-size: 1.5rem; letter-spacing: -0.02em; }
+  ol.steps { margin: 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.6rem; color: var(--ink-2); }
+  ol.steps strong { color: var(--ink); }
+
+  /* index */
+  nav.index { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: 0.4rem; }
+  .nav-item {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: 0.75rem; color: var(--ink-2); text-decoration: none;
+    padding: 0.5rem 0.65rem; background: var(--sunk); border: 1px solid var(--rule);
+    border-left: 2px solid var(--steel);
+  }
+  .nav-item.gen { border-left-color: var(--gen); }
+  .nav-item:hover { color: var(--ink); border-color: var(--rule-2); border-left-color: var(--steel-bright); }
+  .nav-item:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; }
+
+  /* cards */
+  .card { border: 1px solid var(--rule); background: var(--surface); display: flex; flex-direction: column; scroll-margin-top: 1.5rem; }
+  .card.is-gen { border-left: 3px solid var(--gen); }
+  .card-head { padding: 1.5rem 1.75rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; border-bottom: 1px solid var(--rule); }
+  .card-head h2 { font-size: 1.625rem; letter-spacing: -0.025em; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chip {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: 0.6875rem; letter-spacing: 0.03em; padding: 0.2rem 0.5rem;
+    border: 1px solid var(--rule-2); color: var(--ink-2); background: var(--ground);
+  }
+  .chip.dim { color: var(--ink-3); }
+  .chip.route { font-weight: 700; }
+  .chip.route.baked { color: var(--steel); border-color: var(--steel); }
+  .chip.route.gen { color: var(--gen); border-color: var(--gen); background: var(--gen-bg); }
+  .chip.flag { color: var(--flag); border-color: var(--flag); background: var(--flag-bg); }
+  .why { color: var(--ink-2); font-size: 0.9375rem; }
+  .why code, .accept code, footer code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.8125rem; color: var(--steel); }
+
+  .card-body { padding: 1.5rem 1.75rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .refs { display: flex; flex-direction: column; gap: 0.4rem; }
+  .refs-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  pre.hidden { display: none; }
+  button.copy.ghost {
+    color: var(--ink-2); border-color: var(--rule-2); background: var(--ground);
+  }
+  button.copy.ghost:hover { background: var(--sunk); border-color: var(--steel); color: var(--ink); }
+  button.copy.ghost[data-done="1"] { color: var(--gen); border-color: var(--gen); background: var(--gen-bg); }
+  .ref { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.9rem; padding: 0.7rem 0; border-bottom: 1px dotted var(--rule-2); font-size: 0.875rem; align-items: start; }
+  .ref:last-child { border-bottom: 0; }
+  .ref-text { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+  .ref code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.75rem; color: var(--steel); word-break: break-all; }
+  .ref-text > span { color: var(--ink-2); }
+  .ref .note { color: var(--flag); font-size: 0.8125rem; }
+
+  /* thumbnails — the click target that puts real bytes on the clipboard */
+  button.thumb {
+    position: relative; display: block; width: 100%; padding: 0; cursor: pointer;
+    background: var(--sunk); border: 1px solid var(--rule-2); overflow: hidden;
+  }
+  button.thumb img { display: block; width: 100%; height: auto; max-height: 6rem; object-fit: contain; background: #fff; }
+  button.thumb:hover { border-color: var(--steel); }
+  button.thumb:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; }
+  .thumb-badge {
+    position: absolute; inset: auto 0 0 0; background: rgba(20,23,26,0.86); color: #fff;
+    font-size: 0.625rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.15rem 0; text-align: center;
+  }
+  button.thumb[data-done="1"] .thumb-badge { background: #2f6b45; }
+  button.thumb[data-done="err"] .thumb-badge { background: #8a3a1c; }
+  .thumb.is-video {
+    display: flex; align-items: center; justify-content: center; height: 4rem;
+    background: var(--sunk); border: 1px dashed var(--rule-2); color: var(--ink-3);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.6875rem; letter-spacing: 0.1em;
+  }
+  @media (max-width: 34rem) { .ref { grid-template-columns: 5rem minmax(0, 1fr); } }
+
+  .payload { display: flex; flex-direction: column; }
+  .payload-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--mono-bg); padding: 0.5rem 0.5rem 0.5rem 1rem; border-bottom: 1px solid var(--mono-rule); }
+  .payload-bar .eyebrow { color: var(--mono-dim); }
+  pre {
+    margin: 0; background: var(--mono-bg); color: var(--mono-ink); padding: 1.25rem; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: 0.8125rem; line-height: 1.65; white-space: pre-wrap; word-wrap: break-word;
+  }
+  pre.neg { color: #cbb5a8; }
+
+  button.copy {
+    font: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--mono-ink); background: transparent; border: 1px solid #39434a;
+    padding: 0.3rem 0.7rem; cursor: pointer; white-space: nowrap;
+  }
+  button.copy:hover { background: #1e2429; border-color: #55636c; }
+  button.copy:focus-visible { outline: 2px solid var(--steel-bright); outline-offset: 2px; }
+  button.copy[data-done="1"] { color: #8fd6a4; border-color: #3d6b4b; }
+
+  details.split { border: 1px solid var(--rule); background: var(--ground); }
+  details.split > summary {
+    cursor: pointer; padding: 0.6rem 1rem; font-size: 0.8125rem; color: var(--ink-2);
+    list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  }
+  details.split > summary::before { content: "▸"; color: var(--steel); }
+  details[open].split > summary::before { content: "▾"; }
+  details.split > summary:hover { color: var(--ink); }
+  details.split > summary:focus-visible { outline: 2px solid var(--steel); outline-offset: -2px; }
+  .split-body { display: flex; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
+
+  ul.accept { margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9375rem; color: var(--ink-2); }
+  ul.accept strong { color: var(--ink); }
+
+  footer { color: var(--ink-3); font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">FourlinQ · product animation · 18 systems</p>
+    <h1 class="display">Every system, prompted for video</h1>
+    <p class="lede">One prompt per product in the Systems menu, ready to paste. Fourteen of them already ship as rendered tiles — those are the benchmark to beat, not a gap to fill. Four have no mechanism to render and need a generative model regardless.</p>
+  </header>
+
+  <hr class="rule">
+
+  <div class="brief">
+    <p><strong>What you're testing against.</strong> The fourteen baked tiles carry real mechanism: lever handles throwing before the leaf moves, cam locks turning a quarter, hinges, scissor stays that extend, actuator chains that lengthen link by link. They're deterministic and rebuild from one command. A generated clip has to hold all of that for 28 frames, and survive being played backwards.</p>
+    <p>Two conventions the bake settled, which any replacement has to match or the tiles won't sit together: the viewpoint is the <strong>interior face</strong> — that's where handles and locks are mounted, and where the 3D viewer's camera sits — and <strong>moving hardware is steel, not black</strong>, because black furniture on a black frame cannot be seen to move at tile size.</p>
+  </div>
+
+  <section>
+    <h2 class="display">Before you paste</h2>
+    <p class="why">Each prompt is now <strong>one block</strong> — subject, motion, camera discipline, surface stability, strict panel counts and the prohibitions all merged. Grok Imagine has no separate negative field, so a negative left in its own box is a negative the tool never reads. Paste the whole thing. If your tool <em>does</em> have a negative field, every card has a collapsible section that splits it back apart.</p>
+    <ol class="steps">
+      <li><strong>Click the thumbnails to copy the reference images.</strong> The actual bytes go to your clipboard — paste them straight in. For every baked system, <code>01.webp</code> and <code>28.webp</code> are the closed and open poses; attach both and it becomes an interpolation job rather than a generation job, which is far more reliable.</li>
+      <li><strong>Paste the full prompt.</strong> It runs long, and that length is doing work — the CAMERA, FRAMING, CONTINUITY and COMPLETION blocks are what stop the specific failures listed below.</li>
+      <li><strong>Watch it backwards.</strong> The tile scrubs in reverse on un-hover, so any settle, bounce or one-directional flourish looks broken half the time.</li>
+    </ol>
+    <div class="brief">
+      <p><strong>Every block below exists because of a real failure.</strong> Nothing here is precautionary — each was added after an output came back wrong.</p>
+      <p><strong>THE PRODUCT IS ALONE</strong> — the model kept installing the window: a plaster reveal and recessed wall opening around it, screw heads at the corners, a floor visible through the glass. "Pure white seamless background" does not prevent this, because a white wall satisfies it. So the surround is now refused by name, and the glazing is told what colour it is rather than only what it is not.</p>
+      <p><strong>FRAMING IS LOCKED</strong> — a Ken Burns push-in creeping across the clip; this pins the white margin explicitly, because "no zoom" alone did not hold. <strong>MOTION IS ONE CONTINUOUS GLIDE</strong> — the panel advancing in visible increments; now stated as a per-frame test rather than a list of things to avoid. <strong>THE MOVEMENT MUST FINISH</strong> — the slide stopping short of fully open, usually because the model spent the opening seconds holding on the closed pose and ran out of clip. <strong>CAMERA</strong> — three-quarter and slanted views. <strong>REALISM</strong> — dreamy, cinematic, soft-focus mood-film treatment. <strong>SURFACE</strong> — sparkle and ripple shimmer over the glass. <strong>STRICT COUNTS</strong> — duplicated leaves, openings from both sides at once, two panels sliding when only one should.</p>
+      <p>Each is attacked twice: once as a positive assertion the model can act on (<em>"the empty white margin between the product and each of the four edges is the same in every frame"</em>), then once as a prohibition. A geometric statement tends to survive where a style adjective like "locked-off" gets ignored.</p>
+      <p><strong>These run long — around 9,000 characters.</strong> A silently truncated prompt loses its tail, which is where the prohibitions live. If your tool caps below that, every card has a <em>Compact</em> version at roughly 2,700 characters carrying the same constraints in condensed form.</p>
+    </div>
+    <div class="payload">
+      <div class="payload-bar">
+        <p class="eyebrow">Turning a finished clip into a tile</p>
+        <button class="copy" data-copy="ffmpeg">Copy</button>
+      </div>
+<pre id="ffmpeg">DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 clip.mp4)
+mkdir -p public/systems/anim/&lt;id&gt;
+ffmpeg -i clip.mp4 \
+  -vf "fps=28/${DUR},scale=640:360:force_original_aspect_ratio=decrease,\
+pad=640:360:(ow-iw)/2:(oh-ih)/2:white" \
+  -frames:v 28 -q:v 80 "public/systems/anim/&lt;id&gt;/%02d.webp"</pre>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="display">Index</h2>
+    <nav class="index">
+      <!--NAV-->
+    </nav>
+  </section>
+
+  <hr class="rule">
+
+<!--CARDS-->
+
+  <footer>
+    <hr class="rule" style="margin-bottom:1rem">
+    <p>Source of truth: <code>docs/prompt/video/</code> — one self-contained markdown file per asset. This page is generated from those files.</p>
+    <p>⚠ marks a product question, not a rendering one: the old tile and the GLB depict different mechanisms, so the bake had to pick a side. Confirm with the client before either version goes in front of anyone.</p>
+    <p>Every reference path was verified to exist in the repo.</p>
+  </footer>
+
+</div>
+
+<script>
+  document.querySelectorAll("button.copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var el = document.getElementById(btn.getAttribute("data-copy"));
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText).then(function () {
+        var prev = btn.textContent;
+        btn.textContent = "Copied";
+        btn.setAttribute("data-done", "1");
+        setTimeout(function () { btn.textContent = prev; btn.removeAttribute("data-done"); }, 1600);
+      });
+    });
+  });
+
+  /* Image copy. The clipboard only accepts image/png, and these are embedded as
+     JPEG data URIs, so each one is repainted through a canvas on the way out. */
+  function flag(btn, state) {
+    var badge = btn.querySelector(".thumb-badge");
+    var prev = badge.textContent;
+    badge.textContent = state === "err" ? "Failed" : "Copied";
+    btn.setAttribute("data-done", state);
+    setTimeout(function () { badge.textContent = prev; btn.removeAttribute("data-done"); }, 1600);
+  }
+
+  document.querySelectorAll("button.thumb").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var img = document.getElementById(btn.getAttribute("data-img"));
+      if (!img || !img.naturalWidth) return flag(btn, "err");
+      var cvs = document.createElement("canvas");
+      cvs.width = img.naturalWidth;
+      cvs.height = img.naturalHeight;
+      cvs.getContext("2d").drawImage(img, 0, 0);
+      cvs.toBlob(function (blob) {
+        if (!blob || !window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write) {
+          return flag(btn, "err");
+        }
+        navigator.clipboard
+          .write([new ClipboardItem({ "image/png": blob })])
+          .then(function () { flag(btn, "1"); })
+          .catch(function () { flag(btn, "err"); });
+      }, "image/png");
+    });
+  });
+</script>

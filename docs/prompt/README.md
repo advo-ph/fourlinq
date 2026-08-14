@@ -16,6 +16,14 @@ Regenerate with `node scripts/_split-brief.mjs` after editing
 | Louvre / jalousie | [louvre.md](./louvre.md) | **Yes** — `louvre-model.js`, live in the viewer |
 | Slim doors | [slim-door.md](./slim-door.md) | No |
 
+## Video prompts
+
+[video/](./video/) is a separate pack, for Gemini (Veo) and Grok Imagine rather
+than for 3D builders — the hover animations on the system cards, not the GLBs.
+Read its README first: most systems should be **baked** from geometry we already
+own (`scripts/bake-system-anim.mjs`) rather than generated, and the pack covers
+only the four categories where no honest mechanism can be rendered.
+
 **Tilt & turn is deliberately absent.** It is the last configurator type with no
 3D, and it stays that way while it is an unconfirmed product: the glossary
 describes it opening inward, which contradicts the client's "everything opens

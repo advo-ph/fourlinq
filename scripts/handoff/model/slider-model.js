@@ -47,6 +47,42 @@ function buildHandle(M, name) {
 }
 
 /**
+ * Cam (crescent) lock — the fastener a uPVC slider actually carries, and the
+ * only part of a slider that moves other than the leaf.
+ *
+ * The recessed pull above is a finger pocket: it does not move, and animating
+ * it would be a lie. This does move, a quarter turn, and it is what a customer
+ * recognises as "unlocked". Returns `{ group, lever }` so the caller can drive
+ * the lever without reaching back through the scene graph by name.
+ *
+ * The arm is deliberately offset from the pivot rather than centred on it. A
+ * part that rotates about its own axis of symmetry reads as perfectly static no
+ * matter how far it turns — which is why the thumbturn cylinders elsewhere in
+ * this handoff look frozen even when their transform is animating.
+ */
+function buildCamLock(M, name) {
+  const g = new THREE.Group();
+  g.name = name;
+  g.add(mesh(new THREE.BoxGeometry(0.030, 0.066, 0.007), M.steel, name + '_base', [0, 0, -0.0035]));
+
+  /* The lever is STEEL, not the matte black the rest of the furniture wears.
+     Brushed-steel cam furniture is standard on a uPVC slider, so this is not a
+     liberty — but the reason it matters here is legibility. Black hardware on a
+     black frame is invisible at any size, and this part exists to be seen
+     moving. The pale hinge plates on the awning are the proof: they read at
+     tile scale and the black handle beside them does not. */
+  const lever = new THREE.Group();
+  lever.name = name + '_lever';
+  lever.add(mesh(new THREE.BoxGeometry(0.012, 0.048, 0.010), M.steel, name + '_lever_arm', [0, 0.021, 0]));
+  const boss = mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.012, 16), M.steel, name + '_lever_boss', [0, 0, 0]);
+  boss.rotation.x = Math.PI / 2;
+  lever.add(boss);
+  g.add(lever);
+
+  return { group: g, lever };
+}
+
+/**
  * buildSlider({ panel, grid })
  * Horizontal glider on a TWIN track (two rails, exterior + interior).
  * Metres, y-up, interior = +Z. Operable panels sit on the interior plane so the
@@ -173,6 +209,15 @@ export function buildSlider(opts = {}) {
     return h;
   }
 
+  /* Cam lock above the pull, on the same leading stile, where it meets the
+     interlock it fastens against. Returns the lever group for setOpen. */
+  function addLock(carrier, name, dir) {
+    const { group, lever } = buildCamLock(M, name);
+    group.position.set(dir * (-panelW / 2 + PANEL_FACE / 2), 0.115, PANEL_D / 2 + 0.004);
+    carrier.add(group);
+    return lever;
+  }
+
   /* rollers under an operable panel, riding the interior rail */
   function addRoller(carrier, prefix) {
     [-1, 1].forEach((s, i) => {
@@ -205,7 +250,7 @@ export function buildSlider(opts = {}) {
 
     addHandle(operable, 'handle', 1);
     addRoller(operable, 'roller_');
-    leaf.push({ carrier: operable, closedX, dir: -1 });
+    leaf.push({ carrier: operable, closedX, dir: -1, lever: addLock(operable, 'lock', 1) });
   } else {
     /* OXXO: fixed outers on the exterior rail, operable inners on the interior
        rail, parting from the centre. Joint pitch is (panelW - OVERLAP) at the
@@ -246,8 +291,8 @@ export function buildSlider(opts = {}) {
     addRoller(operableL, 'roller_l_');
     addRoller(operableR, 'roller_r_');
 
-    leaf.push({ carrier: operableL, closedX: x1, dir: -1 });
-    leaf.push({ carrier: operableR, closedX: x2, dir: 1 });
+    leaf.push({ carrier: operableL, closedX: x1, dir: -1, lever: addLock(operableL, 'lock_l', 1) });
+    leaf.push({ carrier: operableR, closedX: x2, dir: 1, lever: addLock(operableR, 'lock_r', -1) });
 
     operable = operableL;
     closedX = x1;
@@ -256,10 +301,19 @@ export function buildSlider(opts = {}) {
   root.position.y = H / 2 + 0.02;
 
   const travel = Math.min(OPEN_RATIO * openW, panelW - OVERLAP - 0.008);
+  /* Quarter turn to release. Completed inside the first 15% of the sweep, which
+     is the same lead-in the hinged builders use for their handles — the
+     fastener is clear before the leaf has meaningfully moved. */
+  const LOCK_TURN = Math.PI / 2;
+
   function setOpen(t) {
     const c = Math.min(1, Math.max(0, t));
     const eased = c * c * (3 - 2 * c);
-    for (const l of leaf) l.carrier.position.x = l.closedX + l.dir * eased * travel;
+    const throwT = Math.min(1, c / 0.15);
+    for (const l of leaf) {
+      l.carrier.position.x = l.closedX + l.dir * eased * travel;
+      if (l.lever) l.lever.rotation.z = l.dir * throwT * LOCK_TURN;
+    }
   }
   setOpen(0);
 

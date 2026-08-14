@@ -88,6 +88,21 @@ function buildDPull(M, name) {
     [0, 0.145, PLATE_D + 0.0085]);
   g.add(keyway);
 
+  /* Hook-bolt lever below the grip. The plate, grip and keyed cylinder are all
+     fixed — a D-pull is a grip, not a mechanism, and the key does not turn when
+     you simply slide the door. The lever is the part that does move: a quarter
+     turn retracts the hook bolt from the jamb keep before the leaf can travel.
+     Its arm is offset from the pivot on purpose, so the rotation is legible;
+     a boss spinning about its own axis of symmetry reads as static. */
+  const lever = new THREE.Group();
+  lever.name = name + '_lever';
+  lever.position.set(0, -0.140, PLATE_D + 0.004);
+  lever.add(mesh(new THREE.BoxGeometry(0.013, 0.060, 0.012), M.steel, name + '_lever_arm', [0, 0.028, 0]));
+  const pin = mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.014, 18), M.steel, name + '_lever_boss', [0, 0, 0]);
+  pin.rotation.x = Math.PI / 2;
+  lever.add(pin);
+  g.add(lever);
+
   return g;
 }
 
@@ -217,10 +232,16 @@ export function buildSlidingDoor(opts = {}) {
   const maxTravel = panelW - OVERLAP - 0.010;
   const travel = Math.min(OPEN_RATIO * openW, maxTravel);
   const dir = PANELS === 3 ? 1 : -1;   // OXO centre slides right; XO right panel slides left
+  /* Quarter turn to retract the hook bolt, completed inside the first 15% of
+     the sweep — the same lead-in the hinged builders give their handles. */
+  const lever = handle.getObjectByName('handle_lever');
+  const LEVER_TURN = Math.PI / 2;
+
   function setOpen(t) {
     const c = Math.min(1, Math.max(0, t));
     const eased = c * c * (3 - 2 * c);
     operable.position.x = closedX + dir * eased * travel;
+    if (lever) lever.rotation.z = dir * Math.min(1, c / 0.15) * LEVER_TURN;
   }
   setOpen(0);
 

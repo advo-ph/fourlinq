@@ -218,6 +218,7 @@ export function buildMultiSlide(opts = {}) {
   const fixedIndex = isBipart ? [0, 5] : [N - 1];
 
   /* flush pulls on each lead panel's leading stile, both faces */
+  const thumbturn = [];   // the one part of a flush pull that actually moves
   function addPull(leaf, edgeSign, suffix = '') {
     const edgeX = edgeSign * (panelW / 2 - PANEL_FACE / 2);
     const pullIn = buildFlushPull(M, 'handle_interior' + suffix, true);
@@ -227,6 +228,12 @@ export function buildMultiSlide(opts = {}) {
     const pullOut = buildFlushPull(M, 'handle_exterior' + suffix, false);
     pullOut.position.set(edgeX, -0.06, -PANEL_D / 2 - 0.001);
     leaf.add(pullOut);
+
+    /* The plate and pocket are recessed and fixed — that is the whole point of
+       flush hardware on a panel that has to pass a jamb pocket. The thumbturn
+       paddle is the exception and the only part that should ever move. */
+    const turn = pullIn.getObjectByName('handle_interior' + suffix + '_thumbturn');
+    if (turn) thumbturn.push({ node: turn, sign: edgeSign });
   }
   if (isBipart) {
     addPull(panels[2], 1, '_left');   // left lead, meeting stile on its +x edge
@@ -265,6 +272,11 @@ export function buildMultiSlide(opts = {}) {
       panels[m.index].position.x = closedX[m.index] + (openX[m.index] - closedX[m.index]) * e;
     }
     for (const i of fixedIndex) panels[i].position.x = closedX[i];
+
+    /* Paddle turns through a quarter inside the first 15%, before the lead leaf
+       has meaningfully travelled — the same lead-in the hinged builders use. */
+    const throwT = Math.min(1, c / 0.15);
+    for (const tt of thumbturn) tt.node.rotation.z = tt.sign * throwT * (Math.PI / 2);
   }
   setOpen(0);
 

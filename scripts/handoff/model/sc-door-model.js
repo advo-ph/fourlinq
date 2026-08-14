@@ -221,11 +221,27 @@ export function buildSCDoor(opts = {}) {
   }
   leaf.add(box(0.024, 0.29, 0.024, M.hardware_matte_black, 'handle_bar', hx, -0.12, hzo + 0.046));
   leaf.add(box(0.042, 0.07, 0.014, M.hardware_matte_black, 'lock_body', hx, -0.335, hzo + 0.007));
-  const turn = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.03, 16), M.hardware_matte_black);
+  /* Thumbturn: a boss plus an offset tab, grouped so the whole thing can rotate
+     about the axis it faces down.
+
+     It was a bare cylinder before, and a bare cylinder is exactly the shape
+     whose rotation cannot be seen — spin it about its own axis of symmetry and
+     every frame is identical. The tab is what makes the quarter turn read. */
+  const turn = new THREE.Group();
   turn.name = 'lock_thumbturn';
-  turn.rotation.x = Math.PI / 2;
   turn.position.set(hx, -0.335, hzo + 0.029);
-  turn.castShadow = true;
+  /* Steel, not matte black, and for the same reason as the slider's cam lock:
+     black furniture on a black leaf cannot be seen to move at tile scale. */
+  const boss = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.02, 16), M.hinge_steel);
+  boss.name = 'lock_thumbturn_boss';
+  boss.rotation.x = Math.PI / 2;
+  boss.castShadow = true;
+  turn.add(boss);
+  const tab = new THREE.Mesh(new THREE.BoxGeometry(0.011, 0.044, 0.012), M.hinge_steel);
+  tab.name = 'lock_thumbturn_tab';
+  tab.position.set(0, 0.020, 0.008);
+  tab.castShadow = true;
+  turn.add(tab);
   leaf.add(turn);
 
   group.add(leaf);
@@ -235,9 +251,19 @@ export function buildSCDoor(opts = {}) {
   const travelMax = (hw - 0.006 - leafW) + hw - 0.006;   // 0.894 m
   const travel = travelMax * openRatio;          // 805 mm at openRatio 0.9
 
+  /* Quarter turn on the thumbturn, done inside the first 15% of the sweep, then
+     the leaf runs. Same lead-in as every hinged builder in this handoff.
+
+     The travel is eased too. It was linear, which is the one thing that makes a
+     baked slide look like a transform rather than a door — nothing in a real
+     assembly starts and stops at full speed. */
+  const LOCK_TURN = Math.PI / 2;
+
   function setOpen(t) {
     const k = Math.min(1, Math.max(0, t));
-    leaf.position.x = -S * travel * k;
+    const eased = k * k * (3 - 2 * k);
+    leaf.position.x = -S * travel * eased;
+    turn.rotation.z = -S * Math.min(1, k / 0.15) * LOCK_TURN;
   }
   setOpen(0);
 
