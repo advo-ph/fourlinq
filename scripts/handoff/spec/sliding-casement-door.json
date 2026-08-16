@@ -1,5 +1,5 @@
 {
-  "id": "sc_door",
+  "id": "sliding_casement_door",
   "motion": "translate_x",
   "units": "m",
   "size_mm": {

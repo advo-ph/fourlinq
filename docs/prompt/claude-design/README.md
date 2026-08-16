@@ -4,7 +4,7 @@ One file per asset. Paste the whole file — each restates the full contract, so
 none of them depends on the others or on repo access.
 
 - [Glass Railing](./glass-railing.md) → `railing-model.js`
-- [SC-Door — Sliding Casement Door](./sc-door.md) → `sc-door-model.js`
+- [Sliding Casement Door](./sliding-casement-door.md) → `sliding-casement-door-model.js`
 - [Automated Windows](./automated-window.md) → `automated-window-model.js`
 - [Automated Door Access](./automated-door.md) → `automated-door-model.js`
 - [Slim doors](./slim-door.md) → `slim-door-model.js`

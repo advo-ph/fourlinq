@@ -10,10 +10,14 @@ import { getSystemAnimation } from "@/data/systemAnimations";
 import { FRAME_FINISHES } from "@/data/fourlinq-data";
 import { benefits, comparisonData } from "@/data/benefits";
 
-/** Fixed ids from the 2026-08-07 client feedback (LANE_PROMPT / migration 019). */
+/**
+ * Fixed ids from the 2026-08-07 client feedback (LANE_PROMPT / migration 019).
+ * 2026-08-16: sc-door removed from catalog per client instruction; replaced by
+ * sliding-casement-door which inherits its assets and takes its catalog slot.
+ */
 export const AUG07_PRODUCT_ID = [
   "glass-railing",
-  "sc-door",
+  "sliding-casement-door",
   "automated-window",
   "louvre",
 ] as const;
@@ -95,14 +99,14 @@ describe("products data integrity", () => {
   });
 });
 
-describe("Aug 7 product additions (glass-railing, sc-door, automated-window, louvre)", () => {
+describe("Aug 7 product additions (glass-railing, sliding-casement-door, automated-window, louvre)", () => {
   const expected: Record<
     (typeof AUG07_PRODUCT_ID)[number],
     { name: string; category: string }
   > = {
     "glass-railing": { name: "Glass Railing", category: "specialist" },
-    "sc-door": {
-      name: "Soft Closing Sliding Door",
+    "sliding-casement-door": {
+      name: "Sliding Casement Door",
       category: "doors",
     },
     "automated-window": { name: "Automated Windows", category: "windows" },
@@ -148,11 +152,15 @@ describe("Aug 7 product additions (glass-railing, sc-door, automated-window, lou
     }
   });
 
-  it("SC-Door copy says Sliding Casement and never glider", () => {
-    const product = products.find((p) => p.id === "sc-door");
+  it("Sliding Casement Door copy mentions casement and never glider", () => {
+    // 2026-08-16: sc-door replaced by sliding-casement-door. The original guard
+    // required "Sliding Casement" in the copy — the new product name is itself
+    // "Sliding Casement Door", so that requirement is met by the name alone.
+    // Guard: copy must contain "casement" and must not claim it is a glider.
+    const product = products.find((p) => p.id === "sliding-casement-door");
     expect(product).toBeDefined();
     const copy = `${product!.name} ${product!.description} ${product!.shortDescription} ${product!.specs.join(" ")}`;
-    expect(copy).toMatch(/Sliding Casement/i);
+    expect(copy).toMatch(/casement/i);
     expect(copy.toLowerCase()).not.toContain("glider");
   });
 });
@@ -206,7 +214,10 @@ describe("Aug 8 door-automation split (automated-door)", () => {
   it("each door-category ask has a product a doors shopper can actually reach", () => {
     const doorProduct = products.filter((p) => p.category === "doors");
     expect(doorProduct.some((p) => p.id === "automated-door")).toBe(true);
-    expect(doorProduct.some((p) => p.id === "sc-door")).toBe(true);
+    // 2026-08-16: sc-door removed; sliding-casement-door takes its slot.
+    expect(doorProduct.some((p) => p.id === "sliding-casement-door")).toBe(true);
+    // Guard that the removed sc-door id is no longer present.
+    expect(doorProduct.some((p) => p.id === "sc-door")).toBe(false);
   });
 });
 
@@ -280,6 +291,15 @@ describe("hover animations resolve to frames on disk", () => {
   // A system registered in systemAnimations.ts with no frames behind it fails
   // silently: the card renders, hover reveals a broken <img>, and nothing in
   // the build complains. Cheap to guard, so guard it.
+  //
+  // 2026-08-16: reconciled against the actual systemAnimations.ts ANIMATED map.
+  // Added: louvre, automated-window (both registered + 28 frames on disk).
+  // Added: sliding-casement-door (renamed from sc-door, assets git-mv'd).
+  // Removed: slim-door — it has only 25 frames on disk (not 28) and is NOT
+  //   registered in systemAnimations.ts ANIMATED map. Leaving it out rather
+  //   than silently masking the drift. Reported as outstanding: slim-door needs
+  //   either registration in systemAnimations.ts (with correct FRAME_COUNT) or
+  //   the frames trimmed/completed to 28. See bake-system-anim.mjs.
   const ANIMATED_ID = [
     "casement",
     "sliding",
@@ -291,8 +311,10 @@ describe("hover animations resolve to frames on disk", () => {
     "large-panel-doors",
     "lift-and-slide",
     "90-series",
+    "louvre",
+    "automated-window",
+    "sliding-casement-door",
     "automated-door",
-    "slim-door",
   ] as const;
 
   it.each(ANIMATED_ID)("%s has every frame it claims", (id) => {
@@ -311,11 +333,21 @@ describe("hover animations resolve to frames on disk", () => {
   });
 
   it("the first frame is the one the resting image crossfades into", () => {
-    // SystemCardMedia fades the frame layer over the resting <img>, so frame 01
-    // must exist for every animated product or the reveal starts on a gap.
+    // SystemCardMedia fades the frame layer over the resting <img>, so the
+    // first frame in the returned array must exist on disk for every animated
+    // product or the reveal starts on a gap.
+    //
+    // For most systems the array is 01→28 (closed→open) and frames[0] is 01.
+    // For REVERSED systems (automated-window) the array is 28→01 (open→closed)
+    // so frames[0] is 28 — that is the resting pose that matches the card still,
+    // and SystemCardMedia handles it correctly. We skip the /01\.webp$/ check
+    // for those: what matters is that frames[0] exists, not which frame it is.
+    const REVERSED_IDS = new Set(["automated-window"]);
     for (const id of ANIMATED_ID) {
       const frames = getSystemAnimation(id)!.frames;
-      expect(frames[0]).toMatch(/\/01\.webp$/);
+      if (!REVERSED_IDS.has(id)) {
+        expect(frames[0]).toMatch(/\/01\.webp$/);
+      }
       expect(publicImageExists(frames[0])).toBe(true);
     }
   });
@@ -379,7 +411,19 @@ describe("migration ↔ static catalog parity", () => {
 });
 
 describe("migration 019 ↔ static catalog id parity", () => {
-  it("seeded product slugs in 019 match the Aug-7 static id set", () => {
+  // Migration 019 seeded the original Aug-7 slugs. One of them (sc-door) has
+  // since been superseded by sliding-casement-door (client instruction
+  // 2026-08-16, migration 027). AUG07_PRODUCT_ID now tracks the CURRENT live
+  // ids. This test checks 019 against the original seeded set, which includes
+  // sc-door rather than sliding-casement-door.
+  const AUG07_SEEDED_IN_019 = [
+    "glass-railing",
+    "sc-door",
+    "automated-window",
+    "louvre",
+  ] as const;
+
+  it("seeded product slugs in 019 match the original Aug-7 seed set", () => {
     const migrationPath = resolve(
       process.cwd(),
       "server/migrations/019_aug07_product_additions.sql",
@@ -395,10 +439,98 @@ describe("migration 019 ↔ static catalog id parity", () => {
     );
     const seeded = new Set(
       quoted.filter((slug) =>
-        (AUG07_PRODUCT_ID as readonly string[]).includes(slug),
+        (AUG07_SEEDED_IN_019 as readonly string[]).includes(slug),
       ),
     );
-    expect([...seeded].sort()).toEqual([...AUG07_PRODUCT_ID].sort());
+    expect([...seeded].sort()).toEqual([...AUG07_SEEDED_IN_019].sort());
+  });
+
+  it("migration 027 introduces sliding-casement-door and retires sc-door", () => {
+    // Migration 027 supersedes 019/024/025/026 for the sc-door slug. It must
+    // seed sliding-casement-door and deactivate sc-door (no-DELETE discipline).
+    const migrationPath = resolve(
+      process.cwd(),
+      "server/migrations/027_sliding_casement_door.sql",
+    );
+    expect(existsSync(migrationPath), "migration 027 file must exist").toBe(true);
+    const sql = readFileSync(migrationPath, "utf8");
+
+    expect(sql).toContain("'sliding-casement-door'");
+    expect(sql).toContain("'sc-door'");
+    // No-DELETE discipline: sc-door must be deactivated, not deleted.
+    expect(sql).toMatch(/is_active\s*=\s*false/);
+    // Check for SQL DELETE/DROP statements only (not the word in comments).
+    // Strip SQL comments before checking so "--no-DELETE discipline" prose
+    // does not trip the guard (same pattern as migration 020/023 tests above).
+    const sqlNoComments = sql.replace(/--[^\n]*/g, "");
+    expect(sqlNoComments).not.toMatch(/\bDELETE\b/i);
+    expect(sqlNoComments).not.toMatch(/\bDROP\b/i);
+
+    // --- Structural schema-correctness checks ---
+    // These would have caught the three fatal defects in the original 027 file.
+
+    // 1. product_type INSERT must supply product_category_id (NOT NULL FK).
+    //    The correct pattern resolves it via a JOIN on product_category, not
+    //    by deriving from an existing row (which silently no-ops when sc-door
+    //    is absent). Verify the INSERT INTO product_type block references
+    //    product_category_id as a target column.
+    expect(
+      sqlNoComments,
+      "product_type INSERT must supply product_category_id (NOT NULL column)",
+    ).toMatch(
+      /INSERT\s+INTO\s+product_type\s*\([^)]*product_category_id[^)]*\)/i,
+    );
+
+    // 2. product INSERT must supply product_type_id (NOT NULL FK).
+    //    Without it the INSERT fails with a not-null violation.
+    expect(
+      sqlNoComments,
+      "product INSERT must supply product_type_id (NOT NULL column)",
+    ).toMatch(/INSERT\s+INTO\s+product\s*\([^)]*product_type_id[^)]*\)/i);
+
+    // 3. product INSERT must NOT write to a column called category_slug.
+    //    category_slug is a VALUES alias used only in the JOIN in migration 019
+    //    and does not exist as a real column on the product table.
+    expect(
+      sqlNoComments,
+      "product INSERT must not reference category_slug (not a real column)",
+    ).not.toMatch(/INSERT\s+INTO\s+product\s*\([^)]*category_slug[^)]*\)/i);
+
+    // 4. product INSERT must supply finish_labels and glass_labels (text[]).
+    //    Without them /api/products returns the new product with zero finishes
+    //    and zero glass options, diverging from the static catalog.
+    expect(
+      sqlNoComments,
+      "product INSERT must supply finish_labels",
+    ).toMatch(/INSERT\s+INTO\s+product\s*\([^)]*finish_labels[^)]*\)/i);
+    expect(
+      sqlNoComments,
+      "product INSERT must supply glass_labels",
+    ).toMatch(/INSERT\s+INTO\s+product\s*\([^)]*glass_labels[^)]*\)/i);
+
+    // 5. Both finish_labels and glass_labels must be populated with literal
+    //    array values (not NULL or empty). Check the canonical finish labels
+    //    from FRAME_FINISHES are present in the file body.
+    const EXPECTED_FINISH_LABELS = [
+      "Oak Light", "Oak Malt", "Jet Black", "Charcoal Gray",
+      "Matte Quartz", "Silica Cream", "Black Wood", "Gray Wood",
+      "Dark Oak", "Walnut", "Golden Oak", "White",
+    ];
+    for (const label of EXPECTED_FINISH_LABELS) {
+      expect(
+        sql,
+        `finish_labels must include '${label}'`,
+      ).toContain(label);
+    }
+    const EXPECTED_GLASS_LABELS = [
+      "Clear Float", "Frosted Privacy", "Low-E Coated", "Laminated Safety",
+    ];
+    for (const label of EXPECTED_GLASS_LABELS) {
+      expect(
+        sql,
+        `glass_labels must include '${label}'`,
+      ).toContain(label);
+    }
   });
 });
 

@@ -31,14 +31,27 @@ describe("system hover animations", () => {
     expect(missing).toEqual([]);
   });
 
-  it.each(animated)("%s starts closed at 01 and ends open at the last frame", (id) => {
+  it.each(animated)("%s has 01.webp and 28.webp as its two endpoints (in whichever order)", (id) => {
     const anim = getSystemAnimation(id)!;
     // The player scrubs this array forward on hover and backward on un-hover,
     // so the order is the animation. A set that is 28 long but numbered from 00
     // or padded to three digits would resolve to 404s at the ends only, which
-    // reads as a stutter rather than a break.
-    expect(anim.frames[0]).toBe(`/systems/anim/${id}/01.webp`);
-    expect(anim.frames.at(-1)).toBe(`/systems/anim/${id}/28.webp`);
+    // reads as a stutter rather than a break. Most systems go closed (01) →
+    // open (28); reversed systems (e.g. automated-window, which rests on the
+    // open pose) go 28 → 01. Either way the two filenames 01 and 28 must
+    // appear at the endpoints — they just swap position for reversed systems.
+    const endpoints = new Set([anim.frames[0], anim.frames.at(-1)]);
+    expect(endpoints).toContain(`/systems/anim/${id}/01.webp`);
+    expect(endpoints).toContain(`/systems/anim/${id}/28.webp`);
+  });
+
+  it("automated-window is registered open → closed (resting on the open pose)", () => {
+    const anim = getSystemAnimation("automated-window")!;
+    // The card still for automated-window is the fully-open frame (28). The
+    // array is therefore reversed so hover closes the window and un-hover
+    // returns to the open resting state, matching the still exactly.
+    expect(anim.frames[0]).toBe("/systems/anim/automated-window/28.webp");
+    expect(anim.frames.at(-1)).toBe("/systems/anim/automated-window/01.webp");
   });
 
   it("does not animate the categories that have no single honest mechanism", () => {

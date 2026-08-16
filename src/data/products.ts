@@ -101,7 +101,8 @@ export const products: Product[] = [
     id: "sliding-door",
     name: "Sliding Door",
     category: "doors",
-    description: PRODUCT_TYPES.find((p) => p.id === "sliding")!.description,
+    description:
+      "Slides horizontally along a track rather than swinging, so the floor space a swinging leaf would take stays usable. A soft-close damper catches the leaf at the end of its travel, so it decelerates and seats itself instead of slamming. Suited to balconies, lanai access, and wide openings where outward clearance is limited.",
     shortDescription: PRODUCT_TYPES.find((p) => p.id === "sliding")!.tagline,
     // NOTE: do not swap this to a real photo in isolation. This card has a
     // 28-frame hover animation (systemAnimations.ts) rendered from the same
@@ -110,10 +111,15 @@ export const products: Product[] = [
     // and she approved it at meeting 00:17:07. A real resting photo would jump
     // to a synthetic render on hover. Replace the resting image only together
     // with a re-rendered frame set.
+    // 2026-08-16: description went inline (it previously borrowed the sliding
+    // *window* type's text from PRODUCT_TYPES, which was a mismatch in scope).
+    // The soft-close spec and description absorbed from the removed sc-door
+    // product on this date.
     image: "/images/wp-export/slidingdoor.webp",
     specs: [
-      "Multi-chamber uPVC profile",
+      "Multi-chamber uPVC profile with weather seals",
       "Space-saving horizontal slide",
+      "Soft-close damper on the active leaf",
       "6mm to 12mm glass options",
       "Galvanized steel reinforcement",
     ],
@@ -307,32 +313,26 @@ export const products: Product[] = [
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Low-E Coated", "Tinted Grey", "Laminated Safety"],
   },
+  // Replaces the removed `sc-door` product per client instruction 2026-08-16.
+  // The sc-door ("Soft Closing Sliding Door") was a wrong product entry and has
+  // been removed from the catalog; its useful soft-close copy folded into the
+  // sliding-door entry below. This product, Sliding Casement Door, takes its
+  // catalog slot and inherits its assets: the render, the 28-frame hover
+  // animation, and the GLB were originally authored for "SC-Door System
+  // (Sliding Casement Door)" (migration 019), i.e. this exact product.
+  // Asset caveat (outstanding, not solved): the 28-frame animation shows only
+  // the horizontal slide, NOT the casement pull-open swing. A real photograph
+  // and a slide→swing frame set are still wanted from the client.
   {
-    id: "sc-door",
-    // Renamed from "SC-Door System (Sliding Casement Door)" by client
-    // instruction, 2026-08-12 (migration 025). The product did not change: it
-    // is still the Sliding Casement Door, and the copy below still says so.
-    // What changed is which part of it leads the name — the soft-closing
-    // system rather than the SC-Door label nobody outside the office reads.
-    // The id stays `sc-door`: it keys the 3D model, the animation frames, the
-    // migrations, and any deep link already shared.
-    name: "Soft Closing Sliding Door",
+    id: "sliding-casement-door",
+    name: "Sliding Casement Door",
     category: "doors",
     description:
-      "Soft-closing system on a Sliding Casement Door — a casement door that slides rather than swings. A damper catches the leaf at the end of its travel, so it decelerates and seats itself instead of slamming, and the multi-point seal engages cleanly every time. The track frees the floor space a swinging leaf would take while keeping the sealed, secure character of a casement door. For main and secondary entries, lanai access, and rooms where a slamming or swinging leaf is a problem. Custom-specified per opening.",
-    shortDescription: "Casement seal and security, closing softly.",
-    // Client-approved RENDER (2026-08-12), same 1672×941 batch as the other
-    // render/ files — hence render/, not real/. This ends the image sharing
-    // introduced by migration 024, where this product and `sliding-door` both
-    // pointed at /images/wp-export/slidingdoor.webp. It also answers most of
-    // the ask in docs/AUG07_ASSET_REQUEST.md: the leaf is on its own top track
-    // with the roller hangers visible, so the card no longer shows a plain
-    // slider. What is still outstanding is a real photograph and a leaf shown
-    // mid-travel — this render is closed and head-on.
-    image: "/images/products/render/sc-door.webp",
+      "A door that works two ways from one leaf. It slides horizontally along its track to position, then opens as a casement — pull the handle and the leaf swings toward you the way a normal casement door does. Close it, and it slides back along the track. The sliding travel frees the floor space a swinging leaf would otherwise need, while the casement action gives a full, sealed opening when you want one. Suited to lanai access, main and secondary entries, and wide openings that should work both ways. Custom-specified per opening.",
+    shortDescription: "Slides to position, then opens like a casement.",
+    image: "/images/products/render/sliding-casement-door.webp",
     specs: [
-      "Soft-close damper on the active leaf",
-      "Sliding Casement operation (not a swing leaf)",
+      "Slide-then-swing operation from a single leaf",
       "Multi-point locking on the active leaf",
       "Space-saving travel on track",
       "Multi-chamber profile with weather seals",

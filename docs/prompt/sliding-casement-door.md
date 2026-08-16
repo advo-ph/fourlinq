@@ -1,4 +1,4 @@
-# SC-Door (Sliding Casement Door) — asset prompt
+# Sliding Casement Door — asset prompt
 
 > **Self-contained.** Everything needed to build this one asset is in this file:
 > the brief, the contract it must satisfy, the material palette, and the test it
@@ -10,17 +10,19 @@
 
 ---
 
-### 2. SC-Door (Sliding Casement Door) — `sc-door`
+### 2. Sliding Casement Door — `sliding-casement-door`
 
-Live now as a schematic placeholder. Named "Sliding Casement" in all copy —
+Builder delivered (`scripts/handoff/model/sliding-casement-door-model.js`,
+previously `sc-door-model.js`). Assets inherited from the former `sc-door`
+entry per client instruction 2026-08-16. Named "Sliding Casement" in all copy —
 never "glider" (guarded by `data-integrity.test.ts`).
 
-**Deliver as** `scripts/handoff/model/sc-door-model.js`, exporting
-`buildScDoor(opts)` → `{ group, setOpen(t) }`. Builder over GLB: the SC-Door
-shares most of its section with `sliding-door-model.js`, so authoring it as
-source lets it borrow that file's track, interlock and threshold helpers
-instead of a modeller redrawing them — and the bake writes the slide clip from
-`setOpen`, so nobody hand-keys a translation and nobody has to obey the node
+**Deliver as** `scripts/handoff/model/sliding-casement-door-model.js`, exporting
+`buildSlidingCasementDoor(opts)` → `{ group, setOpen(t) }`. Builder over GLB: the
+Sliding Casement Door shares most of its section with `sliding-door-model.js`, so
+authoring it as source lets it borrow that file's track, interlock and threshold
+helpers instead of a modeller redrawing them — and the bake writes the slide clip
+from `setOpen`, so nobody hand-keys a translation and nobody has to obey the node
 naming rules.
 
 **Mechanism**

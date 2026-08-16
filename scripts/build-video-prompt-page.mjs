@@ -116,7 +116,7 @@ const META = [
     counts: "Exactly TWO panels, in every single frame — the right one FIXED, the left one operable. ONLY the left operable panel moves. It lifts vertically first, then slides horizontally. The right panel is completely motionless. Nothing hinges and no second panel slides." },
   { id: "90-series", mech: "single hinged door, half lite", flag: "old tile was a 3-panel bifold",
     counts: "Exactly THREE leaves, and the count is identical in every single frame. All three fold to the LEFT. Nothing folds to the right and no leaf is added or lost mid-motion." },
-  { id: "sc-door", mech: "translate X 805 mm, thumbturn",
+  { id: "sliding-casement-door", mech: "translate X 805 mm, thumbturn",
     counts: "Exactly TWO panels, in every single frame — the left one a FIXED lite, the right one the operable leaf. ONLY the operable leaf moves, horizontally. The fixed lite is completely motionless. Nothing hinges, nothing swings, nothing lifts, and no second panel slides." },
   { id: "automated-door", mech: "bi-part, trapezoidal motor ramp",
     counts: "Exactly FOUR panels, in every single frame — TWO fixed outer side screens and TWO operable centre leaves. ONLY the two centre leaves move, sliding apart from the centre at exactly the same moment and the same speed. The side screens are completely motionless. Nothing hinges, swings or revolves." },

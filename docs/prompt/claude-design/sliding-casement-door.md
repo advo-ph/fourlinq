@@ -1,14 +1,14 @@
-# Claude Design prompt — SC-Door — Sliding Casement Door
+# Claude Design prompt — Sliding Casement Door
 
 > Paste everything below the line into Claude Design as one prompt. It is
 > self-contained: it does not assume access to the FourlinQ repo.
 
 ---
 
-Build a procedural three.js model of a **sliding casement door, the SC-Door System** for FourlinQ, a
+Build a procedural three.js model of a **sliding casement door** for FourlinQ, a
 uPVC and aluminium windows-and-doors fabricator in the Philippines.
 
-Deliver it as `sc-door-model.js`, exporting `buildSCDoor(opts)`.
+Deliver it as `sliding-casement-door-model.js`, exporting `buildSlidingCasementDoor(opts)`.
 
 ## The product
 

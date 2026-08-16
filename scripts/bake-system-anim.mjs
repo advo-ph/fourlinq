@@ -4,7 +4,7 @@
  *
  * The ten sets that already exist were extracted from product video. Four
  * systems the client named have no video and so have dead tiles: louvre,
- * automated-window, sc-door, automated-door. We own GLBs for all four, with the
+ * automated-window, sliding-casement-door, automated-door. We own GLBs for all four, with the
  * mechanism already authored as a baked clip, so the frames can be rendered
  * rather than filmed — deterministic, re-runnable, and no provenance question.
  *
@@ -66,7 +66,7 @@ const MODEL_FOR = {
   "large-panel-doors": "multislide",
   "lift-and-slide": "lift-slide",
   "90-series": "ninety-series",
-  "sc-door": "sc-door",
+  "sliding-casement-door": "sliding-casement-door",
   "automated-door": "automated-door",
 };
 

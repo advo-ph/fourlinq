@@ -111,7 +111,7 @@ Four full-bleed **photo-cards** in a row, each a real project photo + name + ite
 | 22 | Add 3 door products: Large Panel, Lift & Slide, 90 Series | Partial | Names, cutouts, and animation exist; product truth, photos, and specifications remain approval-blocked. |
 | 23 | Why uPVC page too sparse — "just showed one photo, a cut section" | Partial | Page is now substantial, but has a second 500vh pinned sequence, claim risk, and no parallel Aluminium/Glass evidence depth. |
 | 24 | Confirm product re-assignments: Slide & Fold → Doors, Awning → Windows | Implemented in current catalog; glossary approval still required | Current placement matches the meeting direction. |
-| 25 | Aug-7 catalog products: glass-railing, sc-door, louvre, automated-window on `/products` + migration 019 | Shipped on `lane/catalog` (static + seed file); DB apply still hand-run at deploy | Glass under specialist only; heroes are schematic placeholders — see `docs/AUG07_ASSET_REQUEST.md`. |
+| 25 | Aug-7 catalog products: glass-railing, sliding-casement-door (was sc-door), louvre, automated-window on `/products` + migration 019/027 | Shipped; sc-door renamed and replaced by sliding-casement-door per client instruction 2026-08-16 (migration 027) | Glass under specialist only; render inherited from sc-door — real photo and slide→swing frame set outstanding. See `docs/AUG07_ASSET_REQUEST.md`. |
 
 ---
 

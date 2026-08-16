@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 /**
- * FourlinQ — SC-Door System. A casement-proportioned door leaf that slides
+ * FourlinQ — Sliding Casement Door. A casement-proportioned door leaf that slides
  * on a track rather than swinging on hinges.
  *
  * Units: real metres. Y up. +Z is the interior (viewer side).
@@ -102,7 +102,7 @@ function glazedPanel(M, { w, h, depth, stile, bottomRail, topRail, prefix }) {
   return g;
 }
 
-export function buildSCDoor(opts = {}) {
+export function buildSlidingCasementDoor(opts = {}) {
   const width = opts.width ?? 1.8;         // clear opening the two panels fill
   const height = opts.height ?? 2.4;
   const openRatio = opts.openRatio ?? 0.9;
@@ -111,7 +111,7 @@ export function buildSCDoor(opts = {}) {
   const S = handing === 'LH' ? -1 : 1;     // +1 = leaf on the right, travels -X
 
   const group = new THREE.Group();
-  group.name = 'sc_door';
+  group.name = 'sliding-casement-door';
 
   const hw = width / 2, hh = height / 2;   // 0.9, 1.2 — daylight of the opening
   const face = 0.062;                      // uPVC face width

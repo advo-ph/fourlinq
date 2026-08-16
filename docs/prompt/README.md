@@ -10,7 +10,7 @@ Regenerate with `node scripts/_split-brief.mjs` after editing
 | Asset | File | Built? |
 |---|---|---|
 | Glass Railing | [glass-railing.md](./glass-railing.md) | No |
-| SC-Door (Sliding Casement Door) | [sc-door.md](./sc-door.md) | No |
+| Sliding Casement Door | [sliding-casement-door.md](./sliding-casement-door.md) | No |
 | Automated Door Access | [automated-door.md](./automated-door.md) | No |
 | Automated Windows | [automated-window.md](./automated-window.md) | No |
 | Louvre / jalousie | [louvre.md](./louvre.md) | **Yes** — `louvre-model.js`, live in the viewer |

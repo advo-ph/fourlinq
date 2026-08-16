@@ -19,15 +19,15 @@ Products shipped in migration `019` and `src/data/products.ts` started on **sche
 
 | Product id | Display name | Current path | Shot still wanted from client |
 |---|---|---|---|
-| `sc-door` | Soft Closing Sliding Door | `/images/products/render/sc-door.webp` (own render) | **Mostly answered** by the client render of 2026-08-12 (migration `026`), which shows the track and roller hangers rather than a plain slider. Still wanted eventually: a real photograph, and the leaf caught mid-travel rather than closed head-on. No longer urgent. |
+| `sliding-casement-door` | Sliding Casement Door | `/images/products/render/sliding-casement-door.webp` (inherited from sc-door: 2x upscale of anim frame 1, 1280×720, 2026-08-16) | **Two asks open.** (a) A real photograph — the card still shows a synthetic animation frame. (b) A slide→swing frame set — the inherited 28-frame animation shows only the horizontal slide, NOT the casement pull-open swing. The casement swing is the distinguishing feature of the product. Both asks are outstanding from the client. |
 | `automated-window` | Automated Windows | render (above) | Close detail of a motorised opener / chain actuator on a FourlinQ sash. The approved render shows a chain actuator generically; a real one on a real sash is still better. |
 | `automated-door` | Automated Door Access | render (above) | Digital-access hardware close-up (keypad, reader, or fob plate) on a FourlinQ leaf. Same reasoning as above. |
 | `fixed-slide-door` | Fixed & Slide Door | render (above) | An installed six-panel run, ideally part-open so the stacking reads. |
 | `slim-door` | Slim Door | render (above) | The five-shot list in [AUG07_PROJECT_AREA_REQUEST.md](./AUG07_PROJECT_AREA_REQUEST.md) still stands. |
 
-> **`sc-door` no longer shares the sliding-door picture** (migration `026`, 2026-08-12). For about an hour that day it did: migration `024` put `/images/wp-export/slidingdoor.webp` on both this product and `sliding-door`, which meant the card showed a plain two-panel slider directly above a paragraph explaining that the product is a Sliding Casement and *not* an ordinary slider. The client then supplied a dedicated render — leaf on its own top track, roller hangers visible — and that contradiction is resolved. `sliding-door` keeps the shared file; nothing else moved.
+> **`sc-door` removed from catalog** (client instruction, 2026-08-16, migration `027`). The product was a wrong catalog entry. Its slug, assets (render, 28 animation frames, GLB), and useful soft-close copy have been redistributed: the slug is retired, the assets are inherited by `sliding-casement-door` via `git mv`, and the soft-close description and spec folded into `sliding-door`. The `sc-door` product_type and product rows are deactivated (not deleted) in migration `027`.
 >
-> The `sc-door` id, used in this table and in the paths above, is deliberately unchanged despite the rename to "Soft Closing Sliding Door" (migration `025`). It keys the 3D model, the `product_type` row, and earlier migrations.
+> History of this slot: migration `019` seeded it as "SC-Door System (Sliding Casement Door)"; `024` gave it the sliding-door image; `025` renamed it "Soft Closing Sliding Door"; `026` gave it a dedicated render. All four are superseded for this slug by `027`.
 
 ## Rules (do not bypass)
 

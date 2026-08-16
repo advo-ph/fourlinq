@@ -1,8 +1,13 @@
-// Hover "opening" animations for system cards.
+// Hover animations for system cards.
 //
-// Each animated system has a sequence of WebP frames (closed → open) stored
-// under public/systems/anim/<id>/NN.webp. On card hover the frames play forward
-// once; on un-hover they play in reverse back to the closed state. See
+// Each animated system has a sequence of WebP frames stored under
+// public/systems/anim/<id>/NN.webp. The baked files are always numbered
+// 01 = closed … 28 = open, matching the order `scripts/bake-system-anim.mjs`
+// produces. On card hover the player scrubs the frames array forward once;
+// on un-hover it scrubs backward. For most systems that means closed → open
+// on hover and open → closed on un-hover. For systems whose card still is the
+// fully-open pose the array is reversed here in data (see REVERSED below) so
+// the resting frame and the still match and the motion reads correctly. See
 // SystemCardMedia.tsx for the player.
 //
 // Every set is now RENDERED, baked from GLBs FourlinQ owns outright by
@@ -26,6 +31,25 @@
 const FRAME_COUNT = 28;
 const BASE = "/systems/anim";
 
+/**
+ * Systems whose card still is the fully-open pose rather than the closed one.
+ *
+ * The baked frames are always numbered 01 = closed → 28 = open on disk, so
+ * that a fresh `node scripts/bake-system-anim.mjs` run stays consistent and
+ * does not silently un-reverse or double-reverse anything. The reversal lives
+ * here in data instead: getSystemAnimation returns the array open → closed for
+ * these ids so the player's forward pass (hover) goes from open toward closed
+ * and the backward pass (un-hover) returns to the open resting state.
+ *
+ * automated-window: the supplied card still is frame 28 (sash fully extended,
+ * chain actuator visible). Resting on frame 01 (closed) would crossfade into
+ * a pose that looks nothing like the still. Resting on frame 28 and closing on
+ * hover matches the still exactly and reads correctly for a motorised opener —
+ * the interesting motion is the powered sweep, shown departing from its open
+ * resting state.
+ */
+const REVERSED = new Set(["automated-window"]);
+
 /** product id (slug) → number of frames available */
 const ANIMATED: Record<string, number> = {
   casement: FRAME_COUNT,
@@ -40,12 +64,15 @@ const ANIMATED: Record<string, number> = {
   "90-series": FRAME_COUNT,
   louvre: FRAME_COUNT,
   "automated-window": FRAME_COUNT,
-  "sc-door": FRAME_COUNT,
+  "sliding-casement-door": FRAME_COUNT,
   "automated-door": FRAME_COUNT,
 };
 
 export interface SystemAnimation {
-  /** Ordered closed → open frame URLs. */
+  /**
+   * Frame URLs in playback order — forward on hover, reversed on un-hover.
+   * Most systems go closed → open; systems in REVERSED go open → closed.
+   */
   frames: string[];
 }
 
@@ -57,5 +84,9 @@ export function getSystemAnimation(productId: string): SystemAnimation | null {
     { length: count },
     (_, i) => `${BASE}/${productId}/${String(i + 1).padStart(2, "0")}.webp`,
   );
+  // Systems in REVERSED rest on the open end: the array is flipped so the
+  // player's forward pass goes from open toward closed on hover, and reverses
+  // back to the open still on un-hover. The files on disk stay 01–28.
+  if (REVERSED.has(productId)) frames.reverse();
   return { frames };
 }

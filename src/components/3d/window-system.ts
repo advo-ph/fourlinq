@@ -39,7 +39,7 @@ export type SystemType =
   | "curtain-wall"
   | "automated-door"
   | "automated-window"
-  | "sc-door"
+  | "sliding-casement-door"
   | "glass-railing"
   | "special-arch"
   | "special-triangle"
@@ -101,7 +101,7 @@ export const CATALOGUE_SYSTEM: SystemType[] = [
   "curtain-wall",
   "automated-door",
   "automated-window",
-  "sc-door",
+  "sliding-casement-door",
   "glass-railing",
   "special-arch",
   "special-triangle",
@@ -515,10 +515,10 @@ export const SYSTEMS: Record<SystemType, SystemConfig> = {
     openLabel: "Open window",
     closeLabel: "Close window",
   },
-  "sc-door": {
-    label: "Soft Closing Sliding Door",
-    visibleRoot: ["sc-door"],
-    model: MODEL_SYSTEM("sc-door"),
+  "sliding-casement-door": {
+    label: "Sliding Casement Door",
+    visibleRoot: ["sliding-casement-door"],
+    model: MODEL_SYSTEM("sliding-casement-door"),
     center: [0, 0, 0.024],
     scale: 0.5388,
     openTime: 2,

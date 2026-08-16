@@ -31,6 +31,27 @@ Keep entries concise — one line per change, written in past tense, focused on 
 >
 > The "rename `[Unreleased]` to a dated heading on deploy" ritual described above has not been followed since April, so this one section now spans four months and many deploys. That is a bookkeeping drift, not a claim that any of it is unshipped — the site auto-deploys on every push to `main`, so entries are live within minutes of landing. Either cut dated headings per deploy from here on, or drop the `[Unreleased]` convention in favour of the dated `### Session:` headings that are actually being maintained.
 
+### Session: 2026-08-16 — sc-door removed; Sliding Casement Door introduced
+
+#### Removed
+
+- **`sc-door` ("Soft Closing Sliding Door") removed from the product catalog** per client instruction. It was a wrong product entry. Its `product_type` and `product` rows are deactivated (not deleted) in migration `027`. The slug `sc-door` is retired.
+
+#### Changed
+
+- **`sliding-door` description went inline** (it previously borrowed the sliding *window* type's copy from `PRODUCT_TYPES`). The new description is scoped to the door product and absorbs the soft-close spec from the removed sc-door. Specs updated to include "Soft-close damper on the active leaf" and "Multi-chamber uPVC profile with weather seals".
+
+#### Added
+
+- **New product: Sliding Casement Door** (`sliding-casement-door`, doors category). Takes the catalog slot of the removed sc-door. A door that slides along its track to position and then opens as a casement — slide travel frees floor space; casement action gives a full sealed opening. Custom-specified per opening. [src/data/products.ts](../src/data/products.ts), migration `027`.
+- **Asset inheritance recorded:** the render, 28-frame hover animation, and GLB are inherited from sc-door via `git mv` — those assets were originally authored for "SC-Door System (Sliding Casement Door)" (migration 019), i.e. this exact product. Outstanding asks from the client: (a) a real photograph; (b) a slide→swing frame set, since the inherited animation shows only the horizontal slide, not the casement pull-open swing. See [docs/AUG07_ASSET_REQUEST.md](./AUG07_ASSET_REQUEST.md).
+
+### Session: 2026-08-16 — sc-door preview swapped to animation frame
+
+#### Changed
+
+- **The sc-door product card now shows a 2x upscale of animation frame 1** (`public/systems/anim/sc-door/01.webp`, 640×360 → 1280×720, re-encoded at q90), replacing the client render of 2026-08-12 (1672×941, migration `026`). The render showed the track and roller hangers; this frame shows the door closed head-on. No path changed (`public/images/products/render/sc-door.webp`), no migration needed. The outstanding asset ask — real photograph, leaf mid-travel — is now more open, not less: the track detail the render provided is gone from the card.
+
 ### Session: 2026-08-14 — deploy host is `advo`, API binds 6207
 
 #### Changed

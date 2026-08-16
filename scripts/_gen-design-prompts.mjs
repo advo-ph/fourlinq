@@ -147,11 +147,11 @@ Do not put the handrail on \`hardware_matte_black\` — it is a finish-bearing p
 `.trim(),
   },
   {
-    slug: "sc-door",
-    subject: "sliding casement door, the SC-Door System",
-    name: "SC-Door — Sliding Casement Door",
-    fn: "buildSCDoor",
-    file: "sc-door-model.js",
+    slug: "sliding-casement-door",
+    subject: "sliding casement door",
+    name: "Sliding Casement Door",
+    fn: "buildSlidingCasementDoor",
+    file: "sliding-casement-door-model.js",
     brief: `
 ## The product
 
