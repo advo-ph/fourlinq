@@ -10,9 +10,9 @@
 // the resting frame and the still match and the motion reads correctly. See
 // SystemCardMedia.tsx for the player.
 //
-// Every set is now RENDERED, baked from GLBs FourlinQ owns outright by
-// `node scripts/bake-system-anim.mjs`. Nothing here is extracted from product
-// video any more.
+// Most sets are RENDERED, baked from GLBs FourlinQ owns outright by
+// `node scripts/bake-system-anim.mjs`. The exceptions are listed in IMPORTED
+// below.
 //
 // That replaced ten filmed sets whose provenance this repo never recorded — the
 // commit that added all 280 frames is titled "f", and `systemAnimations.ts`
@@ -49,6 +49,29 @@ const BASE = "/systems/anim";
  * resting state.
  */
 const REVERSED = new Set(["automated-window"]);
+
+/**
+ * Systems whose frames came from client-supplied animation video, not from a
+ * GLB bake — written by `node scripts/import-anim-video.mjs <video> <id>`.
+ *
+ * They are listed for one practical reason: `bake-system-anim.mjs` re-renders
+ * every id in its MODEL_FOR map, which includes all three of these, so a full
+ * bake run would overwrite the supplied look with the GLB render and nothing
+ * would flag it. Check this set before running a bake, and pass `--only <id>`
+ * to keep clear of them.
+ *
+ * awning also carries a mechanism note. The supplied clip arrived named
+ * "casementwindow", but it depicts a single top-hung sash opening at the
+ * bottom on a manual handle, which is the awning mechanism — not the twin
+ * side-hinged leaves the `casement` card shows. It was routed here on that
+ * basis, so `casement` keeps its rendered twin-leaf set.
+ */
+const IMPORTED = new Set(["awning", "casement-door", "automated-door"]);
+
+/** True if a system's frames are video-sourced rather than baked from a GLB. */
+export function isImportedAnimation(productId: string): boolean {
+  return IMPORTED.has(productId);
+}
 
 /** product id (slug) → number of frames available */
 const ANIMATED: Record<string, number> = {
