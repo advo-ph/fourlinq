@@ -122,6 +122,20 @@ if (isProd) {
           );
           return;
         }
+        // System hover-animation frames have fixed filenames (01.webp … 28.webp)
+        // and are rewritten in place whenever a set is re-baked or re-imported,
+        // so they need the same policy as /images/ for exactly the same reason.
+        // Serving them immutably for a year meant a replaced set never reached
+        // anyone who had already hovered the card. getSystemAnimation appends
+        // ?v=<set hash> (src/generated/anim-versions.json) so a replacement is
+        // picked up at once even by a browser holding a stale immutable copy.
+        if (filePath.includes("/systems/anim/")) {
+          res.setHeader(
+            "Cache-Control",
+            "public, max-age=300, stale-while-revalidate=86400"
+          );
+          return;
+        }
         // All other static assets (fonts, icons, manifest.json, etc.) inherit
         // the top-level maxAge + immutable set above — no override needed.
       },

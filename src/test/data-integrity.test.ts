@@ -22,9 +22,15 @@ export const AUG07_PRODUCT_ID = [
   "louvre",
 ] as const;
 
-/** Resolve a public `/images/...` path to a file under public/ and check it exists. */
+/**
+ * Resolve a public `/images/...` path to a file under public/ and check it exists.
+ *
+ * Strips any `?v=<hash>` cache-busting token first. Both /images/ (via
+ * src/lib/image-version.ts) and the system animation frames (via
+ * systemAnimations.ts) carry one, and it is not part of the path on disk.
+ */
 export function publicImageExists(publicPath: string): boolean {
-  const relative = publicPath.replace(/^\//, "");
+  const relative = publicPath.split("?")[0].replace(/^\//, "");
   return existsSync(resolve(process.cwd(), "public", relative));
 }
 
@@ -346,7 +352,8 @@ describe("hover animations resolve to frames on disk", () => {
     for (const id of ANIMATED_ID) {
       const frames = getSystemAnimation(id)!.frames;
       if (!REVERSED_IDS.has(id)) {
-        expect(frames[0]).toMatch(/\/01\.webp$/);
+        // Trailing `?v=<hash>` cache-busting token, so this cannot anchor on $.
+        expect(frames[0]).toMatch(/\/01\.webp(\?|$)/);
       }
       expect(publicImageExists(frames[0])).toBe(true);
     }

@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
     "dev:web": "vite",
     "projects:thumbs": "node scripts/generate-project-thumbs.mjs",
-    "prebuild": "node scripts/generate-project-thumbs.mjs",
+    "prebuild": "node scripts/generate-project-thumbs.mjs && node scripts/generate-anim-versions.mjs",
     "build": "vite build",
     "build:server": "esbuild server/index.ts --bundle --platform=node --target=node22 --format=cjs --define:import.meta.dirname=__dirname --define:import.meta.url=__filename --outfile=server/index.bundle.cjs --external:pg-native",
     "build:dev": "vite build --mode development",
