@@ -9,6 +9,7 @@ const DesignToolEmbed = lazy(() => import("@/pages/DesignTool"));
 import { type HeroSlide } from "@/components/home/HeroCarousel";
 import VideoHero from "@/components/home/VideoHero";
 import SystemsTiles from "@/components/home/SystemsTiles";
+import SlimDoorSpotlight from "@/components/home/SlimDoorSpotlight";
 import ProjectReels from "@/components/home/ProjectReels";
 import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
@@ -55,6 +56,11 @@ const Index = () => {
       <Section tone="canvas" size="lg">
         <SystemsTiles />
       </Section>
+
+      {/* New-system spotlight for Slim ALU, ahead of the project reels (per
+          Prince, 2026-08-31). Both are black modules; this one runs its film
+          full-bleed while the reels stay guttered, which keeps them apart. */}
+      <SlimDoorSpotlight />
 
       <ProjectReels />
 
