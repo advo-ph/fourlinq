@@ -16,7 +16,11 @@
 set -uo pipefail
 
 APP_NAME="${APP_NAME:-fourlinq}"
-HEALTH_URL="${HEALTH_URL:-http://localhost:3001/api/health}"
+# Port 6207, NOT 3001 — must match API_PORT in ecosystem.config.cjs (the port
+# nginx proxies to). The default sat on the old 3001 from before commit 4a2605c
+# moved the API, so every Deploy run from 2026-08-14 onward polled a dead port
+# and failed this gate after the deploy had already succeeded.
+HEALTH_URL="${HEALTH_URL:-http://localhost:6207/api/health}"
 ERROR_LOG="${ERROR_LOG:-/opt/fourlinq/logs/error.log}"
 NEED_OK="${NEED_OK:-3}"
 MAX_TRY="${MAX_TRY:-20}"
