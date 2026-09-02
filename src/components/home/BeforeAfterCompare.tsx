@@ -4,7 +4,8 @@ import Section from "@/components/primitives/Section";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
 
 /**
- * Before/after wipe — drag the handle to trade one photograph for the other.
+ * Before/after wipe. On a mouse the seam simply follows the cursor; on touch it
+ * is dragged.
  *
  * ASSET NOTE (2026-09-02). The repository holds no during-construction
  * photography; every FourlinQ project shot on file is of a completed install.
@@ -29,18 +30,47 @@ const AFTER = {
 };
 
 /**
- * The attract sequence. Overshoot right, overshoot left, settle — enough travel
- * to read as "this moves" without looking like a glitch. Played once when the
- * module first enters view, then once more after a pause if the visitor still
- * hasn't touched it. It never runs again after that, and never runs at all
- * under prefers-reduced-motion.
+ * MOTION MODEL
+ *
+ * Every movement is driven by one requestAnimationFrame loop that writes
+ * `clip-path` and `left` straight to the DOM. Nothing about the seam's position
+ * lives in React state.
+ *
+ * That is deliberate, and it is what fixes the two faults in the first version:
+ *
+ *   1. Jank. The attract nudge used to setState to five fixed stops, each
+ *      starting a 420ms CSS transition, while the stops fired every 380ms. Every
+ *      transition was cut off mid-flight and restarted from wherever it had got
+ *      to, which is exactly what "jonky" looked like. The nudge is now a
+ *      continuous decaying sine wave sampled per frame, so there is no
+ *      transition to interrupt.
+ *   2. Touch lag. A setState per pointermove meant a full React render (and a
+ *      re-render of both <img> subtrees) between the finger moving and the seam
+ *      moving. Writing to the node directly removes that entirely.
+ *
+ * `posRef` is where the seam is drawn; `targetRef` is where it wants to be. The
+ * loop eases the first toward the second, except while dragging, where it snaps
+ * so the seam stays locked to the finger.
  */
-const NUDGE_STEPS = [50, 61, 41, 52, 50];
-const NUDGE_STEP_MS = 380;
-const NUDGE_REPEAT_DELAY_MS = 4200;
+const CENTRE = 50;
+
+/** Attract nudge: a decaying sine. The sin(pi*t) envelope is zero at both ends,
+ *  so the wobble grows in and settles out without any visible start or stop. */
+const NUDGE_DURATION_MS = 2400;
+const NUDGE_AMPLITUDE = 15;
+const NUDGE_CYCLES = 1.25;
+const NUDGE_START_DELAY_MS = 450;
+const NUDGE_REPEAT_DELAY_MS = 3800;
 const NUDGE_MAX_PLAYS = 2;
 
-const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+/** Fraction of the remaining distance closed per 60fps frame when easing. Kept
+ *  frame-rate independent below, so a 120Hz display eases at the same speed. */
+const FOLLOW_SMOOTHING = 0.2;
+const RETURN_SMOOTHING = 0.11;
+const REFERENCE_FRAME_MS = 1000 / 60;
+
+/** Below this gap the seam is close enough to snap and stop the loop. */
+const SETTLE_EPSILON = 0.02;
 
 /**
  * Overlay chip. Deliberately not the shared `.eyebrow` class: that is 14px with
@@ -49,126 +79,279 @@ const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
  * smaller, no-wrap scale.
  */
 const CHIP =
-  "pointer-events-none absolute bg-black/50 px-2.5 py-1 font-sans text-[0.625rem] font-medium uppercase tracking-[0.14em] text-white/90 whitespace-nowrap backdrop-blur-sm md:px-3 md:py-1.5 md:text-[0.75rem]";
+  "pointer-events-none absolute bg-black/50 px-2.5 py-1 font-sans text-[0.625rem] font-medium uppercase tracking-[0.14em] text-white/90 whitespace-nowrap backdrop-blur-sm transition-opacity duration-300 md:px-3 md:py-1.5 md:text-[0.75rem]";
 
 const clamp = (value: number) => Math.min(100, Math.max(0, value));
 
+/** Sentinel for "begin the nudge on the next frame", so its phase starts at
+ *  exactly t=0 rather than at whatever fraction the scheduling frame landed on. */
+const NUDGE_PENDING = -1;
+
 const BeforeAfterCompare = () => {
-  const frameRef = useRef<HTMLDivElement>(null);
-  const draggingRef = useRef(false);
   const prefersReducedMotion = useReducedMotion();
 
-  const [position, setPosition] = useState(50);
-  // Eased while the handle moves on its own, off while a finger or cursor is
-  // driving it — a transition during a drag feels like lag.
-  const [eased, setEased] = useState(true);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const wipeRef = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const beforeLabelRef = useRef<HTMLSpanElement>(null);
+  const afterLabelRef = useRef<HTMLSpanElement>(null);
+
+  const posRef = useRef(CENTRE);
+  const targetRef = useRef(CENTRE);
+  const rafRef = useRef<number | null>(null);
+  const lastTsRef = useRef<number | null>(null);
+  const ariaRef = useRef(CENTRE);
+
+  const draggingRef = useRef(false);
+  const hoveringRef = useRef(false);
+  const nudgeStartRef = useRef<number | null>(null);
+  const nudgePlaysRef = useRef(0);
+  const nudgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const engagedRef = useRef(false);
+  // tick() must be able to restart the loop when a replay timer fires, but
+  // ensureLoop is defined after tick. This ref breaks the cycle without making
+  // the two callbacks mutually dependent.
+  const ensureLoopRef = useRef<() => void>(() => {});
+
+  // Only two things ever re-render this component: retiring the hint, and
+  // learning whether the device has a real cursor.
   const [engaged, setEngaged] = useState(false);
+  const [canHover, setCanHover] = useState(false);
 
-  const stopNudging = useCallback(() => setEngaged(true), []);
+  /** Write one frame. No React involved. */
+  const paint = useCallback((value: number) => {
+    if (wipeRef.current) {
+      wipeRef.current.style.clipPath = `inset(0 ${100 - value}% 0 0)`;
+    }
+    if (handleRef.current) {
+      handleRef.current.style.left = `${value}%`;
+    }
+    if (beforeLabelRef.current) {
+      beforeLabelRef.current.style.opacity = value < 18 ? "0" : "1";
+    }
+    if (afterLabelRef.current) {
+      afterLabelRef.current.style.opacity = value > 82 ? "0" : "1";
+    }
+    // Announce whole percentages only, so assistive tech isn't told about
+    // every sub-pixel frame of a 60fps sweep.
+    const rounded = Math.round(value);
+    if (rounded !== ariaRef.current && handleRef.current) {
+      ariaRef.current = rounded;
+      handleRef.current.setAttribute("aria-valuenow", String(rounded));
+      handleRef.current.setAttribute(
+        "aria-valuetext",
+        `${rounded}% handover, ${100 - rounded}% finished`,
+      );
+    }
+  }, []);
 
-  const setFromClientX = useCallback((clientX: number) => {
+  const tick = useCallback(
+    (ts: number) => {
+      // Clamped so a backgrounded tab returning doesn't jump the seam.
+      const dt = Math.min(64, ts - (lastTsRef.current ?? ts));
+      lastTsRef.current = ts;
+
+      // Stamp a pending nudge to this frame's clock.
+      if (nudgeStartRef.current === NUDGE_PENDING) nudgeStartRef.current = ts;
+
+      const nudgeStart = nudgeStartRef.current;
+      if (nudgeStart !== null) {
+        const t = (ts - nudgeStart) / NUDGE_DURATION_MS;
+        if (t >= 1) {
+          nudgeStartRef.current = null;
+          targetRef.current = CENTRE;
+          if (nudgePlaysRef.current < NUDGE_MAX_PLAYS && !engagedRef.current) {
+            nudgeTimerRef.current = setTimeout(() => {
+              if (engagedRef.current) return;
+              nudgePlaysRef.current += 1;
+              nudgeStartRef.current = NUDGE_PENDING;
+              ensureLoopRef.current();
+            }, NUDGE_REPEAT_DELAY_MS);
+          }
+        } else {
+          targetRef.current =
+            CENTRE +
+            NUDGE_AMPLITUDE * Math.sin(Math.PI * t) * Math.sin(2 * Math.PI * NUDGE_CYCLES * t);
+        }
+      }
+
+      const target = targetRef.current;
+      const pos = posRef.current;
+
+      // A drag tracks 1:1; the nudge curve is already smooth, so it is followed
+      // exactly rather than eased twice (which would round off its shape).
+      if (draggingRef.current || nudgeStartRef.current !== null) {
+        posRef.current = target;
+      } else {
+        const perFrame = hoveringRef.current ? FOLLOW_SMOOTHING : RETURN_SMOOTHING;
+        const factor = 1 - Math.pow(1 - perFrame, dt / REFERENCE_FRAME_MS);
+        posRef.current = pos + (target - pos) * factor;
+      }
+
+      paint(posRef.current);
+
+      const busy =
+        draggingRef.current || hoveringRef.current || nudgeStartRef.current !== null;
+      if (!busy && Math.abs(target - posRef.current) < SETTLE_EPSILON) {
+        posRef.current = target;
+        paint(target);
+        rafRef.current = null;
+        lastTsRef.current = null;
+        return;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    },
+    [paint],
+  );
+
+  const ensureLoop = useCallback(() => {
+    if (rafRef.current === null) {
+      lastTsRef.current = null;
+      rafRef.current = requestAnimationFrame(tick);
+    }
+  }, [tick]);
+
+  ensureLoopRef.current = ensureLoop;
+
+  /** First interaction of any kind retires the hint and cancels the attract. */
+  const engage = useCallback(() => {
+    if (engagedRef.current) return;
+    engagedRef.current = true;
+    nudgeStartRef.current = null;
+    if (nudgeTimerRef.current) {
+      clearTimeout(nudgeTimerRef.current);
+      nudgeTimerRef.current = null;
+    }
+    setEngaged(true);
+  }, []);
+
+  const targetFromClientX = useCallback((clientX: number) => {
     const frame = frameRef.current;
     if (!frame) return;
     const rect = frame.getBoundingClientRect();
     if (rect.width === 0) return;
-    setPosition(clamp(((clientX - rect.left) / rect.width) * 100));
+    targetRef.current = clamp(((clientX - rect.left) / rect.width) * 100);
   }, []);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    stopNudging();
-    setEased(false);
+    // A mouse press is not required — hover already drives the seam — but
+    // pressing should still grab it, and on touch this is the only way in.
+    engage();
     draggingRef.current = true;
     event.currentTarget.setPointerCapture(event.pointerId);
-    setFromClientX(event.clientX);
+    targetFromClientX(event.clientX);
+    ensureLoop();
   };
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-    setFromClientX(event.clientX);
+    if (draggingRef.current) {
+      targetFromClientX(event.clientX);
+      ensureLoop();
+      return;
+    }
+    // Hover-follow, cursor devices only. A touch "move" without a press never
+    // reaches here in practice, and pen/touch are excluded explicitly so a
+    // stray hover event can't move the seam on a phone.
+    if (event.pointerType !== "mouse") return;
+    engage();
+    hoveringRef.current = true;
+    targetFromClientX(event.clientX);
+    ensureLoop();
   };
 
   const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!draggingRef.current) return;
     draggingRef.current = false;
-    setEased(true);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+    ensureLoop();
+  };
+
+  const handlePointerLeave = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (draggingRef.current) return;
+    if (event.pointerType !== "mouse") return;
+    hoveringRef.current = false;
+    // Ease back to centre so the module is never left lopsided for the next
+    // person who scrolls past it.
+    targetRef.current = CENTRE;
+    ensureLoop();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const step = event.shiftKey ? 10 : 2;
     let next: number | null = null;
 
-    if (event.key === "ArrowLeft") next = position - step;
-    else if (event.key === "ArrowRight") next = position + step;
+    if (event.key === "ArrowLeft") next = targetRef.current - step;
+    else if (event.key === "ArrowRight") next = targetRef.current + step;
     else if (event.key === "Home") next = 0;
     else if (event.key === "End") next = 100;
 
     if (next === null) return;
     event.preventDefault();
-    stopNudging();
-    setEased(true);
-    setPosition(clamp(next));
+    engage();
+    hoveringRef.current = false;
+    targetRef.current = clamp(next);
+    ensureLoop();
   };
 
-  // Attract loop. Bails out entirely for reduced-motion users, and unsubscribes
-  // the observer as soon as it has fired once so a scroll-past-and-back doesn't
-  // restart the sequence.
+  // Does this device have a real cursor? Decides the wording of the hint only —
+  // the pointer handlers gate on the live event's pointerType, not on this.
   useEffect(() => {
-    if (prefersReducedMotion || engaged) return;
+    if (typeof window.matchMedia !== "function") return;
+    const query = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const sync = () => setCanHover(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  // Kick the attract sequence once, the first time the module is properly in
+  // view. The observer disconnects immediately so scrolling back doesn't replay
+  // it. Reduced-motion users get a static seam at centre.
+  useEffect(() => {
+    if (prefersReducedMotion) return;
     const frame = frameRef.current;
     if (!frame) return;
 
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    let plays = 0;
-
-    const play = () => {
-      NUDGE_STEPS.forEach((value, index) => {
-        timers.push(
-          setTimeout(() => {
-            // A drag that started mid-sequence must win.
-            if (draggingRef.current) return;
-            setEased(true);
-            setPosition(value);
-          }, index * NUDGE_STEP_MS),
-        );
-      });
-
-      plays += 1;
-      if (plays < NUDGE_MAX_PLAYS) {
-        timers.push(
-          setTimeout(play, NUDGE_STEPS.length * NUDGE_STEP_MS + NUDGE_REPEAT_DELAY_MS),
-        );
-      }
-    };
+    let startTimer: ReturnType<typeof setTimeout> | null = null;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         observer.disconnect();
-        timers.push(setTimeout(play, 500));
+        startTimer = setTimeout(() => {
+          if (engagedRef.current) return;
+          nudgePlaysRef.current = 1;
+          nudgeStartRef.current = NUDGE_PENDING;
+          ensureLoop();
+        }, NUDGE_START_DELAY_MS);
       },
       { threshold: 0.45 },
     );
 
     observer.observe(frame);
-
     return () => {
       observer.disconnect();
-      timers.forEach(clearTimeout);
+      if (startTimer) clearTimeout(startTimer);
     };
-  }, [prefersReducedMotion, engaged]);
+  }, [prefersReducedMotion, ensureLoop]);
 
-  const motionStyle = eased ? { transition: `clip-path 420ms ${EASE}` } : { transition: "none" };
-  const handleMotionStyle = eased ? { transition: `left 420ms ${EASE}` } : { transition: "none" };
+  // Paint the opening frame, and make sure nothing is left running on unmount.
+  useEffect(() => {
+    paint(CENTRE);
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (nudgeTimerRef.current) clearTimeout(nudgeTimerRef.current);
+    };
+  }, [paint]);
 
   return (
     <Section tone="canvas" size="lg">
       <EyebrowHeading
         level={2}
         eyebrow="Before and after"
-        lede="Drag the handle. On the left, a FourlinQ install on handover day — frames set, glass in, the room still bare. On the right, a finished home carrying the same systems."
+        lede="On the left, a FourlinQ install on handover day — frames set, glass in, the room still bare. On the right, a finished home carrying the same systems."
       >
         The part you keep looking at.
       </EyebrowHeading>
@@ -179,6 +362,7 @@ const BeforeAfterCompare = () => {
         onPointerMove={handlePointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
+        onPointerLeave={handlePointerLeave}
         className="relative mt-12 aspect-video w-full cursor-ew-resize select-none overflow-hidden bg-[#0a0a0a] lg:mt-16"
         // pan-y keeps vertical page scrolling with the browser while horizontal
         // drags still reach the pointer handlers.
@@ -196,10 +380,7 @@ const BeforeAfterCompare = () => {
 
         {/* Clipping the wrapper (not resizing the image) keeps both photographs
             on exactly the same geometry, so the seam never shifts. */}
-        <div
-          className="absolute inset-0"
-          style={{ clipPath: `inset(0 ${100 - position}% 0 0)`, ...motionStyle }}
-        >
+        <div ref={wipeRef} className="absolute inset-0" style={{ clipPath: "inset(0 50% 0 0)" }}>
           <img
             src={BEFORE.src}
             alt={BEFORE.alt}
@@ -211,31 +392,26 @@ const BeforeAfterCompare = () => {
         </div>
 
         {/* Corner labels. Each dims when its own side is mostly wiped away. */}
-        <span
-          className={`${CHIP} left-3 top-3 md:left-6 md:top-6`}
-          style={{ opacity: position < 18 ? 0 : 1, transition: "opacity 300ms ease" }}
-        >
+        <span ref={beforeLabelRef} className={`${CHIP} left-3 top-3 md:left-6 md:top-6`}>
           {BEFORE.label}
         </span>
-        <span
-          className={`${CHIP} right-3 top-3 md:right-6 md:top-6`}
-          style={{ opacity: position > 82 ? 0 : 1, transition: "opacity 300ms ease" }}
-        >
+        <span ref={afterLabelRef} className={`${CHIP} right-3 top-3 md:right-6 md:top-6`}>
           {AFTER.label}
         </span>
 
         <div
+          ref={handleRef}
           role="slider"
           tabIndex={0}
           aria-label="Compare handover and finished states"
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-valuenow={Math.round(position)}
-          aria-valuetext={`${Math.round(position)}% handover, ${100 - Math.round(position)}% finished`}
+          aria-valuenow={50}
+          aria-valuetext="50% handover, 50% finished"
           onKeyDown={handleKeyDown}
-          onFocus={stopNudging}
+          onFocus={engage}
           className="group absolute inset-y-0 z-10 w-12 -translate-x-1/2 cursor-ew-resize focus:outline-none"
-          style={{ left: `${position}%`, ...handleMotionStyle }}
+          style={{ left: "50%" }}
         >
           <span className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-white/90 shadow-[0_0_12px_rgba(0,0,0,0.45)]" />
           <span className="pointer-events-none absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 shadow-lg transition-transform duration-200 group-hover:scale-105 group-focus-visible:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-brand-500 group-focus-visible:ring-offset-2 md:h-12 md:w-12">
@@ -260,9 +436,9 @@ const BeforeAfterCompare = () => {
             on first interaction. */}
         <span
           className={`${CHIP} bottom-3 left-1/2 -translate-x-1/2 md:bottom-6`}
-          style={{ opacity: engaged ? 0 : 1, transition: "opacity 400ms ease" }}
+          style={{ opacity: engaged ? 0 : 1 }}
         >
-          Drag to compare
+          {canHover ? "Move to compare" : "Drag to compare"}
         </span>
       </div>
     </Section>
