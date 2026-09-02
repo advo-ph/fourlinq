@@ -11,6 +11,7 @@ import VideoHero from "@/components/home/VideoHero";
 import SystemsTiles from "@/components/home/SystemsTiles";
 import SlimDoorSpotlight from "@/components/home/SlimDoorSpotlight";
 import ProjectReels from "@/components/home/ProjectReels";
+import BeforeAfterCompare from "@/components/home/BeforeAfterCompare";
 import InspirationStrip from "@/components/home/InspirationStrip";
 import WhatsNew from "@/components/home/WhatsNew";
 import BrandCTA from "@/components/home/BrandCTA";
@@ -68,6 +69,11 @@ const Index = () => {
           stable viewport var so it can't reflow when mobile browser chrome
           collapses mid-scroll. */}
       <div aria-hidden="true" className="h-[calc(var(--fq-lvh)*0.1)]" />
+
+      {/* Before/after wipe. Sits on canvas deliberately: SlimDoorSpotlight and
+          ProjectReels are both black, so a third dark module in a row would
+          flatten the run. It also works as a lead-in to the projects gallery. */}
+      <BeforeAfterCompare />
 
       {/* Our Projects gallery moved above the design tool (per Prince,
           2026-07-21) — project proof sits before the configurator. */}
