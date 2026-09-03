@@ -88,12 +88,6 @@ const REVERSED = new Set(["automated-window"]);
  * then both swinging out — so it replaced the GLB render rather than being
  * re-routed the way the first clip was. The awning entry above stands.
  *
- * slim-door is listed for provenance only — it has no GLB and so no MODEL_FOR
- * entry, and a bake run cannot reach it. Its frames come from the client's
- * "3P SLIDING" clip (2026-09-03), which is also the source of the card image;
- * see the slim-door entry in src/data/products.ts for why that clip settled
- * the mechanism.
- *
  * louvre joined on 2026-09-03. The GLB render it replaced was a tall single
  * panel whose bare blades all but vanished against the white ground even at
  * the raised 0.42 glass opacity. The supplied clip is a two-panel unit with
@@ -106,7 +100,6 @@ const IMPORTED = new Set([
   "casement",
   "casement-door",
   "automated-door",
-  "slim-door",
   "louvre",
 ]);
 
@@ -131,7 +124,6 @@ const ANIMATED: Record<string, number> = {
   "automated-window": FRAME_COUNT,
   "sliding-casement-door": FRAME_COUNT,
   "automated-door": FRAME_COUNT,
-  "slim-door": FRAME_COUNT,
 };
 
 export interface SystemAnimation {
