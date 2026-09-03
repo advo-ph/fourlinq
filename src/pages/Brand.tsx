@@ -20,22 +20,18 @@ const HeroCopy = () => (
           enters at ~58% of the video frame, so lg/xl hold 3.75/5rem to keep
           the single-line headline on the white wall. From 1440 the full 6rem
           clears the window edge. */}
-      <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[3rem] sm:text-[3.75rem] xl:text-[5rem] min-[1440px]:text-[6rem] leading-[1.02] max-w-[14ch]">
+      <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.5rem] sm:text-[4.5rem] xl:text-[6rem] min-[1440px]:text-[7.5rem] leading-[1.02] max-w-[14ch]">
         Built for a lifetime.
       </h1>
     </StaggerItem>
     <StaggerItem>
-      {/* lg narrows the measure so the subline also stays clear of the
-          glazing; below lg and from xl+ it uses the full WhyUpvc 36rem. */}
-      <p className="mt-8 lg:mt-10 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[36rem] lg:max-w-[30rem] xl:max-w-[36rem] leading-[1.55]">
+      <p className="mt-1 sm:mt-8 lg:mt-10 text-xs sm:text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[18rem] leading-[1.4] sm:leading-[1.55]">
         What we promise, what the warranty covers, where to put your hands on it.
       </p>
     </StaggerItem>
     <StaggerItem>
-      <div className="mt-8">
-        {/* -ml-5 negates the button's own px-5 so the link text aligns flush
-            with the headline and subline rather than sitting inset. */}
-        <EditorialButton to="/inspiration" variant="ghost" size="md" className="-ml-5">
+      <div className="mt-2 sm:mt-8">
+        <EditorialButton to="/inspiration" variant="ghost" size="md" className="-ml-5 text-xs sm:text-base">
           View full gallery
         </EditorialButton>
       </div>
@@ -65,8 +61,7 @@ const Brand = () => {
         ceiling on the right. The brand line sits in black over the white wall,
         vertically centred at every breakpoint. ── */}
     <header
-      className="relative w-full overflow-hidden bg-[color:var(--canvas-soft)] -mt-[72px]"
-      style={{ height: "var(--fq-svh)" }}
+      className="relative w-full overflow-hidden bg-[color:var(--canvas-soft)] -mt-[72px] h-[calc(var(--fq-svh)*0.3)] sm:h-[var(--fq-svh)]"
       aria-label="Built for a lifetime"
     >
       <video

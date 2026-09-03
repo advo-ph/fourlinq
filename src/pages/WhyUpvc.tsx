@@ -131,8 +131,7 @@ const WhyUpvc = () => {
         off-white studio shot throughout; no scrims needed. Dark editorial
         ink text sits vertically centred in the visible hero area. ── */}
     <header
-      className="relative w-full overflow-hidden bg-[color:var(--canvas-soft)] -mt-[72px]"
-      style={{ height: "var(--fq-svh)" }}
+      className="relative w-full overflow-hidden bg-[color:var(--canvas-soft)] -mt-[72px] h-[calc(var(--fq-svh)*0.3)] sm:h-[var(--fq-svh)]"
       aria-label="Why uPVC"
     >
       <video
@@ -156,10 +155,10 @@ const WhyUpvc = () => {
       <div className="relative h-full flex items-center pt-[72px]">
         <div className="container-editorial w-full">
           <div className="max-w-[43rem] text-left">
-            <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[3rem] sm:text-[3.75rem] lg:text-[5rem] xl:text-[6rem] leading-[1.02] max-w-[14ch]">
+            <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.5rem] sm:text-[4.5rem] lg:text-[6rem] xl:text-[7.5rem] leading-[1.02] max-w-[14ch]">
               Why uPVC.
             </h1>
-            <p className="mt-8 lg:mt-10 text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[36rem] leading-[1.55]">
+            <p className="mt-1 sm:mt-8 lg:mt-10 text-xs sm:text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[18rem] leading-[1.4] sm:leading-[1.55]">
               We use uPVC because of what this country does to a window. The heat, the humidity, the salt air along the coast, the storms.
             </p>
           </div>
