@@ -269,17 +269,21 @@ describe("Aug 12 door additions (fixed-slide-door, slim-door)", () => {
     expect(copy).not.toMatch(/\d+\s*(m|mm|metre|meter|ft|foot|feet)\b/i);
   });
 
-  it("slim-door commits to swinging, and offers only glass the catalog carries", () => {
-    // The image the client supplied on 2026-08-12 settled the swing-or-slide
-    // question MEETING_2026-08-12 §8 left open. Guard against it drifting back
-    // to a sliding claim.
+  it("slim-door commits to sliding, and offers only glass the catalog carries", () => {
+    // MEETING_2026-08-12 §8 left the swing-or-slide question open. This test
+    // asserted "swing" from 2026-08-12, on the Aug-12 render. It was inverted on
+    // 2026-09-03: two client-supplied sources say slide — the "SlimDoor Chi"
+    // clips behind SlimDoorSpotlight.tsx, and the "3P SLIDING" clip that is now
+    // both the card image and the hover animation. The guard is kept, pointed
+    // the other way, so the card cannot drift back to a swing claim while the
+    // homepage spotlight and the hover animation both show panels sliding.
     const product = products.find((p) => p.id === "slim-door")!;
     const copy = `${product.description} ${product.specs.join(" ")}`;
-    expect(copy).toMatch(/swing/i);
-    expect(copy).not.toMatch(/slid(e|ing)/i);
+    expect(copy).toMatch(/slid(e|ing)/i);
+    expect(copy).not.toMatch(/swing/i);
 
-    // Reeded glass shows in the render but is not a FourlinQ glass option, so
-    // the copy must not sell it.
+    // Reeded glass showed in the superseded Aug-12 render and is not a FourlinQ
+    // glass option, so the copy must not sell it.
     expect(copy).not.toMatch(/reeded|fluted|ribbed/i);
   });
 
@@ -301,11 +305,10 @@ describe("hover animations resolve to frames on disk", () => {
   // 2026-08-16: reconciled against the actual systemAnimations.ts ANIMATED map.
   // Added: louvre, automated-window (both registered + 28 frames on disk).
   // Added: sliding-casement-door (renamed from sc-door, assets git-mv'd).
-  // Removed: slim-door — it has only 25 frames on disk (not 28) and is NOT
-  //   registered in systemAnimations.ts ANIMATED map. Leaving it out rather
-  //   than silently masking the drift. Reported as outstanding: slim-door needs
-  //   either registration in systemAnimations.ts (with correct FRAME_COUNT) or
-  //   the frames trimmed/completed to 28. See bake-system-anim.mjs.
+  // 2026-09-03: slim-door added, closing the drift the 2026-08-16 pass reported
+  //   as outstanding. It had 25 orphan frames on disk and no ANIMATED entry, so
+  //   nothing read them. Re-imported from the client's "3P SLIDING" clip at the
+  //   full 28 and registered, so it is now covered here like every other id.
   const ANIMATED_ID = [
     "casement",
     "sliding",
@@ -321,6 +324,7 @@ describe("hover animations resolve to frames on disk", () => {
     "automated-window",
     "sliding-casement-door",
     "automated-door",
+    "slim-door",
   ] as const;
 
   it.each(ANIMATED_ID)("%s has every frame it claims", (id) => {

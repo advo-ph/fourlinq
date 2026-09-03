@@ -449,18 +449,26 @@ export const products: Product[] = [
     name: "Slim Door",
     category: "doors",
     description:
-      "A swing door on a narrow frame, so the glass reads as the whole panel and the border almost disappears. Suited to entries, studies, and interior rooms where you want light to carry from one space into the next without a heavy frame around it. Glass is chosen per opening: clear where light should pass through, privacy glass where it should not. Handing, glass, and finish are set during consultation.",
-    shortDescription: "Maximum glass. Minimum frame.",
-    // Client-approved RENDER (2026-08-12), not a photograph — hence render/,
-    // not real/. This image also settles the mechanism question that
-    // docs/MEETING_2026-08-12.md §8 left open: it swings, it does not slide.
+      "Three glazed panels on a narrow frame. They slide to one side and stack together, so most of the run opens as a single clear span and the border almost disappears. Suited to living rooms, lanais, and any wall you want to open onto a garden or a view. Glass is chosen per opening: clear where light should pass through, privacy glass where it should not. Stacking side, glass, and finish are set during consultation.",
+    shortDescription: "Three panels slide. The frame disappears.",
+    // Frame 01 of the client's "3P SLIDING" clip (2026-09-03) — the same clip
+    // the hover animation is imported from, so the card still and the resting
+    // animation frame are the same picture.
+    //
+    // It replaced the Aug-12 render, and with it the swing claim that render
+    // carried. MEETING_2026-08-12 §8 left the mechanism open; the Aug-12 render
+    // answered "swing", and the client's own supplier clips answered "slide" —
+    // first the "SlimDoor Chi" set behind SlimDoorSpotlight.tsx, which already
+    // noted this entry contradicted them, and now this one. Two client sources
+    // against one render, and the newer, so the catalogue moved to slide and
+    // the page and the card finally agree.
     image: "/images/products/render/slim-door.webp",
     specs: [
       "Slim sightline frame",
-      "Single swing leaf",
+      "Three sliding panels",
+      "Panels stack to one side",
       "Full-height glazing",
-      "Clear or privacy glass",
-      "Handing and finish set per opening",
+      "Stacking side and finish set per opening",
     ],
     finishes: productFinishes,
     glassOptions: ["Clear Float", "Frosted Privacy", "Low-E Coated", "Laminated Safety"],

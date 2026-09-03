@@ -80,9 +80,35 @@ const REVERSED = new Set(["automated-window"]);
  * "casementwindow", but it depicts a single top-hung sash opening at the
  * bottom on a manual handle, which is the awning mechanism — not the twin
  * side-hinged leaves the `casement` card shows. It was routed here on that
- * basis, so `casement` keeps its rendered twin-leaf set.
+ * basis, so `casement` kept its rendered twin-leaf set at the time.
+ *
+ * casement joined the set on 2026-09-03, from a second clip the client sent
+ * under the same name. This one does depict the casement mechanism — twin
+ * side-hinged leaves, both lever handles throwing before either leaf moves,
+ * then both swinging out — so it replaced the GLB render rather than being
+ * re-routed the way the first clip was. The awning entry above stands.
+ *
+ * slim-door is listed for provenance only — it has no GLB and so no MODEL_FOR
+ * entry, and a bake run cannot reach it. Its frames come from the client's
+ * "3P SLIDING" clip (2026-09-03), which is also the source of the card image;
+ * see the slim-door entry in src/data/products.ts for why that clip settled
+ * the mechanism.
+ *
+ * louvre joined on 2026-09-03. The GLB render it replaced was a tall single
+ * panel whose bare blades all but vanished against the white ground even at
+ * the raised 0.42 glass opacity. The supplied clip is a two-panel unit with
+ * the blades reading clearly at every angle, and it runs closed → open, so it
+ * needs no REVERSED entry. louvre IS in MODEL_FOR, so a full bake would
+ * overwrite it.
  */
-const IMPORTED = new Set(["awning", "casement-door", "automated-door"]);
+const IMPORTED = new Set([
+  "awning",
+  "casement",
+  "casement-door",
+  "automated-door",
+  "slim-door",
+  "louvre",
+]);
 
 /** True if a system's frames are video-sourced rather than baked from a GLB. */
 export function isImportedAnimation(productId: string): boolean {
@@ -105,6 +131,7 @@ const ANIMATED: Record<string, number> = {
   "automated-window": FRAME_COUNT,
   "sliding-casement-door": FRAME_COUNT,
   "automated-door": FRAME_COUNT,
+  "slim-door": FRAME_COUNT,
 };
 
 export interface SystemAnimation {
