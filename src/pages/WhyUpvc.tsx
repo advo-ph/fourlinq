@@ -158,7 +158,7 @@ const WhyUpvc = () => {
             <h1 className="font-serif font-normal tracking-tight text-[color:var(--ink-primary)] text-[1.5rem] sm:text-[4.5rem] lg:text-[6rem] xl:text-[7.5rem] leading-[1.02] max-w-[14ch]">
               Why uPVC.
             </h1>
-            <p className="mt-1 sm:mt-8 lg:mt-10 text-xs sm:text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[18rem] leading-[1.4] sm:leading-[1.55]">
+            <p className="mt-1 sm:mt-8 lg:mt-10 text-xs sm:text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[16rem] leading-[1.4] sm:leading-[1.55]">
               We use uPVC because of what this country does to a window. The heat, the humidity, the salt air along the coast, the storms.
             </p>
           </div>

@@ -25,7 +25,7 @@ const HeroCopy = () => (
       </h1>
     </StaggerItem>
     <StaggerItem>
-      <p className="mt-1 sm:mt-8 lg:mt-10 text-xs sm:text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[18rem] leading-[1.4] sm:leading-[1.55]">
+      <p className="mt-1 sm:mt-8 lg:mt-10 text-xs sm:text-body-lg lg:text-lead text-[color:var(--ink-secondary)] max-w-[16rem] leading-[1.4] sm:leading-[1.55]">
         What we promise, what the warranty covers, where to put your hands on it.
       </p>
     </StaggerItem>
