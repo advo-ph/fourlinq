@@ -19,14 +19,16 @@ import EyebrowHeading from "@/components/primitives/EyebrowHeading";
  */
 
 /**
- * The 16:9 film is still being produced (the supplier clips are portrait and
- * are being expanded to landscape). Set this to the served path once the file
- * lands in `public/videos/systems/` — the section swaps from placeholder to
- * video with no other change. Keep it `null` until the file exists, otherwise
- * the <video> element requests a 404.
+ * The 16:9 film landed on 2026-09-03. The client's master is HEVC, which
+ * Chrome and Firefox will not decode, so the served file is transcoded to
+ * H.264 High / yuv420p and stripped of its audio track (the element is muted
+ * anyway). Poster is frame 0, so the still and the first played frame match.
+ *
+ * Setting either constant back to `null` returns the section to its
+ * placeholder state with no other change.
  */
-const SLIM_DOOR_VIDEO: string | null = null;
-const SLIM_DOOR_POSTER: string | null = null;
+const SLIM_DOOR_VIDEO: string | null = "/videos/systems/slim-alu-spotlight.mp4";
+const SLIM_DOOR_POSTER: string | null = "/videos/systems/slim-alu-spotlight-poster.jpg";
 
 const VARIANTS = [
   { name: "HP-Linkage", note: "Move one panel, the rest follow." },
