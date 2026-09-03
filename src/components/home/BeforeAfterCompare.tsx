@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
 import Section from "@/components/primitives/Section";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
@@ -7,26 +7,21 @@ import EyebrowHeading from "@/components/primitives/EyebrowHeading";
  * Before/after wipe. On a mouse the seam simply follows the cursor; on touch it
  * is dragged.
  *
- * ASSET NOTE (2026-09-02). The repository holds no during-construction
- * photography; every FourlinQ project shot on file is of a completed install.
- * The pair below is therefore the honest closest thing: a real handover-stage
- * room (systems in, nothing else) against a real finished interior. They are
- * two different houses, so the copy claims only "the same systems", never the
- * same building. When the client supplies a true matched pair, replace the two
- * files in `public/images/compare/` — same names, same 16:9 crop — and nothing
- * else here needs to change. `/images/` is served with a 5-minute TTL
- * (server/index.ts), so a swap reaches visitors on their next load.
+ * ASSET NOTE (2026-09-03). A true matched pair: the same room photographed
+ * before and after, so the seam lines up on the same walls and openings. To
+ * swap them, replace the two files in `public/images/compare/` — same names,
+ * same 1536x864 crop — and nothing else here needs to change. `/images/` is
+ * served with a 5-minute TTL (server/index.ts), so a swap reaches visitors on
+ * their next load.
  */
 const BEFORE = {
   src: "/images/compare/turnover-bare.webp",
-  label: "On turnover",
-  alt: "Bare room on handover day, with FourlinQ black aluminium sliding doors and windows already installed",
+  alt: "The same room mid-build: scaffolding outside, bare openings, dust on the floor",
 };
 
 const AFTER = {
   src: "/images/compare/turnover-finished.webp",
-  label: "Lived in",
-  alt: "Finished living room with full-height FourlinQ glazing opening onto a pool",
+  alt: "The finished room with FourlinQ black aluminium sliding doors and windows fitted",
 };
 
 /**
@@ -66,20 +61,13 @@ const NUDGE_MAX_PLAYS = 2;
 /** Fraction of the remaining distance closed per 60fps frame when easing. Kept
  *  frame-rate independent below, so a 120Hz display eases at the same speed. */
 const FOLLOW_SMOOTHING = 0.2;
-const RETURN_SMOOTHING = 0.11;
+/** Used once the cursor has left: the seam settles on the last place it was put
+ *  rather than travelling anywhere new, so this only ever closes a tiny gap. */
+const SETTLE_SMOOTHING = 0.11;
 const REFERENCE_FRAME_MS = 1000 / 60;
 
 /** Below this gap the seam is close enough to snap and stop the loop. */
 const SETTLE_EPSILON = 0.02;
-
-/**
- * Overlay chip. Deliberately not the shared `.eyebrow` class: that is 14px with
- * 0.14em tracking, which wraps to two lines inside a 390px-wide frame and tears
- * the pill background. These sit on top of photography, so they get their own
- * smaller, no-wrap scale.
- */
-const CHIP =
-  "pointer-events-none absolute bg-black/50 px-2.5 py-1 font-sans text-[0.625rem] font-medium uppercase tracking-[0.14em] text-white/90 whitespace-nowrap backdrop-blur-sm transition-opacity duration-300 md:px-3 md:py-1.5 md:text-[0.75rem]";
 
 const clamp = (value: number) => Math.min(100, Math.max(0, value));
 
@@ -93,8 +81,6 @@ const BeforeAfterCompare = () => {
   const frameRef = useRef<HTMLDivElement>(null);
   const wipeRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLDivElement>(null);
-  const beforeLabelRef = useRef<HTMLSpanElement>(null);
-  const afterLabelRef = useRef<HTMLSpanElement>(null);
 
   const posRef = useRef(CENTRE);
   const targetRef = useRef(CENTRE);
@@ -113,11 +99,6 @@ const BeforeAfterCompare = () => {
   // the two callbacks mutually dependent.
   const ensureLoopRef = useRef<() => void>(() => {});
 
-  // Only two things ever re-render this component: retiring the hint, and
-  // learning whether the device has a real cursor.
-  const [engaged, setEngaged] = useState(false);
-  const [canHover, setCanHover] = useState(false);
-
   /** Write one frame. No React involved. */
   const paint = useCallback((value: number) => {
     if (wipeRef.current) {
@@ -125,12 +106,6 @@ const BeforeAfterCompare = () => {
     }
     if (handleRef.current) {
       handleRef.current.style.left = `${value}%`;
-    }
-    if (beforeLabelRef.current) {
-      beforeLabelRef.current.style.opacity = value < 18 ? "0" : "1";
-    }
-    if (afterLabelRef.current) {
-      afterLabelRef.current.style.opacity = value > 82 ? "0" : "1";
     }
     // Announce whole percentages only, so assistive tech isn't told about
     // every sub-pixel frame of a 60fps sweep.
@@ -183,7 +158,7 @@ const BeforeAfterCompare = () => {
       if (draggingRef.current || nudgeStartRef.current !== null) {
         posRef.current = target;
       } else {
-        const perFrame = hoveringRef.current ? FOLLOW_SMOOTHING : RETURN_SMOOTHING;
+        const perFrame = hoveringRef.current ? FOLLOW_SMOOTHING : SETTLE_SMOOTHING;
         const factor = 1 - Math.pow(1 - perFrame, dt / REFERENCE_FRAME_MS);
         posRef.current = pos + (target - pos) * factor;
       }
@@ -213,7 +188,9 @@ const BeforeAfterCompare = () => {
 
   ensureLoopRef.current = ensureLoop;
 
-  /** First interaction of any kind retires the hint and cancels the attract. */
+  /** First interaction of any kind cancels the attract nudge for good, so the
+   *  seam never fights the person now moving it. Refs only — this component
+   *  never re-renders after mount. */
   const engage = useCallback(() => {
     if (engagedRef.current) return;
     engagedRef.current = true;
@@ -222,7 +199,6 @@ const BeforeAfterCompare = () => {
       clearTimeout(nudgeTimerRef.current);
       nudgeTimerRef.current = null;
     }
-    setEngaged(true);
   }, []);
 
   const targetFromClientX = useCallback((clientX: number) => {
@@ -271,10 +247,11 @@ const BeforeAfterCompare = () => {
   const handlePointerLeave = (event: React.PointerEvent<HTMLDivElement>) => {
     if (draggingRef.current) return;
     if (event.pointerType !== "mouse") return;
+    // The seam stays exactly where the cursor left it. Snapping back to centre
+    // undid whatever the visitor had just lined up to look at, and made the
+    // module feel like it was resisting them. `targetRef` is left untouched, so
+    // the loop simply settles on the last position and stops.
     hoveringRef.current = false;
-    // Ease back to centre so the module is never left lopsided for the next
-    // person who scrolls past it.
-    targetRef.current = CENTRE;
     ensureLoop();
   };
 
@@ -294,17 +271,6 @@ const BeforeAfterCompare = () => {
     targetRef.current = clamp(next);
     ensureLoop();
   };
-
-  // Does this device have a real cursor? Decides the wording of the hint only —
-  // the pointer handlers gate on the live event's pointerType, not on this.
-  useEffect(() => {
-    if (typeof window.matchMedia !== "function") return;
-    const query = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const sync = () => setCanHover(query.matches);
-    sync();
-    query.addEventListener("change", sync);
-    return () => query.removeEventListener("change", sync);
-  }, []);
 
   // Kick the attract sequence once, the first time the module is properly in
   // view. The observer disconnects immediately so scrolling back doesn't replay
@@ -348,13 +314,9 @@ const BeforeAfterCompare = () => {
 
   return (
     <Section tone="canvas" size="lg">
-      <EyebrowHeading
-        level={2}
-        eyebrow="Before and after"
-        lede="On the left, a FourlinQ install on handover day — frames set, glass in, the room still bare. On the right, a finished home carrying the same systems."
-      >
-        The part you keep looking at.
-      </EyebrowHeading>
+      {/* Title only. The photographs carry the point; a lede explaining them
+          just delayed people from reaching the thing they came to drag. */}
+      <EyebrowHeading level={2}>Compare the before and after</EyebrowHeading>
 
       <div
         ref={frameRef}
@@ -391,14 +353,6 @@ const BeforeAfterCompare = () => {
           />
         </div>
 
-        {/* Corner labels. Each dims when its own side is mostly wiped away. */}
-        <span ref={beforeLabelRef} className={`${CHIP} left-3 top-3 md:left-6 md:top-6`}>
-          {BEFORE.label}
-        </span>
-        <span ref={afterLabelRef} className={`${CHIP} right-3 top-3 md:right-6 md:top-6`}>
-          {AFTER.label}
-        </span>
-
         <div
           ref={handleRef}
           role="slider"
@@ -431,15 +385,6 @@ const BeforeAfterCompare = () => {
             </svg>
           </span>
         </div>
-
-        {/* Text prompt for anyone who reads before they touch. Retires for good
-            on first interaction. */}
-        <span
-          className={`${CHIP} bottom-3 left-1/2 -translate-x-1/2 md:bottom-6`}
-          style={{ opacity: engaged ? 0 : 1 }}
-        >
-          {canHover ? "Move to compare" : "Drag to compare"}
-        </span>
       </div>
     </Section>
   );
