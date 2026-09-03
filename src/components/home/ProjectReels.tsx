@@ -67,20 +67,10 @@ const ProjectReels = () => {
         </div>
 
         <div>
-          <div className="hidden md:grid md:grid-cols-3 gap-5 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 lg:gap-8">
             {PROJECT_REELS.map((reel) => (
               <ReelCard key={reel.id} reel={reel} />
             ))}
-          </div>
-
-          <div className="md:hidden -mx-4 overflow-x-auto no-scrollbar">
-            <ul className="flex gap-4 px-4">
-              {PROJECT_REELS.map((reel) => (
-                <li key={reel.id} className="shrink-0 w-[78vw]">
-                  <ReelCard reel={reel} />
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>
