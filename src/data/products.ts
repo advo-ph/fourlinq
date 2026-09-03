@@ -462,7 +462,15 @@ export const products: Product[] = [
     // noted this entry contradicted them, and now this one. Two client sources
     // against one render, and the newer, so the catalogue moved to slide and
     // the page and the card finally agree.
-    image: "/images/products/render/slim-door.webp",
+    //
+    // The `-3p` suffix is load-bearing. Images are served
+    // `max-age=300, stale-while-revalidate=86400` (server/index.ts), so a file
+    // replaced in place keeps serving stale to anyone who had already loaded it
+    // — for up to a day. 028 assumed the 300 s freshness window was the whole
+    // story and left the path alone; returning visitors kept seeing the Aug-12
+    // swing render. A new path is the only reliable replacement. Future swaps
+    // need a new filename too: bump the suffix and delete the old file.
+    image: "/images/products/render/slim-door-3p.webp",
     specs: [
       "Slim sightline frame",
       "Three sliding panels",
