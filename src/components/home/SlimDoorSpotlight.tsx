@@ -170,14 +170,11 @@ const SlimDoorSpotlight = () => {
                 `leading` is set explicitly because EyebrowHeading's sub-xl sizes
                 are bare `text-[Nrem]` arbitraries, which carry no line-height —
                 they were inheriting ~1.5 and costing 28px of wrap. 1.1 matches
-                the `text-h2` token the xl step uses. The `p` rule is the
-                eyebrow (the lede is a sibling, below): it hugs its heading on
-                mobile, where 24px of gap is budget this screen cannot spare. */}
+                the `text-h2` token the xl step uses. */}
             <EyebrowHeading
               level={2}
-              eyebrow="New system"
               toneInverse
-              className="[&>p]:mb-3 [&>h2]:text-balance [&>h2]:text-[2.25rem] [&>h2]:leading-[1.1] md:[&>p]:mb-v400 md:[&>h2]:text-[2.75rem] xl:[&>h2]:text-h2"
+              className="[&>h2]:text-balance [&>h2]:text-[2.25rem] [&>h2]:leading-[1.1] md:[&>h2]:text-[2.75rem] xl:[&>h2]:text-h2"
             >
               Slim ALU sliding doors.
             </EyebrowHeading>
