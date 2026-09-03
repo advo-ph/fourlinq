@@ -284,6 +284,10 @@ const QuietNavbar = () => {
   // Force-hidden by full-bleed sections (e.g. the ScrollWindow benefit sequence)
   // that want the viewport to themselves — overrides the scroll-direction logic.
   const [forceHidden, setForceHidden] = useState(false);
+  // Force-shown by sections that carry their own sticky heading (e.g. the
+  // Projects gallery) — the two would otherwise fight and open a gap above the
+  // pinned title. Overrides the scroll-direction hide.
+  const [forceShown, setForceShown] = useState(false);
   const lastScrollY = useRef(0);
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -291,7 +295,7 @@ const QuietNavbar = () => {
   // Slide the bar away on scroll-down, bring it back on scroll-up — but never
   // while a panel, the mobile drawer, or search is open (the panel hangs off
   // the bar) or when parked near the top.
-  const navHidden = forceHidden || (hidden && !openPanel && !mobileOpen && !searchOpen);
+  const navHidden = !forceShown && (forceHidden || (hidden && !openPanel && !mobileOpen && !searchOpen));
   const mobileDialogRef = useDialogFocus<HTMLDivElement>({
     isOpen: mobileOpen,
     onClose: () => setMobileOpen(false),
@@ -349,6 +353,7 @@ const QuietNavbar = () => {
     setSearchOpen(false);
     setHidden(false);
     setForceHidden(false);
+    setForceShown(false);
     lastScrollY.current = window.scrollY;
   }, [location]);
 
@@ -357,6 +362,13 @@ const QuietNavbar = () => {
     const onHide = (e: Event) => setForceHidden(!!(e as CustomEvent).detail);
     window.addEventListener("fq-hide-header", onHide as EventListener);
     return () => window.removeEventListener("fq-hide-header", onHide as EventListener);
+  }, []);
+
+  // Sections with their own sticky heading can lock the bar visible while in view.
+  useEffect(() => {
+    const onLock = (e: Event) => setForceShown(!!(e as CustomEvent).detail);
+    window.addEventListener("fq-lock-header", onLock as EventListener);
+    return () => window.removeEventListener("fq-lock-header", onLock as EventListener);
   }, []);
 
   useEffect(() => {
@@ -719,39 +731,83 @@ const QuietNavbar = () => {
                       {link.label}
                     </Link>
                     {link.group && (
-                      <div className="pb-4 -mt-2 space-y-4">
-                        {link.group.map((g, gi) => (
-                          <div key={g.title ?? gi}>
-                            {g.title && <p className="eyebrow mb-1.5">{g.title}</p>}
-                            <ul className="space-y-1">
-                              {g.card.map((c) => (
-                                <li key={c.label}>
-                                  <Link
-                                    to={c.to}
-                                    className="block py-1.5 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
-                                  >
-                                    {c.label}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
+                      <div className="pb-4 -mt-2 space-y-6">
+                        {link.group.map((g, gi) => {
+                          const hasImages = g.card.some((c) => c.image);
+                          const isMaterial = g.title === "By material";
+                          return (
+                            <div key={g.title ?? gi}>
+                              {g.title && (
+                                <p className="eyebrow mb-3 pb-2 border-b border-[color:var(--rule-soft)]">
+                                  {g.title}
+                                </p>
+                              )}
+                              {isMaterial ? (
+                                <ul className="grid grid-cols-2 gap-2">
+                                  {g.card.map((c) => (
+                                    <li key={c.label}>
+                                      <NavMaterialButton card={c} onNavigate={() => setMobileOpen(false)} />
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : hasImages ? (
+                                <ul className={cn("grid gap-3", g.card.length === 4 ? "grid-cols-2" : "grid-cols-3")}>
+                                  {g.card.map((c) => (
+                                    <li key={c.label}>
+                                      <Link
+                                        to={c.to}
+                                        onClick={() => setMobileOpen(false)}
+                                        className="group block"
+                                      >
+                                        <div className={cn(
+                                          "relative overflow-hidden bg-[color:var(--canvas-soft)]",
+                                          g.aspect ?? "aspect-[4/3]"
+                                        )}>
+                                          <img
+                                            src={c.image}
+                                            alt={c.label}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="w-full h-full object-cover"
+                                          />
+                                        </div>
+                                        <p className="mt-1.5 text-center text-[11px] font-medium leading-tight text-[color:var(--ink-primary)]">
+                                          {c.label}
+                                        </p>
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <ul className="space-y-1">
+                                  {g.card.map((c) => (
+                                    <li key={c.label}>
+                                      <Link
+                                        to={c.to}
+                                        className="block py-1.5 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
+                                      >
+                                        {c.label}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          );
+                        })}
                         {link.label === "Systems" && (
                           <div>
-                            <p className="eyebrow mb-1.5">Brochures</p>
-                            <ul className="space-y-1">
+                            <p className="eyebrow mb-3 pb-2 border-b border-[color:var(--rule-soft)]">
+                              Brochures
+                            </p>
+                            <ul className="grid grid-cols-1 gap-2">
                               {SYSTEM_BROCHURES.map((b) => (
                                 <li key={b.label}>
-                                  <a
-                                    href={b.file}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 py-1.5 text-body-sm text-[color:var(--ink-secondary)] hover:text-[color:var(--accent)] transition-colors duration-300 ease-marvin"
-                                  >
-                                    {b.label}
-                                    <ArrowDownToLine size={14} strokeWidth={1.5} className="shrink-0 text-[color:var(--ink-muted)]" />
-                                  </a>
+                                  <NavBrochureButton
+                                    label={b.label}
+                                    file={b.file}
+                                    onNavigate={() => setMobileOpen(false)}
+                                  />
                                 </li>
                               ))}
                             </ul>
