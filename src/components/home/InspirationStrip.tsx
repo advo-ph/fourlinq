@@ -138,6 +138,25 @@ const InspirationStrip = () => {
   // project, so in practice this and not project.image drives every tile.
   const coverImages = merged?.projectCoverImages ?? {};
 
+  // Keep the site header pinned while this section is on screen. The section has
+  // its own sticky heading; letting the auto-hiding navbar slide away would open
+  // a gap above that heading. Runs at every breakpoint.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const lock = (on: boolean) =>
+      window.dispatchEvent(new CustomEvent("fq-lock-header", { detail: on }));
+    const io = new IntersectionObserver(
+      ([entry]) => lock(entry.isIntersecting),
+      { threshold: 0 },
+    );
+    io.observe(track);
+    return () => {
+      io.disconnect();
+      lock(false);
+    };
+  }, []);
+
   useEffect(() => {
     const track = trackRef.current;
     const panel = panelRef.current;
@@ -221,14 +240,26 @@ const InspirationStrip = () => {
           ref={trackRef}
           className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr),minmax(0,1.15fr)] gap-3 lg:gap-4 items-start"
         >
-          {/* Sticky feature. On mobile the panel still renders so the heading
-              and subtitle sit above the grid; only the scroll line and the
-              crossfading hero are desktop-only. */}
+          {/* Sticky feature. The panel is sticky at every breakpoint: on mobile
+              the heading + subtitle pin as a section header while the gallery
+              scrolls behind them (canvas background + z-10 so tiles slide under
+              cleanly). Only the scroll line and crossfading hero are
+              desktop-only. pb-5 keeps the gap inside the pinned background so no
+              tile peeks through above it. */}
           <div
             ref={panelRef}
-            className="mb-5 lg:mb-0 lg:sticky lg:self-start"
+            className="relative z-10 bg-[color:var(--canvas)] pb-5 sticky self-start lg:z-auto lg:bg-transparent lg:pb-0"
             style={{ top: STICKY_TOP }}
           >
+            {/* Mobile only: paint the header-height band above the pinned panel
+                so gallery tiles scroll behind the heading instead of peeking
+                through the gap over it while the auto-hiding navbar is up. */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 bottom-full bg-[color:var(--canvas)] lg:hidden"
+              style={{ height: STICKY_TOP }}
+            />
+
             {/* Thin scroll-position line: fills across a part, then the hero turns over. */}
             <div className="relative hidden h-[1.5px] w-full overflow-hidden bg-[color:var(--rule-soft)] lg:block">
               <div
