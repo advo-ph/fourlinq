@@ -112,7 +112,10 @@ function AnimatedMedia({
   const dirRef = useRef(0); // -1 closing | 0 idle | 1 opening
   const rafRef = useRef<number | null>(null);
   const lastTsRef = useRef(0);
-  const preloadedRef = useRef(false);
+  // warmStartedRef: set at the TOP of warm() to prevent double-warming.
+  // warmedRef: set at the END of warm() once all frames have decoded and are ready to play.
+  const warmStartedRef = useRef(false);
+  const warmedRef = useRef(false);
   // Retained, decoded frame <img> objects. Holding references keeps them in the
   // browser's in-memory cache for the component's lifetime, so playback never
   // re-fetches a frame. Without this, the warmed images are GC-eligible and the
@@ -122,35 +125,71 @@ function AnimatedMedia({
   const framesImgsRef = useRef<(HTMLImageElement | null)[]>([]);
   const openRef = useRef(false); // toggle state for click trigger
   const playOnceCalledRef = useRef(false); // prevents double-fire between mount + in-view triggers
+  const playOncePendingRef = useRef(false); // prevents two triggers from both starting polls simultaneously
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readyPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // warmFnRef: lets effects beyond the preload observer call warm() directly.
+  const warmFnRef = useRef<(() => void) | null>(null);
+  // revealedRef: kept in sync with `revealed` state so closures scheduled via
+  // setTimeout (e.g. the playReverse call in playOnce) see the current value
+  // rather than the stale value captured at the time they were created.
+  const revealedRef = useRef(false);
+  // lastShownRef: tracks the last frame index written to animImgRef so showFrame
+  // can bail out early when the rounded index hasn't changed between rAF ticks,
+  // avoiding redundant src writes that force unnecessary decode/paint work.
+  const lastShownRef = useRef(-1);
   const [revealed, setRevealed] = useState(false); // top layer opacity
 
   // Preload + decode this element's frames once it nears the viewport, so the
-  // first play is lag-free. Decoding sequentially keeps the main thread
-  // responsive and avoids janking the animation.
+  // first play is lag-free. Decoding uses bounded parallelism (6 concurrent
+  // workers pulling from a shared index cursor) to avoid serialising 28 network
+  // round trips on mobile while still keeping the main thread responsive.
+  // Effect is declared first so warmFnRef is assigned before the autoPlayOnMount
+  // effect runs (effects execute in declaration order).
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
     let cancelled = false;
+
     const warm = async () => {
-      if (cancelled || preloadedRef.current) return;
-      preloadedRef.current = true;
-      for (let i = 0; i < frames.length; i++) {
-        if (cancelled) return;
-        const img = new Image();
-        img.decoding = "async";
-        img.src = frames[i];
-        // Retain the element so the decoded frame stays resident — this is what
-        // keeps playback from re-fetching (and failing) under memory pressure.
-        framesImgsRef.current[i] = img;
-        try {
-          await img.decode();
-        } catch {
-          /* decode can reject if interrupted — the retained <img> stays cached */
+      if (cancelled || warmStartedRef.current) return;
+      warmStartedRef.current = true; // guard against double-warming
+
+      const CONCURRENCY = 6;
+      let cursor = 0; // shared index — workers race to claim the next frame
+
+      const worker = async () => {
+        while (true) {
+          if (cancelled) return;
+          const i = cursor++;
+          if (i >= frames.length) return;
+          const img = new Image();
+          img.decoding = "async";
+          img.src = frames[i];
+          // Retain the element so the decoded frame stays resident — this is what
+          // keeps playback from re-fetching (and failing) under memory pressure.
+          framesImgsRef.current[i] = img;
+          try {
+            await img.decode();
+          } catch {
+            /* decode can reject if interrupted — the retained <img> stays cached */
+          }
         }
+      };
+
+      // Launch up to CONCURRENCY workers in parallel; all share `cursor`.
+      await Promise.all(
+        Array.from({ length: Math.min(CONCURRENCY, frames.length) }, worker),
+      );
+
+      if (!cancelled) {
+        warmedRef.current = true; // frames are ready; playOnce poll can proceed
       }
     };
+
+    // Store warm so autoPlayOnMount effect can call it without waiting for IO.
+    warmFnRef.current = warm;
+
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
@@ -168,8 +207,12 @@ function AnimatedMedia({
   }, [frames]);
 
   const showFrame = (i: number) => {
+    // Skip the write when the rounded index hasn't changed — avoids redundant
+    // src assignments that force unnecessary decode/paint work at 60 fps.
+    if (i === lastShownRef.current) return;
     const img = animImgRef.current;
     if (!img) return;
+    lastShownRef.current = i;
     // Prefer the retained, already-decoded frame's URL so the swap resolves from
     // the in-memory cache instead of issuing a fresh (evictable, failable) fetch.
     img.src = framesImgsRef.current[i]?.src ?? frames[i];
@@ -200,6 +243,7 @@ function AnimatedMedia({
       showFrame(0);
       dirRef.current = 0;
       rafRef.current = null;
+      revealedRef.current = false; // sync ref before state update
       setRevealed(false); // crossfade back to the resting image
       return;
     }
@@ -217,14 +261,20 @@ function AnimatedMedia({
 
   const playForward = () => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    // Reset lastShownRef so a re-play always repaints from the current position.
+    lastShownRef.current = -1;
     showFrame(Math.round(idxRef.current));
+    revealedRef.current = true; // sync ref before state update
     setRevealed(true);
     dirRef.current = 1;
     startLoop();
   };
 
   const playReverse = () => {
-    if (!revealed) return;
+    // Guard on the ref rather than the `revealed` state value — the ref is
+    // always current even inside a stale setTimeout closure, whereas the state
+    // value captured at scheduling time would have been false (pre-forward-play).
+    if (!revealedRef.current) return;
     dirRef.current = -1;
     startLoop();
   };
@@ -235,29 +285,40 @@ function AnimatedMedia({
     if (canHover) return;
     if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     if (playOnceCalledRef.current) return;
-    playOnceCalledRef.current = true;
+    // Prevent two simultaneous triggers (mount + in-view) from both starting polls.
+    if (playOncePendingRef.current) return;
+    playOncePendingRef.current = true;
 
     const run = () => {
+      // Mark the one-shot consumed here (inside run) so a timed-out poll does
+      // NOT burn the one-shot — a slow network may just need more time.
+      playOnceCalledRef.current = true;
+      playOncePendingRef.current = false;
       playForward();
       holdTimerRef.current = setTimeout(() => {
         playReverse();
       }, FORWARD_MS + 300);
     };
 
-    if (preloadedRef.current) {
+    if (warmedRef.current) {
       run();
     } else {
-      // Frames haven't decoded yet — poll until ready (max 1 s / 20 attempts).
+      // Frames haven't decoded yet — poll until ready (max 5 s / 100 attempts).
+      // 100 attempts at 50 ms = 5 s budget; slow mobile networks need the time.
       let attempts = 0;
       readyPollRef.current = setInterval(() => {
         attempts++;
-        if (preloadedRef.current) {
+        if (warmedRef.current) {
           if (readyPollRef.current != null) clearInterval(readyPollRef.current);
           readyPollRef.current = null;
           run();
-        } else if (attempts >= 20) {
+        } else if (attempts >= 100) {
           if (readyPollRef.current != null) clearInterval(readyPollRef.current);
           readyPollRef.current = null;
+          playOncePendingRef.current = false;
+          // Frames didn't finish in time — play anyway as a best-effort fallback
+          // so the user sees something rather than nothing.
+          run();
         }
       }, 50);
     }
@@ -306,8 +367,13 @@ function AnimatedMedia({
   }, [autoPlayInView]);
 
   // Auto-play 400 ms after mount — used by drawers whose slide-in is 400 ms (mobile only).
+  // Calls warm() directly (via warmFnRef) without waiting for the IntersectionObserver,
+  // because the drawer panel slides in over 400 ms and the observer may not report
+  // intersecting in time for frames to be ready when playOnce polls.
   useEffect(() => {
     if (!autoPlayOnMount || canHover) return;
+    // Kick off warm immediately so frames decode in parallel with the drawer slide-in.
+    warmFnRef.current?.();
     const id = setTimeout(() => {
       playOnce();
     }, 400);
