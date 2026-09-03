@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getSystemAnimation } from "@/data/systemAnimations";
 
 interface Props {
@@ -56,7 +56,15 @@ export default function SystemCardMedia({
   autoPlayInView = false,
   autoPlayOnMount = false,
 }: Props) {
-  const anim = getSystemAnimation(productId);
+  // Memoised on productId because the frame array is the preload effect's only
+  // dependency, and getSystemAnimation builds a fresh array on every call. An
+  // unstable identity re-runs that effect on every parent render, and its
+  // cleanup sets `cancelled`, which aborts the in-flight decode workers — but
+  // warmStartedRef stays true, so the re-run returns early and warmedRef is
+  // never set. The one-shot then waits out its whole 5s budget before falling
+  // back. The parent here is a framer-motion list item, so it re-renders on
+  // layout passes the card itself has no say in.
+  const anim = useMemo(() => getSystemAnimation(productId), [productId]);
 
   if (!anim) {
     return <img src={src} alt={alt} loading="lazy" decoding="async" className={imgClassName} />;
