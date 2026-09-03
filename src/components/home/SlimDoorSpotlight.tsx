@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import Section from "@/components/primitives/Section";
 import EyebrowHeading from "@/components/primitives/EyebrowHeading";
+import { cn } from "@/lib/utils";
 
 /**
  * Slim ALU spotlight — the new system, introduced above the project reels.
@@ -19,18 +20,32 @@ import EyebrowHeading from "@/components/primitives/EyebrowHeading";
  */
 
 /**
- * Layout contract: the module stacks — heading and lede, then the film, then
- * the variant strip. The one-screen constraint that used to drive this section
- * (`min-h:--fq-svh` plus a `--film-h` height cap on the film) was dropped on
- * 2026-09-04: the client asked for the film to run the full page width, and a
- * full-width 16:9 box is ~775px tall on a 1440 screen, which no longer fits
- * alongside the copy. The section is now free-height and scrolls.
+ * Layout contract: the whole module — eyebrow, heading, lede, film and all
+ * three variants — must read in a single screen. The section is therefore
+ * sized to `--fq-svh` (the stable small-viewport height, px-pinned on touch
+ * by stable-viewport.ts) rather than `dvh`: svh is the *smallest* the viewport
+ * ever gets, so the fit survives mobile browser chrome expanding, and unlike
+ * dvh it does not reflow mid-scroll. `min-h` not `h`, so an unusually short
+ * window pushes the section taller instead of clipping copy.
  *
- * Gutters deliberately mirror ProjectReels ("See FourlinQ in the real world"),
- * the other black video module on this page: an outer `px-4 md:px-6 lg:px-8`
- * that the film and the variant strip run to, with the copy inset one step
- * further by `container-editorial` inside it. Same rhythm, so the two modules
- * read as a pair.
+ * The film is no longer full-bleed. It sits in the right half of a split on
+ * lg+, and its height is capped by `--film-h` so it can never eat the budget
+ * the text needs: the box takes `min(column width, --film-h × 16/9)`, which
+ * keeps 16:9 exact whichever constraint binds. The reel grid below is still
+ * guttered but multi-card, so the two black modules stay visually distinct on
+ * composition rather than on bleed.
+ *
+ * Below lg — where the layout is stacked, not split — the `--film-h` cap is
+ * dropped and the film runs the full column instead (2026-09-04). On a short
+ * or wide phone the cap used to bind before the column did, leaving the film
+ * inset and centred with visible slack on both sides while the copy above it
+ * ran edge to edge; it read as a mistake. The cap still governs lg+, where the
+ * film shares vertical budget with the text column beside it.
+ *
+ * The sub-lg gutter is nudged to the ProjectReels gutter (16px, then 24px at
+ * md) rather than container-editorial's flat 20px, so the two black video
+ * modules on the homepage line up on mobile. Hence `-mx-1 md:mx-1 lg:mx-0` on
+ * the film's wrapper: 4px out on mobile, 4px in on tablet, untouched on lg+.
  */
 
 /**
@@ -95,9 +110,13 @@ function SpotlightFilm() {
   }, []);
 
   return (
-    // Full width of its gutter, uncapped height. `aspect-video` owns the ratio,
-    // so nothing is cropped or letterboxed — the box just scales with the page.
-    <div className="relative aspect-video w-full overflow-hidden bg-[#0a0a0a]">
+    // Sub-lg the film simply takes the column. From lg it is the smaller of
+    // the column and the width a `--film-h`-tall 16:9 box would need.
+    // `aspect-video` owns the ratio either way, so the box is never letterboxed
+    // or re-cropped — only scaled. When the height cap wins, the slack falls in
+    // the gutter rather than the outer margin: the film's right edge stays
+    // locked to the container margin on lg+.
+    <div className="relative aspect-video w-full overflow-hidden bg-[#0a0a0a] lg:ml-auto lg:mr-0 lg:w-[min(100%,calc(var(--film-h)*16/9))]">
       {SLIM_DOOR_VIDEO ? (
         <video
           ref={videoRef}
@@ -143,13 +162,21 @@ const SlimDoorSpotlight = () => {
       size="sm"
       contained={false}
       noAnimation
-      className="!bg-black py-6 md:py-12 lg:py-14 2xl:py-20"
+      className={cn(
+        // 2xl takes the extra outer margin, not xl: a 1280×720 laptop is xl and
+        // has only ~80px of slack to spend, where a 1440×900 screen has ~250.
+        "!bg-black flex min-h-[var(--fq-svh)] flex-col py-6 md:py-12 lg:py-14 2xl:py-20",
+        // Height ceiling for the film, as a fraction of the screen. Mobile has
+        // to carry the whole stack vertically, so the film gets the least.
+        "[--film-h:calc(var(--fq-svh)*0.235)] md:[--film-h:calc(var(--fq-svh)*0.38)] lg:[--film-h:calc(var(--fq-svh)*0.46)]",
+      )}
     >
-      {/* Outer gutter is the reels gutter — the film runs to these edges. */}
-      <div className="px-4 md:px-6 lg:px-8">
-        {/* Copy sits one inset deeper, matching the reels heading. */}
-        <div className="container-editorial mb-7 md:mb-9 lg:mb-10">
-          <div className="max-w-[46rem]">
+      <div className="container-editorial flex w-full flex-1 flex-col">
+        {/* Text left, film right on lg+; stacked below. Centred in whatever
+            height is left after the variant strip, so a tall window reads as
+            deliberate air rather than a gap. */}
+        <div className="flex min-h-0 flex-1 flex-col justify-center gap-7 md:gap-9 lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
+          <div className="lg:w-[40%] lg:shrink-0">
             {/* Heading stays level 2 to match the reels module below it; the
                 arbitrary variants only walk the mobile/tablet steps down so the
                 48px default cannot spend the screen budget on two loose lines.
@@ -166,9 +193,13 @@ const SlimDoorSpotlight = () => {
             </EyebrowHeading>
 
             {/* Lede is rendered here rather than through EyebrowHeading's
-                `lede` prop: that prop is locked to text-body-lg on mobile,
-                which is one step heavier than this block wants. Same ink
-                token, one step down the ramp. */}
+                `lede` prop: that prop is locked to text-body-lg on mobile, and
+                at 18px this paragraph alone costs ~80px more than the screen
+                has to give. Same ink token, one step down the ramp.
+                Both it and the heading step up at xl rather than lg: the split
+                starts at lg (992px), where the text column is only ~360px wide
+                — 56px display and a 20px lede wrap to 3 and 9 lines there and
+                push the section past one screen. lg keeps the tablet step. */}
             <p className="mt-v400 max-w-[38rem] text-body leading-[1.5] text-white/70 md:mt-v500 md:text-body-lg md:leading-[1.6] xl:mt-v600 xl:text-lead xl:leading-[1.55]">
               Full-height glass on a slim aluminium frame, hung from a concealed top track.
               Anti-sway rollers keep the panels steady, soft close catches them at both ends,
@@ -176,14 +207,18 @@ const SlimDoorSpotlight = () => {
               partition.
             </p>
           </div>
+
+          {/* Negative/positive inline margin pulls the film off
+              container-editorial's 20px gutter and onto the reels' 16px (md:
+              24px) below lg. Neutral from lg, where the split owns the edges. */}
+          <div className="-mx-1 min-w-0 md:mx-1 lg:mx-0 lg:flex-1">
+            <SpotlightFilm />
+          </div>
         </div>
 
-        <SpotlightFilm />
-
-        {/* Variant strip runs to the film's edges, so its rule reads as the
-            film's own bottom line. Hairline-divided rows on mobile (name over
-            note), three columns from md. */}
-        <ul className="mt-7 grid divide-y divide-white/10 border-t border-white/15 pt-5 md:mt-9 md:grid-cols-3 md:gap-8 md:divide-y-0 md:pt-6 lg:mt-10 lg:gap-12 lg:pt-8">
+        {/* Variant strip anchors the bottom edge. Hairline-divided rows on
+            mobile (name over note), three columns from md. */}
+        <ul className="mt-7 grid shrink-0 divide-y divide-white/10 border-t border-white/15 pt-5 md:mt-9 md:grid-cols-3 md:gap-8 md:divide-y-0 md:pt-6 lg:mt-10 lg:gap-12 lg:pt-8">
           {VARIANTS.map((variant) => (
             <li key={variant.name} className="py-2.5 first:pt-0 last:pb-0 md:py-0">
               {/* leading-tight only below md — the bare `text-[1.0625rem]`
