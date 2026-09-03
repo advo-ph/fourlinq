@@ -37,16 +37,24 @@ import { cn } from "@/lib/utils";
  */
 
 /**
- * The 16:9 film landed on 2026-09-03. The client's master is HEVC, which
- * Chrome and Firefox will not decode, so the served file is transcoded to
- * H.264 High / yuv420p and stripped of its audio track (the element is muted
- * anyway). Poster is frame 0, so the still and the first played frame match.
+ * The 16:9 film landed on 2026-09-03; the client's final cut replaced it the
+ * same day. Her masters are HEVC, which Chrome and Firefox will not decode, so
+ * the served file is transcoded to H.264 High / yuv420p and stripped of its
+ * audio track (the element is muted anyway). Poster is frame 0, so the still
+ * and the first played frame match.
+ *
+ * The `-v2` in the filename is load-bearing. Unlike `/images/` and
+ * `/systems/anim/`, `/videos/` gets no cache exception in server/index.ts, so
+ * it falls to the default `max-age=365d, immutable`. A film replaced at its own
+ * path would never reach anyone who had already watched it. Every future
+ * replacement therefore needs a NEW filename too — bump the suffix, delete the
+ * old pair, and let the JS bundle hash carry the reference.
  *
  * Setting either constant back to `null` returns the section to its
  * placeholder state with no other change.
  */
-const SLIM_DOOR_VIDEO: string | null = "/videos/systems/slim-alu-spotlight.mp4";
-const SLIM_DOOR_POSTER: string | null = "/videos/systems/slim-alu-spotlight-poster.jpg";
+const SLIM_DOOR_VIDEO: string | null = "/videos/systems/slim-alu-spotlight-v2.mp4";
+const SLIM_DOOR_POSTER: string | null = "/videos/systems/slim-alu-spotlight-v2-poster.jpg";
 
 const VARIANTS = [
   { name: "HP-Linkage", note: "Move one panel, the rest follow." },
