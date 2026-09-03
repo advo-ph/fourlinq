@@ -20,6 +20,18 @@ interface Props {
    * - "click": first press plays forward, next press reverses (toggle).
    */
   trigger?: "hover" | "click";
+  /**
+   * Mobile only. Fires a one-shot play-forward → hold → reverse sequence when
+   * ≥50% of the element scrolls into view. No-op on desktop (canHover) or when
+   * prefers-reduced-motion: reduce is set. Fires at most once per mount.
+   */
+  autoPlayInView?: boolean;
+  /**
+   * Mobile only. Fires a one-shot play-forward → hold → reverse sequence 400 ms
+   * after mount (matching the drawer slide-in duration). No-op on desktop or
+   * when prefers-reduced-motion: reduce is set. Fires at most once per mount.
+   */
+  autoPlayOnMount?: boolean;
 }
 
 /** Open animation duration (closed → open). */
@@ -41,6 +53,8 @@ export default function SystemCardMedia({
   imgClassName = "",
   animClassName = "w-full h-full object-cover",
   trigger = "hover",
+  autoPlayInView = false,
+  autoPlayOnMount = false,
 }: Props) {
   const anim = getSystemAnimation(productId);
 
@@ -56,6 +70,8 @@ export default function SystemCardMedia({
       imgClassName={imgClassName}
       animClassName={animClassName}
       trigger={trigger}
+      autoPlayInView={autoPlayInView}
+      autoPlayOnMount={autoPlayOnMount}
     />
   );
 }
@@ -67,6 +83,8 @@ function AnimatedMedia({
   imgClassName,
   animClassName,
   trigger,
+  autoPlayInView,
+  autoPlayOnMount,
 }: {
   frames: string[];
   src: string;
@@ -74,8 +92,20 @@ function AnimatedMedia({
   imgClassName: string;
   animClassName: string;
   trigger: "hover" | "click";
+  autoPlayInView: boolean;
+  autoPlayOnMount: boolean;
 }) {
   const N = frames.length;
+
+  // Only wire the hover animation on devices that actually hover (fine pointer).
+  // On touch screens, "pointer-enter" fires on tap and would play the animation
+  // instead of letting the press fall through to the card's open-drawer click —
+  // which read as a flicker that never opened the drawer. Binding nothing here
+  // lets the tap bubble straight to the button.
+  const canHover =
+    typeof window !== "undefined" &&
+    !!window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
+
   const wrapRef = useRef<HTMLDivElement>(null);
   const animImgRef = useRef<HTMLImageElement>(null);
   const idxRef = useRef(0); // current frame index (float, eased by rAF)
@@ -91,6 +121,9 @@ function AnimatedMedia({
   // and the animation to collapse to just its first and last frame.
   const framesImgsRef = useRef<(HTMLImageElement | null)[]>([]);
   const openRef = useRef(false); // toggle state for click trigger
+  const playOnceCalledRef = useRef(false); // prevents double-fire between mount + in-view triggers
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const readyPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [revealed, setRevealed] = useState(false); // top layer opacity
 
   // Preload + decode this element's frames once it nears the viewport, so the
@@ -196,6 +229,40 @@ function AnimatedMedia({
     startLoop();
   };
 
+  // One-shot mobile auto-play: forward → hold ~300 ms → reverse.
+  // Guards: desktop (canHover), reduced-motion, and double-fire (playOnceCalledRef).
+  const playOnce = () => {
+    if (canHover) return;
+    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (playOnceCalledRef.current) return;
+    playOnceCalledRef.current = true;
+
+    const run = () => {
+      playForward();
+      holdTimerRef.current = setTimeout(() => {
+        playReverse();
+      }, FORWARD_MS + 300);
+    };
+
+    if (preloadedRef.current) {
+      run();
+    } else {
+      // Frames haven't decoded yet — poll until ready (max 1 s / 20 attempts).
+      let attempts = 0;
+      readyPollRef.current = setInterval(() => {
+        attempts++;
+        if (preloadedRef.current) {
+          if (readyPollRef.current != null) clearInterval(readyPollRef.current);
+          readyPollRef.current = null;
+          run();
+        } else if (attempts >= 20) {
+          if (readyPollRef.current != null) clearInterval(readyPollRef.current);
+          readyPollRef.current = null;
+        }
+      }, 50);
+    }
+  };
+
   // Hover trigger
   const handleEnter = () => {
     openRef.current = true;
@@ -217,24 +284,50 @@ function AnimatedMedia({
     }
   };
 
+  // Auto-play when the card scrolls ≥50% into view (mobile only, fires once).
+  useEffect(() => {
+    if (!autoPlayInView || canHover) return;
+    const el = wrapRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          playOnce();
+        }
+      },
+      { threshold: 0.5, rootMargin: "0px" },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPlayInView]);
+
+  // Auto-play 400 ms after mount — used by drawers whose slide-in is 400 ms (mobile only).
+  useEffect(() => {
+    if (!autoPlayOnMount || canHover) return;
+    const id = setTimeout(() => {
+      playOnce();
+    }, 400);
+    return () => {
+      clearTimeout(id);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPlayOnMount]);
+
   useEffect(
     () => () => {
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      if (holdTimerRef.current != null) clearTimeout(holdTimerRef.current);
+      if (readyPollRef.current != null) clearInterval(readyPollRef.current);
       // Release retained frames so a long-lived list of cards doesn't pin
       // decoded image memory after the card unmounts.
       framesImgsRef.current = [];
     },
     [],
   );
-
-  // Only wire the hover animation on devices that actually hover (fine pointer).
-  // On touch screens, "pointer-enter" fires on tap and would play the animation
-  // instead of letting the press fall through to the card's open-drawer click —
-  // which read as a flicker that never opened the drawer. Binding nothing here
-  // lets the tap bubble straight to the button.
-  const canHover =
-    typeof window !== "undefined" &&
-    !!window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
 
   const interaction =
     trigger === "click"

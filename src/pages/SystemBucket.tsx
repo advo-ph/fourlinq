@@ -104,6 +104,7 @@ const SystemBucket = ({ copy }: { copy: BucketCopy }) => {
                         src={product.image}
                         alt={product.name}
                         imgClassName="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.02]"
+                        autoPlayInView
                       />
                     </div>
                     <div className="mt-6">
@@ -213,6 +214,7 @@ const ProductPeek = ({ product, onClose }: { product: Product; onClose: () => vo
               imgClassName="w-full h-full object-contain"
               animClassName="w-full h-full object-contain"
               trigger="click"
+              autoPlayOnMount
             />
           </div>
           <p className="text-body text-[color:var(--ink-secondary)] leading-[1.7] mb-10">

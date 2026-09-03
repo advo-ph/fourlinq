@@ -114,6 +114,7 @@ const ProductDrawer = ({ product, onClose }: { product: Product; onClose: () => 
               imgClassName="w-full h-full object-contain"
               animClassName="w-full h-full object-contain"
               trigger="click"
+              autoPlayOnMount
             />
           </div>
 
@@ -345,6 +346,7 @@ const Products = () => {
                         src={product.image}
                         alt={product.name}
                         imgClassName="w-full h-full object-cover transition-transform duration-700 ease-marvin [@media(hover:hover)]:group-hover:scale-[1.03]"
+                        autoPlayInView
                       />
                     </div>
                     <div className="mt-6">
