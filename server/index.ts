@@ -22,6 +22,28 @@ const app = express();
 const PORT = parseInt(process.env.API_PORT || "6207", 10);
 const isProd = process.env.NODE_ENV === "production";
 
+// nginx runs on this same host and proxies to us over loopback, so every
+// request arrives with a socket address of 127.0.0.1. Without this, Express
+// reports req.ip as 127.0.0.1 for EVERY visitor, which collapses all three
+// per-IP rate limiters in routes/inquiries.ts into a single shared bucket —
+// measured: the 4th distinct visitor to the contact form inside a minute got a
+// 429, so the form allowed 3 submissions per minute site-wide rather than 3
+// per person. It also filled the pm2 error log with
+// ERR_ERL_UNEXPECTED_X_FORWARDED_FOR on every hit.
+//
+// "loopback" and NOT `true`: `true` trusts the whole X-Forwarded-For chain, so
+// a client can send its own header and pick a fresh key per request. Measured
+// against this exact limiter config, an abuser under `true` sent 5/5 requests
+// with no 429 at all; under "loopback" they were blocked from the 4th, because
+// only 127.0.0.1 counts as a proxy and nginx's appended real client address is
+// the first untrusted hop. express-rate-limit flags `true` as a misconfiguration
+// for the same reason (ERR_ERL_PERMISSIVE_TRUST_PROXY).
+//
+// Revisit this if a CDN is ever put in front of the origin: fourlinq.ph
+// currently resolves straight to the VPS with no intermediary, so there is
+// exactly one hop to trust.
+app.set("trust proxy", "loopback");
+
 // Security
 app.use(helmet({ contentSecurityPolicy: false }));
 // Gzip/Brotli compression for all responses (JSON API + served files).

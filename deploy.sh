@@ -131,13 +131,16 @@ log "Health check..."
 HEALTH_OK=0
 for attempt in 1 2 3 4 5 6 7 8 9 10; do
   sleep 2
-  if ssh "${VPS_SSH}" "curl -fsS --max-time 5 http://localhost:3001/api/health" 2>/dev/null; then
+  # Port 6207, NOT 3001 — must match API_PORT in ecosystem.config.cjs. The
+  # workflow's copy of this check sat on the retired 3001 until b3c6b83 and
+  # failed every Deploy run for three weeks; this manual path had the same bug.
+  if ssh "${VPS_SSH}" "curl -fsS --max-time 5 http://localhost:6207/api/health" 2>/dev/null; then
     echo
     HEALTH_OK=1
     log "Healthy after ${attempt} attempt(s)."
     break
   fi
 done
-[ "${HEALTH_OK}" = "1" ] || err "Health check FAILED — service is not answering on port 3001. Check: ssh ${VPS_SSH} 'pm2 logs fourlinq --err --lines 40 --nostream'"
+[ "${HEALTH_OK}" = "1" ] || err "Health check FAILED — service is not answering on port 6207. Check: ssh ${VPS_SSH} 'pm2 logs fourlinq --err --lines 40 --nostream'"
 
-log "Done. Site live on port 3001 (proxied by nginx → https://fourlinq.ph)."
+log "Done. Site live on port 6207 (proxied by nginx → https://fourlinq.ph)."
