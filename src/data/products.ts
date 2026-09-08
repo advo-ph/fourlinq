@@ -304,9 +304,10 @@ export const products: Product[] = [
     // renders in general; she approved this one specifically. The real-photo
     // ask in docs/AUG07_ASSET_REQUEST.md still stands.
     // 2026-09-08: recentered render (railing was bottom-half, dead white space
-    // above). New filename glass-railing-v2.webp — SWR window requires a new
-    // path for the swap to land immediately (same lesson as slim-door / 029).
-    image: "/images/products/render/glass-railing-v2.webp",
+    // above). glass-railing-v2.webp shipped but the railing object was scaled
+    // up to 85 % of the frame — wrong scale. v3 restores the original smaller
+    // object scale inside the frame. SWR window requires a new path each time.
+    image: "/images/products/render/glass-railing-v3.webp",
     specs: [
       "Tempered safety glass panels",
       "Frameless or minimal-frame hardware options",
