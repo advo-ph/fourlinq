@@ -96,7 +96,7 @@ export const SYSTEM_TYPE: SystemType[] = [
     label: "Specialist Systems",
     description:
       "Custom geometry to architect drawings: arches, curtain walls, bespoke shapes.",
-    item: ["Arch", "Curtain Wall", "Custom Shapes"],
+    item: ["Arch", "Curtain Wall", "Custom Shapes", "Glass Railing"],
     filter: "specialist",
     to: "/products?filter=specialist",
     image: "/images/wp-export/FourlinQ-Project-8.jpg",
