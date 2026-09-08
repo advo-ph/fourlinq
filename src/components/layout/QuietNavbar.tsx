@@ -45,20 +45,25 @@ interface NavLink {
 
 // Systems keeps both taxonomy axes. Left column, in a 4-up grid: the four
 // windows fill the top row, then every door beneath it, then the specialist
-// systems last. Special Shapes reads as the niche window, so it sits last among
-// windows. Right column: the material axis as a 2x2 grid (aluminium is a
+// systems last. Right column: the material axis as a 2x2 grid (aluminium is a
 // material, not a fourth type — Imie, 2026-07-02). Product tiles deep-link to
 // their drawer on /products via the ?product= param.
 //
 // The heading stays "Windows & Doors" by client instruction even though the
 // specialist tiles now sit under it — they were reachable only from /products
 // before, so the nav under-reported the catalog.
+//
+// Two catch-alls are pinned last inside their own group: Special Shapes among
+// windows and Custom Shapes among specialist. Both read as "whatever else you
+// need", so they close a group rather than interrupt it. Named systems first.
 const WINDOW_PRODUCTS = products.filter((p) => p.category === "windows");
+const SPECIALIST_PRODUCTS = products.filter((p) => p.category === "specialist");
 const SYSTEM_PRODUCTS: NavCard[] = [
   ...WINDOW_PRODUCTS.filter((p) => p.id !== "special-shapes"),
   ...WINDOW_PRODUCTS.filter((p) => p.id === "special-shapes"),
   ...products.filter((p) => p.category === "doors"),
-  ...products.filter((p) => p.category === "specialist"),
+  ...SPECIALIST_PRODUCTS.filter((p) => p.id !== "custom-shapes"),
+  ...SPECIALIST_PRODUCTS.filter((p) => p.id === "custom-shapes"),
 ].map((p) => ({
   label: p.name,
   to: `/products?filter=${p.category}&product=${p.id}`,

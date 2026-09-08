@@ -96,7 +96,10 @@ export const SYSTEM_TYPE: SystemType[] = [
     label: "Specialist Systems",
     description:
       "Custom geometry to architect drawings: arches, curtain walls, bespoke shapes.",
-    item: ["Arch", "Curtain Wall", "Custom Shapes", "Glass Railing"],
+    // Custom Shapes sits last on purpose: it is the catch-all ("anything else
+    // to your drawing"), so it closes the list instead of interrupting the
+    // named systems. Same rule as Special Shapes among windows.
+    item: ["Arch", "Curtain Wall", "Glass Railing", "Custom Shapes"],
     filter: "specialist",
     to: "/products?filter=specialist",
     image: "/images/wp-export/FourlinQ-Project-8.jpg",
