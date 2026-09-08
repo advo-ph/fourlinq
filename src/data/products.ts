@@ -303,7 +303,10 @@ export const products: Product[] = [
     // not real/. ROADMAP item 20 / R4 record the client rejecting white-bg
     // renders in general; she approved this one specifically. The real-photo
     // ask in docs/AUG07_ASSET_REQUEST.md still stands.
-    image: "/images/products/render/glass-railing.webp",
+    // 2026-09-08: recentered render (railing was bottom-half, dead white space
+    // above). New filename glass-railing-v2.webp — SWR window requires a new
+    // path for the swap to land immediately (same lesson as slim-door / 029).
+    image: "/images/products/render/glass-railing-v2.webp",
     specs: [
       "Tempered safety glass panels",
       "Frameless or minimal-frame hardware options",
